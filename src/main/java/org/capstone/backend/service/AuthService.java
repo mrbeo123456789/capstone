@@ -7,6 +7,7 @@ import org.capstone.backend.utils.JwtUtil;
 import org.capstone.backend.utils.enums.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -59,5 +60,25 @@ public class AuthService {
         // account.setCreatedBy(username);
 
         return accountRepository.save(account);
+    }
+    // Xác thực bằng OAuth2 (Google)
+    public String loginWithOAuth2(OAuth2User oAuth2User) {
+        String email = oAuth2User.getAttribute("email");
+        Optional<Account> accountOpt = accountRepository.findByEmail(email);
+
+        Account account;
+        if (accountOpt.isPresent()) {
+            account = accountOpt.get();
+        } else {
+            // Nếu user chưa có trong database, tạo mới
+            account = new Account();
+            account.setUsername(email.split("@")[0]);
+            account.setEmail(email);
+            account.setUsername(oAuth2User.getAttribute("name"));
+            account.setRole(Role.MEMBER);
+            accountRepository.save(account);
+        }
+
+        return jwtUtil.generateToken(account.getUsername(), account.getRole().toString());
     }
 }
