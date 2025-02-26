@@ -1,4 +1,6 @@
 package org.capstone.backend.utils.enums;
 
-public enum Status {
+public enum Role {
+    ADMIN,
+    MEMBER;
 }
