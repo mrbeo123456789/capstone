@@ -1,24 +1,41 @@
-import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
-import {BASE_URL} from "../utils/contant.js";
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { BASE_URL } from "../contant/contant.js";
 
 export const authService = createApi({
-    reducerPath:"auth",
+    reducerPath: "auth",
     baseQuery: fetchBaseQuery({
-            baseUrl:BASE_URL
-        }),
-    tagTypes: ["auth"],
+        baseUrl: BASE_URL,
+        prepareHeaders: (headers) => {
+            const token = localStorage.getItem("token");
+            if (token) {
+                headers.set("Authorization", `Bearer ${token}`);
+            }
+            headers.set("Content-Type", "application/json");
+            return headers;
+        },
+    }),
+    tagTypes: ["Auth"],
     endpoints: (builder) => ({
+        // API Đăng nhập
         login: builder.mutation({
             query: (data) => ({
-                url: "/api/auth/login",
+                url: "/auth/login",
                 method: "POST",
                 body: data,
-                responseHandler:  (response) => response.text(),
-            })
-        })
-    })
-})
+            }),
+            transformErrorResponse: (error) => error.data || "Login failed",
+        }),
 
-export const {
-    useLoginMutation,
-} = authService
+        // API Đăng ký
+        register: builder.mutation({
+            query: (data) => ({
+                url: "/auth/register",
+                method: "POST",
+                body: data,
+            }),
+            transformErrorResponse: (error) => error.data || "Registration failed",
+        }),
+    }),
+});
+
+export const { useLoginMutation, useRegisterMutation } = authService;
