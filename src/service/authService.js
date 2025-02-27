@@ -35,7 +35,12 @@ export const authService = createApi({
             }),
             transformErrorResponse: (error) => error.data || "Registration failed",
         }),
+
+        getUser: builder.query({
+            query: () => "/auth/me",
+            providesTags: ["Auth"],
+        }),
     }),
 });
 
-export const { useLoginMutation, useRegisterMutation } = authService;
+export const { useLoginMutation, useRegisterMutation,useGetUserQuery } = authService;

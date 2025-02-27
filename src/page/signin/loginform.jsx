@@ -62,7 +62,7 @@ const LoginForm = () => {
                         >
                             {loading ? "Logging in..." : "Login →"}
                         </button>
-                        <p className="text-center text-sm mt-2">Don't have an account? <a href="#" className="text-blue-400 underline">Sign up</a></p>
+                        <p className="text-center text-sm mt-2">Don't have an account? <a href="/register" className="text-blue-400 underline">Sign up</a></p>
                     </form>
                 </div>
             </div>

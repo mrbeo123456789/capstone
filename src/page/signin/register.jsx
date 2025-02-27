@@ -68,7 +68,7 @@ const RegisterForm = () => {
     };
 
     return (
-        <div className="flex justify-center items-center h-screen bg-cover bg-center" style={{ backgroundImage: "url('/assets/loginBackground.webp')" }}>
+        <div className="flex justify-center items-center h-screen bg-cover bg-center" style={{ backgroundImage: "url('/assets/background.jpg')" }}>
             <div className="flex bg-black/40 p-8 rounded-lg text-white w-full max-w-4xl shadow-lg">
                 {/* Left Panel */}
                 <div className="flex-1 flex flex-col justify-center items-center p-6 bg-black/50 rounded-l-lg">
