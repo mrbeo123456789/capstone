@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -56,7 +57,7 @@ public class AuthService {
         // Set role as MEMBER (using enum Role)
         account.setRole(Role.MEMBER);
         // Optionally, set createdAt and createdBy fields if needed
-        // account.setCreatedAt(LocalDateTime.now());
+         account.setCreatedAt(LocalDateTime.now());
         // account.setCreatedBy(username);
 
         return accountRepository.save(account);

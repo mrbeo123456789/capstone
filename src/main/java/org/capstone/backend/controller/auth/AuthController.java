@@ -1,6 +1,7 @@
 package org.capstone.backend.controller.auth;
 
 
+import jakarta.validation.Valid;
 import org.capstone.backend.dto.auth.LoginRequest;
 import org.capstone.backend.dto.auth.LoginResponse;
 import org.capstone.backend.dto.auth.RegisterRequest;
@@ -34,7 +35,7 @@ public class AuthController {
         }
     }
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest registerRequest) {
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest registerRequest) {
         try {
             Account newAccount = authService.register(
                     registerRequest.getUsername(),
@@ -46,14 +47,6 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
     }
-    @GetMapping("/oauth2-login")
-    public ResponseEntity<?> oauth2Login(@org.springframework.security.core.annotation.AuthenticationPrincipal OAuth2User oAuth2User) {
-        if (oAuth2User == null) {
-            throw new RuntimeException("User is not authenticated via OAuth2");
-        }
 
-        String token = authService.loginWithOAuth2(oAuth2User);
-        return ResponseEntity.ok(new LoginResponse(token));
-    }
 
 }

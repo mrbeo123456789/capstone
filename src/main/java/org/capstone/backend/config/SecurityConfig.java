@@ -32,8 +32,9 @@ public class SecurityConfig {
     private String jwtSecret;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.cors(cors -> cors.configurationSource(request -> {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, OAuth2SuccessHandler oAuth2SuccessHandler) throws Exception {
+        http
+                .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
                     config.setAllowedOrigins(List.of("http://localhost:5173"));
                     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
@@ -49,7 +50,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
-                        .defaultSuccessUrl("/api/auth/oauth2-login", true)
+                        .successHandler(oAuth2SuccessHandler) // Dùng custom handler thay vì redirect
                         .failureUrl("/login?error=true")
                         .userInfoEndpoint(userInfo -> userInfo.oidcUserService(oidcUserService()))
                 )
@@ -60,6 +61,7 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
