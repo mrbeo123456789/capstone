@@ -3,7 +3,9 @@ import {BASE_URL} from "../utils/contant.js";
 
 export const authService = createApi({
     reducerPath:"auth",
-    baseQuery: fetchBaseQuery({baseUrl:BASE_URL}),
+    baseQuery: fetchBaseQuery({
+            baseUrl:BASE_URL
+        }),
     tagTypes: ["auth"],
     endpoints: (builder) => ({
         login: builder.mutation({
