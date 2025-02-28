@@ -44,6 +44,7 @@ public class AuthController {
             );
             return ResponseEntity.ok(("Registration successful for user: " + newAccount.getUsername()));
         } catch (RuntimeException ex) {
+            System.out.println(ex.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
     }
