@@ -16,26 +16,45 @@ export const authService = createApi({
     }),
     tagTypes: ["Auth"],
     endpoints: (builder) => ({
-        // API Đăng nhập
-        login: builder.mutation({
-            query: (data) => ({
-                url: "/auth/login",
-                method: "POST",
-                body: data,
-            }),
-            transformErrorResponse: (error) => error.data || "Login failed",
-        }),
-
-        // API Đăng ký
         register: builder.mutation({
             query: (data) => ({
                 url: "api/auth/register",
                 method: "POST",
-                body: data,
+                body: {
+                    username: data.username,
+                    email: data.email,
+                    password: data.password,
+                },
             }),
-            transformErrorResponse: (error) => error.data || "Registration failed",
+            transformResponse: (response) => {
+                return { message: response }; // Backend trả về chuỗi message
+            },
         }),
 
+        login: builder.mutation({
+            query: (data) => ({
+                url: "/auth/login",
+                method: "POST",
+                body: {
+                    username: data.username,
+                    password: data.password,
+                },
+            }),
+            transformResponse: (response) => {
+                localStorage.setItem("token", response.token);
+                return response;
+            },
+        }),
+        // Đăng nhập Google
+        loginWithGoogle: builder.query({
+            query: () => "/oauth2/authorization/google",
+        }),
+
+        // Xử lý callback OAuth2 để lấy JWT Token
+        handleOAuthCallback: builder.query({
+            query: () => "/api/auth/oauth2-login",
+            credentials: "include",
+        }),
         getUser: builder.query({
             query: () => "/auth/me",
             providesTags: ["Auth"],
@@ -43,4 +62,8 @@ export const authService = createApi({
     }),
 });
 
-export const { useLoginMutation, useRegisterMutation,useGetUserQuery } = authService;
+export const { useRegisterMutation,
+    useLoginMutation,
+    useLoginWithGoogleQuery,
+    useHandleOAuthCallbackQuery,
+    useGetUserQuery} = authService;

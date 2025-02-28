@@ -5,6 +5,7 @@ import Layout from "../page/ui/Layout.jsx";
 import RegisterForm from "../page/signin/register.jsx";
 import MemberProfile from "../page/member/MemberProfile.jsx";
 import GroupManagement from "../page/group/groupList.jsx";
+import AuthCallBack from "../page/signin/AuthCallBack.jsx";
 const router = createBrowserRouter([
     {
         path:"/login",
@@ -15,6 +16,11 @@ const router = createBrowserRouter([
         path:"/register",
         errorElement:<ErrorPage/>,
         element: <RegisterForm/>,
+    },
+    {
+        path:"/auth/callback",
+        errorElement:<ErrorPage/>,
+        element: <AuthCallBack/>,
     },
     {
         path:"/group-management",

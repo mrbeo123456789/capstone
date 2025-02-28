@@ -5,7 +5,6 @@ import {
     useUpdateGroupMutation,
     useDeleteGroupMutation
 } from "../../service/groupService";
-import { useGetUserQuery } from "../../service/authService"; // API lấy thông tin người tạo
 import Modal from "../../component/Modal.jsx"; // Import modal popup
 
 const GroupManagement = () => {
@@ -13,7 +12,6 @@ const GroupManagement = () => {
     const [createGroup] = useCreateGroupMutation();
     const [updateGroup] = useUpdateGroupMutation();
     const [deleteGroup] = useDeleteGroupMutation();
-    const { data: user, isloading,  } = useGetUserQuery(); // Lấy thông tin người tạo nhóm
 
     const [searchQuery, setSearchQuery] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -79,10 +77,6 @@ const GroupManagement = () => {
         }
     };
 
-    const filteredGroups = groups?.filter((group) =>
-        group.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-
     return (
         <div className="p-8 bg-gray-100 min-h-screen">
             <div className="flex justify-between items-center mb-6">
@@ -96,14 +90,6 @@ const GroupManagement = () => {
             </div>
 
             {/* Thanh tìm kiếm */}
-            <input
-                type="text"
-                placeholder="Search groups..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="p-2 border rounded w-full mb-4"
-            />
-
             {/* Hiển thị danh sách nhóm */}
             <div className="bg-white shadow rounded p-4">
                 <h2 className="text-xl font-semibold mb-2">Groups</h2>
