@@ -58,7 +58,7 @@ const RegisterForm = () => {
         if (!validateForm()) return;
 
         try {
-            const response = await register({ email, username, password }).unwrap();
+            const response = await register({ email, username, password });
             alert("Đăng ký thành công! Vui lòng đăng nhập.");
             console.log(response);
             window.location.href = "/login"; // Chuyển hướng đến trang đăng nhập

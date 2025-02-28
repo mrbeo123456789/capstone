@@ -8,7 +8,7 @@ export const authService = createApi({
         prepareHeaders: (headers) => {
             const token = localStorage.getItem("token");
             if (token) {
-                headers.set("Authorization", `Bearer ${token}`);
+                //headers.set("Authorization", `Bearer ${token}`);
             }
             headers.set("Content-Type", "application/json");
             return headers;
@@ -29,7 +29,7 @@ export const authService = createApi({
         // API Đăng ký
         register: builder.mutation({
             query: (data) => ({
-                url: "/auth/register",
+                url: "api/auth/register",
                 method: "POST",
                 body: data,
             }),
