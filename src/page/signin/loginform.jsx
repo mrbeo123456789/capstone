@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { FaGoogle, FaFacebookF } from "react-icons/fa";
-import { useLoginMutation } from "../../service/authService.js"; // Import hàm gọi API
+import {useLoginMutation, useRegisterMutation} from "../../service/authService.js"; // Import hàm gọi API
 
 const LoginForm = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [login, { isLoading }] = useLoginMutation();
+
 
     const handleLogin = async (e) => {
         e.preventDefault();
