@@ -4,7 +4,7 @@ import ErrorPage from "../page/error/ErrorPage.jsx";
 import Layout from "../page/ui/Layout.jsx";
 import RegisterForm from "../page/signin/register.jsx";
 import MemberProfile from "../page/member/MemberProfile.jsx";
-import GroupManagement from "../page/group/groupList.jsx";
+import GroupManagement from "../page/group/groupPage.jsx";
 const router = createBrowserRouter([
     {
         path:"/login",
