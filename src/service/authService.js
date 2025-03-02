@@ -6,10 +6,10 @@ export const authService = createApi({
     baseQuery: fetchBaseQuery({
         baseUrl: BASE_URL,
         prepareHeaders: (headers) => {
-            const token = localStorage.getItem("token");
+            const token = localStorage.getItem("jwt_token");
             if (token) {
-                console.log(token);
-                //headers.set("Authorization", `Bearer ${token}`);
+                console.log("JWT Token:", token);
+                headers.set("Authorization", `Bearer ${token}`);
             }
             headers.set("Content-Type", "application/json");
             return headers;
@@ -18,53 +18,80 @@ export const authService = createApi({
     tagTypes: ["Auth"],
     endpoints: (builder) => ({
         register: builder.mutation({
-            query: (data) => ({
-                url: "api/auth/register",
-                method: "POST",
-                body: {
-                    username: data.username,
-                    email: data.email,
-                    password: data.password,
-                },
-            }),
+            query: (data) => {
+                console.log("Register Data:", data);
+                return {
+                    url: "/auth/register",
+                    method: "POST",
+                    body: data,
+                };
+            },
             transformResponse: (response) => {
-                return { message: response }; // Backend trả về chuỗi message
+                console.log("Register Response:", response);
+                return { message: response };
             },
         }),
 
         login: builder.mutation({
-            query: (data) => ({
-                url: "/auth/login",
-                method: "POST",
-                body: {
-                    username: data.username,
-                    password: data.password,
-                },
-            }),
+            query: (data) => {
+                console.log("Login Data:", data);
+                return {
+                    url: "/auth/login",
+                    method: "POST",
+                    body: data,
+                };
+            },
             transformResponse: (response) => {
-                localStorage.setItem("token", response.token);
+                console.log("Login Response:", response);
+                localStorage.setItem("jwt_token", response.token);
                 return response;
             },
         }),
-        // Đăng nhập Google
-        loginWithGoogle: builder.query({
-            query: () => "/oauth2/authorization/google",
+
+        loginWithGoogle: builder.mutation({
+            query: () => {
+                console.log("Login with Google triggered");
+                return {
+                    url: "/oauth2/authorization/google",
+                    method: "GET",
+                };
+            },
         }),
 
-        // Xử lý callback OAuth2 để lấy JWT Token
-        handleOAuthCallback: builder.query({
-            query: () => "/api/auth/oauth2-login",
-            credentials: "include",
+        handleOAuthCallback: builder.mutation({
+            query: () => {
+                console.log("OAuth Callback triggered");
+                return {
+                    url: "/api/auth/oauth2-login",
+                    method: "GET",
+                    credentials: "include",
+                };
+            },
+            transformResponse: (response) => {
+                console.log("OAuth Callback Response:", response);
+                localStorage.setItem("jwt_token", response.token);
+                return response;
+            },
         }),
+
         getUser: builder.query({
-            query: () => "/auth/me",
+            query: () => {
+                console.log("Fetching user data...");
+                return "/api/auth/me";
+            },
             providesTags: ["Auth"],
+            transformResponse: (response) => {
+                console.log("User Data Response:", response);
+                return response;
+            },
         }),
     }),
 });
 
-export const { useRegisterMutation,
+export const {
+    useRegisterMutation,
     useLoginMutation,
-    useLoginWithGoogleQuery,
-    useHandleOAuthCallbackQuery,
-    useGetUserQuery} = authService;
+    useLoginWithGoogleMutation,
+    useHandleOAuthCallbackMutation,
+    useGetUserQuery
+} = authService;
