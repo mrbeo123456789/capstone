@@ -1,29 +1,30 @@
 import React, { useState } from "react";
-import { FaGoogle, FaFacebookF } from "react-icons/fa";
-import {useLoginMutation, useRegisterMutation} from "../../service/authService.js"; // Import hàm gọi API
+import { FaGoogle } from "react-icons/fa";
+import { useLoginMutation } from "../../service/authService.js"; // Import hàm gọi API
 
 const LoginForm = () => {
-    const [email, setEmail] = useState("");
+    const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [login, { isLoading }] = useLoginMutation();
+    const [login] = useLoginMutation();
+
     const handleLogin = async (e) => {
         e.preventDefault();
         setError(null);
         setLoading(true);
 
         try {
-            const response = await login({ email, password });
-            alert("Đăng nhập thành công!");
-            console.log(response);
-            window.location.href = "/dashboard"; // Chuyển hướng sau khi đăng nhập
+            const response = await login({ username, password });
+            console.log("Login Response:", response);
+            // window.location.href = "/dashboard"; // Chuyển hướng sau khi đăng nhập
         } catch (err) {
             setError(err.message || "Đăng nhập thất bại");
         }
 
         setLoading(false);
     };
+
     // Chuyển hướng người dùng đến Google OAuth
     const loginWithGoogle = () => {
         window.location.href = "http://localhost:8080/oauth2/authorization/google";
@@ -48,8 +49,8 @@ const LoginForm = () => {
                         <h3 className="text-2xl font-bold text-center mb-4">Login</h3>
                         {error && <p className="text-red-500 text-sm">{error}</p>}
                         <div>
-                            <label className="block text-sm mb-1">Email</label>
-                            <input type="text" placeholder="email@domain.com" value={email} onChange={(e) => setEmail(e.target.value)}
+                            <label className="block text-sm mb-1">Username</label>
+                            <input type="text" placeholder="Enter your username" value={username} onChange={(e) => setUsername(e.target.value)}
                                    className="w-full px-4 py-2 bg-transparent border border-gray-500 rounded-md text-white outline-none placeholder-gray-400 focus:border-blue-400" />
                         </div>
                         <div>
