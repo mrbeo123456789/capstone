@@ -14,6 +14,10 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String firstName;
+
+    private String lastName;
+
     private Integer age;
 
     private String gender;
@@ -21,6 +25,10 @@ public class Member {
     private String phone;
 
     private String avatar;
+
+    private String address;
+
+    private String country;
 
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
@@ -30,7 +38,12 @@ public class Member {
     
     @Column(name = "updated_by")
     private String updatedBy;
-    
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "created_by")
+    private String createdBy;
 
     @OneToOne
     @JoinColumn(name = "account_id", nullable = false)
