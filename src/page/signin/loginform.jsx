@@ -17,7 +17,7 @@ const LoginForm = () => {
         try {
             const response = await login({ username, password });
             console.log("Login Response:", response);
-            // window.location.href = "/dashboard"; // Chuyển hướng sau khi đăng nhập
+            window.location.href = "/member/detail"; // Chuyển hướng sau khi đăng nhập
         } catch (err) {
             setError(err.message || "Đăng nhập thất bại");
         }

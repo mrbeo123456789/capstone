@@ -23,11 +23,11 @@ const GroupManagement = () => {
     const [selectedSport, setSelectedSport] = useState(""); // Môn thể dục
     const [message, setMessage] = useState("");
 
-    useEffect(() => {
-        if (user) {
-            setCreator(user.username); // Gán username vào trường người tạo
-        }
-    }, [user]);
+    // useEffect(() => {
+    //     if (user) {
+    //         setCreator(user.username); // Gán username vào trường người tạo
+    //     }
+    // }, [user]);
 
     const openAddModal = () => {
         setModalType("add");

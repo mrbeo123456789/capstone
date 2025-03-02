@@ -13,6 +13,8 @@ import {generatePassword, generateUsername} from "../../utils/utils.js";
 import toast from "react-hot-toast";
 
 function MemberProfile() {
+    const [user, setUser] = useState(null);
+
     const {register,
         handleSubmit,
         setValue,
@@ -27,6 +29,29 @@ function MemberProfile() {
     });
     const navigate = useNavigate();
     useEffect(() => {
+        const token = localStorage.getItem("jwt_token");
+        if (!token) {
+            toast.error("You need to log in first!");
+            navigate("/login");
+        }
+        fetch("http://localhost:8080/api/member/profile", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        })
+            .then(res => {
+                if (!res.ok) throw new Error("Failed to fetch user data");
+                return res.json();
+            })
+            .then(data => setUser(data))
+            .catch(error => {
+                toast.error(error.message);
+                console.error(error);
+            });
+
+        console.log(user);
         window.addEventListener("animationstart", autofillHandler);
         window.addEventListener("input", autofillHandler);
         return () => {

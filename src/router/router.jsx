@@ -6,6 +6,7 @@ import RegisterForm from "../page/signin/register.jsx";
 import MemberProfile from "../page/member/MemberProfile.jsx";
 import GroupManagement from "../page/group/groupList.jsx";
 import AuthCallBack from "../page/signin/AuthCallBack.jsx";
+import CreateChallenge from "../page/challenge/CreateChallenge.jsx";
 const router = createBrowserRouter([
     {
         path:"/login",
@@ -35,6 +36,17 @@ const router = createBrowserRouter([
             {
                 path:"/member/detail",
                 element: <MemberProfile />
+            }
+        ]
+    },
+    {
+        path:"/challenges",
+        errorElement:<ErrorPage/>,
+        element: <Layout></Layout>,
+        children:[
+            {
+                path:"/challenges/create",
+                element: <CreateChallenge />
             }
         ]
     }
