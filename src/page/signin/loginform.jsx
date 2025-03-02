@@ -15,6 +15,10 @@ const LoginForm = () => {
 
         try {
             const response = await login({ email, password });
+
+            if(response.error){
+                //throw new Error(response.error);
+            }
             alert("Đăng nhập thành công!");
             console.log(response);
             window.location.href = "/dashboard"; // Chuyển hướng sau khi đăng nhập

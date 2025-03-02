@@ -61,11 +61,9 @@ function MemberProfile() {
     }
 
     const handleFileChange = (event) => {
-
         const file = event.target.files[0];
         setValue("avatar", file,{ shouldValidate: true });// Đặt giá trị cho field avatar
         setPreview(URL.createObjectURL(file));
-
     };
 
     const handleClosePreview = (e)=>{
@@ -75,35 +73,26 @@ function MemberProfile() {
     }
     const handleChangeCountry = (e) => {
         const country = e.target.value;
-
         setValue("country", country,{ shouldValidate: true });
-
         handleGenerateUsername();
         setCountry(country);
-
     }
 
     const handleChangeFirstName = (e)=>{
         setValue("firstname", e.target.value,{shouldValidate:true});
-
         handleGenerateUsername();
-
     }
     const handleChangeLastName = (e)=>{
-
         setValue("lastname", e.target.value,{shouldValidate:true});
-
         handleGenerateUsername();
     }
 
     const handleGenerateUsername =()=>{
         if(getValues("country") === "Vietnam"){
             let username = getValues("firstname") + generateUsername(watch("lastname"));
-
             const num = data?.content?.filter(x=> x.username.startsWith(username) && typeof (+x.username.replace(username))==="number" ).length;
             console.log(data,num)
             setValue("username", username+(num+1),{ shouldValidate: true });
-
         }
         else if(country.length >2) {
             setValue("username", watch("firstname")+watch("lastname"),{ shouldValidate: true });
@@ -131,7 +120,6 @@ function MemberProfile() {
                     <nav aria-label="Breadcrumb" className="mb-4">
                         <ol className="flex items-center">
                             <li className="group flex items-center">
-
                                 <NavLink to={"/"}
                                          className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
                                          data-testid="flowbite-breadcrumb-item" href="#">
