@@ -13,6 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 @RestController
 @RequestMapping("/api/auth")
@@ -28,6 +31,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         try {
+
             String token = authService.login(loginRequest.getUsername(), loginRequest.getPassword());
             return ResponseEntity.ok(new LoginResponse(token));
         } catch (Exception e) {
@@ -37,15 +41,26 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest registerRequest) {
         try {
+            System.out.println("Received Register Request: " + registerRequest); // Debug dữ liệu nhận
             Account newAccount = authService.register(
                     registerRequest.getUsername(),
                     registerRequest.getEmail(),
                     registerRequest.getPassword()
             );
-            return ResponseEntity.ok(("Registration successful for user: " + newAccount.getUsername()));
+
+            // ✅ Return a JSON object instead of plain text
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Registration successful for user: " + newAccount.getUsername());
+
+            return ResponseEntity.ok(response); // Returns JSON format
         } catch (RuntimeException ex) {
-            System.out.println(ex.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+            System.out.println("Registration error: " + ex.getMessage());
+
+            // ✅ Return an error message in JSON format
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", ex.getMessage());
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
     }
 
