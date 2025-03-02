@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { FaGoogle, FaFacebookF } from "react-icons/fa";
+import { FaGoogle } from "react-icons/fa";
 import { useRegisterMutation } from "../../service/authService.js";
+import { useNavigate } from "react-router-dom"; // Điều hướng sau khi đăng ký
 
 const RegisterForm = () => {
     const [email, setEmail] = useState("");
@@ -9,17 +10,14 @@ const RegisterForm = () => {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState({});
     const [register, { isLoading }] = useRegisterMutation();
+    const navigate = useNavigate(); // Hook điều hướng
 
     // Kiểm tra định dạng email hợp lệ
-    const validateEmail = (email) => {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    };
+    const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-    // Kiểm tra mật khẩu có ít nhất 6 ký tự, bao gồm chữ hoa và chữ thường
+    // Kiểm tra mật khẩu mạnh: Ít nhất 6 ký tự, có chữ hoa, chữ thường và số
     const validatePassword = (password) => {
-        const hasUpperCase = /[A-Z]/.test(password);
-        const hasLowerCase = /[a-z]/.test(password);
-        return password.length >= 6 && hasUpperCase && hasLowerCase;
+        return /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{6,}$/.test(password);
     };
 
     // Kiểm tra toàn bộ form
@@ -39,7 +37,7 @@ const RegisterForm = () => {
         if (!password) {
             errors.password = "Password is required.";
         } else if (!validatePassword(password)) {
-            errors.password = "Password must be at least 6 characters and contain both uppercase and lowercase letters.";
+            errors.password = "Password must be at least 6 characters, contain an uppercase letter, a lowercase letter, and a number.";
         }
 
         if (password !== confirmPassword) {
@@ -58,70 +56,72 @@ const RegisterForm = () => {
         if (!validateForm()) return;
 
         try {
-            const response = await register({ email, username, password }).unwrap();
-            alert("Đăng ký thành công! Vui lòng đăng nhập.");
-            console.log(response);
-            window.location.href = "/login"; // Chuyển hướng đến trang đăng nhập
+            const response = await register({ email, username, password });
+            alert(response.message); // Backend trả về chuỗi message
+            navigate("/login");
         } catch (err) {
-            setError({ api: err.message || "Đăng ký thất bại" });
+            setError({ api: err.data?.message || "Registration failed. Please try again." });
         }
     };
 
     return (
-        <div className="flex justify-center items-center h-screen bg-cover bg-center" style={{ backgroundImage: "url('/assets/background.jpg')" }}>
-            <div className="flex bg-black/40 p-8 rounded-lg text-white w-full max-w-4xl shadow-lg">
-                {/* Left Panel */}
-                <div className="flex-1 flex flex-col justify-center items-center p-6 bg-black/50 rounded-l-lg">
-                    <h1 className="text-4xl font-bold mb-4">GoBe</h1>
-                    <p className="text-lg mb-6">Join us and push your limits</p>
-                    <div className="flex flex-col gap-4">
-                        <button className="flex items-center justify-center gap-3 w-48 bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition">
-                            <FaGoogle className="text-xl" /> Google
-                        </button>
+        <div className="flex justify-center items-center h-screen bg-gray-100">
+            <div className="bg-white p-8 rounded shadow-md w-96">
+                <h2 className="text-2xl font-bold mb-4 text-center">Sign Up</h2>
+                {error.api && <p className="text-red-500 text-sm mb-4">{error.api}</p>}
+                <form onSubmit={handleRegister} className="space-y-4">
+                    <div>
+                        <label className="block text-sm mb-1">Email</label>
+                        <input
+                            type="email" placeholder="email@domain.com" value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="w-full p-2 border rounded"
+                        />
+                        {error.email && <p className="text-red-500 text-sm">{error.email}</p>}
                     </div>
+                    <div>
+                        <label className="block text-sm mb-1">Username</label>
+                        <input
+                            type="text" placeholder="Enter your name" value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            className="w-full p-2 border rounded"
+                        />
+                        {error.username && <p className="text-red-500 text-sm">{error.username}</p>}
+                    </div>
+                    <div>
+                        <label className="block text-sm mb-1">Password</label>
+                        <input
+                            type="password" placeholder="Enter password" value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="w-full p-2 border rounded"
+                        />
+                        {error.password && <p className="text-red-500 text-sm">{error.password}</p>}
+                    </div>
+                    <div>
+                        <label className="block text-sm mb-1">Confirm Password</label>
+                        <input
+                            type="password" placeholder="Confirm password" value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            className="w-full p-2 border rounded"
+                        />
+                        {error.confirmPassword && <p className="text-red-500 text-sm">{error.confirmPassword}</p>}
+                    </div>
+                    <button
+                        type="submit"
+                        className="w-full bg-green-600 text-white p-2 rounded hover:bg-green-700"
+                        disabled={isLoading}
+                    >
+                        {isLoading ? "Registering..." : "Sign Up"}
+                    </button>
+                </form>
+                <div className="text-center mt-4">
+                    <button className="bg-red-600 text-white p-2 rounded hover:bg-red-700 flex items-center justify-center w-full">
+                        <FaGoogle className="mr-2" /> Sign Up with Google
+                    </button>
                 </div>
-                {/* Right Panel */}
-                <div className="flex-1 bg-black/85 p-8 rounded-r-lg flex flex-col justify-center">
-                    <form onSubmit={handleRegister} className="space-y-4">
-                        <h3 className="text-2xl font-bold text-center mb-4">Sign Up</h3>
-                        {error.api && <p className="text-red-500 text-sm">{error.api}</p>}
-                        <div>
-                            <label className="block text-sm mb-1">Email</label>
-                            <input type="email" placeholder="email@domain.com" value={email}
-                                   onChange={(e) => setEmail(e.target.value)}
-                                   className="w-full px-4 py-2 bg-gray-700 border border-gray-500 rounded-md text-white outline-none placeholder-gray-400 focus:border-blue-400" />
-                            {error.email && <p className="text-red-500 text-sm">{error.email}</p>}
-                        </div>
-                        <div>
-                            <label className="block text-sm mb-1">Username</label>
-                            <input type="text" placeholder="Enter your name" value={username}
-                                   onChange={(e) => setUsername(e.target.value)}
-                                   className="w-full px-4 py-2 bg-gray-700 border border-gray-500 rounded-md text-white outline-none placeholder-gray-400 focus:border-blue-400" />
-                            {error.username && <p className="text-red-500 text-sm">{error.username}</p>}
-                        </div>
-                        <div>
-                            <label className="block text-sm mb-1">Password</label>
-                            <input type="password" placeholder="Enter password" value={password}
-                                   onChange={(e) => setPassword(e.target.value)}
-                                   className="w-full px-4 py-2 bg-gray-700 border border-gray-500 rounded-md text-white outline-none placeholder-gray-400 focus:border-blue-400" />
-                            {error.password && <p className="text-red-500 text-sm">{error.password}</p>}
-                        </div>
-                        <div>
-                            <label className="block text-sm mb-1">Confirm Password</label>
-                            <input type="password" placeholder="Confirm password" value={confirmPassword}
-                                   onChange={(e) => setConfirmPassword(e.target.value)}
-                                   className="w-full px-4 py-2 bg-gray-700 border border-gray-500 rounded-md text-white outline-none placeholder-gray-400 focus:border-blue-400" />
-                            {error.confirmPassword && <p className="text-red-500 text-sm">{error.confirmPassword}</p>}
-                        </div>
-                        <button type="submit"
-                                className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition"
-                                disabled={isLoading}
-                        >
-                            {isLoading ? "Registering..." : "Sign Up →"}
-                        </button>
-                        <p className="text-center text-sm mt-2">Already have an account? <a href="/login" className="text-blue-400 underline">Login</a></p>
-                    </form>
-                </div>
+                <p className="text-center text-sm mt-4">
+                    Already have an account? <a href="/login" className="text-blue-500">Login</a>
+                </p>
             </div>
         </div>
     );

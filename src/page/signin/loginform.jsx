@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { FaGoogle, FaFacebookF } from "react-icons/fa";
-import { useLoginMutation } from "../../service/authService.js"; // Import hàm gọi API
+import {useLoginMutation, useRegisterMutation} from "../../service/authService.js"; // Import hàm gọi API
 
 const LoginForm = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
-
+    const [login, { isLoading }] = useLoginMutation();
     const handleLogin = async (e) => {
         e.preventDefault();
         setError(null);
@@ -24,6 +24,10 @@ const LoginForm = () => {
 
         setLoading(false);
     };
+    // Chuyển hướng người dùng đến Google OAuth
+    const loginWithGoogle = () => {
+        window.location.href = "http://localhost:8080/oauth2/authorization/google";
+    };
 
     return (
         <div className="flex justify-center items-center h-screen bg-cover bg-center" style={{ backgroundImage: "url('/assets/loginBackground.webp')" }}>
@@ -33,11 +37,8 @@ const LoginForm = () => {
                     <h1 className="text-4xl font-bold mb-4">GoBe</h1>
                     <p className="text-lg mb-6">Go far and fast with us</p>
                     <div className="flex flex-col gap-4">
-                        <button className="flex items-center justify-center gap-3 w-48 bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition">
+                        <button onClick={loginWithGoogle} className="flex items-center justify-center gap-3 w-48 bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition">
                             <FaGoogle className="text-xl" /> Google
-                        </button>
-                        <button className="flex items-center justify-center gap-3 w-48 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition">
-                            <FaFacebookF className="text-xl" /> Facebook
                         </button>
                     </div>
                 </div>

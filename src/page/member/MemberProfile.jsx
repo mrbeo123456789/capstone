@@ -12,7 +12,6 @@ import useSelectCityAndCountry from "../../hook/useSelectCityAndCountry.jsx";
 import {generatePassword, generateUsername} from "../../utils/utils.js";
 import toast from "react-hot-toast";
 
-
 function MemberProfile() {
     const {register,
         handleSubmit,
@@ -41,7 +40,6 @@ function MemberProfile() {
     const [country, cities, countries, setCountry]= useSelectCityAndCountry();
 
     const handleSubmitData =  async (data)=>{
-
         const formData = new FormData();
         Object.keys(data).forEach((key) => {
             formData.append(key, data[key]);
@@ -124,7 +122,6 @@ function MemberProfile() {
         setValue("country", document.getElementById("country").value);
         setValue("department", document.getElementById("department").value);
         setValue("role", document.getElementById("role").value);
-
     }
     return (
         <div
