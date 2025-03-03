@@ -15,7 +15,7 @@ const RegisterForm = () => {
 
     // Validate email phải có đuôi "@email.com"
     const validateEmail = (email) => {
-        return /^[a-zA-Z0-9._%+-]+@email\.com$/.test(email);
+        return /^[a-zA-Z0-9._%+-]+@/.test(email);
     };
 
     // Validate password: ít nhất 8 ký tự, có chữ hoa, chữ thường và số
@@ -30,7 +30,7 @@ const RegisterForm = () => {
         if (!email) {
             errors.email = "Email không được để trống.";
         } else if (!validateEmail(email)) {
-            errors.email = "Email phải có đuôi '@email.com'.";
+            errors.email = "Email phải có đuôi '@'.";
         }
 
         if (!username) {
