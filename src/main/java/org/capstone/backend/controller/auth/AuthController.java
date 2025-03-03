@@ -35,7 +35,9 @@ public class AuthController {
             String token = authService.login(loginRequest.getUsername(), loginRequest.getPassword());
             return ResponseEntity.ok(new LoginResponse(token));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Username or password is not correct");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
         }
     }
     @PostMapping("/register")
@@ -48,7 +50,7 @@ public class AuthController {
                     registerRequest.getPassword()
             );
 
-            // ✅ Return a JSON object instead of plain text
+
             Map<String, String> response = new HashMap<>();
             response.put("message", "Registration successful for user: " + newAccount.getUsername());
 
@@ -56,7 +58,7 @@ public class AuthController {
         } catch (RuntimeException ex) {
             System.out.println("Registration error: " + ex.getMessage());
 
-            // ✅ Return an error message in JSON format
+
             Map<String, String> errorResponse = new HashMap<>();
             errorResponse.put("error", ex.getMessage());
 
