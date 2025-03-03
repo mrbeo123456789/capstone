@@ -25,23 +25,37 @@ public class UserProfileService {
         this.firebaseUpload = firebaseUpload;
     }
 
-    // 🔹 Lấy thông tin profile (DTO)
+    /**
+     * Lấy thông tin profile của member và chuyển đổi sang DTO.
+     *
+     * @param username Tên đăng nhập của người dùng.
+     * @return UserProfileResponse chứa thông tin profile.
+     */
     public UserProfileResponse getMemberProfile(String username) {
         Member member = findOrCreateMember(username);
         return mapToDto(member);
     }
 
-    // 🔹 Cập nhật profile (hoặc tạo mới nếu chưa có)
-    public Member updateMember(String username, UserProfileRequest request, MultipartFile avatar) throws IOException {
+    /**
+     * Cập nhật profile của member dựa theo thông tin từ DTO và file avatar (nếu có),
+     * sau đó trả về thông tin profile cập nhật dưới dạng DTO.
+     *
+     * @param username Tên đăng nhập của người dùng.
+     * @param request  Dữ liệu cập nhật profile.
+     * @param avatar   File avatar mới (nếu có).
+     * @return UserProfileResponse chứa thông tin profile cập nhật.
+     * @throws IOException Nếu quá trình upload file gặp lỗi.
+     */
+    public UserProfileResponse updateMember(String username, UserProfileRequest request, MultipartFile avatar) throws IOException {
         Member member = findOrCreateMember(username);
 
-        // ✅ Upload avatar lên Firebase nếu có file mới
+        // Upload avatar lên Firebase nếu có file mới
         if (avatar != null && !avatar.isEmpty()) {
             String avatarUrl = firebaseUpload.uploadFile(avatar);
             member.setAvatar(avatarUrl);
         }
 
-        // ✅ Cập nhật thông tin từ DTO
+        // Cập nhật thông tin profile từ DTO
         member.setFirstName(request.getFirstName());
         member.setLastName(request.getLastName());
         member.setAge(request.getAge());
@@ -53,10 +67,10 @@ public class UserProfileService {
         member.setUpdatedAt(LocalDateTime.now());
         member.setUpdatedBy(username);
 
-
-        return memberRepository.save(member);
+        // Lưu lại thông tin member đã cập nhật
+        Member updatedMember = memberRepository.save(member);
+        return mapToDto(updatedMember);
     }
-
 
     private Member findOrCreateMember(String username) {
         Account account = accountRepository.findByUsername(username)
@@ -68,10 +82,16 @@ public class UserProfileService {
             newMember.setCreatedAt(LocalDateTime.now());
             newMember.setUpdatedAt(LocalDateTime.now());
             newMember.setUpdatedBy(username);
-            return memberRepository.save(newMember); // ⚡ Tạo mới ngay lập tức để tránh lỗi tham chiếu
+            return memberRepository.save(newMember); // Tạo mới ngay lập tức để tránh lỗi tham chiếu
         });
     }
 
+    /**
+     * Chuyển đổi đối tượng Member sang UserProfileResponse DTO.
+     *
+     * @param member Đối tượng Member cần chuyển đổi.
+     * @return UserProfileResponse chứa thông tin profile.
+     */
     private UserProfileResponse mapToDto(Member member) {
         UserProfileResponse response = new UserProfileResponse();
         response.setFirstName(member.getFirstName());

@@ -5,8 +5,6 @@ import lombok.Data;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-
 @Data
 @Entity
 @Table(name = "member")
@@ -17,12 +15,19 @@ public class Member {
     private Long id;
 
     private String firstName;
+
     private String lastName;
+
     private Integer age;
+
     private String gender;
+
     private String phone;
+
     private String avatar;
+
     private String address;
+
     private String country;
 
     @Column(name = "date_of_birth")
@@ -30,31 +35,18 @@ public class Member {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
+    
     @Column(name = "updated_by")
     private String updatedBy;
 
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @Column(name = "created_by", updatable = false)
+    @Column(name = "created_by")
     private String createdBy;
 
     @OneToOne
     @JoinColumn(name = "account_id", nullable = false)
     private Account account;
 
-    // Thêm quan hệ với GroupMember
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<GroupMember> groupMembers;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 }
