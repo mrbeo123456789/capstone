@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { FaGoogle } from "react-icons/fa";
-import { useLoginMutation } from "../../service/authService.js"; // Import hàm gọi API
+import { useNavigate } from "react-router-dom";
+import { useLoginMutation } from "../../service/authService.js";
 
 const LoginForm = () => {
     const [username, setUsername] = useState("");
@@ -8,24 +9,47 @@ const LoginForm = () => {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
     const [login] = useLoginMutation();
+    const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
         setError(null);
-        setLoading(true);
 
-        try {
-            const response = await login({ username, password });
-            console.log("Login Response:", response);
-            window.location.href = "/member/detail"; // Chuyển hướng sau khi đăng nhập
-        } catch (err) {
-            setError(err.message || "Đăng nhập thất bại");
+        if (!username.trim()) {
+            setError("Username cannot be empty");
+            return;
+        }
+        if (password.length < 6) {
+            setError("Password must be at least 6 characters long");
+            return;
         }
 
+        setLoading(true);
+        try {
+            const response = await login({ username, password }).unwrap(); // unwrap giúp lấy dữ liệu JSON chuẩn
+            console.log("Login Response:", response);
+
+            if (response.token) {
+                localStorage.setItem("jwt_token", response.token);
+                navigate("/member/detail");
+            } else {
+                setError("Unexpected response from server");
+            }
+        } catch (err) {
+            console.error("Login Error:", err);
+
+            if (err.data && err.data.error) {
+                setError(err.data.error);
+            } else if (err.status === 401) {
+                setError("Thông tin không chính xác");
+            } else {
+                setError("Login failed. Please try again.");
+            }
+        }
         setLoading(false);
     };
 
-    // Chuyển hướng người dùng đến Google OAuth
+
     const loginWithGoogle = () => {
         window.location.href = "http://localhost:8080/oauth2/authorization/google";
     };
@@ -33,17 +57,13 @@ const LoginForm = () => {
     return (
         <div className="flex justify-center items-center h-screen bg-cover bg-center" style={{ backgroundImage: "url('/assets/loginBackground.webp')" }}>
             <div className="flex bg-black/40 p-8 rounded-lg text-white w-full max-w-4xl shadow-lg">
-                {/* Left Panel */}
                 <div className="flex-1 flex flex-col justify-center items-center p-6 bg-black/50 rounded-l-lg">
                     <h1 className="text-4xl font-bold mb-4">GoBe</h1>
                     <p className="text-lg mb-6">Go far and fast with us</p>
-                    <div className="flex flex-col gap-4">
-                        <button onClick={loginWithGoogle} className="flex items-center justify-center gap-3 w-48 bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition">
-                            <FaGoogle className="text-xl" /> Google
-                        </button>
-                    </div>
+                    <button onClick={loginWithGoogle} className="flex items-center justify-center gap-3 w-48 bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition">
+                        <FaGoogle className="text-xl" /> Google
+                    </button>
                 </div>
-                {/* Right Panel */}
                 <div className="flex-1 bg-black/85 p-8 rounded-r-lg flex flex-col justify-center">
                     <form onSubmit={handleLogin} className="space-y-5">
                         <h3 className="text-2xl font-bold text-center mb-4">Login</h3>
