@@ -32,7 +32,9 @@ public class UserProfileController {
         }
 
         String username = authentication.getName();
+        System.out.println(username);
         UserProfileResponse profile = userProfileService.getMemberProfile(username);
+        System.out.println("Profile data: " + profile.getLastName());
         return ResponseEntity.ok(profile);
     }
 
