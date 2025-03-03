@@ -6,7 +6,7 @@ export const groupService = createApi({
     baseQuery: fetchBaseQuery({
         baseUrl: BASE_URL,
         prepareHeaders: (headers) => {
-            const token = localStorage.getItem("token");
+            const token = localStorage.getItem("jwt_token");
             if (token) {
                 headers.set("Authorization", `Bearer ${token}`);
             }
@@ -17,7 +17,7 @@ export const groupService = createApi({
     tagTypes: ["Group"],
     endpoints: (builder) => ({
         getGroups: builder.query({
-            query: () => "/groups",
+            query: () => "/groups/groupslist",
             providesTags: ["Group"],
         }),
         createGroup: builder.mutation({

@@ -1,7 +1,7 @@
 const menuItems = [
-    { name: "Employee List", href: "/employees", icon: "user-icon" },
-    { name: "User List", href: "/users", icon: "user-icon" },
-    { name: "Candidate", href: "/candidates", icon: "candidate-icon" },
+    { name: "My Challenge", href: "/employees", icon: "user-icon" },
+    { name: "Group List", href: "/groups", icon: "user-icon" },
+    { name: "Achievement", href: "/candidates", icon: "candidate-icon" },
     { name: "Schedules", href: "/schedules", icon: "calendar-icon" },
     { name: "Time Manage", href: "/time", icon: "time-icon" },
 ];

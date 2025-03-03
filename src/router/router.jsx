@@ -24,7 +24,7 @@ const router = createBrowserRouter([
         element: <AuthCallBack/>,
     },
     {
-        path:"/group-management",
+        path:"/groups",
         errorElement:<ErrorPage/>,
         element: <GroupManagement/>,
     },
