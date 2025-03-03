@@ -6,10 +6,10 @@ export const memberService = createApi({
     baseQuery: fetchBaseQuery({
         baseUrl: BASE_URL,
         prepareHeaders: (headers) => {
-            const token = localStorage.getItem("token");
+            const token = localStorage.getItem("jwt_token");
             if (token) {
                 console.log(token);
-                //headers.set("Authorization", `Bearer ${token}`);
+                headers.set("Authorization", `Bearer ${token}`);
             }
             headers.set("Content-Type", "application/json");
             return headers;
@@ -19,13 +19,13 @@ export const memberService = createApi({
     endpoints: (builder) => ({
         // API lấy danh sách thành viên
         getMembers: builder.query({
-            query: () => "/members",
+            query: () => "/member",
             providesTags: ["Member"],
         }),
 
         // API lấy thông tin thành viên theo ID
         getMemberById: builder.query({
-            query: (id) => `/members/${id}`,
+            query: (id) => `/member/${id}`,
             providesTags: ["Member"],
         }),
 
