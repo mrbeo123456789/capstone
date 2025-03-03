@@ -1,5 +1,6 @@
 package org.capstone.backend.controller.group;
 
+import org.capstone.backend.dto.group.GroupResponse;
 import org.capstone.backend.entity.Groups;
 import org.capstone.backend.dto.group.GroupRequest;
 import org.capstone.backend.service.group.GroupService;
@@ -21,7 +22,7 @@ public class GroupController {
     }
 
     @GetMapping("/groupslist")
-    public ResponseEntity<List<Groups>> getMyGroupList() {
+    public ResponseEntity<List<GroupResponse>> getMyGroupList() {
         Long memberId = getAuthenticatedMemberId();
         return ResponseEntity.ok(groupService.getGroupsByMemberId(memberId));
     }
