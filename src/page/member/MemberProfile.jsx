@@ -11,9 +11,11 @@ import {FiPhone} from "react-icons/fi";
 import useSelectCityAndCountry from "../../hook/useSelectCityAndCountry.jsx";
 import {generatePassword, generateUsername} from "../../utils/utils.js";
 import toast from "react-hot-toast";
+import {useUpdateMemberMutation} from "../../service/memberService.js";
 
 function MemberProfile() {
     const [user, setUser] = useState(null);
+    const [updateUser, { isLoading, isError, isSuccess, error }] = useUpdateMemberMutation();
 
     const {register,
         handleSubmit,
@@ -73,7 +75,7 @@ function MemberProfile() {
             const toastId = toast.loading("Add employee processing...!")
             try {
                 console.log(formData)
-                await addEmployee(formData).unwrap();
+                await updateUser(formData).unwrap();
                 toast.success("Employee added successfully!",{ id: toastId });
                 reset();
                 setPreview(null);
@@ -167,8 +169,7 @@ function MemberProfile() {
                                 <span
                                     className="flex items-center m-2 text-sm font-medium text-gray-500 dark:text-gray-400"
                                     data-testid="flowbite-breadcrumb-item ">
-                                            Add employee
-                                        </span>
+                                            Add employee</span>
                             </li>
                         </ol>
                     </nav>

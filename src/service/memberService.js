@@ -31,10 +31,10 @@ export const memberService = createApi({
 
         // API cập nhật thông tin thành viên
         updateMember: builder.mutation({
-            query: ({ id, data }) => ({
-                url: `/members/${id}`,
+            query: ( formData ) => ({
+                url: `/member/update`,
                 method: "PUT",
-                body: data,
+                body: formData,
             }),
             invalidatesTags: ["Member"],
         }),
