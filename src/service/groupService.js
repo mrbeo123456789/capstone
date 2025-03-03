@@ -22,7 +22,7 @@ export const groupService = createApi({
         }),
         createGroup: builder.mutation({
             query: (groupData) => ({
-                url: "/groups",
+                url: "/groups/create",
                 method: "POST",
                 body: groupData,
             }),
