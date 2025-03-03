@@ -33,20 +33,23 @@ export const authService = createApi({
         }),
 
         login: builder.mutation({
-            query: (data) => {
-                console.log("Login Data:", data);
-                return {
-                    url: "/auth/login",
-                    method: "POST",
-                    body: data,
-                };
-            },
+            query: (data) => ({
+                url: "/auth/login",
+                method: "POST",
+                body: data,
+            }),
             transformResponse: (response) => {
                 console.log("Login Response:", response);
+
+                if (typeof response === "string") {
+                    return { error: response }; // Nếu phản hồi là text, bọc vào object
+                }
+
                 localStorage.setItem("jwt_token", response.token);
                 return response;
             },
         }),
+
 
         loginWithGoogle: builder.mutation({
             query: () => {
@@ -74,24 +77,10 @@ export const authService = createApi({
             },
         }),
 
-        getUser: builder.query({
-            query: () => {
-                console.log("Fetching user data...");
-                return "/api/auth/me";
-            },
-            providesTags: ["Auth"],
-            transformResponse: (response) => {
-                console.log("User Data Response:", response);
-                return response;
-            },
-        }),
     }),
 });
 
 export const {
     useRegisterMutation,
     useLoginMutation,
-    useLoginWithGoogleMutation,
-    useHandleOAuthCallbackMutation,
-    useGetUserQuery
 } = authService;
