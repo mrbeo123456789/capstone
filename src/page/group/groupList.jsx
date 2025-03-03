@@ -147,7 +147,6 @@ const GroupManagement = () => {
                         <h2 className="text-xl font-bold text-center mb-4 text-red-500">
                             {modalType === "add" ? "Create Group" : "Edit Group"}
                         </h2>
-
                         <div className="flex items-center space-x-4 mb-3">
                             <label className="w-20 h-20 bg-gray-800 rounded-lg flex items-center justify-center cursor-pointer border border-red-600">
                                 {groupImage ? (
@@ -157,14 +156,12 @@ const GroupManagement = () => {
                                 )}
                                 <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
                             </label>
-
                             <input
                                 type="text"
                                 placeholder="Group Name"
                                 value={groupName}
                                 onChange={(e) => setGroupName(e.target.value)}
-                                className="w-full p-3 border border-red-600 bg-gray-900 text-white rounded-md focus:ring-2 focus:ring-red-500"
-                            />
+                                className="w-full p-3 border border-red-600 bg-gray-900 text-white rounded-md focus:ring-2 focus:ring-red-500"/>
                         </div>
 
                         <div className="flex mt-4 border-b border-red-600">
@@ -174,8 +171,7 @@ const GroupManagement = () => {
                                         ? "border-b-2 border-red-500 text-red-500"
                                         : "text-gray-400"
                                 }`}
-                                onClick={() => setActiveTab("description")}
-                            >
+                                onClick={() => setActiveTab("description")}>
                                 Description
                             </button>
                             <button
@@ -184,8 +180,7 @@ const GroupManagement = () => {
                                         ? "border-b-2 border-red-500 text-red-500"
                                         : "text-gray-400"
                                 }`}
-                                onClick={() => setActiveTab("rules")}
-                            >
+                                onClick={() => setActiveTab("rules")}>
                                 Rules
                             </button>
                         </div>
@@ -209,8 +204,7 @@ const GroupManagement = () => {
                             </button>
                             <button
                                 onClick={handleSaveGroup}
-                                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition"
-                            >
+                                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition">
                                 {modalType === "add" ? "Create" : "Save Changes"}
                             </button>
                         </div>

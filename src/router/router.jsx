@@ -33,7 +33,13 @@ const router = createBrowserRouter([
     {
         path:"/groups",
         errorElement:<ErrorPage/>,
-        element: <GroupManagement/>,
+        element: <Layout></Layout>,
+        children:[
+            {
+                path:"",
+                element: <GroupManagement />
+            }
+        ]
     },
     {
         path:"/member",
