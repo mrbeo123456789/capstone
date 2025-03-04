@@ -15,7 +15,7 @@ export const Header = () => {
     return (
         <div className="relative">
             <header
-                className="z-40 items-center w-full h-16 bg-white shadow-lg dark:bg-gray-700 rounded-2xl">
+                className="z-40 items-center w-full h-16 bg-blue-gray-800 dark:bg-gray-700 rounded-2xl">
                 <div className="relative z-20 flex flex-col justify-center h-full px-3 mx-auto flex-center">
                     <div className="relative flex items-center w-full pl-1 lg:max-w-68 sm:pr-2 sm:ml-0">
                         <div className="container relative left-0 z-50 flex w-3/4 h-auto h-full">

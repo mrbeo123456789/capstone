@@ -10,16 +10,16 @@ function Layout(){
         <>
             <SearchProvider>
             <PaginationProvider>
-                <div class="flex items-start justify-between">
+                <div class="bg-blue-gray-800 flex items-start justify-between">
                     <SideBar/>
-                    <div class="flex flex-col w-full pl-0 md:p-4 md:space-y-4">
+                    <div class="bg-blue-gray-800 flex flex-col w-full pl-0 md:p-4 md:space-y-4">
                         <Header/>
                         <Outlet></Outlet>
                     </div>
 
                 </div>
 
-                <Footer/>
+                {/*<Footer/>*/}
             </PaginationProvider>
             </SearchProvider>
         </>

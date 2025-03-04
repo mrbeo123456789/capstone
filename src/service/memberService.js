@@ -5,13 +5,16 @@ export const memberService = createApi({
     reducerPath: "member",
     baseQuery: fetchBaseQuery({
         baseUrl: BASE_URL,
-        prepareHeaders: (headers) => {
+        prepareHeaders: (headers, { getState, endpoint }) => {
             const token = localStorage.getItem("jwt_token");
             if (token) {
                 console.log(token);
                 headers.set("Authorization", `Bearer ${token}`);
             }
-            headers.set("Content-Type", "application/json");
+            // ✅ Only set Content-Type for JSON requests, NOT for FormData
+            if (endpoint !== "updateMember") {
+                headers.set("Content-Type", "application/json");
+            }
             return headers;
         },
     }),

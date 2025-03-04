@@ -1,7 +1,7 @@
 const menuItems = [
     { name: "My Challenge", href: "/employees", icon: "user-icon" },
     { name: "Group List", href: "/groups", icon: "user-icon" },
-    { name: "Achievement", href: "/candidates", icon: "candidate-icon" },
+    { name: "Profile", href: "/member/detail", icon: "candidate-icon" },
     { name: "Schedules", href: "/schedules", icon: "calendar-icon" },
     { name: "Time Manage", href: "/time", icon: "time-icon" },
 ];
@@ -10,8 +10,8 @@ export const SideBar = () => {
     const currentPath = window.location.pathname; // Get the current path
 
     return (
-        <div className="relative hidden h-screen my-4 ml-4 shadow-lg lg:block w-80">
-            <div className="h-full bg-white rounded-2xl dark:bg-gray-700">
+        <div className="bg-blue-gray-800 relative hidden h-screen my-4 ml-4 shadow-lg lg:block w-80">
+            <div className="h-full bg-blue-gray-800 rounded-2xl dark:bg-gray-700">
                 <div className="flex items-center justify-center pt-6">
                     {/* Logo */}
                     <svg width="35" height="30" viewBox="0 0 256 366" version="1.1" preserveAspectRatio="xMidYMid">
