@@ -112,26 +112,4 @@ public class GroupServiceImpl implements GroupService {
 
         return groupRepository.save(group);
     }
-
-    @Override
-    public Long getMemberIdFromAuthentication(Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
-            throw new RuntimeException("User is not authenticated");
-        }
-
-        // 🔥 Get username from Authentication
-        String username = authentication.getName();  // Usually the `sub` from JWT
-
-        // 🔥 Find the Account using username
-        Account account = accountRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Account not found"));
-
-        // 🔥 Find Member using Account (not Account ID)
-        Member member = memberRepository.findByAccount(account)
-                .orElseThrow(() -> new RuntimeException("Member not found"));
-
-        return member.getId();
-    }
-
-
 }

@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,25 +42,23 @@ public class UserProfileController {
 
     @PutMapping(value = "/update", consumes = {"multipart/form-data"})
     public ResponseEntity<?> updateProfile(
-            @RequestPart("data") String jsonData,
-            @RequestPart(value = "avatar", required = false) MultipartFile avatar
+            @Validated @ModelAttribute("data") UserProfileRequest request,  // 🔥 Automatically binds JSON fields
+            BindingResult bindingResult,
+            @RequestParam(value = "avatar", required = false) MultipartFile avatar  // 🔥 Handles file upload
     ) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.registerModule(new JavaTimeModule());
-
-            UserProfileRequest request = objectMapper.readValue(jsonData, UserProfileRequest.class);
-
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || "anonymousUser".equals(authentication.getPrincipal())) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body("User is not authenticated");
             }
-
             String username = authentication.getName();
             UserProfileResponse updatedProfile = userProfileService.updateMember(username, request, avatar);
-            return ResponseEntity.ok(updatedProfile);
 
+
+            return ResponseEntity.ok(updatedProfile);
         } catch (JsonProcessingException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Invalid JSON format: " + e.getMessage());

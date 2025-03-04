@@ -3,6 +3,7 @@ package org.capstone.backend.controller.group;
 import org.capstone.backend.dto.group.GroupResponse;
 import org.capstone.backend.entity.Groups;
 import org.capstone.backend.dto.group.GroupRequest;
+import org.capstone.backend.service.AuthService;
 import org.capstone.backend.service.group.GroupService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -16,9 +17,12 @@ import java.util.List;
 public class GroupController {
 
     private final GroupService groupService;
+    private final AuthService authService;
 
-    public GroupController(GroupService groupService) {
+    public GroupController(GroupService groupService,
+                           AuthService authService) {
         this.groupService = groupService;
+        this.authService = authService;
     }
 
     @GetMapping("/groupslist")
@@ -41,6 +45,6 @@ public class GroupController {
 
     private Long getAuthenticatedMemberId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return groupService.getMemberIdFromAuthentication(authentication);
+        return authService.getMemberIdFromAuthentication(authentication);
     }
 }
