@@ -3,9 +3,10 @@ package org.capstone.backend.controller.member;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.capstone.backend.dto.member.ChangePasswordRequest;
 import org.capstone.backend.dto.member.UserProfileRequest;
 import org.capstone.backend.dto.member.UserProfileResponse;
-import org.capstone.backend.service.UserProfileService;
+import org.capstone.backend.service.member.UserProfileService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -67,4 +68,21 @@ public class UserProfileController {
                     .body("Error updating profile: " + e.getMessage());
         }
     }
+
+    @PutMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || "anonymousUser".equals(authentication.getPrincipal())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User is not authenticated");
+        }
+
+        String username = authentication.getName();
+        try {
+            userProfileService.changePassword(username, request);
+            return ResponseEntity.ok("Password changed successfully!");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
 }

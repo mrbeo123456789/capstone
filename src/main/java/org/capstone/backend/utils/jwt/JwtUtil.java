@@ -1,4 +1,4 @@
-package org.capstone.backend.utils;
+package org.capstone.backend.utils.jwt;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

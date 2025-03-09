@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.capstone.backend.service.AuthService;
+import org.capstone.backend.service.auth.AuthService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -12,8 +12,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
@@ -38,6 +36,8 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         response.sendRedirect(redirectUrl);
     }
+
+
 }
 
 

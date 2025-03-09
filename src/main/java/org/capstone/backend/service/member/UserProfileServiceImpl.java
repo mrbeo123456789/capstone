@@ -1,5 +1,6 @@
-package org.capstone.backend.service;
+package org.capstone.backend.service.member;
 
+import org.capstone.backend.dto.member.ChangePasswordRequest;
 import org.capstone.backend.dto.member.UserProfileRequest;
 import org.capstone.backend.dto.member.UserProfileResponse;
 import org.capstone.backend.entity.Account;
@@ -7,6 +8,8 @@ import org.capstone.backend.entity.Member;
 import org.capstone.backend.repository.AccountRepository;
 import org.capstone.backend.repository.MemberRepository;
 import org.capstone.backend.utils.upload.FirebaseUpload;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,38 +17,25 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 
 @Service
-public class UserProfileService {
+public class UserProfileServiceImpl implements UserProfileService {
     private final MemberRepository memberRepository;
     private final AccountRepository accountRepository;
     private final FirebaseUpload firebaseUpload;
-
-    public UserProfileService(MemberRepository memberRepository, AccountRepository accountRepository, FirebaseUpload firebaseUpload) {
+    private final PasswordEncoder passwordEncoder;
+    public UserProfileServiceImpl(MemberRepository memberRepository, AccountRepository accountRepository, FirebaseUpload firebaseUpload, PasswordEncoder passwordEncoder) {
         this.memberRepository = memberRepository;
         this.accountRepository = accountRepository;
         this.firebaseUpload = firebaseUpload;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    /**
-     * Lấy thông tin profile của member và chuyển đổi sang DTO.
-     *
-     * @param username Tên đăng nhập của người dùng.
-     * @return UserProfileResponse chứa thông tin profile.
-     */
+    @Override
     public UserProfileResponse getMemberProfile(String username) {
         Member member = findOrCreateMember(username);
         return mapToDto(member);
     }
 
-    /**
-     * Cập nhật profile của member dựa theo thông tin từ DTO và file avatar (nếu có),
-     * sau đó trả về thông tin profile cập nhật dưới dạng DTO.
-     *
-     * @param username Tên đăng nhập của người dùng.
-     * @param request  Dữ liệu cập nhật profile.
-     * @param avatar   File avatar mới (nếu có).
-     * @return UserProfileResponse chứa thông tin profile cập nhật.
-     * @throws IOException Nếu quá trình upload file gặp lỗi.
-     */
+    @Override
     public UserProfileResponse updateMember(String username, UserProfileRequest request, MultipartFile avatar) throws IOException {
         Member member = findOrCreateMember(username);
 
@@ -86,12 +76,6 @@ public class UserProfileService {
         });
     }
 
-    /**
-     * Chuyển đổi đối tượng Member sang UserProfileResponse DTO.
-     *
-     * @param member Đối tượng Member cần chuyển đổi.
-     * @return UserProfileResponse chứa thông tin profile.
-     */
     private UserProfileResponse mapToDto(Member member) {
         UserProfileResponse response = new UserProfileResponse();
         response.setFirstName(member.getFirstName());
@@ -105,4 +89,18 @@ public class UserProfileService {
         response.setDateOfBirth(member.getDateOfBirth());
         return response;
     }
+    @Override
+    public void changePassword(String username, ChangePasswordRequest request) {
+        Account user = accountRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!BCrypt.checkpw(request.getOldPassword(), user.getPassword())) {
+            throw new RuntimeException("Old password is incorrect");
+        }
+
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        accountRepository.save(user);
+    }
+
 }

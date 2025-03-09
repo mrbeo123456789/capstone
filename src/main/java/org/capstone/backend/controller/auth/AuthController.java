@@ -1,70 +1,102 @@
-package org.capstone.backend.controller.auth;
+    package org.capstone.backend.controller.auth;
 
 
-import jakarta.validation.Valid;
-import org.capstone.backend.dto.auth.LoginRequest;
-import org.capstone.backend.dto.auth.LoginResponse;
-import org.capstone.backend.dto.auth.RegisterRequest;
-import org.capstone.backend.entity.Account;
-import org.capstone.backend.service.AuthService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.web.bind.annotation.*;
+    import jakarta.validation.Valid;
+    import org.capstone.backend.dto.auth.LoginRequest;
+    import org.capstone.backend.dto.auth.LoginResponse;
+    import org.capstone.backend.dto.auth.RegisterRequest;
+    import org.capstone.backend.entity.Account;
+    import org.capstone.backend.service.auth.AuthService;
+    import org.capstone.backend.utils.sendmail.FixedGmailService;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.http.HttpStatus;
+    import org.springframework.http.ResponseEntity;
+    import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+    import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
+    import java.util.HashMap;
+    import java.util.Map;
 
 
-@RestController
-@RequestMapping("/api/auth")
-public class AuthController {
+    @RestController
+    @RequestMapping("/api/auth")
+    public class AuthController {
 
-    private final AuthService authService;
+        private final AuthService authService;
 
-    @Autowired
-    public AuthController(AuthService authService) {
-        this.authService = authService;
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        try {
-
-            String token = authService.login(loginRequest.getUsername(), loginRequest.getPassword());
-            return ResponseEntity.ok(new LoginResponse(token));
-        } catch (Exception e) {
-            Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", "Username or password is not correct");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+        @Autowired
+        public AuthController(AuthService authService) {
+            this.authService = authService;
         }
-    }
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest registerRequest) {
-        try {
-            System.out.println("Received Register Request: " + registerRequest); // Debug dữ liệu nhận
-            Account newAccount = authService.register(
-                    registerRequest.getUsername(),
-                    registerRequest.getEmail(),
-                    registerRequest.getPassword()
-            );
 
+        @PostMapping("/login")
+        public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+            try {
+                String token = authService.login(loginRequest.getUsername(), loginRequest.getPassword());
+                return ResponseEntity.ok(new LoginResponse(token));
+            } catch (RuntimeException e) {
+                String errorMessage = e.getMessage();
+                System.out.println("Login error: " + errorMessage);
 
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Registration successful for user: " + newAccount.getUsername());
+                Map<String, String> errorResponse = new HashMap<>();
+                errorResponse.put("error", errorMessage);
 
-            return ResponseEntity.ok(response); // Returns JSON format
-        } catch (RuntimeException ex) {
-            System.out.println("Registration error: " + ex.getMessage());
-
-
-            Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", ex.getMessage());
-
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+            }
         }
+
+        @PostMapping("/register")
+        public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest registerRequest) {
+            try {
+                Account newAccount = authService.register(
+                        registerRequest.getUsername(),
+                        registerRequest.getEmail(),
+                        registerRequest.getPassword()
+                );
+
+
+                Map<String, String> response = new HashMap<>();
+                response.put("message", "Registration successful for user: " + newAccount.getUsername());
+
+                return ResponseEntity.ok(response); // Returns JSON format
+            } catch (RuntimeException ex) {
+                System.out.println("Registration error: " + ex.getMessage());
+
+
+                Map<String, String> errorResponse = new HashMap<>();
+                errorResponse.put("error", ex.getMessage());
+
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+            }
+        }
+        @PostMapping("/verify-account")
+        public ResponseEntity<String> sendOtpToVerifyAccount(@RequestParam String email) throws Exception {
+            authService.sendOtpToVerifyAccount(email);
+            return ResponseEntity.ok("OTP đã được gửi đến email.");
+        }
+
+        @PostMapping("/confirm-verification")
+        public ResponseEntity<String> verifyAccount(@RequestParam String email, @RequestParam String otp) {
+            if (!authService.verifyAccount(email, otp)) {
+                return ResponseEntity.badRequest().body("OTP không hợp lệ hoặc đã hết hạn!");
+            }
+            return ResponseEntity.ok("Tài khoản đã được kích hoạt!");
+        }
+
+        @PostMapping("/forgot-password")
+        public ResponseEntity<String> forgotPassword(@RequestParam String email) throws Exception {
+            authService.sendOtpForPasswordReset(email);
+            return ResponseEntity.ok("OTP đã được gửi đến email.");
+        }
+
+        @PostMapping("/reset-password")
+        public ResponseEntity<String> resetPassword(@RequestParam String email,
+                                                    @RequestParam String otp,
+                                                    @RequestParam String newPassword) {
+            if (!authService.resetPassword(email, otp, newPassword)) {
+                return ResponseEntity.badRequest().body("OTP không hợp lệ hoặc đã hết hạn!");
+            }
+            return ResponseEntity.ok("Mật khẩu đã được cập nhật thành công!");
+        }
+
     }
-
-
-}

@@ -2,6 +2,7 @@ package org.capstone.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.capstone.backend.utils.enums.AccountStatus;
 import org.capstone.backend.utils.enums.Role;
 
 import java.time.LocalDate;
@@ -27,7 +28,10 @@ public class Account {
     @Column(length = 20)
     private Role role;
 
-    private String status;
+    @Enumerated(EnumType.STRING) // Lưu enum dưới dạng chuỗi (ACTIVE, INACTIVE, BANNED)
+    @Column(nullable = false)
+    private AccountStatus status = AccountStatus.INACTIVE; // Mặc định tài khoản chưa kích hoạt
+
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
