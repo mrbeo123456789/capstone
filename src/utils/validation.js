@@ -5,12 +5,12 @@ export const validateCandidate = yup.object({
     lastname: yup.string().required("Last name is required!"),
     // username: yup.string().required("Username will be auto generated when choose country!")
     //     .min(3, "Username must be greater than 3 characters"),
-    password: yup.string().required("Password is required!")
-        .min(8, "Password must be at least 8 characters!")
-        .matches(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-            "Password must be contain uppercase, lowercase, special character and number!"),
-    email: yup.string().required("Email is required!")
-        .email("Invalid email format!"),
+    // password: yup.string().required("Password is required!")
+    //     .min(8, "Password must be at least 8 characters!")
+    //     .matches(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+    //         "Password must be contain uppercase, lowercase, special character and number!"),
+    // email: yup.string().required("Email is required!")
+    //     .email("Invalid email format!"),
     // phone: yup.string().required("Phone is required!")
     //     .matches(/^[0-9]{10}$/, "Phone number must be exactly 10 digits"),
     // avatar: yup.mixed()

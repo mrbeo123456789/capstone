@@ -1,30 +1,46 @@
-import {Outlet} from "react-router-dom";
+import {Outlet, useLocation} from "react-router-dom";
 import {Header} from "./Header.jsx";
 import {Footer} from "./Footer.jsx";
 import {SideBar} from "./SideBar.jsx";
-import { PaginationProvider } from "../../context/PageContext.jsx";
-import { SearchProvider } from "../../context/SearchContext.jsx"
+import {useState} from "react";
 
-function Layout(){
+function Layout() {
+    const location = useLocation(); // Get current route
+    const [showSidebar, setShowSidebar] = useState(false); // Sidebar state
+
     return (
         <>
-            <SearchProvider>
-            <PaginationProvider>
-                <div class="bg-blue-gray-800 flex items-start justify-between">
-                    <SideBar/>
-                    <div class="bg-blue-gray-800 flex flex-col w-full pl-0 md:p-4 md:space-y-4">
-                        <Header/>
-                        <Outlet></Outlet>
-                    </div>
+            <Header />
+            <div
+                className="flex items-start justify-between"
+                style={{
+                    background: "linear-gradient(235deg, rgb(79 15 103), rgb(123 4 48), rgb(65 2 2))",
+                }}
+            >
+                {/* ✅ Sidebar logic */}
+                {location.pathname !== "/homepage" ? (
+                    <SideBar /> // Show sidebar normally
+                ) : (
+                    showSidebar && <SideBar /> // Show when toggled on homepage
+                )}
 
+                <div className="flex flex-col w-full pl-0 md:p-4 md:space-y-4">
+                    {/* ✅ Toggle Sidebar Button (Only for Homepage) */}
+                    {location.pathname === "/homepage" && (
+                        <button
+                            onClick={() => setShowSidebar(!showSidebar)}
+                            className="absolute bg-red-500 text-white px-4 py-2 rounded shadow-md hover:bg-red-600 transition"
+                        >
+                            {showSidebar ? "✖ Menu" : "☰ Menu"}
+                        </button>
+                    )}
+
+                    <Outlet />
                 </div>
-
-                {/*<Footer/>*/}
-            </PaginationProvider>
-            </SearchProvider>
+            </div>
+            <Footer />
         </>
-
-    )
+    );
 }
 
 export default Layout;

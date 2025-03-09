@@ -1,64 +1,84 @@
-import {useState} from "react";
-import { usePagination } from "../../context/PageContext.jsx";
-import {useSearch} from "../../context/SearchContext.jsx";
-
+import React from "react";
 
 export const Header = () => {
-    const { searchTerm, updateSearch } = useSearch();
-    const { setCurrentPage } = usePagination();
-
-    const handleSearchChange = (event) => {
-        updateSearch(event.target.value);
-        setCurrentPage(1); // Reset to page 1 when search term changes
-    };
+    const menuItems = [
+        { href: "/about", title: "About", text: "About" },
+        { href: "/guide", title: "Guide", text: "Guide" },
+        { href: "/challenges", title: "Challenges", text: "Challenges" },
+        { href: "/ranking", title: "Leaderboard", text: "Leaderboard" },
+        { href: "/news", title: "News", text: "News" },
+    ];
 
     return (
-        <div className="relative">
-            <header
-                className="z-40 items-center w-full h-16 bg-blue-gray-800 dark:bg-gray-700 rounded-2xl">
-                <div className="relative z-20 flex flex-col justify-center h-full px-3 mx-auto flex-center">
-                    <div className="relative flex items-center w-full pl-1 lg:max-w-68 sm:pr-2 sm:ml-0">
-                        <div className="container relative left-0 z-50 flex w-3/4 h-auto h-full">
-                            <div className="relative flex items-center w-full h-full lg:w-64 group">
-                                <div
-                                    className="absolute z-50 flex items-center justify-center block w-auto h-10 p-3 pr-2 text-sm text-gray-500 uppercase cursor-pointer sm:hidden">
-                                    <svg fill="none" className="relative w-5 h-5" stroke-linecap="round"
-                                         stroke-linejoin="round" stroke-width="2" stroke="currentColor"
-                                         viewBox="0 0 24 24">
-                                        <path
-                                            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z">
-                                        </path>
-                                    </svg>
-                                </div>
-                                <svg
-                                    className="absolute left-0 z-20 hidden w-4 h-4 ml-4 text-gray-500 pointer-events-none fill-current group-hover:text-gray-400 sm:block"
-                                    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                    <path
-                                        d="M12.9 14.32a8 8 0 1 1 1.41-1.41l5.35 5.33-1.42 1.42-5.33-5.34zM8 14A6 6 0 1 0 8 2a6 6 0 0 0 0 12z">
-                                    </path>
-                                </svg>
-                                <input type="text"
-                                       placeholder="Search users..."
-                                       value={searchTerm}
-                                       onChange={handleSearchChange}
-                                       className="block w-full py-1.5 pl-10 pr-4 leading-normal rounded-2xl focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 ring-opacity-90 bg-gray-100 dark:bg-gray-800 text-gray-400 aa-input"
-                                       />
-                                <div
-                                    className="absolute right-0 hidden h-auto px-2 py-1 mr-2 text-xs text-gray-400 border border-gray-300 rounded-2xl md:block">
-                                    +
-                                </div>
-                            </div>
-                        </div>
-                        <div
-                            className="relative flex items-center justify-end w-1/4 p-1 ml-5 mr-4 sm:mr-0 sm:right-auto">
-                            <a href="#" className="relative block">
-                                <img alt="profil" src="https://cdn-icons-png.flaticon.com/512/7216/7216128.png"
-                                     className="mx-auto object-cover rounded-full h-10 w-10 "/>
-                            </a>
-                        </div>
-                    </div>
+        <header className="bg-[#410808] shadow-md py-4 w-full z-50">
+            <div className="container mx-auto flex justify-between items-center px-4">
+                {/* Logo */}
+                <h2 className="text-xl font-bold flex items-center space-x-2">
+                    <a href="/" className="flex items-center">
+                        <img
+                            src="https://via.placeholder.com/40" // Placeholder Logo
+                            alt="GoBeyond"
+                            className="h-10 rounded-full"
+                        />
+                        <span className="ml-2 text-orange-400 font-bold text-lg">GoBeyond</span>
+                    </a>
+                </h2>
+
+                {/* Navigation Menu */}
+                <nav className="hidden md:flex space-x-6">
+                    <ul className="flex space-x-4">
+                        {menuItems.map((item, index) => (
+                            <li key={index}>
+                                <a
+                                    href={item.href}
+                                    title={item.title}
+                                    className="text-orange-300 hover:text-red-500 transition font-medium"
+                                >
+                                    {item.text}
+                                </a>
+                            </li>
+                        ))}
+                    </ul>
+                </nav>
+
+                {/* Language Selector */}
+                <div className="relative">
+                    <button className="btn btn-primary dropdown-toggle">
+                        <img
+                            title="Vietnamese"
+                            src="https://upload.wikimedia.org/wikipedia/commons/2/21/Flag_of_Vietnam.svg"
+                            alt="Vietnamese"
+                            className="h-6 w-8 rounded"
+                        />
+                    </button>
                 </div>
-            </header>
-        </div>
+
+                {/* Search & User Avatar */}
+                <div className="flex items-center space-x-4">
+                    {/* Search */}
+                    <div className="relative">
+                        <button type="button">
+                            <i className="fa fa-search text-orange-300 hover:text-red-500 text-lg"></i>
+                        </button>
+                    </div>
+
+                    {/* User Avatar */}
+                    <div>
+                        <img
+                            src="https://randomuser.me/api/portraits/men/32.jpg" // Placeholder User Avatar
+                            alt="User Avatar"
+                            className="w-10 h-10 rounded-full border-2 border-orange-400 cursor-pointer"
+                        />
+                    </div>
+
+                    {/* Mobile Menu Icon */}
+                    <button className="md:hidden flex flex-col space-y-1">
+                        <span className="block w-6 h-1 bg-orange-400"></span>
+                        <span className="block w-6 h-1 bg-orange-400"></span>
+                        <span className="block w-6 h-1 bg-orange-400"></span>
+                    </button>
+                </div>
+            </div>
+        </header>
     );
 };
