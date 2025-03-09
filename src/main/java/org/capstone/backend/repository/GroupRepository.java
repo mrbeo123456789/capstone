@@ -9,6 +9,6 @@ import java.util.List;
 
 public interface GroupRepository extends JpaRepository<Groups, Long> {
 
-    @Query("SELECT g FROM Groups g JOIN GroupMember gm ON g.id = gm.group.id WHERE gm.member.id = :memberId")
+    @Query("SELECT g FROM Groups g JOIN GroupMember gm ON g.id = gm.group.id WHERE gm.member.id = :memberId and gm.status= 'active'")
     List<Groups> findByMemberId(@Param("memberId") Long memberId);
 }

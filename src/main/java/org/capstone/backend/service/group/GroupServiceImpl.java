@@ -1,4 +1,4 @@
-package org.capstone.backend.service.group;
+package org.capstone.backend.service.group.impl;
 
 import org.capstone.backend.dto.group.GroupMemberResponse;
 import org.capstone.backend.dto.group.GroupResponse;
@@ -11,10 +11,15 @@ import org.capstone.backend.repository.AccountRepository;
 import org.capstone.backend.repository.GroupMemberRepository;
 import org.capstone.backend.repository.GroupRepository;
 import org.capstone.backend.repository.MemberRepository;
+import org.capstone.backend.service.group.GroupService;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service

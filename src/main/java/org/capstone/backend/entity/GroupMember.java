@@ -2,6 +2,7 @@ package org.capstone.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.capstone.backend.utils.enums.GroupMemberStatus;
 
 import java.time.LocalDateTime;
 
@@ -30,8 +31,9 @@ public class GroupMember {
     @Column(name = "role", nullable = false)
     private String role;
 
+    @Enumerated(EnumType.STRING) // Lưu dưới dạng chuỗi trong DB
     @Column(name = "status", nullable = false)
-    private String status;
+    private GroupMemberStatus status;
 
     @Column(name = "created_by", updatable = false)
     private Long createdBy;
