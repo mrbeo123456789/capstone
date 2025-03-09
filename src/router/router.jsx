@@ -6,6 +6,7 @@ import RegisterForm from "../page/signin/register.jsx";
 import MemberProfile from "../page/member/MemberProfile.jsx";
 import GroupManagement from "../page/group/groupList.jsx";
 import AuthCallBack from "../page/signin/AuthCallBack.jsx";
+import AdminDashboard from "../page/admin/AdminDashboard.jsx";
 const router = createBrowserRouter([
     {
         path:"/login",
@@ -26,6 +27,11 @@ const router = createBrowserRouter([
         path:"/group-management",
         errorElement:<ErrorPage/>,
         element: <GroupManagement/>,
+    },
+    {
+        path:"/admin-dashboard",
+        errorElement:<ErrorPage/>,
+        element: <AdminDashboard/>,
     },
     {
         path:"/member",
