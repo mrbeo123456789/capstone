@@ -1,49 +1,25 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useGetUserQuery } from "../../service/authService.js";
+import { useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const AuthCallback = () => {
     const navigate = useNavigate();
-    const [error, setError] = useState(null);
+    const location = useLocation();
 
     useEffect(() => {
-        const fetchToken = async () => {
-            try {
-                const response = await fetch("http://localhost:8080/api/auth/oauth2-login", {
-                    method: "GET",
-                    credentials: "include", // Nếu backend dùng cookie để lưu session
-                });
+        const params = new URLSearchParams(location.search);
+        const token = params.get("token");
 
-                if (!response.ok) {
-                    throw new Error("Không thể đăng nhập bằng Google!");
-                }
-
-                const data = await response.json();
-                const token = data.token;
-
-                if (token) {
-                    localStorage.setItem("jwt_token", token);
-                    navigate("/dashboard");
-                } else {
-                    throw new Error("Token không hợp lệ!");
-                }
-            } catch (error) {
-                console.error("Lỗi đăng nhập:", error);
-                setError("Đăng nhập thất bại. Vui lòng thử lại.");
-                navigate("/login?error=true");
-            }
-        };
-
-        fetchToken();
-    }, [navigate("/dashboard")]);
+        if (token) {
+            localStorage.setItem("jwt_token", token);
+            navigate("/dashboard", { replace: true });
+        } else {
+            navigate("/login?error=true");
+        }
+    }, [location, navigate]);
 
     return (
         <div className="flex justify-center items-center h-screen">
-            {error ? (
-                <h2 className="text-red-500">{error}</h2>
-            ) : (
-                <h2 className="text-center">Đang xử lý đăng nhập...</h2>
-            )}
+            <h2 className="text-center">Đang xử lý đăng nhập...</h2>
         </div>
     );
 };

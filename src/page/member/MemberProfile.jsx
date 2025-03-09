@@ -11,8 +11,12 @@ import {FiPhone} from "react-icons/fi";
 import useSelectCityAndCountry from "../../hook/useSelectCityAndCountry.jsx";
 import {generatePassword, generateUsername} from "../../utils/utils.js";
 import toast from "react-hot-toast";
+import {useUpdateMemberMutation} from "../../service/memberService.js";
 
 function MemberProfile() {
+    const [user, setUser] = useState(null);
+    const [updateUser, { isLoading, isError, isSuccess, error }] = useUpdateMemberMutation();
+
     const {register,
         handleSubmit,
         setValue,
@@ -27,6 +31,29 @@ function MemberProfile() {
     });
     const navigate = useNavigate();
     useEffect(() => {
+        const token = localStorage.getItem("jwt_token");
+        if (!token) {
+            toast.error("You need to log in first!");
+            navigate("/login");
+        }
+        fetch("http://localhost:8080/api/member/profile", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        })
+            .then(res => {
+                if (!res.ok) throw new Error("Failed to fetch user data");
+                return res.json();
+            })
+            .then(data => setUser(data))
+            .catch(error => {
+                toast.error(error.message);
+                console.error(error);
+            });
+
+        console.log(user);
         window.addEventListener("animationstart", autofillHandler);
         window.addEventListener("input", autofillHandler);
         return () => {
@@ -48,7 +75,7 @@ function MemberProfile() {
             const toastId = toast.loading("Add employee processing...!")
             try {
                 console.log(formData)
-                await addEmployee(formData).unwrap();
+                await updateUser(formData).unwrap();
                 toast.success("Employee added successfully!",{ id: toastId });
                 reset();
                 setPreview(null);
@@ -61,11 +88,9 @@ function MemberProfile() {
     }
 
     const handleFileChange = (event) => {
-
         const file = event.target.files[0];
         setValue("avatar", file,{ shouldValidate: true });// Đặt giá trị cho field avatar
         setPreview(URL.createObjectURL(file));
-
     };
 
     const handleClosePreview = (e)=>{
@@ -75,35 +100,26 @@ function MemberProfile() {
     }
     const handleChangeCountry = (e) => {
         const country = e.target.value;
-
         setValue("country", country,{ shouldValidate: true });
-
         handleGenerateUsername();
         setCountry(country);
-
     }
 
     const handleChangeFirstName = (e)=>{
         setValue("firstname", e.target.value,{shouldValidate:true});
-
         handleGenerateUsername();
-
     }
     const handleChangeLastName = (e)=>{
-
         setValue("lastname", e.target.value,{shouldValidate:true});
-
         handleGenerateUsername();
     }
 
     const handleGenerateUsername =()=>{
         if(getValues("country") === "Vietnam"){
             let username = getValues("firstname") + generateUsername(watch("lastname"));
-
             const num = data?.content?.filter(x=> x.username.startsWith(username) && typeof (+x.username.replace(username))==="number" ).length;
             console.log(data,num)
             setValue("username", username+(num+1),{ shouldValidate: true });
-
         }
         else if(country.length >2) {
             setValue("username", watch("firstname")+watch("lastname"),{ shouldValidate: true });
@@ -131,7 +147,6 @@ function MemberProfile() {
                     <nav aria-label="Breadcrumb" className="mb-4">
                         <ol className="flex items-center">
                             <li className="group flex items-center">
-
                                 <NavLink to={"/"}
                                          className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
                                          data-testid="flowbite-breadcrumb-item" href="#">
@@ -154,8 +169,7 @@ function MemberProfile() {
                                 <span
                                     className="flex items-center m-2 text-sm font-medium text-gray-500 dark:text-gray-400"
                                     data-testid="flowbite-breadcrumb-item ">
-                                            Add employee
-                                        </span>
+                                            Add employee</span>
                             </li>
                         </ol>
                     </nav>
