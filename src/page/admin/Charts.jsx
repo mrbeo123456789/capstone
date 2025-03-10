@@ -38,10 +38,9 @@ const Charts = () => {
                 </ResponsiveContainer>
             </div>
 
-            {/* 🏆 Challenge Status Donut Chart (Bigger Size) */}
-            <div className="bg-gray-800 p-6 rounded-lg shadow-md flex flex-col items-center">
-                <h2 className="text-yellow-300 font-bold mb-3 text-lg">Challenge Status</h2>
-                <div className="relative w-96 h-96">
+            {/* 🏆 Challenge Status Donut Chart with Legends on Right */}
+            <div className="bg-gray-800 p-6 rounded-lg shadow-md flex">
+                <div className="relative w-3/4 h-96 flex justify-center items-center">
                     <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
                             <Pie
@@ -66,6 +65,16 @@ const Charts = () => {
                         <span className="text-2xl font-bold text-gray-300">Total</span>
                         <span className="text-4xl font-extrabold text-white">{totalChallenges}</span>
                     </div>
+                </div>
+
+                {/* 📊 Legends on the Right Side */}
+                <div className="w-1/4 flex flex-col justify-center space-y-3 ml-4">
+                    {challengesData.map((item, index) => (
+                        <div key={index} className="flex items-center space-x-2">
+                            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: item.color }}></div>
+                            <span className="text-gray-300 text-sm">{item.name}</span>
+                        </div>
+                    ))}
                 </div>
             </div>
         </div>

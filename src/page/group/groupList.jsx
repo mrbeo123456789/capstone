@@ -106,6 +106,7 @@ const GroupManagement = () => {
                         <tr className="bg-red-800 text-white">
                             <th className="px-4 py-2">ID</th>
                             <th className="px-4 py-2">Name</th>
+                            <th className="px-4 py-2">Member</th>
                             <th className="px-4 py-2">Actions</th>
                         </tr>
                         </thead>
@@ -115,6 +116,7 @@ const GroupManagement = () => {
                                 <tr key={group.id} className="border-t border-gray-700">
                                     <td className="px-4 py-2">{group.id}</td>
                                     <td className="px-4 py-2">{group.name}</td>
+                                    <td className="px-4 py-2">{group.members}</td>
                                     <td className="px-4 py-2">
                                         <button
                                             onClick={() => openEditModal(group)}

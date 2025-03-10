@@ -7,6 +7,7 @@ import MemberProfile from "../page/member/MemberProfile.jsx";
 import GroupManagement from "../page/group/groupList.jsx";
 import AuthCallBack from "../page/signin/AuthCallBack.jsx";
 import AdminDashboard from "../page/admin/AdminDashboard.jsx";
+import UserList from "../page/admin/UserList.jsx";
 const router = createBrowserRouter([
     {
         path:"/login",
@@ -32,6 +33,11 @@ const router = createBrowserRouter([
         path:"/admin-dashboard",
         errorElement:<ErrorPage/>,
         element: <AdminDashboard/>,
+    },
+    {
+        path:"/admin-userlist",
+        errorElement:<ErrorPage/>,
+        element: <UserList/>,
     },
     {
         path:"/member",
