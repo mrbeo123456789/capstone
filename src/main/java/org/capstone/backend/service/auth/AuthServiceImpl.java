@@ -135,11 +135,7 @@ public class AuthServiceImpl implements AuthService {
 
     // 🟢 Xác minh OTP và đặt lại mật khẩu mới
     @Override
-    public boolean resetPassword(String email, String otp, String newPassword) {
-        if (!otpService.verifyOtp(email, otp)) {
-            return false;
-        }
-
+    public boolean resetPassword(String email, String newPassword) {
         Optional<Account> accountOpt = accountRepository.findByEmail(email);
         if (accountOpt.isEmpty()) {
             return false;

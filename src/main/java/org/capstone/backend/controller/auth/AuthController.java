@@ -7,11 +7,9 @@
     import org.capstone.backend.dto.auth.RegisterRequest;
     import org.capstone.backend.entity.Account;
     import org.capstone.backend.service.auth.AuthService;
-    import org.capstone.backend.utils.sendmail.FixedGmailService;
     import org.springframework.beans.factory.annotation.Autowired;
     import org.springframework.http.HttpStatus;
     import org.springframework.http.ResponseEntity;
-    import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
     import org.springframework.web.bind.annotation.*;
 
     import java.util.HashMap;
@@ -82,7 +80,7 @@
             if (!authService.verifyAccount(email, otp)) {
                 return ResponseEntity.badRequest().body("OTP không hợp lệ hoặc đã hết hạn!");
             }
-            return ResponseEntity.ok("Tài khoản đã được kích hoạt!");
+            return ResponseEntity.ok("OTP correct");
         }
 
         @PostMapping("/forgot-password")
@@ -93,11 +91,10 @@
         }
 
         @PostMapping("/reset-password")
-        public ResponseEntity<String> resetPassword(@RequestParam String email,
-                                                    @RequestParam String otp,
-                                                    @RequestParam String newPassword) {
-            if (!authService.resetPassword(email, otp, newPassword)) {
-                return ResponseEntity.badRequest().body("OTP không hợp lệ hoặc đã hết hạn!");
+        public ResponseEntity<String> resetPassword(@RequestBody String email,
+                                                    @RequestBody String newPassword) {
+            if (!authService.resetPassword(email, newPassword)) {
+                return ResponseEntity.badRequest().body("Change failed");
             }
             return ResponseEntity.ok("Mật khẩu đã được cập nhật thành công!");
         }
