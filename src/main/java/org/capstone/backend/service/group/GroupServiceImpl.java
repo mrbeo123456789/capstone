@@ -1,4 +1,4 @@
-package org.capstone.backend.service.group.impl;
+package org.capstone.backend.service.group;
 
 import org.capstone.backend.dto.group.GroupMemberResponse;
 import org.capstone.backend.dto.group.GroupResponse;
@@ -12,6 +12,7 @@ import org.capstone.backend.repository.GroupMemberRepository;
 import org.capstone.backend.repository.GroupRepository;
 import org.capstone.backend.repository.MemberRepository;
 import org.capstone.backend.service.group.GroupService;
+import org.capstone.backend.utils.enums.GroupMemberStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -96,7 +97,7 @@ public class GroupServiceImpl implements GroupService {
                 .group(savedGroup)
                 .member(member)
                 .role("OWNER") // You can change role as needed
-                .status("ACTIVE") // Default status
+                .status(GroupMemberStatus.ACTIVE) // Default status
                 .createdBy(createdBy)
                 .build();
 
