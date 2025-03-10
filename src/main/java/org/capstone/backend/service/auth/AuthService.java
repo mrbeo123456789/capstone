@@ -1,6 +1,7 @@
 package org.capstone.backend.service.auth;
 
 import org.capstone.backend.entity.Account;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 public interface AuthService {
@@ -17,4 +18,5 @@ public interface AuthService {
     void sendOtpForPasswordReset(String email) throws Exception;
 
     boolean resetPassword(String email,  String newPassword);
+    Long getMemberIdFromAuthentication(Authentication authentication);
 }

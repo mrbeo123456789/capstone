@@ -80,7 +80,7 @@ public class GroupInvitationServiceImpl implements GroupInvitationService {
 
     @Override
     public String acceptInvitation(String inviteCode, String username) {
-        // Tìm account theo username
+        // 🔥 Tìm account theo username
         Account account = accountRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
 
@@ -89,26 +89,34 @@ public class GroupInvitationServiceImpl implements GroupInvitationService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email not associated with this account");
         }
 
-        // Kiểm tra và lấy lời mời từ DB
+        // 🔥 Kiểm tra và lấy lời mời từ DB
         GroupInvitation invitation = groupInvitationRepository.findByInviteLink(inviteCode)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid invite code"));
 
-        // Kiểm tra xem email có hợp lệ không
+        // 🔥 Kiểm tra xem email có hợp lệ không
         if (!invitation.isValid(email)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to join this group");
         }
 
-        // Lấy thông tin member từ email
+        // 🔥 Lấy thông tin member từ email
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found"));
 
-        // Kiểm tra xem đã tham gia nhóm chưa
+        // 🔥 Kiểm tra xem thành viên có bị cấm không
+        Optional<GroupMember> bannedMember = groupMemberRepository
+                .findByGroupIdAndMemberIdAndStatus(invitation.getGroup().getId(), member.getId(), GroupMemberStatus.BANNED);
+
+        if (bannedMember.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are banned from joining this group");
+        }
+
+        // 🔥 Kiểm tra xem đã tham gia nhóm chưa
         boolean alreadyJoined = groupMemberRepository.existsByGroupAndMember(invitation.getGroup(), member);
         if (alreadyJoined) {
             return "https://yourapp.com/groups/" + invitation.getGroup().getId();
         }
 
-        // Thêm member vào group
+        // 🔥 Thêm member vào group
         GroupMember groupMember = GroupMember.builder()
                 .group(invitation.getGroup())
                 .member(member)

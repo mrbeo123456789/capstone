@@ -13,6 +13,7 @@ import org.capstone.backend.repository.GroupRepository;
 import org.capstone.backend.repository.MemberRepository;
 import org.capstone.backend.service.group.GroupService;
 import org.capstone.backend.utils.enums.GroupMemberStatus;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -118,4 +119,69 @@ public class GroupServiceImpl implements GroupService {
 
         return groupRepository.save(group);
     }
+
+    @Override
+    public void kickMember(Long groupId, Long memberId, String username) {
+        // 🔥 Lấy Group cần kick thành viên
+        Groups group = groupRepository.findById(groupId).orElse(null);
+
+        if (group == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Group not found");
+        }
+
+        // 🔥 Lấy tài khoản yêu cầu kick (phải là owner của group)
+        Account requesterAccount = accountRepository.findByUsername(username).orElse(null);
+
+        if (requesterAccount == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found");
+        }
+
+        if (!group.getCreatedBy().equals(requesterAccount.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to kick members from this group");
+        }
+
+        // 🔥 Lấy ra thành viên cần kick
+        Optional<GroupMember> optionalMember = groupMemberRepository.findByGroupIdAndMemberIdAndStatus(groupId, memberId, GroupMemberStatus.ACTIVE);
+
+        if (optionalMember.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found in this group");
+        }
+
+        GroupMember memberToKick = optionalMember.get();
+        memberToKick.setStatus(GroupMemberStatus.LEFT);
+        groupMemberRepository.save(memberToKick);
+    }
+
+    @Override
+    public void leaveGroup(Long groupId, String username) {
+        // 🔥 Lấy tài khoản hiện tại
+        Account account = accountRepository.findByUsername(username).orElse(null);
+
+        if (account == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found");
+        }
+
+        // 🔥 Tìm thành viên tương ứng với tài khoản
+        Member member = memberRepository.findByAccount(account).orElse(null);
+
+        if (member == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found");
+        }
+
+        // 🔥 Lấy ra mối quan hệ thành viên và nhóm
+        Optional<GroupMember> optionalGroupMember = groupMemberRepository.findByGroupIdAndMemberIdAndStatus(groupId, member.getId(), GroupMemberStatus.ACTIVE);
+
+        if (optionalGroupMember.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "You are not a member of this group");
+        }
+
+        GroupMember groupMember = optionalGroupMember.get();
+        groupMember.setStatus(GroupMemberStatus.LEFT);
+        groupMemberRepository.save(groupMember);
+    }
+
+
+
+
+
 }

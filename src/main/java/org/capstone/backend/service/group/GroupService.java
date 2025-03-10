@@ -15,4 +15,6 @@ public interface GroupService {
     List<GroupResponse> getGroupsByMemberId(Long memberId);
     Groups createGroup(GroupRequest request, Long createdBy);
     Groups updateGroup(Long groupId, GroupRequest request, Long updatedBy);
+    void kickMember(Long groupId, Long memberId, String username);
+    void leaveGroup(Long groupId, String username);
 }

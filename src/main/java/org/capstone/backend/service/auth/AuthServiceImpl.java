@@ -1,11 +1,14 @@
 package org.capstone.backend.service.auth;
 
 import org.capstone.backend.entity.Account;
+import org.capstone.backend.entity.Member;
 import org.capstone.backend.repository.AccountRepository;
+import org.capstone.backend.repository.MemberRepository;
 import org.capstone.backend.utils.enums.AccountStatus;
 import org.capstone.backend.utils.enums.Role;
 import org.capstone.backend.utils.jwt.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
@@ -20,13 +23,14 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final OtpService otpService;
-
+    private final MemberRepository memberRepository;
     @Autowired
-    public AuthServiceImpl(AccountRepository accountRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, OtpService otpService) {
+    public AuthServiceImpl(AccountRepository accountRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, OtpService otpService, MemberRepository memberRepository) {
         this.accountRepository = accountRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
         this.otpService = otpService;
+        this.memberRepository = memberRepository;
     }
 
     @Override
@@ -146,5 +150,19 @@ public class AuthServiceImpl implements AuthService {
         accountRepository.save(account);
 
         return true;
+    }
+    public Long getMemberIdFromAuthentication(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
+            throw new RuntimeException("User is not authenticated");
+        }
+        // 🔥 Get username from Authentication
+        String username = authentication.getName();  // Usually the `sub` from JWT
+        // 🔥 Find the Account using username
+        Account account = accountRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Account not found"));
+        // 🔥 Find Member using Account (not Account ID)
+        Member member = memberRepository.findByAccount(account)
+                .orElseThrow(() -> new RuntimeException("Member not found"));
+        return member.getId();
     }
 }
