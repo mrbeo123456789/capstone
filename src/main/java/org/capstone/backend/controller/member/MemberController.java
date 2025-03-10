@@ -6,7 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.capstone.backend.dto.member.ChangePasswordRequest;
 import org.capstone.backend.dto.member.UserProfileRequest;
 import org.capstone.backend.dto.member.UserProfileResponse;
-import org.capstone.backend.service.member.UserProfileService;
+import org.capstone.backend.service.member.MemberService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -18,11 +18,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/member")
-public class UserProfileController {
-    private final UserProfileService userProfileService;
+public class MemberController {
+    private final MemberService memberService;
 
-    public UserProfileController(UserProfileService userProfileService) {
-        this.userProfileService = userProfileService;
+    public MemberController(MemberService memberService) {
+        this.memberService = memberService;
     }
 
     @GetMapping("/profile")
@@ -36,7 +36,7 @@ public class UserProfileController {
 
         String username = authentication.getName();
         System.out.println(username);
-        UserProfileResponse profile = userProfileService.getMemberProfile(username);
+        UserProfileResponse profile = memberService.getMemberProfile(username);
         System.out.println("Profile data: " + profile.getLastName());
         return ResponseEntity.ok(profile);
     }
@@ -56,7 +56,7 @@ public class UserProfileController {
                         .body("User is not authenticated");
             }
             String username = authentication.getName();
-            UserProfileResponse updatedProfile = userProfileService.updateMember(username, request, avatar);
+            UserProfileResponse updatedProfile = memberService.updateMember(username, request, avatar);
 
 
             return ResponseEntity.ok(updatedProfile);
@@ -78,7 +78,7 @@ public class UserProfileController {
 
         String username = authentication.getName();
         try {
-            userProfileService.changePassword(username, request);
+            memberService.changePassword(username, request);
             return ResponseEntity.ok("Password changed successfully!");
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

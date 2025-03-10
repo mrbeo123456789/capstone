@@ -7,7 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-public interface UserProfileService {
+public interface MemberService {
     UserProfileResponse getMemberProfile(String username);
     UserProfileResponse updateMember(String username, UserProfileRequest request, MultipartFile avatar) throws IOException;
 

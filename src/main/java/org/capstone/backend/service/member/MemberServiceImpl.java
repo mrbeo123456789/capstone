@@ -17,12 +17,12 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 
 @Service
-public class UserProfileServiceImpl implements UserProfileService {
+public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final AccountRepository accountRepository;
     private final FirebaseUpload firebaseUpload;
     private final PasswordEncoder passwordEncoder;
-    public UserProfileServiceImpl(MemberRepository memberRepository, AccountRepository accountRepository, FirebaseUpload firebaseUpload, PasswordEncoder passwordEncoder) {
+    public MemberServiceImpl(MemberRepository memberRepository, AccountRepository accountRepository, FirebaseUpload firebaseUpload, PasswordEncoder passwordEncoder) {
         this.memberRepository = memberRepository;
         this.accountRepository = accountRepository;
         this.firebaseUpload = firebaseUpload;
@@ -78,9 +78,10 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     private UserProfileResponse mapToDto(Member member) {
         UserProfileResponse response = new UserProfileResponse();
+        response.setUsername(member.getAccount().getUsername());
+        response.setEmail(member.getAccount().getEmail());
         response.setFirstName(member.getFirstName());
         response.setLastName(member.getLastName());
-        response.setAge(member.getAge());
         response.setGender(member.getGender());
         response.setPhone(member.getPhone());
         response.setAvatar(member.getAvatar());

@@ -76,7 +76,9 @@
         }
 
         @PostMapping("/confirm-verification")
-        public ResponseEntity<String> verifyAccount(@RequestParam String email, @RequestParam String otp) {
+        public ResponseEntity<String> verifyAccount(@RequestBody Map<String, String> request) {
+            String email = request.get("email");
+            String otp = request.get("otp");
             if (!authService.verifyAccount(email, otp)) {
                 return ResponseEntity.badRequest().body("OTP không hợp lệ hoặc đã hết hạn!");
             }
@@ -84,7 +86,8 @@
         }
 
         @PostMapping("/forgot-password")
-        public ResponseEntity<String> forgotPassword(@RequestParam String email) throws Exception {
+        public ResponseEntity<String> forgotPassword(@RequestBody Map<String, String> request) throws Exception {
+            String email = request.get("email");
             authService.sendOtpForPasswordReset(email);
             return ResponseEntity.ok("OTP đã được gửi đến email.");
         }
