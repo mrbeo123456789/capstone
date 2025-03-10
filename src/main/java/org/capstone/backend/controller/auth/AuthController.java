@@ -91,8 +91,9 @@
         }
 
         @PostMapping("/reset-password")
-        public ResponseEntity<String> resetPassword(@RequestBody String email,
-                                                    @RequestBody String newPassword) {
+        public ResponseEntity<String> resetPassword(@RequestBody Map<String, String> request) {
+            String email = request.get("email");
+            String newPassword = request.get("newPassword");
             if (!authService.resetPassword(email, newPassword)) {
                 return ResponseEntity.badRequest().body("Change failed");
             }
