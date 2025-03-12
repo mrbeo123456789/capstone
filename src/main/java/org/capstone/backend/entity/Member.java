@@ -5,6 +5,8 @@ import lombok.Data;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+
 @Data
 @Entity
 @Table(name = "member")
@@ -18,8 +20,6 @@ public class Member {
 
     private String lastName;
 
-    private Integer age;
-
     private String gender;
 
     private String phone;
@@ -28,7 +28,11 @@ public class Member {
 
     private String address;
 
-    private String country;
+    private String ward;
+
+    private String city;
+
+    private String district;
 
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
@@ -48,5 +52,6 @@ public class Member {
     @OneToOne
     @JoinColumn(name = "account_id", nullable = false)
     private Account account;
-
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChallengeMember> challengeMembers;
 }

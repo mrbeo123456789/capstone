@@ -14,6 +14,8 @@ public class UserProfileResponse {
     private String phone;
     private String avatar;
     private String address;
-    private String country;
+    private String ward;
+    private String city;
+    private String district;
     private LocalDate dateOfBirth;
 }
