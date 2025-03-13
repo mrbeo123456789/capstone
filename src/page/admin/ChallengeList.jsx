@@ -5,31 +5,31 @@ import Navbar from "../navbar/AdminNavbar.jsx";
 const ChallengeList = () => {
     // Sample data with more challenges
     const allChallenges = [
-        { id: 1, name: 'Giacomo Guilizzoni', type: 'Running', date: '01/01', duration: '2 months', status: 'accepted' },
-        { id: 2, name: 'Marco Botton', type: 'Workout', date: '13/10', duration: '6 months', status: 'waiting' },
-        { id: 3, name: 'Mariah Maclachlan', type: 'Gym', date: '05/04', duration: '3 months', status: 'rejected' },
-        { id: 4, name: 'Valerie Liberty', type: 'Swimming', date: '22/03', duration: '1 month', status: 'accepted' },
-        { id: 5, name: 'Guido Jack', type: 'Cycling', date: '15/06', duration: '4 months', status: 'waiting' },
-        { id: 6, name: 'Emma Wong', type: 'Running', date: '30/04', duration: '2 months', status: 'rejected' },
-        { id: 7, name: 'Alex Johnson', type: 'Hiking', date: '19/02', duration: '3 months', status: 'accepted' },
-        { id: 8, name: 'Taylor Swift', type: 'Yoga', date: '11/07', duration: '5 months', status: 'waiting' },
-        { id: 9, name: 'Chris Evans', type: 'Boxing', date: '03/08', duration: '2 months', status: 'rejected' },
-        { id: 10, name: 'Jenna Smith', type: 'CrossFit', date: '05/05', duration: '3 months', status: 'accepted' },
-        { id: 11, name: 'David Miller', type: 'Pilates', date: '16/09', duration: '4 months', status: 'waiting' },
-        { id: 12, name: 'Sophia Clark', type: 'Cycling', date: '22/10', duration: '6 months', status: 'rejected' },
-        { id: 13, name: 'Michael Brown', type: 'Swimming', date: '08/11', duration: '1 month', status: 'accepted' },
-        { id: 14, name: 'Olivia Wilson', type: 'Running', date: '14/12', duration: '2 months', status: 'waiting' },
-        { id: 15, name: 'Samuel Rodriguez', type: 'Weight Training', date: '25/01', duration: '3 months', status: 'rejected' },
-        { id: 16, name: 'Emma Thompson', type: 'Kickboxing', date: '07/03', duration: '4 months', status: 'accepted' },
-        { id: 17, name: 'Andrew Davis', type: 'Zumba', date: '19/04', duration: '2 months', status: 'waiting' },
-        { id: 18, name: 'Isabella Martin', type: 'Marathon', date: '30/05', duration: '6 months', status: 'rejected' },
-        { id: 19, name: 'Joshua Garcia', type: 'Triathlon', date: '12/06', duration: '5 months', status: 'accepted' },
-        { id: 20, name: 'Sofia Martinez', type: 'Cardio', date: '24/07', duration: '2 months', status: 'waiting' },
-        { id: 21, name: 'Daniel Anderson', type: 'CrossFit', date: '04/08', duration: '3 months', status: 'rejected' },
-        { id: 22, name: 'Mia Thomas', type: 'Swimming', date: '16/09', duration: '4 months', status: 'accepted' },
-        { id: 23, name: 'Matthew Jackson', type: 'Cycling', date: '28/10', duration: '2 months', status: 'waiting' },
-        { id: 24, name: 'Chloe White', type: 'Running', date: '09/11', duration: '3 months', status: 'rejected' },
-        { id: 25, name: 'Ethan Harris', type: 'Gym', date: '21/12', duration: '6 months', status: 'accepted' }
+        { id: 1, name: 'Giacomo Guilizzoni', type: 'Running', date: '01/01/2022', duration: '2 months', status: 'accepted' },
+        { id: 2, name: 'Marco Botton', type: 'Workout', date: '13/10/2024', duration: '6 months', status: 'waiting' },
+        { id: 3, name: 'Mariah Maclachlan', type: 'Gym', date: '05/04/2025', duration: '3 months', status: 'rejected' },
+        { id: 4, name: 'Valerie Liberty', type: 'Swimming', date: '22/03/2012', duration: '1 month', status: 'accepted' },
+        { id: 5, name: 'Guido Jack', type: 'Cycling', date: '15/06/2021', duration: '4 months', status: 'waiting' },
+        { id: 6, name: 'Emma Wong', type: 'Running', date: '30/04/2010', duration: '2 months', status: 'rejected' },
+        { id: 7, name: 'Alex Johnson', type: 'Hiking', date: '19/02/2014', duration: '3 months', status: 'accepted' },
+        { id: 8, name: 'Taylor Swift', type: 'Yoga', date: '11/07/2017', duration: '5 months', status: 'waiting' },
+        { id: 9, name: 'Chris Evans', type: 'Boxing', date: '03/08/2019', duration: '2 months', status: 'rejected' },
+        { id: 10, name: 'Jenna Smith', type: 'CrossFit', date: '05/05/2022', duration: '3 months', status: 'accepted' },
+        { id: 11, name: 'David Miller', type: 'Pilates', date: '16/09/2019', duration: '4 months', status: 'waiting' },
+        { id: 12, name: 'Sophia Clark', type: 'Cycling', date: '22/10/2025', duration: '6 months', status: 'rejected' },
+        { id: 13, name: 'Michael Brown', type: 'Swimming', date: '08/11/2026', duration: '1 month', status: 'accepted' },
+        { id: 14, name: 'Olivia Wilson', type: 'Running', date: '14/12/2009', duration: '2 months', status: 'waiting' },
+        { id: 15, name: 'Samuel Rodriguez', type: 'Weight Training', date: '25/01/2018', duration: '3 months', status: 'rejected' },
+        { id: 16, name: 'Emma Thompson', type: 'Kickboxing', date: '07/03/2015', duration: '4 months', status: 'accepted' },
+        { id: 17, name: 'Andrew Davis', type: 'Zumba', date: '19/04/2019', duration: '2 months', status: 'waiting' },
+        { id: 18, name: 'Isabella Martin', type: 'Marathon', date: '30/05/2020', duration: '6 months', status: 'rejected' },
+        { id: 19, name: 'Joshua Garcia', type: 'Triathlon', date: '12/06/2006', duration: '5 months', status: 'accepted' },
+        { id: 20, name: 'Sofia Martinez', type: 'Cardio', date: '24/07/2018', duration: '2 months', status: 'waiting' },
+        { id: 21, name: 'Daniel Anderson', type: 'CrossFit', date: '04/08/2019', duration: '3 months', status: 'rejected' },
+        { id: 22, name: 'Mia Thomas', type: 'Swimming', date: '16/09/2025', duration: '4 months', status: 'accepted' },
+        { id: 23, name: 'Matthew Jackson', type: 'Cycling', date: '28/10/2024', duration: '2 months', status: 'waiting' },
+        { id: 24, name: 'Chloe White', type: 'Running', date: '09/11/2026', duration: '3 months', status: 'rejected' },
+        { id: 25, name: 'Ethan Harris', type: 'Gym', date: '21/12/2025', duration: '6 months', status: 'accepted' }
     ];
 
     const [filterStatus, setFilterStatus] = useState(null);
@@ -137,7 +137,7 @@ const ChallengeList = () => {
                             <tr className="bg-gradient-to-r from-red-100 via-orange-50 to-yellow-50">
                                 <th className="py-3 px-4 text-left border-b border-gray-200 font-semibold text-gray-700 w-2/5">Name</th>
                                 <th className="py-3 px-4 text-left border-b border-gray-200 font-semibold text-gray-700 w-1/6">Type</th>
-                                <th className="py-3 px-4 text-left border-b border-gray-200 font-semibold text-gray-700 w-1/6">Date</th>
+                                <th className="py-3 px-4 text-left border-b border-gray-200 font-semibold text-gray-700 w-1/6">Star Date</th>
                                 <th className="py-3 px-4 text-left border-b border-gray-200 font-semibold text-gray-700 w-1/6">Duration</th>
                                 <th className="py-3 px-4 text-left border-b border-gray-200 font-semibold text-gray-700 w-1/6">
                                     <div className="relative">

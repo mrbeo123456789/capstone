@@ -48,7 +48,7 @@ const Navbar = () => {
                     </li>
                     <li>
                         <NavLink
-                            to="/admin-reports"
+                            to="/admin-reportlist"
                             className={({ isActive }) =>
                                 `px-4 py-2 rounded-md transition duration-200 ${
                                     isActive ? "bg-red-500 text-white" : "hover:bg-gray-700"

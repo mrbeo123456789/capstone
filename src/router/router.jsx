@@ -10,6 +10,7 @@ import AdminDashboard from "../page/admin/AdminDashboard.jsx";
 import UserList from "../page/admin/UserList.jsx";
 import ChallengeList from "../page/admin/ChallengeList.jsx";
 import EvidenceList from "../page/admin/EvidenceList.jsx";
+import ReportList from "../page/admin/ReportList.jsx";
 const router = createBrowserRouter([
     {
         path:"/login",
@@ -40,10 +41,16 @@ const router = createBrowserRouter([
         path:"/admin-userlist",
         errorElement:<ErrorPage/>,
         element: <UserList/>,
-    },{
+    },
+    {
         path:"/admin-evidencelist",
         errorElement:<ErrorPage/>,
         element: <EvidenceList/>,
+    },
+    {
+        path:"/admin-reportlist",
+        errorElement:<ErrorPage/>,
+        element: <ReportList/>,
     },
     {
         path:"/admin-challengelist",
