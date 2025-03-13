@@ -32,4 +32,7 @@ public class ChallengeType {
     private LocalDateTime updatedAt;
 
 
+    public ChallengeType(Object o, String fitness) {
+        this.name = fitness;
+    }
 }

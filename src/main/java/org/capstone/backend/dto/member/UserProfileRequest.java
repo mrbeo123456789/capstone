@@ -7,6 +7,10 @@ import java.time.LocalDate;
 
 @Data
 public class UserProfileRequest {
+        @NotBlank(message = "Full name cannot be empty")
+        @Size(max = 50, message = "Full name cannot exceed 50 characters")
+        private String fullName;
+
         @NotBlank(message = "First name cannot be empty")
         @Size(max = 50, message = "First name cannot exceed 50 characters")
         private String firstName;

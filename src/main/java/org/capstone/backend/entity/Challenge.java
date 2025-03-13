@@ -28,6 +28,15 @@ public class Challenge {
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
+    @Column(name = "summary")
+    private String summary;
+
+    @Column(name = "picture")
+    private String picture;
+
+    @Column(name = "banner")
+    private String banner;
+
     @Column(name = "description")
     private String description;
 
@@ -70,9 +79,11 @@ public class Challenge {
 
     @Column(name = "updated_by")
     private Long updatedBy;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "challenge_type_id", nullable = false)
     private ChallengeType challengeType;
+
     @OneToMany(mappedBy = "challenge", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChallengeMember> challengeMembers = new ArrayList<>();
 

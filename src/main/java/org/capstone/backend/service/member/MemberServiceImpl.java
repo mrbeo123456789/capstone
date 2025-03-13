@@ -81,6 +81,7 @@ public class MemberServiceImpl implements MemberService {
         UserProfileResponse response = new UserProfileResponse();
         response.setUsername(member.getAccount().getUsername());
         response.setEmail(member.getAccount().getEmail());
+        response.setFullName(member.getFullName());
         response.setFirstName(member.getFirstName());
         response.setLastName(member.getLastName());
         response.setGender(member.getGender());

@@ -33,6 +33,7 @@ public class ChallengeController {
         Challenge createdChallenge = challengeService.createChallenge(request, username);
         return ResponseEntity.ok(createdChallenge);
     }
+
     @GetMapping("/challenge-types")
     public List<ChallengeType> getAllChallengeTypes() {
         return challengeService.getAllTypes();

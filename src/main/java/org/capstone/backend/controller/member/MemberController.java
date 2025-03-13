@@ -58,7 +58,6 @@ public class MemberController {
             String username = authentication.getName();
             UserProfileResponse updatedProfile = memberService.updateMember(username, request, avatar);
 
-
             return ResponseEntity.ok(updatedProfile);
         } catch (JsonProcessingException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

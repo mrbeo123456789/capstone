@@ -8,6 +8,7 @@ import java.time.LocalDate;
 public class UserProfileResponse {
     private String email;
     private String username;
+    private String fullName;
     private String firstName;
     private String lastName;
     private String gender;
