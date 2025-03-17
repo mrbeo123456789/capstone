@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../navbar/AdminNavbar.jsx";
 import { FaSort, FaCheckCircle, FaTimesCircle, FaUser, FaEnvelope, FaIdCard, FaPhone, FaBirthdayCake, FaMapMarkerAlt } from "react-icons/fa";
-import { IoCloseCircle } from "react-icons/io5";
 
 const UserList = () => {
     const navigate = useNavigate();
@@ -14,7 +13,7 @@ const UserList = () => {
         phone: `0${Math.floor(Math.random() * 900000000) + 100000000}`,
         dob: `${Math.floor(Math.random() * 28) + 1}/${Math.floor(Math.random() * 12) + 1}/${Math.floor(Math.random() * 20) + 1980}`,
         address: `${Math.floor(Math.random() * 100) + 1} Đường Nguyễn Huệ, Quận ${Math.floor(Math.random() * 12) + 1}, TP.HCM`,
-        role: i % 3 === 0 ? "Admin" : i % 3 === 1 ? "Challenge Host" : "Member",
+        role: i % 2 === 0 ? "Admin" : "Member",
         status: i % 4 === 0 ? "banned" : "active",
         avatar: `https://randomuser.me/api/portraits/${i % 2 === 0 ? 'men' : 'women'}/${i % 70 + 1}.jpg`
     }));
@@ -25,7 +24,10 @@ const UserList = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedUser, setSelectedUser] = useState(null);
     const [showPopup, setShowPopup] = useState(false);
+    const [roleFilter, setRoleFilter] = useState("all");
     const usersPerPage = 10;
+
+    const allRoles = ["Admin", "Member"];
 
     const handleSort = (key) => {
         setSortConfig((prev) => {
@@ -49,7 +51,7 @@ const UserList = () => {
     };
 
     const openUserDetail = (user) => {
-        setSelectedUser(user);
+        setSelectedUser({...user});
         setShowPopup(true);
     };
 
@@ -57,10 +59,14 @@ const UserList = () => {
         setShowPopup(false);
     };
 
-    const filteredUsers = users.filter(user =>
-        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredUsers = users.filter(user => {
+        const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.email.toLowerCase().includes(searchTerm.toLowerCase());
+
+        const matchesRole = roleFilter === "all" || user.role === roleFilter;
+
+        return matchesSearch && matchesRole;
+    });
 
     const sortedUsers = [...filteredUsers].sort((a, b) => {
         for (const { key, direction } of sortConfig) {
@@ -70,46 +76,113 @@ const UserList = () => {
         return 0;
     });
 
+    const saveUserChanges = (updatedUser) => {
+        setUsers(prevUsers =>
+            prevUsers.map(user =>
+                user.id === updatedUser.id ? updatedUser : user
+            )
+        );
+        setSelectedUser(updatedUser);
+    };
+
     const indexOfLastUser = currentPage * usersPerPage;
     const indexOfFirstUser = indexOfLastUser - usersPerPage;
     const currentUsers = sortedUsers.slice(indexOfFirstUser, indexOfLastUser);
     const totalPages = Math.ceil(sortedUsers.length / usersPerPage);
 
-    // Component for user detail popup
-    const UserDetailPopup = ({ user, onClose }) => {
+    // Component for user detail popup with editing capabilities
+    const UserDetailPopup = ({ user, onClose, onSave }) => {
         if (!user) return null;
+
+        const [editedUser, setEditedUser] = useState({...user});
+        const [isEditing, setIsEditing] = useState(false);
+
+        const handleInputChange = (e) => {
+            const { name, value } = e.target;
+            setEditedUser({...editedUser, [name]: value});
+        };
+
+        const handleSave = () => {
+            onSave(editedUser);
+            setIsEditing(false);
+        };
 
         return (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                 <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl overflow-hidden animate-fadeIn">
                     <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white p-4 flex justify-between items-center">
                         <h2 className="text-xl font-bold">Chi tiết người dùng</h2>
-                        <button
-                            onClick={onClose}
-                            className="text-white hover:text-gray-200 transition-colors"
-                        >
-                            <IoCloseCircle className="text-2xl" />
-                        </button>
+                        <div className="flex space-x-2">
+                            {isEditing ? (
+                                <>
+                                    <button
+                                        onClick={handleSave}
+                                        className="px-3 py-1 bg-green-600 hover:bg-green-700 rounded-md text-sm font-medium"
+                                    >
+                                        Lưu
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            setEditedUser({...user});
+                                            setIsEditing(false);
+                                        }}
+                                        className="px-3 py-1 bg-gray-600 hover:bg-gray-700 rounded-md text-sm font-medium"
+                                    >
+                                        Hủy
+                                    </button>
+                                </>
+                            ) : (
+                                <button
+                                    onClick={() => setIsEditing(true)}
+                                    className="px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded-md text-sm font-medium"
+                                >
+                                    Chỉnh sửa
+                                </button>
+                            )}
+                        </div>
                     </div>
 
                     <div className="p-6">
                         <div className="flex flex-col md:flex-row items-center mb-6">
                             <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-orange-200 flex-shrink-0 mb-4 md:mb-0">
                                 <img
-                                    src={user.avatar}
-                                    alt={user.name}
+                                    src={editedUser.avatar}
+                                    alt={editedUser.name}
                                     className="w-full h-full object-cover"
                                 />
                             </div>
                             <div className="md:ml-6 text-center md:text-left">
-                                <h3 className="text-2xl font-bold text-gray-800">{user.name}</h3>
-                                <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium mt-2 ${
-                                    user.role === "Admin" ? "bg-purple-100 text-purple-800" :
-                                        user.role === "Challenge Host" ? "bg-blue-100 text-blue-800" :
+                                {isEditing ? (
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        value={editedUser.name}
+                                        onChange={handleInputChange}
+                                        className="text-2xl font-bold text-gray-800 border-b border-orange-300 focus:outline-none focus:border-orange-500 w-full"
+                                    />
+                                ) : (
+                                    <h3 className="text-2xl font-bold text-gray-800">{editedUser.name}</h3>
+                                )}
+
+                                {isEditing ? (
+                                    <select
+                                        name="role"
+                                        value={editedUser.role}
+                                        onChange={handleInputChange}
+                                        className="mt-2 px-3 py-1 rounded-full text-sm font-medium border border-orange-300 focus:outline-none focus:border-orange-500"
+                                    >
+                                        {allRoles.map(role => (
+                                            <option key={role} value={role}>{role}</option>
+                                        ))}
+                                    </select>
+                                ) : (
+                                    <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium mt-2 ${
+                                        editedUser.role === "Admin" ? "bg-purple-100 text-purple-800" :
                                             "bg-green-100 text-green-800"
-                                }`}>
-                                    {user.role}
-                                </span>
+                                    }`}>
+                                        {editedUser.role}
+                                    </span>
+                                )}
                             </div>
                         </div>
 
@@ -119,7 +192,7 @@ const UserList = () => {
                                     <FaIdCard className="mr-2" />
                                     <span className="text-sm font-medium">Tên đăng nhập</span>
                                 </div>
-                                <div className="text-gray-800 pl-6">{user.username}</div>
+                                <div className="text-gray-800 pl-6">{editedUser.username}</div>
                             </div>
 
                             <div className="bg-orange-50 p-3 rounded-lg">
@@ -127,7 +200,17 @@ const UserList = () => {
                                     <FaEnvelope className="mr-2" />
                                     <span className="text-sm font-medium">Email</span>
                                 </div>
-                                <div className="text-gray-800 pl-6">{user.email}</div>
+                                {isEditing ? (
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        value={editedUser.email}
+                                        onChange={handleInputChange}
+                                        className="text-gray-800 pl-6 border-b border-orange-300 focus:outline-none focus:border-orange-500 bg-transparent w-full"
+                                    />
+                                ) : (
+                                    <div className="text-gray-800 pl-6">{editedUser.email}</div>
+                                )}
                             </div>
 
                             <div className="bg-orange-50 p-3 rounded-lg">
@@ -135,7 +218,17 @@ const UserList = () => {
                                     <FaPhone className="mr-2" />
                                     <span className="text-sm font-medium">Số điện thoại</span>
                                 </div>
-                                <div className="text-gray-800 pl-6">{user.phone}</div>
+                                {isEditing ? (
+                                    <input
+                                        type="tel"
+                                        name="phone"
+                                        value={editedUser.phone}
+                                        onChange={handleInputChange}
+                                        className="text-gray-800 pl-6 border-b border-orange-300 focus:outline-none focus:border-orange-500 bg-transparent w-full"
+                                    />
+                                ) : (
+                                    <div className="text-gray-800 pl-6">{editedUser.phone}</div>
+                                )}
                             </div>
 
                             <div className="bg-orange-50 p-3 rounded-lg">
@@ -143,7 +236,17 @@ const UserList = () => {
                                     <FaBirthdayCake className="mr-2" />
                                     <span className="text-sm font-medium">Ngày sinh</span>
                                 </div>
-                                <div className="text-gray-800 pl-6">{user.dob}</div>
+                                {isEditing ? (
+                                    <input
+                                        type="text"
+                                        name="dob"
+                                        value={editedUser.dob}
+                                        onChange={handleInputChange}
+                                        className="text-gray-800 pl-6 border-b border-orange-300 focus:outline-none focus:border-orange-500 bg-transparent w-full"
+                                    />
+                                ) : (
+                                    <div className="text-gray-800 pl-6">{editedUser.dob}</div>
+                                )}
                             </div>
 
                             <div className="bg-orange-50 p-3 rounded-lg md:col-span-2">
@@ -151,7 +254,17 @@ const UserList = () => {
                                     <FaMapMarkerAlt className="mr-2" />
                                     <span className="text-sm font-medium">Địa chỉ</span>
                                 </div>
-                                <div className="text-gray-800 pl-6">{user.address}</div>
+                                {isEditing ? (
+                                    <input
+                                        type="text"
+                                        name="address"
+                                        value={editedUser.address}
+                                        onChange={handleInputChange}
+                                        className="text-gray-800 pl-6 border-b border-orange-300 focus:outline-none focus:border-orange-500 bg-transparent w-full"
+                                    />
+                                ) : (
+                                    <div className="text-gray-800 pl-6">{editedUser.address}</div>
+                                )}
                             </div>
 
                             <div className="bg-orange-50 p-3 rounded-lg md:col-span-2">
@@ -160,13 +273,13 @@ const UserList = () => {
                                     <span className="text-sm font-medium">Trạng thái</span>
                                 </div>
                                 <div className="flex items-center pl-6">
-                                    {user.status === "active" ? (
+                                    {editedUser.status === "active" ? (
                                         <FaCheckCircle className="text-green-500 mr-2" />
                                     ) : (
                                         <FaTimesCircle className="text-red-500 mr-2" />
                                     )}
-                                    <span className={`font-medium ${user.status === "active" ? "text-green-600" : "text-red-600"}`}>
-                                        {user.status === "active" ? "Đang hoạt động" : "Đã bị khóa"}
+                                    <span className={`font-medium ${editedUser.status === "active" ? "text-green-600" : "text-red-600"}`}>
+                                        {editedUser.status === "active" ? "Đang hoạt động" : "Đã bị khóa"}
                                     </span>
                                 </div>
                             </div>
@@ -176,16 +289,17 @@ const UserList = () => {
                     <div className="bg-gray-50 px-6 py-4 flex justify-end space-x-3 border-t border-gray-200">
                         <button
                             onClick={() => {
-                                toggleUserStatus(user.id);
+                                const updatedUser = {...editedUser, status: editedUser.status === "active" ? "banned" : "active"};
+                                onSave(updatedUser);
                                 onClose();
                             }}
                             className={`px-4 py-2 rounded-md font-medium ${
-                                user.status === "banned"
+                                editedUser.status === "banned"
                                     ? "bg-green-500 hover:bg-green-600 text-white"
                                     : "bg-red-500 hover:bg-red-600 text-white"
                             }`}
                         >
-                            {user.status === "banned" ? "Mở khóa" : "Khóa"}
+                            {editedUser.status === "banned" ? "Mở khóa" : "Khóa"}
                         </button>
                         <button
                             onClick={onClose}
@@ -206,19 +320,33 @@ const UserList = () => {
                 <div className="bg-white rounded-xl shadow-xl overflow-hidden max-w-6xl mx-auto border border-orange-100">
                     <div className="p-4 md:p-6 border-b border-orange-100 bg-gradient-to-r from-orange-50 to-yellow-50">
                         <h1 className="text-2xl font-bold text-orange-600 mb-4">Quản lý người dùng</h1>
-                        <div className="relative">
-                            <input
-                                type="text"
-                                placeholder="Tìm kiếm theo tên hoặc email..."
-                                className="w-full pl-10 pr-4 py-3 border border-orange-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
-                            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-orange-400">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
+                        <div className="flex flex-col md:flex-row gap-4 mb-4">
+                            <div className="relative flex-grow">
+                                <input
+                                    type="text"
+                                    placeholder="Tìm kiếm theo tên hoặc email..."
+                                    className="w-full pl-10 pr-4 py-3 border border-orange-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-orange-400">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                </div>
                             </div>
+                            {/*<div className="w-full md:w-64">*/}
+                            {/*    <select*/}
+                            {/*        value={roleFilter}*/}
+                            {/*        onChange={(e) => setRoleFilter(e.target.value)}*/}
+                            {/*        className="w-full py-3 px-4 border border-orange-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white"*/}
+                            {/*    >*/}
+                            {/*        <option value="all">Tất cả vai trò</option>*/}
+                            {/*        {allRoles.map(role => (*/}
+                            {/*            <option key={role} value={role}>{role}</option>*/}
+                            {/*        ))}*/}
+                            {/*    </select>*/}
+                            {/*</div>*/}
                         </div>
                     </div>
                     <div className="overflow-x-auto">
@@ -271,8 +399,7 @@ const UserList = () => {
                                     <td className="p-4">
                                             <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                                                 user.role === "Admin" ? "bg-purple-100 text-purple-800" :
-                                                    user.role === "Challenge Host" ? "bg-blue-100 text-blue-800" :
-                                                        "bg-green-100 text-green-800"
+                                                    "bg-green-100 text-green-800"
                                             }`}>
                                                 {user.role}
                                             </span>
@@ -367,6 +494,7 @@ const UserList = () => {
                 <UserDetailPopup
                     user={selectedUser}
                     onClose={closeUserDetail}
+                    onSave={saveUserChanges}
                 />
             )}
         </div>
