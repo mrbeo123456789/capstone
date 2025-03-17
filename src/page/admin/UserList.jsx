@@ -335,18 +335,6 @@ const UserList = () => {
                                     </svg>
                                 </div>
                             </div>
-                            {/*<div className="w-full md:w-64">*/}
-                            {/*    <select*/}
-                            {/*        value={roleFilter}*/}
-                            {/*        onChange={(e) => setRoleFilter(e.target.value)}*/}
-                            {/*        className="w-full py-3 px-4 border border-orange-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white"*/}
-                            {/*    >*/}
-                            {/*        <option value="all">Tất cả vai trò</option>*/}
-                            {/*        {allRoles.map(role => (*/}
-                            {/*            <option key={role} value={role}>{role}</option>*/}
-                            {/*        ))}*/}
-                            {/*    </select>*/}
-                            {/*</div>*/}
                         </div>
                     </div>
                     <div className="overflow-x-auto">
@@ -360,12 +348,7 @@ const UserList = () => {
                                     </button>
                                 </th>
                                 <th className="p-4 text-left font-bold text-orange-800 hidden md:table-cell">Email</th>
-                                <th className="p-4 text-left font-bold text-orange-800">
-                                    <button className="flex items-center" onClick={() => handleSort("role")}>
-                                        Vai trò
-                                        <FaSort className="ml-1 text-orange-500" />
-                                    </button>
-                                </th>
+
                                 <th className="p-4 text-left font-bold text-orange-800">
                                     <button className="flex items-center" onClick={() => handleSort("status")}>
                                         Trạng thái
@@ -396,14 +379,7 @@ const UserList = () => {
                                         </div>
                                     </td>
                                     <td className="p-4 hidden md:table-cell text-gray-600">{user.email}</td>
-                                    <td className="p-4">
-                                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                                user.role === "Admin" ? "bg-purple-100 text-purple-800" :
-                                                    "bg-green-100 text-green-800"
-                                            }`}>
-                                                {user.role}
-                                            </span>
-                                    </td>
+
                                     <td className="p-4">
                                         {user.status === "banned" ? (
                                             <div className="flex items-center text-red-500">
