@@ -6,7 +6,7 @@ export const challengeService = createApi({
     baseQuery: fetchBaseQuery({
         baseUrl: BASE_URL,
         prepareHeaders: (headers) => {
-            const token = localStorage.getItem("token");
+            const token = localStorage.getItem("jwt_token");
             if (token) {
                 headers.set("Authorization", `Bearer ${token}`);
             }
@@ -22,7 +22,7 @@ export const challengeService = createApi({
         }),
         createChallenge: builder.mutation({
             query: (challengeData) => ({
-                url: "/challenges",
+                url: "/challenges/create",
                 method: "POST",
                 body: challengeData,
             }),

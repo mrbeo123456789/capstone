@@ -18,18 +18,12 @@ export const authService = createApi({
     tagTypes: ["Auth"],
     endpoints: (builder) => ({
         register: builder.mutation({
-            query: (data) => {
-                console.log("Register Data:", data);
-                return {
-                    url: "/auth/register",
-                    method: "POST",
-                    body: data,
-                };
-            },
-            transformResponse: (response) => {
-                console.log("Register Response:", response);
-                return { message: response };
-            },
+            query: (data) => ({
+                url: "/auth/register",
+                method: "POST",
+                body: data,
+            }),
+            transformResponse: (response) => ({ message: response }),
         }),
 
         login: builder.mutation({
@@ -39,42 +33,42 @@ export const authService = createApi({
                 body: data,
             }),
             transformResponse: (response) => {
-                console.log("Login Response:", response);
-
                 if (typeof response === "string") {
-                    return { error: response }; // Nếu phản hồi là text, bọc vào object
+                    return { error: response };
                 }
-
                 localStorage.setItem("jwt_token", response.token);
                 return response;
             },
         }),
 
-
-        loginWithGoogle: builder.mutation({
-            query: () => {
-                console.log("Login with Google triggered");
-                return {
-                    url: "/oauth2/authorization/google",
-                    method: "GET",
-                };
-            },
-        }),
-
-        handleOAuthCallback: builder.mutation({
-            query: () => {
-                console.log("OAuth Callback triggered");
-                return {
-                    url: "/api/auth/oauth2-login",
-                    method: "GET",
-                    credentials: "include",
-                };
-            },
+        forgotPassword: builder.mutation({
+            query: (email) => ({
+                url: "/auth/forgot-password",
+                method: "POST",
+                body: { email },
+            }),
             transformResponse: (response) => {
-                console.log("OAuth Callback Response:", response);
-                localStorage.setItem("jwt_token", response.token);
-                return response;
+                console.log("Forgot Password Response:", response);
+                return { message: response };
             },
+        }),
+
+        resetPassword: builder.mutation({
+            query: ({ email, newPassword }) => ({
+                url: "/auth/reset-password",
+                method: "POST",
+                body: { email, newPassword },
+            }),
+            transformResponse: (response) => ({ message: response }),
+        }),
+
+        verifyAccount: builder.mutation({
+            query: ({ email, otp }) => ({
+                url: "/auth/confirm-verification",
+                method: "POST",
+                body: { email, otp },
+            }),
+            transformResponse: (response) => ({ message: response }),
         }),
 
     }),
@@ -83,4 +77,7 @@ export const authService = createApi({
 export const {
     useRegisterMutation,
     useLoginMutation,
+    useForgotPasswordMutation,
+    useResetPasswordMutation,
+    useVerifyAccountMutation,
 } = authService;

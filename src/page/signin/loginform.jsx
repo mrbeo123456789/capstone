@@ -31,7 +31,7 @@ const LoginForm = () => {
 
             if (response.token) {
                 localStorage.setItem("jwt_token", response.token);
-                navigate("/member/detail");
+                navigate("/homepage");
             } else {
                 setError("Unexpected response from server");
             }
@@ -69,8 +69,8 @@ const LoginForm = () => {
                         <h3 className="text-2xl font-bold text-center mb-4">Login</h3>
                         {error && <p className="text-red-500 text-sm">{error}</p>}
                         <div>
-                            <label className="block text-sm mb-1">Username</label>
-                            <input type="text" placeholder="Enter your username" value={username} onChange={(e) => setUsername(e.target.value)}
+                            <label className="block text-sm mb-1">Username or your Primary Email</label>
+                            <input type="text" placeholder="Enter your username (or Email)" value={username} onChange={(e) => setUsername(e.target.value)}
                                    className="w-full px-4 py-2 bg-transparent border border-gray-500 rounded-md text-white outline-none placeholder-gray-400 focus:border-blue-400" />
                         </div>
                         <div>

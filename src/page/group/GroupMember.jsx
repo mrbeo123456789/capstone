@@ -33,9 +33,9 @@ const GroupUsers = () => {
                      background: "linear-gradient(to right, red, orange)"
                  }}>
                 <div className="bg-black flex flex-col w-full rounded-lg shadow-md items-center"
-                style={{
-                    borderRadius: "1em",
-                }}>
+                     style={{
+                         borderRadius: "1em",
+                     }}>
                     {/* Gradient Border Effect */}
                     <div>
                         <div className="p-1 rounded-lg flex items-center">

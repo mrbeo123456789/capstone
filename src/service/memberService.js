@@ -41,10 +41,24 @@ export const memberService = createApi({
             }),
             invalidatesTags: ["Member"],
         }),
+
+        changePassword: builder.mutation({
+            query: (data) => ({
+                url: "/member/change-password",
+                method: "PUT",
+                body: data,
+            }),
+            transformResponse: (response) => {
+                console.log("Change Password Response:", response);
+                return { message: response };
+            },
+        }),
     }),
 });
 
 export const {
     useGetMembersQuery,
-    useGetMemberByIdQuery, 
-    useUpdateMemberMutation } = memberService;
+    useGetMemberByIdQuery,
+    useUpdateMemberMutation ,
+    useChangePasswordMutation,
+} = memberService;

@@ -1,40 +1,24 @@
-import {Outlet, useLocation} from "react-router-dom";
-import {Header} from "./Header.jsx";
-import {Footer} from "./Footer.jsx";
-import {SideBar} from "./SideBar.jsx";
-import {useState} from "react";
+import { Outlet } from "react-router-dom";
+import { Header } from "./Header.jsx";
+import { Footer } from "./Footer.jsx";
+import { SideBar } from "./SideBar.jsx";
+import {useSidebar} from "../../context/SidebarContext.jsx";
 
 function Layout() {
-    const location = useLocation(); // Get current route
-    const [showSidebar, setShowSidebar] = useState(false); // Sidebar state
+    const { isSidebarOpen, toggleSidebar } = useSidebar();
+    console.log("isSidebarOpen in Layout:", isSidebarOpen);
 
     return (
         <>
-            <Header />
+            <Header toggleSidebar={toggleSidebar} />
             <div
                 className="flex items-start justify-between"
                 style={{
-                    background: "linear-gradient(235deg, rgb(79 15 103), rgb(123 4 48), rgb(65 2 2))",
+                    background: "linear-gradient(235deg, rgb(254 225 144), rgb(250 241 221), rgb(252 247 226))",
                 }}
             >
-                {/* ✅ Sidebar logic */}
-                {location.pathname !== "/homepage" ? (
-                    <SideBar /> // Show sidebar normally
-                ) : (
-                    showSidebar && <SideBar /> // Show when toggled on homepage
-                )}
-
-                <div className="flex flex-col w-full pl-0 md:p-4 md:space-y-4">
-                    {/* ✅ Toggle Sidebar Button (Only for Homepage) */}
-                    {location.pathname === "/homepage" && (
-                        <button
-                            onClick={() => setShowSidebar(!showSidebar)}
-                            className="absolute bg-red-500 text-white px-4 py-2 rounded shadow-md hover:bg-red-600 transition"
-                        >
-                            {showSidebar ? "✖ Menu" : "☰ Menu"}
-                        </button>
-                    )}
-
+                {isSidebarOpen && <SideBar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />}
+                <div className={`w-full transition-all duration-300 pl-0 md:p-4 md:space-y-4`}>
                     <Outlet />
                 </div>
             </div>

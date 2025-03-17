@@ -1,9 +1,8 @@
-import React, { useState } from "react";
-import { FaRunning, FaUsers, FaUser, FaLock, FaTrophy, FaChartBar, FaBars, FaTimes } from "react-icons/fa";
+import React from "react";
+import { FaRunning, FaUsers, FaUser, FaLock, FaTrophy, FaChartBar, FaBars } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
-export const SideBar = () => {
-    const [isOpen, setIsOpen] = useState(true);
-
+export const SideBar = ({ isOpen, toggleSidebar }) => {
     const menuItems = [
         { name: "My Challenge", icon: <FaRunning />, link: "/challenges/joins" },
         { name: "My Group", icon: <FaUsers />, link: "/groups/joins" },
@@ -14,9 +13,10 @@ export const SideBar = () => {
     ];
 
     return (
-        <div className="relative hidden my-4 ml-4 shadow-lg lg:block w-80 h-full">
+        <div className="relative z-50">
+
             {/* Sidebar */}
-            <div className={`rounded-lg bg-[#370F0F] text-orange-300 w-64 h-full top-0 left-0 p-5 transition-all duration-300 ${isOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}>
+            <div className={`rounded-lg bg-[rgb(249,198,159)] w-64 h-full top-0 left-0 p-5 transition-all duration-300 ${isOpen ? "translate-x-0" : "-translate-x-full"}`}>
                 {/* Logo */}
                 <div className="flex items-center space-x-3 mb-6">
                     <img src="https://via.placeholder.com/40" alt="GoBeyond Logo" className="h-10 rounded-full" />
@@ -28,13 +28,13 @@ export const SideBar = () => {
                     <ul className="space-y-4">
                         {menuItems.map((item, index) => (
                             <li key={index}>
-                                <a
-                                    href={item.link}
+                                <Link
+                                    to={item.link}
                                     className="flex items-center space-x-3 p-2 rounded-md hover:bg-orange-600 hover:text-white transition"
                                 >
                                     <span className="text-lg">{item.icon}</span>
                                     <span>{item.name}</span>
-                                </a>
+                                </Link>
                             </li>
                         ))}
                     </ul>

@@ -1,133 +1,247 @@
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import { useCreateChallengeMutation } from "../../service/challengeService.js";
+import {FaWindowClose} from "react-icons/fa";
+import {IoCloudUploadOutline} from "react-icons/io5";
+import {challengeValidation} from "../../utils/validation.js";
+import {yupResolver} from "@hookform/resolvers/yup";
 
 const ChallengeForm = () => {
+    const [createChallenge, { isLoading }] = useCreateChallengeMutation();
+    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState("description");
+    const [preview, setPreview] = useState("");
+    const {register,
+        handleSubmit,
+        setValue,
+        getValues,
+        watch,
+        reset,
+        trigger,
+        formState:{ errors, isValid, isDirty}
+    } = useForm({
+            mode: "all",
+            resolver: yupResolver(challengeValidation)});
+
+
+    const onSubmit = async (data) => {
+        try {
+            const formattedData = {
+                ...data,
+                maxParticipants: parseInt(data.maxParticipants),
+                challengeTypeId: parseInt(data.challengeTypeId),
+            };
+            console.log("Formatted Data:", formattedData);
+            await createChallenge(formattedData);
+            toast.success("Challenge created successfully!");
+            reset();
+            navigate("/challenges");
+        } catch (err) {
+            toast.error("Failed to create challenge: " + err.data?.message || "Unknown error");
+        }
+    };
+
+    const handleFileChange = (event) => {
+        const file = event.target.files[0];
+        setValue("avatar", file,{ shouldValidate: true });// Đặt giá trị cho field avatar
+        setPreview(URL.createObjectURL(file));
+    };
+
+    const handleClosePreview = (e)=>{
+        e.stopPropagation()
+        setPreview(null);
+        setValue("avatar", null,{ shouldValidate: true });
+    }
 
     return (
-        <div
-            className="p-6 flex flex-col items-center h-full w-full"
-            style={{
-                position: "relative",
-                boxSizing: "border-box",
-                borderRadius: "1em",
-                border: "5px solid transparent",
-                zIndex: "1",
-            }}
-        >
-            {/* Outer Gradient Border */}
-            <div
-                className="h-full w-full relative p-1 rounded-lg shadow-md"
-                style={{
-                    top: 0,
-                    right: 0,
-                    bottom: 0,
-                    left: 0,
-                    zIndex: "-1",
-                    margin: "-5px",
-                    borderRadius: "inherit",
-                    background: "linear-gradient(to right, red, orange)",
-                }}
-            >
-                {/* Inner Content Box */}
-                <div
-                    className="bg-black flex flex-col w-full rounded-lg shadow-md items-center p-6"
-                    style={{ borderRadius: "1em" }}
-                >
-                    {/* Form Section */}
-                    <div className="w-full max-w-4xl text-white">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="flex flex-col">
-                                <label className="text-orange-400">Challenge name*</label>
+        <div className="p-6 h-full w-full relative box-border rounded-xl border-4 border-transparent z-[1]">
+            {/* Left Section: Challenge Image & Basic Info */}
+            <div className="bg-gradient-to-r from-red-700 to-orange-600 rounded-lg shadow-md w-full p-1">
+
+                <div className="p-6 bg-white flex flex-col rounded-lg shadow-md">
+                    <h3 className="mb-4 text-xl font-bold text-red-600">General Information</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            {/* Challenge Name */}
+                            <div className="w-full mt-6">
+                                <label className="text-sm font-medium text-red-500">Challenge Name</label>
                                 <input
                                     type="text"
-                                    placeholder="Input your challenge name"
-                                    className="bg-gray-800 text-white p-2 rounded-lg"
+                                    {...register("name", {required: "Challenge name is required"})}
+                                    className="w-full text-black p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                                    placeholder="Give it a short distinct name"
                                 />
+                                <p className="text-red-500">{errors.name?.message}</p>
                             </div>
-
-                            {/* Upload Image Section */}
-                            <div className="flex flex-col items-center">
-                                <img
-                                    src="https://via.placeholder.com/80"
-                                    alt="Challenge"
-                                    className="w-20 h-20 object-cover rounded-lg"
+                            {/* Challenge Name */}
+                            <div className="w-full mt-6">
+                                <label className="text-sm font-medium text-red-500">Summary (Optional)</label>
+                                <input
+                                    type="text"
+                                    {...register("name", {required: "Challenge name is required"})}
+                                    className="w-full text-black p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                                    placeholder="Add a few words under the name of the challenge to inspire guest, e.g ... An unforgettable challenge"
                                 />
-                                <button className="mt-2 bg-red-600 px-3 py-1 rounded text-white">
-                                    Upload Image
-                                </button>
+                                <p className="text-red-500">{errors.name?.message}</p>
                             </div>
+                        </div>
 
-                            {/* Date Pickers */}
-                            <div className="flex flex-col">
-                                <label className="text-orange-400">Start time*</label>
-                                <input type="date" className="bg-gray-800 text-white p-2 rounded-lg" />
-                            </div>
-
-                            <div className="flex flex-col">
-                                <label className="text-orange-400">End time*</label>
-                                <input type="date" className="bg-gray-800 text-white p-2 rounded-lg" />
-                            </div>
-
-                            {/* Select Inputs */}
-                            {["Type", "Category", "Participant type", "Verification method"].map(
-                                (label) => (
-                                    <div key={label} className="flex flex-col">
-                                        <label className="text-orange-400">{label}*</label>
-                                        <select className="bg-gray-800 text-white p-2 rounded-lg">
-                                            <option>ComboBox</option>
-                                        </select>
+                        {/* Challenge Image */}
+                        <label htmlFor="dropzone-file"
+                               className="relative group cursor-pointer flex items-center justify-center">
+                            <div className="w-[300px] h-[400px] flex items-center justify-center relative md:m-2">
+                                {/* Close Button */}
+                                {preview && (
+                                    <FaWindowClose
+                                        className="text-2xl text-red-500 absolute right-2 top-2 z-10"
+                                        onClick={handleClosePreview}
+                                        style={{cursor: "pointer", backgroundColor: "white"}}
+                                    />
+                                )}
+                                {/* Avatar Image OR Placeholder */}
+                                {preview ? (
+                                    <img className="w-full h-full object-cover rounded-lg" src={preview}
+                                         alt="Uploaded Avatar"/>
+                                ) : (
+                                    <div
+                                        className="w-full h-full flex flex-col items-center justify-center border-2 border-gray-300 border-dashed rounded-lg bg-gray-50">
+                                        <IoCloudUploadOutline className="text-2xl"/>
+                                        <p className="mb-2 text-sm text-gray-500">
+                                            <span className="font-semibold">Click to upload</span> or drag and drop
+                                        </p>
+                                        <p className="text-xs text-gray-500">SVG, PNG, JPG, or GIF (MAX. 800x400px)</p>
                                     </div>
-                                )
-                            )}
+                                )}
+                                {/* Hover Overlay */}
+                                {preview && (
+                                    <div
+                                        className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
+                                        <span className="text-white font-semibold">Change Picture</span>
+                                    </div>
+                                )}
+                            </div>
+                        </label>
+                        <input {...register("avatar")} id="dropzone-file" type="file" accept="image/*" className="hidden"
+                               onChange={handleFileChange}/>
+                    </div>
 
-                            {/* Number of Participants */}
-                            <div className="flex flex-col">
-                                <label className="text-orange-400">Number of Participants</label>
-                                <select className="bg-gray-800 text-white p-2 rounded-lg">
-                                    <option>Number</option>
+                </div>
+            </div>
+
+            {/* Right Section: Challenge Details Form */}
+            <div className="bg-gradient-to-r from-red-700 to-orange-600 rounded-lg w-full p-1">
+                <div className="bg-white flex flex-col rounded-lg shadow-md p-6 h-full">
+                    <h3 className="mb-4 text-xl font-bold text-red-600">Challenge Details</h3>
+                    <form onSubmit={handleSubmit(onSubmit)} autoComplete="false">
+                        <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* Start & End Date */}
+                            <div>
+                                <label className="text-sm font-medium text-red-600">Start Date</label>
+                                <input
+                                    type="date"
+                                    {...register("startDate", {required: "Start date is required"})}
+                                    className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                                />
+                                <p className="text-red-500">{errors.startDate?.message}</p>
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium text-red-600">End Date</label>
+                                <input
+                                    type="date"
+                                    {...register("endDate", {required: "End date is required" })}
+                                    className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                                />
+                                <p className="text-red-500">{errors.endDate?.message}</p>
+                            </div>
+
+                            {/* Privacy Status */}
+                            <div>
+                                <label className="text-sm font-medium text-red-600">Privacy</label>
+                                <select {...register("privacy")} className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+                                    <option value="PUBLIC">Public</option>
+                                    <option value="PRIVATE">Private</option>
                                 </select>
+                            </div>
+
+                            {/* Verification Type */}
+                            <div>
+                                <label className="text-sm font-medium text-red-600">Verification Type</label>
+                                <select {...register("verificationType")} className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+                                    <option value="PEER_TO_PEER">Peer to Peer</option>
+                                    <option value="CROSS_CHECK">Cross Check</option>
+                                    <option value="AI_REVIEW">AI Review</option>
+                                </select>
+                            </div>
+
+                            {/* Verification Method */}
+                            <div>
+                                <label className="text-sm font-medium text-red-600">Verification Method</label>
+                                <select {...register("verificationMethod")} className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+                                    <option value="UPLOAD_MEDIA">Upload Media</option>
+                                    <option value="CHECKMARK">Checkmark</option>
+                                </select>
+                            </div>
+
+                            {/* Max Participants */}
+                            <div>
+                                <label className="text-sm font-medium text-red-600">Max Participants</label>
+                                <input
+                                    type="number"
+                                    {...register("maxParticipants", { required: "Enter max participants" })}
+                                    className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                                />
+                                <p className="text-red-500">{errors.maxParticipants?.message}</p>
+                            </div>
+
+                            {/* Challenge Type ID */}
+                            <div>
+                                <label className="text-sm font-medium text-red-600">Challenge Type ID</label>
+                                <input
+                                    type="number"
+                                    {...register("challengeTypeId", { required: "Challenge Type ID is required" })}
+                                    className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                                />
+                                <p className="text-red-500">{errors.challengeTypeId?.message}</p>
                             </div>
                         </div>
 
                         {/* Tabs Section */}
                         <div className="flex mt-4 border-b-2 border-gray-600">
                             <button
-                                className={`flex-1 p-2 text-center font-bold ${
-                                    activeTab === "description"
-                                        ? "bg-blue-400 text-white"
-                                        : "hover:bg-gray-600 text-gray-300"
-                                }`}
-                                onClick={() => setActiveTab("description")}
-                            >
+                                type="button"
+                                className={`flex-1 p-2 text-center font-bold ${activeTab === "description" ? "bg-blue-400 text-white" : "hover:bg-gray-600 text-gray-300"}`}
+                                onClick={() => setActiveTab("description")}>
                                 Description
                             </button>
                             <button
-                                className={`flex-1 p-2 text-center font-bold ${
-                                    activeTab === "rules"
-                                        ? "bg-blue-400 text-white"
-                                        : "hover:bg-gray-600 text-gray-300"
-                                }`}
-                                onClick={() => setActiveTab("rules")}
-                            >
+                                type="button"
+                                className={`flex-1 p-2 text-center font-bold ${activeTab === "rules" ? "bg-blue-400 text-white" : "hover:bg-gray-600 text-gray-300"}`}
+                                onClick={() => setActiveTab("rules")}>
                                 Rules
                             </button>
                         </div>
 
-                        {/* Content Section */}
+                        {/* Description & Rules Section */}
                         <div className="p-4 bg-gray-800 text-white rounded-lg mt-4 h-24">
-                            {activeTab === "description" ? "Description content..." : "Rules content..."}
+                            {activeTab === "description" ? (
+                                <textarea {...register("description")} className="w-full bg-gray-700 p-2 rounded-lg" placeholder="Enter challenge description..." />
+                            ) : (
+                                <textarea {...register("rule")} className="w-full bg-gray-700 p-2 rounded-lg" placeholder="Enter challenge rules..." />
+                            )}
                         </div>
 
                         {/* Buttons */}
                         <div className="flex justify-center gap-6 mt-6">
-                            <button className="bg-red-600 px-6 py-2 rounded text-white hover:bg-red-700">
-                                Create
+                            <button type="submit" className="bg-red-600 px-6 py-2 rounded text-white hover:bg-red-700" disabled={isLoading}>
+                                {isLoading ? "Creating..." : "Create"}
                             </button>
-                            <button className="bg-gray-500 px-6 py-2 rounded text-white hover:bg-gray-600">
+                            <button type="button" className="bg-gray-500 px-6 py-2 rounded text-white hover:bg-gray-600" onClick={() => reset()}>
                                 Cancel
                             </button>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>
