@@ -16,16 +16,16 @@ export const SideBar = ({ isOpen, toggleSidebar }) => {
         <div className="relative z-50">
 
             {/* Sidebar */}
-            <div className={`rounded-lg bg-[rgb(249,198,159)] w-64 h-full top-0 left-0 p-5 transition-all duration-300 ${isOpen ? "translate-x-0" : "-translate-x-full"}`}>
+            <div className={`bg-[rgb(249,198,159)] w-full sm:w-64 h-full top-0 left-0 sm:p-5 transition-all duration-300 ${isOpen ? "translate-x-0" : "-translate-x-full"}`}>
                 {/* Logo */}
-                <div className="flex items-center space-x-3 mb-6">
+                <div className="flex items-center space-x-3 mb-6 hidden md:block">
                     <img src="https://via.placeholder.com/40" alt="GoBeyond Logo" className="h-10 rounded-full" />
                     <span className="text-xl font-bold">GoBeyond</span>
                 </div>
 
                 {/* Menu Items */}
-                <nav>
-                    <ul className="space-y-4">
+                <nav className="">
+                    <ul className="space-y-4 flex sm:flex-col justify-between">
                         {menuItems.map((item, index) => (
                             <li key={index}>
                                 <Link
@@ -33,7 +33,7 @@ export const SideBar = ({ isOpen, toggleSidebar }) => {
                                     className="flex items-center space-x-3 p-2 rounded-md hover:bg-orange-600 hover:text-white transition"
                                 >
                                     <span className="text-lg">{item.icon}</span>
-                                    <span>{item.name}</span>
+                                    <span className="hidden md:block">{item.name}</span>
                                 </Link>
                             </li>
                         ))}

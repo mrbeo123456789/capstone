@@ -15,8 +15,8 @@ const JoinedChallengeDetail = () => {
     };
 
     return (
-        <div className="p-6 w-full min-h-screen">
-            <div className="w-full mx-auto bg-white rounded-lg shadow-lg p-6">
+        <div className="w-full">
+            <div className="mx-auto bg-white rounded-lg shadow-lg p-6 m-2">
                 <div className="flex flex-col md:flex-row justify-between items-center">
                     <div className="md:w-2/3">
                         <h1 className="text-2xl font-bold text-red-600">{challenge.name}</h1>

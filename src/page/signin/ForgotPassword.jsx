@@ -28,7 +28,7 @@ function ForgotPassword() {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-red-700 to-orange-600">
+        <div className="flex flex-col items-center justify-center">
             <div className="bg-white p-8 rounded-lg shadow-lg w-96">
                 <h2 className="text-2xl font-bold text-center text-red-600">Forgot Password?</h2>
                 <p className="text-gray-600 text-sm text-center mb-4">Enter your email to receive an OTP.</p>

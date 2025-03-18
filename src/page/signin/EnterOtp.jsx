@@ -27,7 +27,7 @@ const EnterOTP = () => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-red-700 to-orange-600">
+        <div className="flex flex-col items-center justify-center">
             <div className="bg-white p-8 rounded-lg shadow-lg w-96">
                 <FaLock className="text-4xl mb-4" />
                 <h2 className="text-lg font-bold mb-4">Enter OTP</h2>

@@ -65,7 +65,7 @@ export const Header = ({ toggleSidebar }) => {
 
                     {/* Right Section */}
                     <div className="flex items-center space-x-4">
-                        <div className="relative">
+                        <div className="relative hidden md:block">
                             <button className="btn btn-primary dropdown-toggle">
                                 <img
                                     title="Vietnamese"
@@ -95,7 +95,7 @@ export const Header = ({ toggleSidebar }) => {
                             className="flex items-center space-x-2 text-orange-300 hover:text-red-500 transition font-medium"
                         >
                             <FiLogOut className="text-xl" />
-                            <span>Logout</span>
+                            <span className="hidden sm:block">Logout</span>
                         </button>
                     </div>
                 </div>

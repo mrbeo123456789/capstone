@@ -192,11 +192,11 @@ const router = createBrowserRouter([
                 element: <ChallengeForm />
             },
             {
-                path:"/challenges/detail",
+                path:"/challenges/detail/:id",
                 element: <ChallengeDetail />
             },
             {
-                path:"/challenges/joins/detail",
+                path: "/challenges/joins/detail/:id",
                 element: <JoinedChallengeDetail />
             }
         ]

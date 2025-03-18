@@ -7,7 +7,7 @@ const HomePage = () => {
             <section className="container mx-auto py-16 px-4 flex flex-col lg:flex-row items-center">
                 <div className="lg:w-1/2">
                     <img
-                        src="https://source.boringavatars.com/beam/600/GoBeyond?colors=ef4444,f97316,dc2626"
+                        src="https://news.sanfordhealth.org/wp-content/uploads/2017/07/woman-on-yoga-mat.jpg"
                         alt="runner"
                         className="rounded-lg shadow-lg"
                     />

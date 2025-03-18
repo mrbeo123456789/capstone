@@ -56,11 +56,10 @@ const ChallengeForm = () => {
     }
 
     return (
-        <div className="p-6 h-full w-full relative box-border rounded-xl border-4 border-transparent z-[1]">
+        <div className="bg-white p-6 h-full w-full relative box-border rounded-xl border-4 border-transparent z-[1]">
             {/* Left Section: Challenge Image & Basic Info */}
-            <div className="bg-gradient-to-r from-red-700 to-orange-600 rounded-lg shadow-md w-full p-1">
-
-                <div className="p-6 bg-white flex flex-col rounded-lg shadow-md">
+            <div className="rounded-lg w-full p-1">
+                <div className="p-6 flex flex-col rounded-lg">
                     <h3 className="mb-4 text-xl font-bold text-red-600">General Information</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -75,6 +74,16 @@ const ChallengeForm = () => {
                                 />
                                 <p className="text-red-500">{errors.name?.message}</p>
                             </div>
+
+                            {/* Privacy Status */}
+                            <div>
+                                <label className="text-sm font-medium text-red-600">Privacy</label>
+                                <select {...register("privacy")} className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+                                    <option value="PUBLIC">Public</option>
+                                    <option value="PRIVATE">Private</option>
+                                </select>
+                            </div>
+
                             {/* Challenge Name */}
                             <div className="w-full mt-6">
                                 <label className="text-sm font-medium text-red-500">Summary (Optional)</label>
@@ -91,7 +100,7 @@ const ChallengeForm = () => {
                         {/* Challenge Image */}
                         <label htmlFor="dropzone-file"
                                className="relative group cursor-pointer flex items-center justify-center">
-                            <div className="w-[300px] h-[400px] flex items-center justify-center relative md:m-2">
+                            <div className="w-full h-[400px] flex items-center justify-center relative md:m-2">
                                 {/* Close Button */}
                                 {preview && (
                                     <FaWindowClose
@@ -131,8 +140,13 @@ const ChallengeForm = () => {
             </div>
 
             {/* Right Section: Challenge Details Form */}
-            <div className="bg-gradient-to-r from-red-700 to-orange-600 rounded-lg w-full p-1">
-                <div className="bg-white flex flex-col rounded-lg shadow-md p-6 h-full">
+            <div className="bg-gradient-to-r from-red-700 to-orange-600 rounded-lg w-full p-px">
+                <div className="bg-white flex flex-col rounded-lg shadow-md h-full">
+                </div>
+            </div>
+            {/* Below Section: Challenge Details Form */}
+            <div className="rounded-lg w-full p-1">
+                <div className="flex flex-col rounded-lg p-6 h-full">
                     <h3 className="mb-4 text-xl font-bold text-red-600">Challenge Details</h3>
                     <form onSubmit={handleSubmit(onSubmit)} autoComplete="false">
                         <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -156,14 +170,7 @@ const ChallengeForm = () => {
                                 <p className="text-red-500">{errors.endDate?.message}</p>
                             </div>
 
-                            {/* Privacy Status */}
-                            <div>
-                                <label className="text-sm font-medium text-red-600">Privacy</label>
-                                <select {...register("privacy")} className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
-                                    <option value="PUBLIC">Public</option>
-                                    <option value="PRIVATE">Private</option>
-                                </select>
-                            </div>
+
 
                             {/* Verification Type */}
                             <div>
@@ -224,11 +231,11 @@ const ChallengeForm = () => {
                         </div>
 
                         {/* Description & Rules Section */}
-                        <div className="p-4 bg-gray-800 text-white rounded-lg mt-4 h-24">
+                        <div className="p-4 text-white rounded-lg mt-4 h-24">
                             {activeTab === "description" ? (
-                                <textarea {...register("description")} className="w-full bg-gray-700 p-2 rounded-lg" placeholder="Enter challenge description..." />
+                                <textarea {...register("description")} className="w-full p-2 rounded-lg" placeholder="Enter challenge description..." />
                             ) : (
-                                <textarea {...register("rule")} className="w-full bg-gray-700 p-2 rounded-lg" placeholder="Enter challenge rules..." />
+                                <textarea {...register("rule")} className="w-full-700 p-2 rounded-lg" placeholder="Enter challenge rules..." />
                             )}
                         </div>
 

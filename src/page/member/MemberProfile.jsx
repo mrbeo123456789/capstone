@@ -12,8 +12,6 @@ import useSelectCityAndCountry from "../../hook/useSelectCityAndCountry.jsx";
 import {generatePassword, generateUsername} from "../../utils/utils.js";
 import toast from "react-hot-toast";
 import {useUpdateMemberMutation} from "../../service/memberService.js";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 
 
 function MemberProfile() {
@@ -160,8 +158,8 @@ function MemberProfile() {
             className="p-6 flex flex-col md:flex-row h-full w-full relative box-border rounded-xl border-4 border-transparent z-[1]">
 
             {/* Left Section: Avatar & Basic Info */}
-            <div className="bg-gradient-to-r from-red-700 to-orange-600  rounded-lg shadow-md w-full md:w-1/3">
-                <div className="p-6 bg-white flex flex-col rounded-lg shadow-md md:m-2">
+            <div className="bg-white rounded-lg shadow-md w-full md:w-1/3">
+                <div className="p-6 flex flex-col md:m-2">
                     {/* Avatar Upload */}
                     <label htmlFor="dropzone-file"
                            className="relative group cursor-pointer flex items-center justify-center">
@@ -216,8 +214,8 @@ function MemberProfile() {
             </div>
 
             {/* Right Section: General Info Form */}
-            <div className="bg-gradient-to-r from-red-700 to-orange-600 rounded-lg w-full md:ml-6 p-1">
-                <div className="bg-white flex flex-col rounded-lg shadow-md p-6 h-full">
+            <div className="bg-white rounded-lg w-full md:ml-6 p-1">
+                <div className="flex flex-col rounded-lg p-6 h-full">
                     <h3 className="mb-4 text-xl font-bold text-red-600">General Information</h3>
                     <form onSubmit={handleSubmit(handleSubmitData)} autoComplete="false">
                         {/* First Name */}

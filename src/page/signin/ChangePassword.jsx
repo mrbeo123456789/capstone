@@ -85,9 +85,9 @@ export const ChangePassword = () => {
                             <button type="submit" className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700">
                                 Save
                             </button>
-                            <Link to="/forgot-password" className="text-blue-400 hover:underline text-sm ml-2">
+                            <a href="/forgot-password" className="text-blue-400 hover:underline text-sm ml-2">
                                 I forgot my password.
-                            </Link>
+                            </a>
                         </div>
                     </form>
                 </div>
