@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, ChevronDown, CheckCircle, XCircle } from 'lucide-react';
 import Navbar from "../navbar/AdminNavbar.jsx";
+import ChallengeDetailModal from "../../component/ChallengeDetailModal.jsx"; // Import the new modal component
 
 const ChallengeList = () => {
     // Sample data with more challenges
@@ -8,29 +9,25 @@ const ChallengeList = () => {
         { id: 1, name: 'Giacomo Guilizzoni', type: 'Running', date: '01/01/2022', duration: '2 months', status: 'accepted' },
         { id: 2, name: 'Marco Botton', type: 'Workout', date: '13/10/2024', duration: '6 months', status: 'waiting' },
         { id: 3, name: 'Mariah Maclachlan', type: 'Gym', date: '05/04/2025', duration: '3 months', status: 'rejected' },
-        { id: 4, name: 'Valerie Liberty', type: 'Swimming', date: '22/03/2012', duration: '1 month', status: 'accepted' },
-        { id: 5, name: 'Guido Jack', type: 'Cycling', date: '15/06/2021', duration: '4 months', status: 'waiting' },
-        { id: 6, name: 'Emma Wong', type: 'Running', date: '30/04/2010', duration: '2 months', status: 'rejected' },
-        { id: 7, name: 'Alex Johnson', type: 'Hiking', date: '19/02/2014', duration: '3 months', status: 'accepted' },
-        { id: 8, name: 'Taylor Swift', type: 'Yoga', date: '11/07/2017', duration: '5 months', status: 'waiting' },
-        { id: 9, name: 'Chris Evans', type: 'Boxing', date: '03/08/2019', duration: '2 months', status: 'rejected' },
-        { id: 10, name: 'Jenna Smith', type: 'CrossFit', date: '05/05/2022', duration: '3 months', status: 'accepted' },
-        { id: 11, name: 'David Miller', type: 'Pilates', date: '16/09/2019', duration: '4 months', status: 'waiting' },
-        { id: 12, name: 'Sophia Clark', type: 'Cycling', date: '22/10/2025', duration: '6 months', status: 'rejected' },
-        { id: 13, name: 'Michael Brown', type: 'Swimming', date: '08/11/2026', duration: '1 month', status: 'accepted' },
-        { id: 14, name: 'Olivia Wilson', type: 'Running', date: '14/12/2009', duration: '2 months', status: 'waiting' },
-        { id: 15, name: 'Samuel Rodriguez', type: 'Weight Training', date: '25/01/2018', duration: '3 months', status: 'rejected' },
-        { id: 16, name: 'Emma Thompson', type: 'Kickboxing', date: '07/03/2015', duration: '4 months', status: 'accepted' },
-        { id: 17, name: 'Andrew Davis', type: 'Zumba', date: '19/04/2019', duration: '2 months', status: 'waiting' },
-        { id: 18, name: 'Isabella Martin', type: 'Marathon', date: '30/05/2020', duration: '6 months', status: 'rejected' },
-        { id: 19, name: 'Joshua Garcia', type: 'Triathlon', date: '12/06/2006', duration: '5 months', status: 'accepted' },
-        { id: 20, name: 'Sofia Martinez', type: 'Cardio', date: '24/07/2018', duration: '2 months', status: 'waiting' },
-        { id: 21, name: 'Daniel Anderson', type: 'CrossFit', date: '04/08/2019', duration: '3 months', status: 'rejected' },
-        { id: 22, name: 'Mia Thomas', type: 'Swimming', date: '16/09/2025', duration: '4 months', status: 'accepted' },
-        { id: 23, name: 'Matthew Jackson', type: 'Cycling', date: '28/10/2024', duration: '2 months', status: 'waiting' },
-        { id: 24, name: 'Chloe White', type: 'Running', date: '09/11/2026', duration: '3 months', status: 'rejected' },
-        { id: 25, name: 'Ethan Harris', type: 'Gym', date: '21/12/2025', duration: '6 months', status: 'accepted' }
+        { id: 4, name: 'Val Head', type: 'Cycling', date: '15/07/2023', duration: '1 month', status: 'accepted' },
+        { id: 5, name: 'Bill Fisher', type: 'Yoga', date: '20/11/2024', duration: '2 weeks', status: 'waiting' },
+        { id: 6, name: 'Jared Erondu', type: 'Swimming', date: '09/09/2022', duration: '4 months', status: 'accepted' },
+        { id: 7, name: 'Zara Ali', type: 'Running', date: '22/12/2023', duration: '1 year', status: 'rejected' },
+        { id: 8, name: 'Liam Nguyen', type: 'Workout', date: '03/03/2025', duration: '3 months', status: 'waiting' },
+        { id: 9, name: 'Emma Johansson', type: 'Gym', date: '18/05/2024', duration: '6 months', status: 'accepted' },
+        { id: 10, name: 'Noah Kim', type: 'Yoga', date: '25/06/2024', duration: '2 months', status: 'accepted' },
+        { id: 11, name: 'Olivia Smith', type: 'Cycling', date: '14/08/2023', duration: '1 month', status: 'waiting' },
+        { id: 12, name: 'William Chen', type: 'Swimming', date: '02/02/2025', duration: '5 months', status: 'rejected' },
+        { id: 13, name: 'Sophia Brown', type: 'Running', date: '12/11/2022', duration: '2 weeks', status: 'accepted' },
+        { id: 14, name: 'Mason Lee', type: 'Workout', date: '27/10/2024', duration: '4 months', status: 'waiting' },
+        { id: 15, name: 'Isabella Davis', type: 'Gym', date: '19/03/2025', duration: '3 months', status: 'accepted' },
+        { id: 16, name: 'James Wilson', type: 'Yoga', date: '30/09/2023', duration: '1 year', status: 'rejected' },
+        { id: 17, name: 'Ava Garcia', type: 'Cycling', date: '06/06/2024', duration: '6 months', status: 'accepted' },
+        { id: 18, name: 'Lucas Martinez', type: 'Swimming', date: '11/01/2023', duration: '2 months', status: 'waiting' },
+        { id: 19, name: 'Mia Hernandez', type: 'Running', date: '08/08/2024', duration: '3 months', status: 'accepted' },
+        { id: 20, name: 'Ethan Robinson', type: 'Workout', date: '17/05/2025', duration: '4 months', status: 'rejected' },
     ];
+
 
     const [filterStatus, setFilterStatus] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -39,19 +36,93 @@ const ChallengeList = () => {
     const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
     const challengesPerPage = 10;
 
-    // Handle navigation to challenge detail
-    const handleNavigation = (challengeId) => {
-        console.log(`Navigating to challenge detail page: ${challengeId}`);
-        alert(`Navigating to challenge #${challengeId} details`);
+    // Modal state
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedChallenge, setSelectedChallenge] = useState(null);
+
+    // Handle opening the modal with challenge details
+    const handleOpenModal = (challengeId) => {
+        // Simulate fetching challenge details
+        setTimeout(() => {
+            const challenge = {
+                id: challengeId,
+                name: challenges.find(c => c.id === challengeId)?.name || 'Unknown',
+                type: challenges.find(c => c.id === challengeId)?.type || 'Unknown',
+                date: challenges.find(c => c.id === challengeId)?.date || 'Unknown',
+                duration: challenges.find(c => c.id === challengeId)?.duration || 'Unknown',
+                status: challenges.find(c => c.id === challengeId)?.status || 'Unknown',
+                description: 'This challenge aims to improve health and endurance through consistent training.',
+                goal: 'Complete the challenge within the given timeframe',
+                participantCount: 45,
+                completionRate: 78,
+                comments: [
+                    { user: 'Admin', date: '05/01/2022', text: 'Challenge approved and launched.' },
+                    { user: 'User', date: '15/01/2022', text: 'First week completed, feeling great!' },
+                    { user: 'Coach', date: '22/01/2022', text: 'Keep up the good pace, remember to hydrate properly.' }
+                ]
+            };
+
+            setSelectedChallenge(challenge);
+            setIsModalOpen(true);
+        }, 300);
+    };
+
+    // Handle closing the modal
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
     };
 
     // Handle action buttons
     const handleAction = (challengeId, action) => {
         console.log(`Challenge #${challengeId} ${action}`);
-        alert(`Challenge #${challengeId} ${action} successfully`);
 
-        // Here you would typically update the status in your state/database
-        // For this example, we'll just show the alert
+        // Update the status in the state
+        const updatedChallenges = challenges.map(challenge => {
+            if (challenge.id === challengeId) {
+                return {
+                    ...challenge,
+                    status: action === 'confirmed' ? 'accepted' : 'rejected'
+                };
+            }
+            return challenge;
+        });
+
+        setChallenges(updatedChallenges);
+
+        // If the modal is open and showing this challenge, update its status too
+        if (selectedChallenge && selectedChallenge.id === challengeId) {
+            setSelectedChallenge({
+                ...selectedChallenge,
+                status: action === 'confirmed' ? 'accepted' : 'rejected'
+            });
+        }
+
+        alert(`Challenge #${challengeId} ${action} successfully`);
+    };
+
+    // Handle status change in modal
+    const handleStatusChange = (newStatus) => {
+        if (selectedChallenge) {
+            // Update the challenge in the modal
+            setSelectedChallenge({
+                ...selectedChallenge,
+                status: newStatus
+            });
+
+            // Also update the challenge in the main list
+            const updatedChallenges = challenges.map(challenge => {
+                if (challenge.id === selectedChallenge.id) {
+                    return {
+                        ...challenge,
+                        status: newStatus
+                    };
+                }
+                return challenge;
+            });
+
+            setChallenges(updatedChallenges);
+            alert(`Challenge status updated to: ${newStatus}`);
+        }
     };
 
     // Filter and search challenges
@@ -111,7 +182,7 @@ const ChallengeList = () => {
             {/* Main Content */}
             <main className="flex-grow">
                 <div className="max-w-6xl mx-auto p-6 mt-8">
-                    <h1 className="text-2xl font-bold text-gray-800 mb-8 text-center"></h1>
+                    <h1 className="text-2xl font-bold text-gray-800 mb-8 text-center">Challenge Management</h1>
 
                     {/* Table Container with Search Bar */}
                     <div className="bg-white rounded-lg shadow-lg overflow-hidden">
@@ -193,7 +264,7 @@ const ChallengeList = () => {
                                 <tr key={challenge.id} className="hover:bg-yellow-50">
                                     <td className="py-3 px-4 border-b border-gray-200">
                                         <button
-                                            onClick={() => handleNavigation(challenge.id)}
+                                            onClick={() => handleOpenModal(challenge.id)}
                                             className="text-orange-600 hover:text-red-600 hover:underline text-left"
                                         >
                                             {challenge.name}
@@ -326,6 +397,14 @@ const ChallengeList = () => {
                     </div>
                 </div>
             </main>
+
+            {/* Use the ChallengeDetailModal component */}
+            <ChallengeDetailModal
+                challenge={selectedChallenge}
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
+                onStatusChange={handleStatusChange}
+            />
 
             {/* Footer */}
             <footer className="bg-gradient-to-r from-red-600 via-orange-500 to-yellow-500 p-4 text-white text-center">
