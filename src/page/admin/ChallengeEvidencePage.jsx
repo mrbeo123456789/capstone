@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Search, CheckCircle, Clock, Archive, ThumbsUp, ThumbsDown, HourglassIcon, Play, Volume2, Maximize, X } from 'lucide-react';
-import Navbar from "../navbar/AdminNavbar.jsx";
+import { Search, CheckCircle, Clock, Archive, ThumbsUp, ThumbsDown, HourglassIcon } from 'lucide-react';
+import Sidebar from "../navbar/AdminNavbar.jsx";
+import EvidenceDetailModal from "../../component/ChallengeDetailModal.jsx";
 
 const ChallengeAndEvidenceList = () => {
     const [evidenceItems, setEvidenceItems] = useState([]);
@@ -11,10 +12,8 @@ const ChallengeAndEvidenceList = () => {
     const statuses = ['all', 'approved', 'rejected', 'waiting'];
     const [selectedChallenge, setSelectedChallenge] = useState(null);
     const [filteredEvidence, setFilteredEvidence] = useState([]);
-    const [currentImage, setCurrentImage] = useState(0);
-    // Add state for evidence detail modal
-    const [showEvidenceDetail, setShowEvidenceDetail] = useState(false);
     const [selectedEvidence, setSelectedEvidence] = useState(null);
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
     // Pagination state for challenges
     const [currentPage, setCurrentPage] = useState(1);
@@ -45,11 +44,7 @@ const ChallengeAndEvidenceList = () => {
             ];
 
             setEvidenceItems(mockData);
-            const [mockImages] = useState([
-                "/api/placeholder/800/600",
-                "/api/placeholder/800/600",
-                "/api/placeholder/800/600"
-            ]);
+
             // Extract unique challenges with type and determine status
             const uniqueChallenges = Array.from(new Set(mockData.map(item => item.challenge)))
                 .map(challenge => {
@@ -113,6 +108,32 @@ const ChallengeAndEvidenceList = () => {
         }
     }, [selectedChallenge, statusFilter, evidenceItems]);
 
+    const handleEvidenceClick = (evidence) => {
+        setSelectedEvidence(evidence);
+    };
+
+    const handleCloseModal = () => {
+        setSelectedEvidence(null);
+    };
+
+    const handleAcceptEvidence = (id) => {
+        // Update the evidence status
+        const updatedItems = evidenceItems.map(item =>
+            item.id === id ? {...item, status: 'approved'} : item
+        );
+        setEvidenceItems(updatedItems);
+        setSelectedEvidence(null);
+    };
+
+    const handleRejectEvidence = (id) => {
+        // Update the evidence status
+        const updatedItems = evidenceItems.map(item =>
+            item.id === id ? {...item, status: 'rejected'} : item
+        );
+        setEvidenceItems(updatedItems);
+        setSelectedEvidence(null);
+    };
+
     const getEvidenceStatusIcon = (status) => {
         switch (status) {
             case 'approved':
@@ -165,194 +186,6 @@ const ChallengeAndEvidenceList = () => {
         }
     };
 
-    const nextImage = () => {
-        setCurrentImage((prev) => (prev + 1) % mockImages.length);
-    };
-    const prevImage = () => {
-        setCurrentImage((prev) => (prev - 1 + mockImages.length) % mockImages.length);
-    };
-
-    const openEvidenceDetail = (evidence) => {
-        setSelectedEvidence(evidence);
-        setShowEvidenceDetail(true);
-    };
-    const closeEvidenceDetail = () => {
-        setShowEvidenceDetail(false);
-        setSelectedEvidence(null);
-    };
-
-    const EvidenceDetailModal = ({ evidence, onClose }) => {
-        if (!evidence) return null;
-
-        return (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-                    <div className="border-b p-4 bg-orange-50 flex justify-between items-center sticky top-0 z-10">
-                        <h2 className="text-xl font-bold text-gray-800">Evidence Details</h2>
-                        <button
-                            onClick={onClose}
-                            className="text-gray-500 hover:text-gray-700 focus:outline-none"
-                        >
-                            <X size={24} />
-                        </button>
-                    </div>
-
-                    <div className="p-6">
-                        {/* Header info as table layout */}
-                        <div className="mb-6 border rounded-lg overflow-hidden">
-                            <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-orange-50">
-                                <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Username</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Challenge</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Part</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Date</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Type</th>
-                                </tr>
-                                </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
-                                <tr>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{evidence.addedBy || "User"}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{evidence.challenge}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Part 1</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{evidence.dateAdded}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{evidence.type}</td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        {/* Description section */}
-                        <div className="mb-6">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-2">Description</h3>
-                            <div className="border rounded-lg p-4 bg-gray-50 min-h-20">
-                                <p className="text-gray-700">
-                                    {evidence.description ||
-                                        "This evidence demonstrates completion of the challenge requirements. The user has submitted documentation showing their progress and achievement in meeting the challenge criteria."}
-                                </p>
-                            </div>
-                        </div>
-
-                        {/* Evidence/Media section as image carousel */}
-                        <div className="mb-6">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-2">Evidence</h3>
-                            <div className="border rounded-lg overflow-hidden">
-                                {/* Image carousel */}
-                                <div className="relative">
-                                    <div className="h-80 flex items-center justify-center bg-gray-100">
-                                        <img
-                                            src={mockImages[currentImage]}
-                                            alt="Evidence"
-                                            className="max-h-full max-w-full object-contain"
-                                        />
-                                    </div>
-
-                                    {/* Navigation controls */}
-                                    {mockImages.length > 1 && (
-                                        <div className="absolute inset-y-0 left-0 right-0 flex justify-between items-center px-4">
-                                            <button
-                                                onClick={prevImage}
-                                                className="bg-black bg-opacity-30 text-white p-2 rounded-full hover:bg-opacity-50"
-                                            >
-                                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path>
-                                                </svg>
-                                            </button>
-                                            <button
-                                                onClick={nextImage}
-                                                className="bg-black bg-opacity-30 text-white p-2 rounded-full hover:bg-opacity-50"
-                                            >
-                                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
-                                                </svg>
-                                            </button>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Thumbnails navigation */}
-                                {mockImages.length > 1 && (
-                                    <div className="flex items-center justify-center p-2 bg-gray-50 border-t">
-                                        {mockImages.map((img, index) => (
-                                            <button
-                                                key={index}
-                                                onClick={() => setCurrentImage(index)}
-                                                className={`w-2 h-2 mx-1 rounded-full ${
-                                                    currentImage === index ? 'bg-orange-500' : 'bg-gray-300'
-                                                }`}
-                                                aria-label={`Go to image ${index + 1}`}
-                                            ></button>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Comments section */}
-                        <div className="mb-6">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-2">Comments</h3>
-                            <div className="border rounded-lg p-4 bg-gray-50">
-                                <div className="mb-4 pb-4 border-b">
-                                    <div className="flex items-start">
-                                        <div className="flex-shrink-0 bg-orange-100 rounded-full p-2">
-                                            <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                                            </svg>
-                                        </div>
-                                        <div className="ml-3">
-                                            <p className="text-sm font-medium text-gray-900">Admin</p>
-                                            <p className="text-sm text-gray-700 mt-1">
-                                                This evidence looks compelling. I can see the progress made by the user.
-                                            </p>
-                                            <p className="text-xs text-gray-500 mt-1">March 17, 2025</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Add comment form */}
-                                <div className="mt-4">
-                                <textarea
-                                    className="w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                                    placeholder="Add your comment..."
-                                    rows="2"
-                                ></textarea>
-                                    <div className="flex justify-end mt-2">
-                                        <button className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg">
-                                            Comment
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Action buttons */}
-                        <div className="flex justify-end space-x-3 border-t pt-4">
-                            <button
-                                className="px-4 py-2 bg-white border border-red-500 text-red-500 hover:bg-red-50 rounded-lg"
-                                onClick={onClose}
-                            >
-                                <ThumbsDown className="inline mr-2" size={16} />
-                                Reject
-                            </button>
-                            <button
-                                className="px-4 py-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg"
-                                onClick={onClose}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                className="px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg"
-                                onClick={onClose}
-                            >
-                                <ThumbsUp className="inline mr-2" size={16} />
-                                Approve
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    };
     // Get current page items for challenges
     const filteredChallenges = challenges.filter(challenge =>
         challenge.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -371,7 +204,12 @@ const ChallengeAndEvidenceList = () => {
 
     return (
         <div className="bg-red-50 min-h-screen flex flex-col">
-            <Navbar />
+            <div className="flex flex-1 overflow-hidden relative">
+            <div className={`transition-all duration-300  ${sidebarCollapsed ? 'w-16' : 'w-64'} flex-shrink-0`}>
+                <Sidebar sidebarCollapsed={sidebarCollapsed} setSidebarCollapsed={setSidebarCollapsed} />
+            </div>
+
+                <div className="flex-1 flex flex-col overflow-hidden">
             <div className="container mx-auto p-4 flex-grow">
                 <h1 className="text-2xl font-bold text-orange-600 mb-6">Challenge and Evidence Management</h1>
 
@@ -543,8 +381,8 @@ const ChallengeAndEvidenceList = () => {
                                             {filteredEvidence.map((item) => (
                                                 <tr key={item.id} className="hover:bg-orange-50">
                                                     <td
-                                                        className="px-6 py-4 whitespace-nowrap font-medium text-orange-600 cursor-pointer hover:text-orange-800 hover:underline"
-                                                        onClick={() => openEvidenceDetail(item)}
+                                                        className="px-6 py-4 whitespace-nowrap font-medium text-gray-900 cursor-pointer hover:text-orange-600"
+                                                        onClick={() => handleEvidenceClick(item)}
                                                     >
                                                         {item.name}
                                                     </td>
@@ -561,36 +399,37 @@ const ChallengeAndEvidenceList = () => {
                                             </tbody>
                                         </table>
                                     ) : (
-                                        <div className="flex justify-center items-center h-64">
-                                            <p className="text-gray-500">No evidence found with the selected filter.</p>
+                                        <div className="flex flex-col items-center justify-center h-64">
+                                            <p className="text-gray-500 mb-2">No evidence found for this challenge.</p>
+                                            {selectedChallenge && (
+                                                <p className="text-sm text-gray-400">
+                                                    Try changing the status filter or add new evidence.
+                                                </p>
+                                            )}
                                         </div>
                                     )}
                                 </div>
                             ) : (
-                                <div className="flex justify-center items-center h-64">
-                                    <div className="text-center text-gray-500">
-                                        <p className="mb-2">Select a challenge from the left panel</p>
-                                        <svg className="mx-auto h-12 w-12 text-orange-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 15l-6-6m0 0l6-6m-6 6h12" />
-                                        </svg>
-                                    </div>
+                                <div className="flex flex-col items-center justify-center h-64">
+                                    <p className="text-gray-500">Select a challenge to view evidence.</p>
                                 </div>
                             )}
                         </div>
                     </div>
                 )}
             </div>
+
             {/* Evidence Detail Modal */}
-            {showEvidenceDetail && (
+            {selectedEvidence && (
                 <EvidenceDetailModal
                     evidence={selectedEvidence}
-                    onClose={closeEvidenceDetail}
+                    onClose={handleCloseModal}
+                    onAccept={handleAcceptEvidence}
+                    onReject={handleRejectEvidence}
                 />
             )}
-            {/* Footer */}
-            <footer className="bg-gradient-to-r from-red-600 via-orange-500 to-yellow-500 p-4 text-white text-center mt-auto">
-                <p>© 2025 GoBeyond</p>
-            </footer>
+        </div>
+            </div>
         </div>
     );
 };

@@ -14,7 +14,7 @@ import {
     ChevronFirst
 } from "lucide-react";
 
-const Sidebar = () => {
+const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isGroupsExpanded, setIsGroupsExpanded] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(false);
@@ -29,6 +29,7 @@ const Sidebar = () => {
 
     const toggleCollapse = () => {
         setIsCollapsed(!isCollapsed);
+        setSidebarCollapsed(!sidebarCollapsed);
     };
 
     return (

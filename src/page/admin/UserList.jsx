@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../navbar/AdminNavbar.jsx";
-import { FaSort, FaCheckCircle, FaTimesCircle, FaUser, FaEnvelope, FaIdCard, FaPhone, FaBirthdayCake, FaMapMarkerAlt, FaBars } from "react-icons/fa";
+import { FaSort, FaCheckCircle, FaTimesCircle, FaUser, FaEnvelope, FaIdCard, FaPhone, FaBirthdayCake, FaMapMarkerAlt } from "react-icons/fa";
 
 const UserList = () => {
     const navigate = useNavigate();
@@ -29,10 +29,6 @@ const UserList = () => {
     const usersPerPage = 10;
 
     const allRoles = ["Admin", "Member"];
-
-    const toggleSidebar = () => {
-        setSidebarCollapsed(!sidebarCollapsed);
-    };
 
     const handleSort = (key) => {
         setSortConfig((prev) => {
@@ -322,8 +318,8 @@ const UserList = () => {
         <div className="flex flex-col min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50">
             <div className="flex flex-1 overflow-hidden relative">
                 {/* Sidebar - Collapsible */}
-                <div className={`transition-all duration-300 ${sidebarCollapsed ? 'w-16' : 'w-64'} flex-shrink-0`}>
-                    <Sidebar collapsed={sidebarCollapsed} />
+                <div className={`transition-all duration-300  ${sidebarCollapsed ? 'w-16' : 'w-64'} flex-shrink-0`}>
+                    <Sidebar sidebarCollapsed={sidebarCollapsed} setSidebarCollapsed={setSidebarCollapsed} />
                 </div>
 
                 {/* Main Content Area - Takes remaining width */}
