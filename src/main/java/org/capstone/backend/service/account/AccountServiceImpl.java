@@ -1,8 +1,11 @@
 package org.capstone.backend.service.account;
 
 import org.capstone.backend.dto.account.AccountDTO;
+import org.capstone.backend.dto.account.AccountDetailDTO;
 import org.capstone.backend.entity.Account;
+import org.capstone.backend.entity.Member;
 import org.capstone.backend.repository.AccountRepository;
+import org.capstone.backend.repository.MemberRepository;
 import org.capstone.backend.utils.enums.AccountStatus;
 import org.capstone.backend.utils.enums.Role;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -20,6 +24,8 @@ public class AccountServiceImpl implements AccountService {
 
     @Autowired
     private AccountRepository accountRepository;
+    @Autowired
+    private MemberRepository memberRepository;
 
     @Override
     public Page<AccountDTO> getAllAccounts(int page, int size) {
@@ -67,4 +73,26 @@ public class AccountServiceImpl implements AccountService {
         dto.setUpdatedAt(account.getUpdatedAt());
         return dto;
     }
+    @Override
+    public AccountDetailDTO getAccountDetail(Long id) {
+
+        Account account = accountRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Account not found with id: " + id));
+
+        Member member = memberRepository.findByAccount(account).orElse(null);
+
+        return new AccountDetailDTO(
+                account.getId(),
+                account.getUsername(),
+                account.getEmail(),
+                member != null ? member.getPhone() : "N/A",
+                member != null ? member.getAvatar() : null,
+                member != null ? member.getAddress() : "N/A",
+                member != null && member.getDateOfBirth() != null ? member.getDateOfBirth().toString() : "N/A",
+                account.getStatus(),
+                account.getRole()
+        );
+    }
+
+
 }

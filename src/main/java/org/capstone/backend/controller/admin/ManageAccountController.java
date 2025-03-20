@@ -1,6 +1,7 @@
 package org.capstone.backend.controller.admin;
 
 import org.capstone.backend.dto.account.AccountDTO;
+import org.capstone.backend.dto.account.AccountDetailDTO;
 import org.capstone.backend.service.account.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,7 +19,6 @@ public class ManageAccountController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Page<AccountDTO> accounts = accountService.getAllAccounts(page, size);
-        System.out.println(accounts.getSize());
         return ResponseEntity.ok(accounts);
     }
 
@@ -32,5 +32,15 @@ public class ManageAccountController {
     public ResponseEntity<AccountDTO> unbanAccount(@PathVariable Long id) {
         AccountDTO accountDTO = accountService.unbanAccount(id);
         return ResponseEntity.ok(accountDTO);
+    }
+
+
+    @GetMapping("/getDetail/{id}")
+    public ResponseEntity<AccountDetailDTO> getAccountDetail(@PathVariable Long id) {
+        AccountDetailDTO accountDetailDTO = accountService.getAccountDetail(id);
+        if (accountDetailDTO == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(accountDetailDTO);
     }
 }

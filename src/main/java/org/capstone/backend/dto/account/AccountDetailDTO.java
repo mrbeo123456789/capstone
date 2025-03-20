@@ -5,15 +5,16 @@ import lombok.Data;
 import org.capstone.backend.utils.enums.AccountStatus;
 import org.capstone.backend.utils.enums.Role;
 
-import java.time.LocalDateTime;
-
 @Data
-public class AccountDTO {
-    private Long id;
+@AllArgsConstructor
+public class AccountDetailDTO {
+    private Long accountId;
     private String username;
     private String email;
-    private Role role;
+    private String phone;
+    private String avatar;
+    private String address;
+    private String dateOfBirth;
     private AccountStatus status;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private Role role;
 }
