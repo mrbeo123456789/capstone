@@ -4,6 +4,7 @@ import org.capstone.backend.dto.account.AccountDTO;
 import org.capstone.backend.entity.Account;
 import org.capstone.backend.repository.AccountRepository;
 import org.capstone.backend.utils.enums.AccountStatus;
+import org.capstone.backend.utils.enums.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -22,10 +23,15 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Page<AccountDTO> getAllAccounts(int page, int size) {
-        Page<Account> accounts = accountRepository.findAll(PageRequest.of(page, size));
+        Page<Account> accounts = accountRepository.findByRoleNot(
+                Role.ADMIN,
+                PageRequest.of(page, size)
+        );
         List<AccountDTO> accountDTOs = accounts.stream().map(this::toDTO).collect(Collectors.toList());
+
         return new PageImpl<>(accountDTOs, accounts.getPageable(), accounts.getTotalElements());
     }
+
 
     @Override
     public AccountDTO banAccount(Long id) {

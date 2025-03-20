@@ -18,6 +18,7 @@ public class ManageAccountController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Page<AccountDTO> accounts = accountService.getAllAccounts(page, size);
+        System.out.println(accounts.getSize());
         return ResponseEntity.ok(accounts);
     }
 

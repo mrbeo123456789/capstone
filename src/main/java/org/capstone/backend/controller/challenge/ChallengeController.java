@@ -1,15 +1,23 @@
 package org.capstone.backend.controller.challenge;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.capstone.backend.dto.challenge.ChallengeRequest;
+import org.capstone.backend.dto.challenge.ChallengeResponse;
+import org.capstone.backend.dto.challenge.InviteMemberRequest;
 import org.capstone.backend.entity.Challenge;
 
 import org.capstone.backend.entity.ChallengeType;
 import org.capstone.backend.service.challenge.ChallengeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -20,23 +28,54 @@ public class ChallengeController {
     @Autowired
     private ChallengeService challengeService;
 
-    @PostMapping("/create")
-    public ResponseEntity<Challenge> createChallenge(@RequestBody ChallengeRequest request) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        
-        if (authentication == null || !authentication.isAuthenticated() ||
-                "anonymousUser".equals(authentication.getPrincipal())) {
-            throw new RuntimeException("User is not authenticated");
-        }
+    @PostMapping(value = "/create", consumes = {"multipart/form-data"})
+    public ResponseEntity<?> createChallenge(
+            @Validated @ModelAttribute("data") ChallengeRequest request,
+            @RequestParam(value = "picture", required = false) MultipartFile picture,
+            @RequestParam(value = "banner", required = false) MultipartFile banner
+    ) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated() ||
+                    "anonymousUser".equals(authentication.getPrincipal())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body("User is not authenticated");
+            }
 
-        String username = authentication.getName();
-        Challenge createdChallenge = challengeService.createChallenge(request, username);
-        return ResponseEntity.ok(createdChallenge);
+            String username = authentication.getName();
+            String resultMessage = challengeService.createChallenge(request, picture, banner, username);
+            return ResponseEntity.ok(resultMessage);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error creating challenge: " + e.getMessage());
+        }
     }
+
+
 
     @GetMapping("/challenge-types")
     public List<ChallengeType> getAllChallengeTypes() {
         return challengeService.getAllTypes();
     }
+
+    @PostMapping("/join")
+    public ResponseEntity<String> joinChallenge( @RequestBody Long challengeId) {
+        String result = challengeService.joinChallenge(challengeId);
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/invite")
+    public ResponseEntity<String> inviteMember(@Valid @RequestBody InviteMemberRequest request) {
+        String result = challengeService.inviteMember(request);
+        return ResponseEntity.ok(result);
+    }
+    @GetMapping("/approved")
+    public ResponseEntity<Page<ChallengeResponse>> getApprovedChallenges(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Page<ChallengeResponse> challenges = challengeService.getApprovedChallenges(page, size);
+        return ResponseEntity.ok(challenges);
+    }
+
 
 }

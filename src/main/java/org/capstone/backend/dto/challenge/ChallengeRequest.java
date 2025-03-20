@@ -1,6 +1,5 @@
 package org.capstone.backend.dto.challenge;
 
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 import org.capstone.backend.utils.enums.PrivacyStatus;
@@ -17,10 +16,6 @@ public class ChallengeRequest {
     private String name;
 
     private String summary;
-
-    private String picture;
-
-    private String banner;
 
     @NotBlank(message = "Description cannot be empty")
     private String description;
