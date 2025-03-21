@@ -84,6 +84,25 @@ export const adminUserService = createApi({
             },
             providesTags: ["Admin"],
         }),
+        getChallenges: builder.query({
+            query: ({ page = 0, size = 10 }) => {
+                const url = `/admin/challenges/all?page=${page}&size=${size}`;
+                console.log("Fetching Challenges URL:", url);
+                return url;
+            },
+            providesTags: ["Admin"],
+        }),
+        reviewChallenge: builder.mutation({
+            query: (reviewRequest) => {
+                console.log("Reviewing Challenge:", reviewRequest);
+                return {
+                    url: `/admin/challenges/review`,
+                    method: "POST",
+                    body: reviewRequest,
+                };
+            },
+            invalidatesTags: ["Admin"],
+        }),
     }),
 });
 
@@ -92,5 +111,7 @@ export const {
     useGetUserByIdQuery,
     useBanUserMutation,
     useUnbanUserMutation,
-    useSearchUsersQuery
+    useSearchUsersQuery,
+    useGetChallengesQuery,
+    useReviewChallengeMutation
 } = adminUserService;
