@@ -35,13 +35,6 @@ const VoteOther = () => {
         setVotes((prevVotes) => ({ ...prevVotes, [id]: type }));
     };
 
-    // // Function to bring clicked card to front
-    // const handleSelect = (index) => {
-    //     if (index !== activeIndex) {
-    //         setActiveIndex(index);
-    //     }
-    // };
-
     const [showModal, setShowModal] = useState(false);
     const [currentVideo, setCurrentVideo] = useState("");
 
@@ -121,9 +114,6 @@ const VoteOther = () => {
                 }}
                 uploader={voteItems[activeIndex].user}
             />
-
-
-
         </div>
 
     );

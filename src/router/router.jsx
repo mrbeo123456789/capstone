@@ -4,7 +4,6 @@ import ErrorPage from "../page/error/ErrorPage.jsx";
 import Layout from "../page/ui/Layout.jsx";
 import RegisterForm from "../page/signin/register.jsx";
 import MemberProfile from "../page/member/MemberProfile.jsx";
-import GroupManagement from "../page/group/groupList.jsx";
 import AuthCallBack from "../page/signin/AuthCallBack.jsx";
 import LoginPage from "../page/signin/LoginPage.jsx";
 import NotificationEmail from "../page/ui/NotificationEmail.jsx";
@@ -25,13 +24,13 @@ import UserList from "../page/admin/UserList.jsx";
 import ChallengeDetail from "../page/challenge/ChallengeDetail.jsx";
 import JoinedChallengeDetail from "../page/challenge/JoinedChallengeDetail.jsx";
 import YourChallenge from "../page/challenge/YourChallenge.jsx";
+import GroupUsers from "../page/group/GroupUsers.jsx";
 
 const router = createBrowserRouter([
     {
         path: "/", // ✅ Redirect root to homepage
         element: <Navigate to="/homepage" replace />
-    },
-    {
+    }, {
         path:"/homepage",
         errorElement:<ErrorPage/>,
         element: <Layout></Layout>,
@@ -41,11 +40,6 @@ const router = createBrowserRouter([
                 element: <HomePage />  // Replace with your default component
             }
         ]
-    },
-    {
-        path:"/admin-dashboard",
-        errorElement:<ErrorPage/>,
-        element: <AdminDashboard/>,
     },
     {
         path:"/admin-dashboard",
@@ -158,8 +152,8 @@ const router = createBrowserRouter([
                 element: <GroupPage />
             },
             {
-                path:"/groups/joins/member",
-                element: <GroupMember />
+                path:"/groups/joins/:id",
+                element: <GroupUsers />
             }
         ]
     },
