@@ -9,7 +9,7 @@ const ReportList = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
     const statuses = ['all', 'active', 'pending', 'archived'];
-
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(10);
@@ -94,7 +94,13 @@ const ReportList = () => {
     const prevPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));
 
     return (
-        <div className={"bg-red-50"}> <Navbar/>
+        <div className="flex flex-col min-h-screen bg-gradient-to-br from-red-50 to-yellow-50">
+            {/* Import Header Component */}
+            <div className="flex flex-1 overflow-hidden relative">
+                {/* Sidebar - Collapsible */}
+                <div className={`transition-all duration-300  ${sidebarCollapsed ? 'w-16' : 'w-64'} flex-shrink-0`}>
+                    <Navbar sidebarCollapsed={sidebarCollapsed} setSidebarCollapsed={setSidebarCollapsed}/>
+                </div>
             <div className="container mx-auto p-4 bg-red-50">
 
                 <h1 className="text-2xl font-bold text-orange-600 mb-6">Evidence List</h1>
@@ -248,11 +254,9 @@ const ReportList = () => {
 
                 </div>
             </div>
-            {/* Footer */}
-            <footer className="bg-gradient-to-r from-red-600 via-orange-500 to-yellow-500 p-4 text-white text-center">
-                <p>© 2025 GoBeyond</p>
-            </footer>
+            </div>
         </div>
+
     );
 };
 

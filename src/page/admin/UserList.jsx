@@ -6,15 +6,16 @@ import {
     useGetUsersQuery,
     useBanUserMutation,
     useUnbanUserMutation,
-    useSearchUsersQuery
+    useSearchUsersQuery,
+    useGetUserByIdQuery
 } from "../../service/adminService.js";
 
 const UserList = () => {
-    useNavigate();
     const [currentPage, setCurrentPage] = useState(0); // API is 0-indexed
     const [searchTerm, setSearchTerm] = useState("");
     const [sortConfig, setSortConfig] = useState([]);
-    const [selectedUser, setSelectedUser] = useState(null);
+    // Lưu trữ selectedUserId thay vì toàn bộ object
+    const [selectedUserId, setSelectedUserId] = useState(null);
     const [showPopup, setShowPopup] = useState(false);
     const [roleFilter, setRoleFilter] = useState("all");
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -47,7 +48,6 @@ const UserList = () => {
                 setDebouncedSearch("");
             }
         }, 500);
-
         return () => clearTimeout(timeoutId);
     }, [searchTerm]);
 
@@ -58,7 +58,7 @@ const UserList = () => {
     const isLoading = isLoadingUsers || isLoadingSearch;
     const isError = isErrorUsers || isErrorSearch;
 
-    const allRoles = ["ADMIN", "USER"]; // Update based on your actual roles
+    const allRoles = ["ADMIN", "USER"];
 
     const handleSort = (key) => {
         setSortConfig((prev) => {
@@ -84,13 +84,15 @@ const UserList = () => {
         }
     };
 
+    // Khi mở chi tiết, lưu lại id của user và mở modal
     const openUserDetail = (user) => {
-        setSelectedUser({...user});
+        setSelectedUserId(user.id);
         setShowPopup(true);
     };
 
     const closeUserDetail = () => {
         setShowPopup(false);
+        setSelectedUserId(null);
     };
 
     const filteredUsers = users.filter(user => {
@@ -106,241 +108,167 @@ const UserList = () => {
         return 0;
     });
 
-    const saveUserChanges = async (updatedUser) => {
-        // Here you would typically have an API call to update the user
-        // For now, we'll just refetch the users to get the latest data
-        refetchUsers();
-        setSelectedUser(updatedUser);
-    };
-
-    // Format user data for display
+    // Sửa các trường cho đúng theo dữ liệu backend: firstName, lastName, phone, dob, address, avatar,...
     const formatUserForDisplay = (user) => {
         return {
             id: user.id,
-            name: user.fullName || user.username,
-            username: user.username,
+            name: user.username,
             email: user.email,
-            phone: user.phoneNumber || "N/A",
+            phone: user.phone || "N/A",
             dob: user.dateOfBirth || "N/A",
             address: user.address || "N/A",
-            role: user.roles?.includes("ADMIN") ? "Admin" : "Member",
+            role: user.role?.includes("ADMIN") ? "Admin" : "Member",
             status: user.status ? user.status.toUpperCase() : "ACTIVE",
-            avatar: user.avatar || `https://randomuser.me/api/portraits/${Math.random() > 0.5 ? 'men' : 'women'}/${Math.floor(Math.random() * 70) + 1}.jpg`
+            avatar: user.avatar || `/assets/default-avatar.png`
         };
     };
 
-    // Current users to display
     const currentUsers = sortedUsers.map(formatUserForDisplay);
 
-    // Component for user detail popup with editing capabilities
-    const UserDetailPopup = ({ user, onClose, onSave }) => {
-        if (!user) return null;
+    // Component UserDetailPopup: chỉ cho xem, hiển thị role luôn là "Member"
+    const UserDetailPopup = ({ userId, onClose, onToggleStatus }) => {
+        const { data: userDetail, isLoading: isLoadingDetail, isError: isErrorDetail } = useGetUserByIdQuery(userId);
+        const [userData, setUserData] = useState(null);
 
-        const [editedUser, setEditedUser] = useState({...user});
-        const [isEditing, setIsEditing] = useState(false);
+        useEffect(() => {
+            if (userDetail) {
+                setUserData({ ...userDetail });
+            }
+        }, [userDetail]);
 
-        const handleInputChange = (e) => {
-            const { name, value } = e.target;
-            setEditedUser({...editedUser, [name]: value});
-        };
+        if (isLoadingDetail) {
+            return (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-xl p-6">
+                        <p className="text-center text-gray-700">Loading user details...</p>
+                    </div>
+                </div>
+            );
+        }
 
-        const handleSave = () => {
-            onSave(editedUser);
-            setIsEditing(false);
-        };
+        if (isErrorDetail || !userDetail || userData === null) {
+            return (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-xl p-6">
+                        <p className="text-center text-red-500">Error loading user details.</p>
+                        <button onClick={onClose} className="mt-4 px-4 py-2 bg-gray-300 rounded">
+                            Đóng
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        const displayName = (userData.firstName || "") + (userData.lastName ? " " + userData.lastName : "");
+        const finalName = displayName.trim() ? displayName : userData.username;
 
         return (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                 <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl overflow-hidden animate-fadeIn">
                     <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white p-4 flex justify-between items-center">
                         <h2 className="text-xl font-bold">Chi tiết người dùng</h2>
-                        <div className="flex space-x-2">
-                            {isEditing ? (
-                                <>
-                                    <button
-                                        onClick={handleSave}
-                                        className="px-3 py-1 bg-green-600 hover:bg-green-700 rounded-md text-sm font-medium"
-                                    >
-                                        Lưu
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            setEditedUser({...user});
-                                            setIsEditing(false);
-                                        }}
-                                        className="px-3 py-1 bg-gray-600 hover:bg-gray-700 rounded-md text-sm font-medium"
-                                    >
-                                        Hủy
-                                    </button>
-                                </>
-                            ) : (
-                                <button
-                                    onClick={() => setIsEditing(true)}
-                                    className="px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded-md text-sm font-medium"
-                                >
-                                    Chỉnh sửa
-                                </button>
-                            )}
-                        </div>
+                        <button
+                            onClick={onClose}
+                            className="px-3 py-1 bg-gray-600 hover:bg-gray-700 rounded-md text-sm font-medium"
+                        >
+                            Đóng
+                        </button>
                     </div>
 
                     <div className="p-6">
                         <div className="flex flex-col md:flex-row items-center mb-6">
                             <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-orange-200 flex-shrink-0 mb-4 md:mb-0">
                                 <img
-                                    src={editedUser.avatar}
-                                    alt={editedUser.name}
+                                    src={userData.avatar}
+                                    alt={finalName}
                                     className="w-full h-full object-cover"
                                 />
                             </div>
                             <div className="md:ml-6 text-center md:text-left">
-                                {isEditing ? (
-                                    <input
-                                        type="text"
-                                        name="name"
-                                        value={editedUser.name}
-                                        onChange={handleInputChange}
-                                        className="text-2xl font-bold text-gray-800 border-b border-orange-300 focus:outline-none focus:border-orange-500 w-full"
-                                    />
-                                ) : (
-                                    <h3 className="text-2xl font-bold text-gray-800">{editedUser.name}</h3>
-                                )}
-
-                                {isEditing ? (
-                                    <select
-                                        name="role"
-                                        value={editedUser.role}
-                                        onChange={handleInputChange}
-                                        className="mt-2 px-3 py-1 rounded-full text-sm font-medium border border-orange-300 focus:outline-none focus:border-orange-500"
-                                    >
-                                        {allRoles.map(role => (
-                                            <option key={role} value={role}>{role}</option>
-                                        ))}
-                                    </select>
-                                ) : (
-                                    <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium mt-2 ${
-                                        editedUser.role === "Admin" ? "bg-purple-100 text-purple-800" :
-                                            "bg-green-100 text-green-800"
-                                    }`}>
-                                        {editedUser.role}
-                                    </span>
-                                )}
+                                <h3 className="text-2xl font-bold text-gray-800">{userData.username}</h3>
+                                <span className="inline-block px-3 py-1 rounded-full text-sm font-medium mt-2 bg-green-100 text-green-800">
+                                    Member
+                                </span>
                             </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* USERNAME */}
                             <div className="bg-orange-50 p-3 rounded-lg">
                                 <div className="flex items-center mb-1 text-orange-700">
                                     <FaIdCard className="mr-2" />
                                     <span className="text-sm font-medium">Tên đăng nhập</span>
                                 </div>
-                                <div className="text-gray-800 pl-6">{editedUser.username}</div>
+                                <div className="text-gray-800 pl-6">{userData.username}</div>
                             </div>
 
+                            {/* EMAIL */}
                             <div className="bg-orange-50 p-3 rounded-lg">
                                 <div className="flex items-center mb-1 text-orange-700">
                                     <FaEnvelope className="mr-2" />
                                     <span className="text-sm font-medium">Email</span>
                                 </div>
-                                {isEditing ? (
-                                    <input
-                                        type="email"
-                                        name="email"
-                                        value={editedUser.email}
-                                        onChange={handleInputChange}
-                                        className="text-gray-800 pl-6 border-b border-orange-300 focus:outline-none focus:border-orange-500 bg-transparent w-full"
-                                    />
-                                ) : (
-                                    <div className="text-gray-800 pl-6">{editedUser.email}</div>
-                                )}
+                                <div className="text-gray-800 pl-6">{userData.email}</div>
                             </div>
 
+                            {/* PHONE */}
                             <div className="bg-orange-50 p-3 rounded-lg">
                                 <div className="flex items-center mb-1 text-orange-700">
                                     <FaPhone className="mr-2" />
                                     <span className="text-sm font-medium">Số điện thoại</span>
                                 </div>
-                                {isEditing ? (
-                                    <input
-                                        type="tel"
-                                        name="phone"
-                                        value={editedUser.phone}
-                                        onChange={handleInputChange}
-                                        className="text-gray-800 pl-6 border-b border-orange-300 focus:outline-none focus:border-orange-500 bg-transparent w-full"
-                                    />
-                                ) : (
-                                    <div className="text-gray-800 pl-6">{editedUser.phone}</div>
-                                )}
+                                <div className="text-gray-800 pl-6">{userData.phone}</div>
                             </div>
 
+                            {/* DOB */}
                             <div className="bg-orange-50 p-3 rounded-lg">
                                 <div className="flex items-center mb-1 text-orange-700">
                                     <FaBirthdayCake className="mr-2" />
                                     <span className="text-sm font-medium">Ngày sinh</span>
                                 </div>
-                                {isEditing ? (
-                                    <input
-                                        type="text"
-                                        name="dob"
-                                        value={editedUser.dob}
-                                        onChange={handleInputChange}
-                                        className="text-gray-800 pl-6 border-b border-orange-300 focus:outline-none focus:border-orange-500 bg-transparent w-full"
-                                    />
-                                ) : (
-                                    <div className="text-gray-800 pl-6">{editedUser.dob}</div>
-                                )}
+                                <div className="text-gray-800 pl-6">{userData.dob}</div>
                             </div>
 
+                            {/* ADDRESS */}
                             <div className="bg-orange-50 p-3 rounded-lg md:col-span-2">
                                 <div className="flex items-center mb-1 text-orange-700">
                                     <FaMapMarkerAlt className="mr-2" />
                                     <span className="text-sm font-medium">Địa chỉ</span>
                                 </div>
-                                {isEditing ? (
-                                    <input
-                                        type="text"
-                                        name="address"
-                                        value={editedUser.address}
-                                        onChange={handleInputChange}
-                                        className="text-gray-800 pl-6 border-b border-orange-300 focus:outline-none focus:border-orange-500 bg-transparent w-full"
-                                    />
-                                ) : (
-                                    <div className="text-gray-800 pl-6">{editedUser.address}</div>
-                                )}
+                                <div className="text-gray-800 pl-6">{userData.address}</div>
                             </div>
 
+                            {/* STATUS */}
                             <div className="bg-orange-50 p-3 rounded-lg md:col-span-2">
                                 <div className="flex items-center mb-1 text-orange-700">
                                     <FaUser className="mr-2" />
                                     <span className="text-sm font-medium">Trạng thái</span>
                                 </div>
                                 <div className="flex items-center pl-6">
-                                    {editedUser.status === "active" ? (
+                                    {userData.status?.toLowerCase() === "active" ? (
                                         <FaCheckCircle className="text-green-500 mr-2" />
                                     ) : (
                                         <FaTimesCircle className="text-red-500 mr-2" />
                                     )}
-                                    <span className={`font-medium ${editedUser.status === "active" ? "text-green-600" : "text-red-600"}`}>
-                                        {editedUser.status === "active" ? "Đang hoạt động" : "Đã bị khóa"}
+                                    <span className={`font-medium ${userData.status?.toLowerCase() === "active" ? "text-green-600" : "text-red-600"}`}>
+                                        {userData.status?.toLowerCase() === "active" ? "Đang hoạt động" : "Đã bị khóa"}
                                     </span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
+                    {/* Footer: nút Khóa/Mở khóa và Đóng */}
                     <div className="bg-gray-50 px-6 py-4 flex justify-end space-x-3 border-t border-gray-200">
                         <button
-                            onClick={async () => {
-                                await toggleUserStatus(editedUser.id, editedUser.status);
-                                onClose();
-                            }}
-                            className={`px-4 py-2 rounded-md font-medium ${
-                                editedUser.status === "banned"
-                                    ? "bg-green-500 hover:bg-green-600 text-white"
-                                    : "bg-red-500 hover:bg-red-600 text-white"
+                            className={`p-2 rounded-md transition-colors ${
+                                userData.status.toLowerCase() === "banned"
+                                    ? "bg-green-100 text-green-600 hover:bg-green-200"
+                                    : "bg-red-100 text-red-600 hover:bg-red-200"
                             }`}
+                            onClick={() => toggleUserStatus(userData.id, userData.status)}
                         >
-                            {editedUser.status === "banned" ? "Mở khóa" : "Khóa"}
+                            {userData.status?.toLowerCase() === "active" ? "Khóa" : "Mở khóa"}
                         </button>
                         <button
                             onClick={onClose}
@@ -357,11 +285,9 @@ const UserList = () => {
     return (
         <div className="flex flex-col min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50">
             <div className="flex flex-1 overflow-hidden relative">
-                {/* Sidebar - Collapsible */}
-                <div className={`transition-all duration-300  ${sidebarCollapsed ? 'w-16' : 'w-64'} flex-shrink-0`}>
+                <div className={`transition-all duration-300 ${sidebarCollapsed ? 'w-16' : 'w-64'} flex-shrink-0`}>
                     <Sidebar sidebarCollapsed={sidebarCollapsed} setSidebarCollapsed={setSidebarCollapsed} />
                 </div>
-                {/* Main Content Area - Takes remaining width */}
                 <div className="flex-1 flex flex-col overflow-hidden">
                     <div className="flex-1 overflow-auto p-4">
                         <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-orange-100 h-full flex flex-col">
@@ -436,11 +362,11 @@ const UserList = () => {
                                                                 className="font-medium text-orange-600 hover:text-orange-800 cursor-pointer hover:underline"
                                                                 onClick={() => openUserDetail(user)}
                                                             >
-                                                                {user.name}
-                                                            </span>
+                                                                    {user.name}
+                                                                </span>
                                                         </div>
                                                     </td>
-                                                    <td className="p-4 hidden md:table-cell text-gray-600">{user.email} </td>
+                                                    <td className="p-4 hidden md:table-cell text-gray-600">{user.email}</td>
                                                     <td className="p-4">
                                                         {user.status.toLowerCase() === "banned" ? (
                                                             <div className="flex items-center text-red-500">
@@ -526,12 +452,15 @@ const UserList = () => {
                     </div>
                 </div>
 
-                {/* User Detail Popup */}
-                {showPopup && selectedUser && (
+                {/* User Detail Popup sử dụng API getUserById */}
+                {showPopup && selectedUserId && (
                     <UserDetailPopup
-                        user={selectedUser}
+                        userId={selectedUserId}
                         onClose={closeUserDetail}
-                        onSave={saveUserChanges}
+                        onToggleStatus={toggleUserStatus}
+                        onSave={() => {
+                            refetchUsers();
+                        }}
                     />
                 )}
             </div>

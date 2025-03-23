@@ -50,7 +50,7 @@ export const adminUserService = createApi({
         }),
         getUserById: builder.query({
             query: (id) => {
-                const url = `/admin/accounts/${id}`;
+                const url = `/admin/accounts/getDetail/${id}`;
                 console.log("Fetching URL:", url);
                 return url;
             },
