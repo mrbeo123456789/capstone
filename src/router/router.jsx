@@ -25,6 +25,7 @@ import ChallengeDetail from "../page/challenge/ChallengeDetail.jsx";
 import JoinedChallengeDetail from "../page/challenge/JoinedChallengeDetail.jsx";
 import YourChallenge from "../page/challenge/YourChallenge.jsx";
 import GroupUsers from "../page/group/GroupUsers.jsx";
+import GroupForm from "../page/group/GroupForm.jsx";
 
 const router = createBrowserRouter([
     {
@@ -147,6 +148,10 @@ const router = createBrowserRouter([
         errorElement:<ErrorPage/>,
         element: <Layout></Layout>,
         children:[
+            {
+                path:"/groups/create",
+                element: <GroupForm />
+            },
             {
                 path:"/groups/joins",
                 element: <GroupPage />

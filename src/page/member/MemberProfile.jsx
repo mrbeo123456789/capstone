@@ -1,7 +1,7 @@
 import {NavLink, useNavigate} from "react-router-dom";
 import {IoIosWarning, IoMdHome} from "react-icons/io";
 import {GrNext} from "react-icons/gr";
-import {useForm} from "react-hook-form";
+import {Controller, useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {validateCandidate} from "../../utils/validation.js";
 import {IoCloudUploadOutline} from "react-icons/io5";
@@ -12,11 +12,18 @@ import useSelectCityAndCountry from "../../hook/useSelectCityAndCountry.jsx";
 import {generatePassword, generateUsername} from "../../utils/utils.js";
 import toast from "react-hot-toast";
 import {useUpdateMemberMutation} from "../../service/memberService.js";
+import locationService from "../../service/locationService.js";
 
 
 function MemberProfile() {
     const [user, setUser] = useState(null);
     const [updateUser, { isLoading, isError, isSuccess, error }] = useUpdateMemberMutation();
+    const [provinces, setProvinces] = useState([]);
+    const [districts, setDistricts] = useState([]);
+    const [wards, setWards] = useState([]);
+    const [selectedProvince, setSelectedProvince] = useState("");
+    const [selectedDistrict, setSelectedDistrict] = useState("");
+
 
     const {register,
         handleSubmit,
@@ -25,13 +32,19 @@ function MemberProfile() {
         watch,
         reset,
         trigger,
+        control,
         formState:{ errors, isValid, isDirty}
     } = useForm({mode: "all",
         resolver: yupResolver(validateCandidate)});
 
     const navigate = useNavigate();
-    useEffect( () => {
+    useEffect(() => {
         const token = localStorage.getItem("jwt_token");
+        const fetchProvinces = async () => {
+            const data = await locationService.getProvinces();
+            setProvinces(data);
+        };
+        fetchProvinces();
         if (!token) {
             toast.error("You need to log in first!");
             navigate("/login");
@@ -49,32 +62,71 @@ function MemberProfile() {
             })
             .then(data => {
                 console.log(data);
-                    setUser(data);
-                    // 🔥 Ensure `null` values are replaced with empty strings
-                    setValue("userName", data.userName || "");
-                    setValue("fullName", data.fullName || "");
-                    setValue("firstName", data.firstName || "");
-                    setValue("lastName", data.lastName || "");
-                    setValue("gender", data.gender || "");
-                    setValue("phone", data.phone || "");
-                    setValue("country", data.country || "");
-                    setValue("dateOfBirth", data.dateOfBirth || "");
-                    setPreview(data.avatar || ""); // Set existing avatar preview
+                setUser(data);
+                // Set values
+                setValue("email", data.email || "");
+                setValue("username", data.username || "");
+                setValue("fullName", data.fullName || "");
+                setValue("firstName", data.firstName || "");
+                setValue("lastName", data.lastName || "");
+                setValue("gender", data.gender || "");
+                setValue("phone", data.phone || "");
+                setValue("province", data.city || "");
+                setValue("district", data.district || "");
+                setValue("ward", data.ward || "");
+                setValue("dateOfBirth", formatDate(data.dateOfBirth));
+                setPreview(data.avatar || "");
+                // 👇 Fill province/district/ward IDs
+                setValue("province", data.province || "");
+                setSelectedProvince(data.province || ""); // For fetching districts
+
+                setValue("district", data.district || "");
+                setSelectedDistrict(data.district || ""); // For fetching wards
+
+                setValue("ward", data.ward || "");
+
+                // Load Districts & Wards ngay sau khi có province, district:
+                if (data.province) {
+                    locationService.getDistricts(data.province).then((districts) => {
+                        setDistricts(districts);
+                        if (data.district) {
+                            locationService.getWards(data.district).then((wards) => {
+                                setWards(wards);
+                            });
+                        }
+                    });
                 }
-            )
+            })
             .catch(error => {
                 toast.error(error.message);
                 console.error(error);
             });
+    }, [setValue, trigger]);
 
-        console.log(user);
-        window.addEventListener("animationstart", autofillHandler);
-        window.addEventListener("input", autofillHandler);
-        return () => {
-            window.removeEventListener("animationstart", autofillHandler);
-            window.removeEventListener("input", autofillHandler);
-        }
-    },[setValue,trigger]);
+    const formatDate = (dateArray) => {
+        if (!dateArray) return "";
+        const [year, month, day] = dateArray;
+        const formattedMonth = month.toString().padStart(2, "0");
+        const formattedDay = day.toString().padStart(2, "0");
+        return `${year}-${formattedMonth}-${formattedDay}`;
+    };
+
+// When province changes -> load districts
+    const handleProvinceChange = async (e) => {
+        const provinceId = e.target.value;
+        setSelectedProvince(provinceId);
+        const data = await locationService.getDistricts(provinceId);
+        setDistricts(data);
+        setWards([]); // reset wards
+    };
+
+    // When district changes -> load wards
+    const handleDistrictChange = async (e) => {
+        const districtId = e.target.value;
+        setSelectedDistrict(districtId);
+        const data = await locationService.getWards(districtId);
+        setWards(data);
+    };
 
     const [preview, setPreview] = useState("");
 
@@ -140,19 +192,6 @@ function MemberProfile() {
         }
     }
 
-    const autofillHandler = ()=>{
-        setValue("fullname", document.getElementById("fullname").value);
-        setValue("firstname", document.getElementById("firstname").value);
-        setValue("lastname", document.getElementById("lastname").value);
-        setValue("username", document.getElementById("username").value);
-        setValue("email", document.getElementById("email").value);
-        setValue("phone", document.getElementById("phone").value);
-        setValue("country", document.getElementById("country").value);
-        setValue("city", document.getElementById("city").value);
-        setValue("district", document.getElementById("district").value);
-        setValue("ward", document.getElementById("ward").value);
-        setValue("dateofbirth", document.getElementById("dateofbirth").value);
-    }
     return (
         <div
             className="p-6 flex flex-col md:flex-row h-full w-full relative box-border rounded-xl border-4 border-transparent z-[1]">
@@ -223,21 +262,29 @@ function MemberProfile() {
                             <label className="text-sm font-medium text-red-600 block" htmlFor="fullname">Full Name
                                 <span className="text-red-900"> *</span>
                             </label>
-                            <input type="text" {...register("fullname")} defaultValue={user?.fullName || ""}
-                                   className="w-full sm:w-1/2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="John"/>
+                            <input type="text" {...register("fullName")} defaultValue={user?.fullName || ""}
+                                   className="w-full sm:w-1/2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                                   placeholder="John"/>
+                            <p className="text-red-500">{errors.name?.message}</p>
                         </div>
                         {/* Date of Birth */}
                         <div>
                             <label className="text-sm font-medium text-red-600 block">Date of Birth
                                 <span className="text-red-900"> *</span>
                             </label>
-                            <input type="date" {...register("dateofbirth")}
-                                   className="w-full sm:w-1/2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"/>
+                            <input
+                                type="date"
+                                {...register("dateOfBirth")} // ✅ Thống nhất camelCase
+                                className="w-full sm:w-1/2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                            />
+                            <p className="text-red-500">{errors.name?.message}</p>
                         </div>
+
                         {/* Gender */}
                         <div>
                             <label className="text-sm font-medium text-red-600 block">Gender</label>
-                            <select {...register("Gender")} className="w-full sm:w-1/2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+                            <select {...register("gender")} defaultValue={user?.gender || ""}
+                                    className="w-full sm:w-1/2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
                                 <option value="">Choose Gender</option>
                                 <option value="MALE">Male</option>
                                 <option value="FEMALE">Female</option>
@@ -248,48 +295,90 @@ function MemberProfile() {
                         <div>
                             <label className="text-sm font-medium text-red-600 block">Phone</label>
                             <input type="text" {...register("phone")}
-                                   className="w-full sm:w-1/2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="Phone Number"/>
+                                   className="w-full sm:w-1/2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                                   placeholder="Phone Number"/>
                         </div>
-                        <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-                            {/* City */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {/* Province */}
                             <div>
-                                <label className="text-sm font-medium text-red-600 block">City</label>
-                                <select {...register("city")} className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
-                                    <option value="">Choose City</option>
-                                       {cities?.map((city, index) => (
-                                           <option key={index} value={city.state_name}>
-                                               {city.state_name}
-                                           </option>
-                                       ))}
-                                </select>
+                                <label className="text-sm font-medium text-red-600 block">Tỉnh/Thành Phố</label>
+                                <Controller
+                                    control={control}
+                                    name="province"
+                                    defaultValue={user?.province || ""}
+                                    render={({field}) => (
+                                        <select
+                                            {...field}
+                                            onChange={(e) => {
+                                                field.onChange(e); // update RHF
+                                                handleProvinceChange(e); // fetch districts
+                                            }}
+                                            className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                                        >
+                                            <option value="">Select Province</option>
+                                            {provinces.map((province) => (
+                                                <option key={province.id} value={province.id}>
+                                                    {province.full_name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    )}
+                                />
                             </div>
-                            {/* City */}
+                            {/* District */}
                             <div>
-                                <label className="text-sm font-medium text-red-600 block">District</label>
-                                <select {...register("district")} className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
-                                    <option value="">Choose district</option>
-                                    {cities?.map((city, index) => (
-                                        <option key={index} value={city.state_name}>
-                                            {city.state_name}
-                                        </option>
-                                    ))}
-                                </select>
+                                <label className="text-sm font-medium text-red-600 block">Quận/Huyện</label>
+                                <Controller
+                                    control={control}
+                                    name="district"
+                                    defaultValue={user?.district || ""}
+                                    render={({field}) => (
+                                        <select
+                                            {...field}
+                                            onChange={(e) => {
+                                                field.onChange(e);
+                                                handleDistrictChange(e);
+                                            }}
+                                            className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                                        >
+                                            <option value="">Select District</option>
+                                            {districts.map((district) => (
+                                                <option key={district.id} value={district.id}>
+                                                    {district.full_name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    )}
+                                />
                             </div>
+                            {/* Ward */}
                             <div>
-                                <label className="text-sm font-medium text-red-600 block">Ward</label>
-                                <select {...register("ward")} className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
-                                    <option value="">Choose ward</option>
-                                    {cities?.map((city, index) => (
-                                        <option key={index} value={city.state_name}>
-                                            {city.state_name}
-                                        </option>
-                                    ))}
-                                </select>
+                                <label className="text-sm font-medium text-red-600 block">Xã/Thị Trấn</label>
+                                <Controller
+                                    control={control}
+                                    name="ward"
+                                    defaultValue={user?.ward || ""}
+                                    render={({field}) => (
+                                        <select
+                                            {...field}
+                                            className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                                        >
+                                            <option value="">Select Ward</option>
+                                            {wards.map((ward) => (
+                                                <option key={ward.id} value={ward.id}>
+                                                    {ward.full_name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    )}
+                                />
                             </div>
+
                         </div>
+
                         {/* Submit Button */}
                         <button type="submit"
-                                className="text-white bg-red-600 px-6 py-2 rounded hover:bg-red-900">Update Profile
+                                className="text-white bg-red-600 px-6 py-2 rounded hover:bg-red-900 mt-2">Update Profile
                         </button>
                     </form>
                 </div>

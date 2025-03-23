@@ -40,7 +40,9 @@ const GroupsPage = () => {
                             placeholder="Search"
                             className="w-2/3 p-2 rounded-lg border border-gray-400"
                         />
-                        <button className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
+                        <button className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+                            onClick={() => navigate(`/groups/create`)}
+                        >
                             Create a new group
                         </button>
                     </div>
