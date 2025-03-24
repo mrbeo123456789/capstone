@@ -1,6 +1,10 @@
 import * as yup from "yup";
+// Helper function để parse date & so sánh cho dễ
+const today = new Date();
+today.setHours(0, 0, 0, 0); // Reset time về 00:00 để tránh lỗi so sánh
 
 export const validateCandidate = yup.object({
+
     fullName: yup.string().required("Full name is required!"),
     dateOfBirth: yup
         .string()
@@ -51,7 +55,63 @@ export const validateCandidate = yup.object({
 })
 
 export const challengeValidation = yup.object({
-    // fullname: yup.string().required("Full name is required!"),
+    name: yup.string()
+        .required("Challenge name is required!")
+        .trim()
+        .min(3, "Challenge name must be at least 3 characters"),
+
+    startDate: yup.date()
+        .required("Start date is required")
+        .min(today, "Start date must be in the future"),
+
+    endDate: yup.string()
+        .strict(true)
+        .required("End date is required")
+        .test(
+            "is-after-start",
+            "End date must be after start date",
+            function (value) {
+                const { startDate } = this.parent;
+                if (!startDate || !value) return false;
+                return new Date(value) > new Date(startDate);
+            }
+        ),
+
+    maxParticipants: yup.number()
+        .typeError("Max participants must be a number")
+        .required("Max participants is required")
+        .positive("Max participants must be greater than 0")
+        .integer("Max participants must be an integer"),
+
+    description: yup.string()
+        .required("Description is required")
+        .trim()
+        .min(10, "Description should be at least 10 characters long"),
+
+    rule: yup.string(),
+
+    picture: yup
+        .mixed()
+        .required("Picture is required")
+        .test(
+            "fileSize",
+            "Picture size must be less than 50MB",
+            (value) => {
+                if (!value) return false; // required
+                return value.size <= 50 * 1024 * 1024; // 50MB in bytes
+            }
+        )
+        .test(
+            "fileType",
+            "Unsupported File Format",
+            (value) => {
+                if (!value) return false;
+                return ["image/jpeg", "image/png", "image/jpg", "image/gif"].includes(value.type);
+            }
+        ),
+
+    challengeTypeId: yup.string()
+        .required("Challenge type is required")
 
 })
 

@@ -5,16 +5,19 @@ export const challengeService = createApi({
     reducerPath: "challenge",
     baseQuery: fetchBaseQuery({
         baseUrl: BASE_URL,
-        prepareHeaders: (headers) => {
+        prepareHeaders: (headers, { getState, endpoint }) => {
             const token = localStorage.getItem("jwt_token");
             if (token) {
                 headers.set("Authorization", `Bearer ${token}`);
             }
-            headers.set("Content-Type", "application/json");
+            // ✅ Only set Content-Type for JSON requests, NOT for FormData
+            if (endpoint !== "createChallenge") {
+                headers.set("Content-Type", "application/json");
+            }
             return headers;
         },
     }),
-    tagTypes: ["Challenge"],
+    tagTypes: ["Challenge", "ChallengeTypes"], // Add tag type for types if needed
     endpoints: (builder) => ({
         getChallenges: builder.query({
             query: () => "/challenges",
@@ -43,6 +46,11 @@ export const challengeService = createApi({
             }),
             invalidatesTags: ["Challenge"],
         }),
+
+        getChallengeTypes: builder.query({
+            query: () => "/challenges/challenge-types",
+            providesTags: ["ChallengeTypes"], // Optional
+        }),
     }),
 });
 
@@ -50,5 +58,7 @@ export const {
     useGetChallengesQuery,
     useCreateChallengeMutation,
     useUpdateChallengeMutation,
-    useDeleteChallengeMutation
+    useDeleteChallengeMutation,
+    useGetChallengeTypesQuery // <- Add this
 } = challengeService;
+

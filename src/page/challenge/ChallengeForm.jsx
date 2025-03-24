@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { useCreateChallengeMutation } from "../../service/challengeService.js";
+import {useCreateChallengeMutation, useGetChallengeTypesQuery} from "../../service/challengeService.js";
 import {FaWindowClose} from "react-icons/fa";
 import {IoCloudUploadOutline} from "react-icons/io5";
 import {challengeValidation} from "../../utils/validation.js";
@@ -10,9 +10,21 @@ import {yupResolver} from "@hookform/resolvers/yup";
 
 const ChallengeForm = () => {
     const [createChallenge, { isLoading }] = useCreateChallengeMutation();
+    const { data: challengeTypes, challengeTypeLoading, isError } = useGetChallengeTypesQuery();
+
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState("description");
     const [preview, setPreview] = useState("");
+
+    const today = new Date();
+    const tomorrow = new Date();
+    today.setDate(today.getDate() + 1);
+    tomorrow.setDate(today.getDate() + 1);
+
+    const getFormattedDate = (date) => {
+        return date.toISOString().split('T')[0]; // lấy phần YYYY-MM-DD
+    };
+
     const {register,
         handleSubmit,
         setValue,
@@ -23,29 +35,67 @@ const ChallengeForm = () => {
         formState:{ errors, isValid, isDirty}
     } = useForm({
             mode: "all",
-            resolver: yupResolver(challengeValidation)});
-
+            resolver: yupResolver(challengeValidation),
+            defaultValues: {
+                startDate: getFormattedDate(today),
+                endDate: getFormattedDate(tomorrow)
+            }
+    });
 
     const onSubmit = async (data) => {
-        try {
-            const formattedData = {
-                ...data,
-                maxParticipants: parseInt(data.maxParticipants),
-                challengeTypeId: parseInt(data.challengeTypeId),
-            };
-            console.log("Formatted Data:", formattedData);
-            await createChallenge(formattedData);
-            toast.success("Challenge created successfully!");
-            reset();
-            navigate("/challenges");
-        } catch (err) {
-            toast.error("Failed to create challenge: " + err.data?.message || "Unknown error");
+        const formData = new FormData();
+
+        // Format date fields
+        const formatDate = (dateString) => {
+            const date = new Date(dateString);
+            const offset = date.getTimezoneOffset();
+            date.setMinutes(date.getMinutes() - offset);
+            return date.toISOString().split('T')[0];
+        };
+
+        // Pre-process
+        const processedData = {
+            ...data,
+            maxParticipants: parseInt(data.maxParticipants),
+            challengeTypeId: parseInt(data.challengeTypeId),
+            startDate: formatDate(data.startDate),
+            endDate: formatDate(data.endDate),
+        };
+
+        // Append all fields dynamically
+        Object.keys(processedData).forEach((key) => {
+            if (key === "picture") {
+                if (processedData.picture) {
+                    formData.append("picture", processedData.picture); // File
+                }
+            } else {
+                formData.append(key, processedData[key] ?? ""); // Avoid null/undefined
+            }
+        });
+
+        if (isValid) {
+            const toastId = toast.loading("Creating challenge...");
+            try {
+                console.log("Submitting FormData...");
+                for (let pair of formData.entries()) {
+                    console.log(pair[0] + ": ", pair[1]);
+                }
+
+                await createChallenge(formData).unwrap();
+                toast.success("Challenge created successfully!", { id: toastId });
+                reset();
+                setPreview(null);
+                navigate("/challenges");
+            } catch (err) {
+                console.log(err);
+                toast.error("Failed to create challenge: " + (err?.data?.message || "Unknown error"), { id: toastId });
+            }
         }
     };
 
     const handleFileChange = (event) => {
         const file = event.target.files[0];
-        setValue("avatar", file,{ shouldValidate: true });// Đặt giá trị cho field avatar
+        setValue("picture", file,{ shouldValidate: true });// Đặt giá trị cho field avatar
         setPreview(URL.createObjectURL(file));
     };
 
@@ -60,25 +110,26 @@ const ChallengeForm = () => {
             {/* Left Section: Challenge Image & Basic Info */}
             <div className="rounded-lg w-full p-1">
                 <div className="p-6 flex flex-col rounded-lg">
-                    <h3 className="mb-4 text-xl font-bold text-red-600">General Information</h3>
+                    <h3 className="mb-4 text-xl font-bold ">General Information</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             {/* Challenge Name */}
                             <div className="w-full mt-6">
-                                <label className="text-sm font-medium text-red-500">Challenge Name</label>
+                                <label className="text-sm font-medium ">Challenge Name</label>
                                 <input
                                     type="text"
-                                    {...register("name", {required: "Challenge name is required"})}
+                                    {...register("name")}
                                     className="w-full text-black p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                                     placeholder="Give it a short distinct name"
                                 />
-                                <p className="text-red-500">{errors.name?.message}</p>
+                                <p className="text-red-600">{errors.name?.message}</p>
                             </div>
 
                             {/* Privacy Status */}
                             <div>
-                                <label className="text-sm font-medium text-red-600">Privacy</label>
-                                <select {...register("privacy")} className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <label className="text-sm font-medium ">Privacy</label>
+                                <select {...register("privacy")}
+                                        className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
                                     <option value="PUBLIC">Public</option>
                                     <option value="PRIVATE">Private</option>
                                 </select>
@@ -86,14 +137,14 @@ const ChallengeForm = () => {
 
                             {/* Challenge Name */}
                             <div className="w-full mt-6">
-                                <label className="text-sm font-medium text-red-500">Summary (Optional)</label>
+                                <label className="text-sm font-medium ">Summary (Optional)</label>
                                 <input
                                     type="text"
-                                    {...register("name", {required: "Challenge name is required"})}
+                                    {...register("summary", {required: "Challenge name is required"})}
                                     className="w-full text-black p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                                     placeholder="Add a few words under the name of the challenge to inspire guest, e.g ... An unforgettable challenge"
                                 />
-                                <p className="text-red-500">{errors.name?.message}</p>
+                                <p className="text-red-600">{errors.summary?.message}</p>
                             </div>
                         </div>
 
@@ -104,7 +155,7 @@ const ChallengeForm = () => {
                                 {/* Close Button */}
                                 {preview && (
                                     <FaWindowClose
-                                        className="text-2xl text-red-500 absolute right-2 top-2 z-10"
+                                        className="text-2xl  absolute right-2 top-2 z-10"
                                         onClick={handleClosePreview}
                                         style={{cursor: "pointer", backgroundColor: "white"}}
                                     />
@@ -132,8 +183,10 @@ const ChallengeForm = () => {
                                 )}
                             </div>
                         </label>
-                        <input {...register("avatar")} id="dropzone-file" type="file" accept="image/*" className="hidden"
+                        <input {...register("picture")} id="dropzone-file" type="file" accept="image/*"
+                               className="hidden"
                                onChange={handleFileChange}/>
+                        <p className="text-red-600">{errors.picture?.message}</p>
                     </div>
 
                 </div>
@@ -147,35 +200,35 @@ const ChallengeForm = () => {
             {/* Below Section: Challenge Details Form */}
             <div className="rounded-lg w-full p-1">
                 <div className="flex flex-col rounded-lg p-6 h-full">
-                    <h3 className="mb-4 text-xl font-bold text-red-600">Challenge Details</h3>
+                    <h3 className="mb-4 text-xl font-bold ">Challenge Details</h3>
                     <form onSubmit={handleSubmit(onSubmit)} autoComplete="false">
                         <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                             {/* Start & End Date */}
                             <div>
-                                <label className="text-sm font-medium text-red-600">Start Date</label>
+                                <label className="text-sm font-medium ">Start Date</label>
                                 <input
                                     type="date"
-                                    {...register("startDate", {required: "Start date is required"})}
+                                    {...register("startDate")}
                                     className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                                 />
-                                <p className="text-red-500">{errors.startDate?.message}</p>
+                                <p className="text-red-600">{errors.startDate?.message}</p>
                             </div>
                             <div>
-                                <label className="text-sm font-medium text-red-600">End Date</label>
+                                <label className="text-sm font-medium ">End Date</label>
                                 <input
                                     type="date"
-                                    {...register("endDate", {required: "End date is required" })}
+                                    {...register("endDate")}
                                     className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                                 />
-                                <p className="text-red-500">{errors.endDate?.message}</p>
+                                <p className="text-red-600">{errors.endDate?.message}</p>
                             </div>
-
 
 
                             {/* Verification Type */}
                             <div>
-                                <label className="text-sm font-medium text-red-600">Verification Type</label>
-                                <select {...register("verificationType")} className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <label className="text-sm font-medium ">Verification Type</label>
+                                <select {...register("verificationType")}
+                                        className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
                                     <option value="PEER_TO_PEER">Peer to Peer</option>
                                     <option value="CROSS_CHECK">Cross Check</option>
                                     <option value="AI_REVIEW">AI Review</option>
@@ -184,8 +237,9 @@ const ChallengeForm = () => {
 
                             {/* Verification Method */}
                             <div>
-                                <label className="text-sm font-medium text-red-600">Verification Method</label>
-                                <select {...register("verificationMethod")} className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <label className="text-sm font-medium ">Verification Method</label>
+                                <select {...register("verificationMethod")}
+                                        className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
                                     <option value="UPLOAD_MEDIA">Upload Media</option>
                                     <option value="CHECKMARK">Checkmark</option>
                                 </select>
@@ -193,24 +247,30 @@ const ChallengeForm = () => {
 
                             {/* Max Participants */}
                             <div>
-                                <label className="text-sm font-medium text-red-600">Max Participants</label>
+                                <label className="text-sm font-medium ">Max Participants</label>
                                 <input
                                     type="number"
-                                    {...register("maxParticipants", { required: "Enter max participants" })}
+                                    {...register("maxParticipants")}
                                     className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                                 />
-                                <p className="text-red-500">{errors.maxParticipants?.message}</p>
+                                <p className="text-red-600">{errors.maxParticipants?.message}</p>
                             </div>
 
                             {/* Challenge Type ID */}
                             <div>
-                                <label className="text-sm font-medium text-red-600">Challenge Type ID</label>
-                                <input
-                                    type="number"
-                                    {...register("challengeTypeId", { required: "Challenge Type ID is required" })}
-                                    className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                                />
-                                <p className="text-red-500">{errors.challengeTypeId?.message}</p>
+                                <label className="text-sm font-medium ">Challenge Type ID</label>
+                                <select
+                                    {...register("challengeTypeId", {required: true})}
+                                    className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+                                    <option value="">Select Type</option>
+                                    {/* Optional placeholder */}
+                                    {challengeTypes?.map((type) => (
+                                        <option key={type.id} value={type.id}>
+                                            {type.name}
+                                        </option>
+                                    ))}
+                                </select>
+                                <p className="text-red-600">{errors.challengeTypeId?.message}</p>
                             </div>
                         </div>
 
@@ -231,20 +291,24 @@ const ChallengeForm = () => {
                         </div>
 
                         {/* Description & Rules Section */}
-                        <div className="p-4 text-white rounded-lg mt-4 h-24">
+                        <div className="p-4 rounded-lg mt-4 h-24">
                             {activeTab === "description" ? (
-                                <textarea {...register("description")} className="w-full p-2 rounded-lg" placeholder="Enter challenge description..." />
+                                <textarea {...register("description")} className="w-full p-2 rounded-lg"
+                                          placeholder="Enter challenge description..."/>
                             ) : (
-                                <textarea {...register("rule")} className="w-full-700 p-2 rounded-lg" placeholder="Enter challenge rules..." />
+                                <textarea {...register("rule")} className="w-full-700 p-2 rounded-lg"
+                                          placeholder="Enter challenge rules..."/>
                             )}
                         </div>
-
+                        <p className="text-red-600">{errors.description?.message}</p>
                         {/* Buttons */}
                         <div className="flex justify-center gap-6 mt-6">
-                            <button type="submit" className="bg-red-600 px-6 py-2 rounded text-white hover:bg-red-700" disabled={isLoading}>
+                            <button type="submit" className="bg-red-600 px-6 py-2 rounded text-white hover:bg-red-700"
+                                    disabled={isLoading}>
                                 {isLoading ? "Creating..." : "Create"}
                             </button>
-                            <button type="button" className="bg-gray-500 px-6 py-2 rounded text-white hover:bg-gray-600" onClick={() => reset()}>
+                            <button type="button" className="bg-gray-500 px-6 py-2 rounded text-white hover:bg-gray-600"
+                                    onClick={() => reset()}>
                                 Cancel
                             </button>
                         </div>
