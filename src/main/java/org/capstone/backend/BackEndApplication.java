@@ -1,5 +1,6 @@
 package org.capstone.backend;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -7,6 +8,18 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class BackEndApplication {
 
     public static void main(String[] args) {
+
+        Dotenv dotenv = Dotenv.configure()
+                .ignoreIfMissing() // Cho phép chạy tiếp nếu không có file .env
+                .load();
+        // In ra một biến để kiểm tra xem đã load thành công hay chưa
+        System.out.println("DATABASE_URL = " + dotenv.get("DATABASE_URL"));
+
+        // Nếu cần tích hợp với Spring Boot, bạn có thể chuyển các giá trị từ dotenv vào System properties:
+        dotenv.entries().forEach(entry ->
+                System.setProperty(entry.getKey(), entry.getValue())
+        );
+
         SpringApplication.run(BackEndApplication.class, args);
     }
 

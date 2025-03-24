@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -23,56 +24,74 @@ import com.google.api.services.gmail.GmailScopes;
 import com.google.api.services.gmail.model.Message;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Base64;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 @Async
 @Service
 public class FixedGmailService {
     private static final String APPLICATION_NAME = "Gmail API Fixed Sender";
-    private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance() ;
-    // Thư mục lưu trữ token riêng cho tài khoản cố định
+    private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
     private static final String TOKENS_DIRECTORY_PATH = "fixed_tokens";
-
-    // Quyền truy cập chỉ gửi mail
-    private static final List<String> SCOPES = Collections.singletonList(GmailScopes.GMAIL_SEND);
-    // Đường dẫn đến file credentials cố định trong thư mục resources
     private static final String CREDENTIALS_FILE_PATH = "/fixed_credentials.json";
+    private static final List<String> SCOPES = Collections.singletonList(GmailScopes.GMAIL_SEND);
 
-    /**
-     * Xác thực và tạo đối tượng Gmail service cho tài khoản cố định
-     */
+    private static final Dotenv dotenv = Dotenv.load();
+    private static final String FIXED_SENDER = System.getenv("FIXED_SENDER_EMAIL");
+
+
     private Gmail getGmailService() throws Exception {
-        // Tải file credentials cố định
         InputStream in = FixedGmailService.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
         if (in == null) {
-            throw new FileNotFoundException("Không tìm thấy file: " + CREDENTIALS_FILE_PATH);
+            throw new FileNotFoundException("Credential file not found: " + CREDENTIALS_FILE_PATH);
         }
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 
-        // Thiết lập luồng xác thực và lưu token vào thư mục fixed_tokens
+        FileDataStoreFactory dataStoreFactory = new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH));
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
                 GoogleNetHttpTransport.newTrustedTransport(), JSON_FACTORY, clientSecrets, SCOPES)
-                .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
+                .setDataStoreFactory(dataStoreFactory)
                 .setAccessType("offline")
                 .build();
-        // Sử dụng cổng khác (ví dụ: 8889) nếu cần phân biệt với OAuth của người dùng khác
+
         LocalServerReceiver receiver = new LocalServerReceiver.Builder()
                 .setPort(8080)
                 .setCallbackPath("/oauth2callback")
                 .build();
 
+
         Credential credential = new AuthorizationCodeInstalledApp(flow, receiver).authorize("fixedUser");
+
+        if (credential.getExpiresInSeconds() != null && credential.getExpiresInSeconds() <= 60) {
+            refreshToken(credential);
+        }
+
         return new Gmail.Builder(GoogleNetHttpTransport.newTrustedTransport(), JSON_FACTORY, credential)
                 .setApplicationName(APPLICATION_NAME)
                 .build();
     }
 
-    /**
-     * Tạo MimeMessage chứa nội dung email
-     */
-    public MimeMessage createEmail(String to, String from, String subject, String bodyText) throws Exception {
+    private void refreshToken(Credential credential) throws IOException {
+        if (credential.refreshToken()) {
+            System.out.println("Access token refreshed successfully.");
+            String refreshToken = credential.getRefreshToken();
+            if (refreshToken != null) {
+                Files.write(Paths.get(TOKENS_DIRECTORY_PATH + "/fixedUser_refresh_token.txt"), refreshToken.getBytes());
+                System.out.println("Refresh token saved successfully.");
+            }
+        } else {
+            System.err.println("Failed to refresh Access Token.");
+        }
+    }
+
+    public MimeMessage createEmail(String to, String from, String subject, String bodyText) throws MessagingException {
         Properties props = new Properties();
-        Session session = Session.getDefaultInstance(props, null);
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        Session session = Session.getInstance(props);
 
         MimeMessage email = new MimeMessage(session);
         email.setFrom(new InternetAddress(from));
@@ -82,30 +101,34 @@ public class FixedGmailService {
         return email;
     }
 
-    /**
-     * Mã hóa MimeMessage thành dạng raw message để gửi qua Gmail API
-     */
     public Message createMessageWithEmail(MimeMessage emailContent) throws Exception {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         emailContent.writeTo(buffer);
-        byte[] bytes = buffer.toByteArray();
-        String encodedEmail = Base64.getUrlEncoder().encodeToString(bytes);
+        String encodedEmail = Base64.getUrlEncoder().encodeToString(buffer.toByteArray());
         Message message = new Message();
         message.setRaw(encodedEmail);
         return message;
     }
 
-    /**
-     * Gửi email qua Gmail API từ tài khoản cố định
-     */
-    public void sendEmail(String to, String subject, String bodyText) throws Exception {
-        // Lấy đối tượng Gmail service cho tài khoản cố định
-        Gmail service = getGmailService();
-        // Địa chỉ người gửi cố định
-        String fixedSender = "fusep490g4@gmail.com";
-        MimeMessage emailContent = createEmail(to, fixedSender, subject, bodyText);
-        Message message = createMessageWithEmail(emailContent);
-        message = service.users().messages().send("me", message).execute();
-        System.out.println("Đã gửi email, Message id: " + message.getId());
+    public void sendEmail(String to, String subject, String bodyText) {
+        try {
+            Gmail service = getGmailService();
+            MimeMessage emailContent = createEmail(to, FIXED_SENDER, subject, bodyText);
+            Message message = createMessageWithEmail(emailContent);
+
+            message = service.users().messages().send("me", message).execute();
+            System.out.println("Email sent successfully. Message ID: " + message.getId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendTestEmail() {
+        sendEmail("example@example.com", "Test Email", "This is a test email sent using the FixedGmailService.");
+    }
+
+    public static void main(String[] args) {
+        FixedGmailService service = new FixedGmailService();
+        service.sendTestEmail();
     }
 }

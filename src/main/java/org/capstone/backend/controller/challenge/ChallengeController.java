@@ -9,6 +9,7 @@ import org.capstone.backend.entity.Challenge;
 
 import org.capstone.backend.entity.ChallengeType;
 import org.capstone.backend.service.challenge.ChallengeService;
+import org.capstone.backend.service.challenge.InvitationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -24,9 +25,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/challenges")
 public class ChallengeController {
-
     @Autowired
     private ChallengeService challengeService;
+
 
     @PostMapping(value = "/create", consumes = {"multipart/form-data"})
     public ResponseEntity<?> createChallenge(
@@ -64,11 +65,7 @@ public class ChallengeController {
         return ResponseEntity.ok(result);
     }
 
-    @PostMapping("/invite")
-    public ResponseEntity<String> inviteMember(@Valid @RequestBody InviteMemberRequest request) {
-        String result = challengeService.inviteMember(request);
-        return ResponseEntity.ok(result);
-    }
+
     @GetMapping("/approved")
     public ResponseEntity<Page<ChallengeResponse>> getApprovedChallenges(
             @RequestParam(defaultValue = "0") int page,
