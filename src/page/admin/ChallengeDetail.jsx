@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Footer from "../../component/footer.jsx";
+import { CheckCircle, XCircle } from "lucide-react";
 
 const ChallengeDetail = () => {
     const { id } = useParams();
@@ -10,8 +11,11 @@ const ChallengeDetail = () => {
     const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState('Information');
     const [searchText, setSearchText] = useState('');
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [confirmAction, setConfirmAction] = useState(null); // 'confirmed' (approve) hoặc 'rejected' (reject)
+    const [confirmChallengeId, setConfirmChallengeId] = useState(null);
+    const [reason, setReason] = useState(""); // lý do người dùng nhập
 
-    // Sử dụng optional chaining để đảm bảo không gọi .filter trên null
     const filteredMembers = challenge?.members?.filter(member =>
         member.username.toLowerCase().includes(searchText.toLowerCase())
     ) || [];
@@ -53,7 +57,7 @@ const ChallengeDetail = () => {
                         { username: "member3", email: "member3@example.com", joinDate: "2025-03-14" },
                         { username: "member4", email: "member4@example.com", joinDate: "2025-03-15" }
                     ],
-                    status: "pending", // pending, approved, rejected
+                    status: "pending", // Giá trị từ backend: pending, approved, rejected
                     createdAt: "2025-03-10T10:00:00",
                     tags: ["Algorithm", "Data Structure", "Optimization"]
                 };
@@ -77,8 +81,26 @@ const ChallengeDetail = () => {
     };
 
     const handleKickUser = (username) => {
-        // Xử lý logic kick user, ví dụ gọi API
         alert(`Kick user: ${username}`);
+    };
+
+    // Mở modal confirm với challengeId và action
+    const openConfirmModal = (challengeId, action) => {
+        setConfirmChallengeId(challengeId);
+        setConfirmAction(action); // 'confirmed' hoặc 'rejected'
+        setReason("");
+        setShowConfirmModal(true);
+    };
+
+    // Khi ấn OK trong modal confirm, cập nhật trạng thái trong state (giả lập)
+    const handleConfirmAction = () => {
+        const newStatus = confirmAction === 'confirmed' ? 'approved' : 'rejected';
+        setChallenge(prev => ({
+            ...prev,
+            status: newStatus
+        }));
+        alert(`Challenge #${challenge.id} ${confirmAction === 'confirmed' ? 'approved' : 'rejected'} with reason: "${reason}"`);
+        setShowConfirmModal(false);
     };
 
     if (loading) {
@@ -128,42 +150,63 @@ const ChallengeDetail = () => {
 
     return (
         <div className="flex flex-col min-h-screen bg-gradient-to-br from-orange-100 to-yellow-100">
-            {/* Header với nút quay lại và nút approve/reject dành cho admin */}
+            {/* Challenge header với nút ban/unban ở bên phải */}
             <div className="bg-white shadow">
-                <div className="container mx-auto p-4 flex justify-between items-center">
-                    <button onClick={handleGoBack} className="flex items-center text-gray-700 hover:text-indigo-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                        </svg>
-                    </button>
-                    <div className="flex space-x-4">
-                        <button className="px-4 py-1 bg-green-500 hover:bg-green-600 text-white font-medium rounded shadow">
-                            Approve
-                        </button>
-                        <button className="px-4 py-1 bg-red-500 hover:bg-red-600 text-white font-medium rounded shadow">
-                            Reject
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            {/* Challenge header hiển thị tên challenge (đã link với ChallengeList) */}
-            <div className="bg-white shadow">
-                <div className="container mx-auto p-4 flex items-center">
-                    <div className="w-24 h-24 bg-gray-200 rounded-md overflow-hidden border border-gray-300 flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                    </div>
-                    <div className="ml-4">
-                        <h1 className="text-2xl font-bold text-gray-800">{challenge.title}</h1>
-                        <div className="flex flex-wrap gap-2 mt-2">
-                            {challenge.tags.map((tag, index) => (
-                                <span key={index} className="px-2 py-1 bg-indigo-100 text-indigo-800 text-xs rounded-full">
-                                    {tag}
-                                </span>
-                            ))}
+                <div className="container mx-auto p-4 flex items-center justify-between">
+                    <div className="flex items-center">
+                        <div className="w-24 h-24 bg-gray-200 rounded-md overflow-hidden border border-gray-300 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
                         </div>
+                        <div className="ml-4">
+                            <h1 className="text-2xl font-bold text-gray-800">{challenge.title}</h1>
+                            <div className="flex flex-wrap gap-2 mt-2">
+                                {challenge.tags.map((tag, index) => (
+                                    <span key={index} className="px-2 py-1 bg-indigo-100 text-indigo-800 text-xs rounded-full">
+                    {tag}
+                  </span>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                    {/* Nút ban/unban */}
+                    <div>
+                        {challenge.status === "pending" ? (
+                            <>
+                                <button
+                                    className="p-2 bg-green-100 text-green-600 rounded-md hover:bg-green-200 transition-colors mr-2"
+                                    onClick={() => openConfirmModal(challenge.id, 'confirmed')}
+                                >
+                                    <CheckCircle className="h-5 w-5" />
+                                </button>
+                                <button
+                                    className="p-2 bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition-colors"
+                                    onClick={() => openConfirmModal(challenge.id, 'rejected')}
+                                >
+                                    <XCircle className="h-5 w-5" />
+                                </button>
+                            </>
+                        ) : (
+                            <button
+                                className={`p-2 rounded-md transition-colors ${
+                                    challenge.status === "approved"
+                                        ? "bg-red-100 text-red-600 hover:bg-red-200"
+                                        : "bg-green-100 text-green-600 hover:bg-green-200"
+                                }`}
+                                onClick={() =>
+                                    challenge.status === "approved"
+                                        ? openConfirmModal(challenge.id, 'rejected')
+                                        : openConfirmModal(challenge.id, 'confirmed')
+                                }
+                            >
+                                {challenge.status === "approved" ? (
+                                    <XCircle className="h-5 w-5" />
+                                ) : (
+                                    <CheckCircle className="h-5 w-5" />
+                                )}
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>
@@ -194,7 +237,6 @@ const ChallengeDetail = () => {
                 <div className="bg-white shadow rounded-lg overflow-hidden">
                     {activeTab === 'Information' && (
                         <div className="p-6">
-                            {/* Các thông tin cơ bản luôn hiển thị */}
                             <h2 className="text-lg font-semibold text-gray-800 mb-2">Thông tin cơ bản</h2>
                             <p className="text-gray-700 mb-2">
                                 <span className="font-medium">Mô tả: </span>{challenge.description}
@@ -212,7 +254,6 @@ const ChallengeDetail = () => {
                                 <span className="font-medium">Người tạo: </span>{challenge.creator}
                             </p>
 
-                            {/* Hiển thị thông tin chi tiết bổ sung nếu đã duyệt */}
                             {(challenge.status === 'approved' || challenge.status === 'rejected') ? (
                                 <>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 bg-gray-50 p-4 rounded-lg mt-4">
@@ -330,10 +371,7 @@ const ChallengeDetail = () => {
 
                     {activeTab === 'Members' && (
                         <div className="p-6">
-                            <h2 className="text-xl font-semibold mb-4 text-gray-800">
-                                Danh sách thành viên tham gia
-                            </h2>
-                            {/* Thanh tìm kiếm */}
+                            <h2 className="text-xl font-semibold mb-4 text-gray-800">Danh sách thành viên tham gia</h2>
                             <div className="mb-4">
                                 <input
                                     type="text"
@@ -352,9 +390,7 @@ const ChallengeDetail = () => {
                                         <div>
                                             <p className="text-gray-800 font-medium">{member.username}</p>
                                             <p className="text-gray-600 text-sm">{member.email}</p>
-                                            <p className="text-gray-500 text-xs">
-                                                Joined: {member.joinDate}
-                                            </p>
+                                            <p className="text-gray-500 text-xs">Joined: {member.joinDate}</p>
                                         </div>
                                         <button
                                             onClick={() => handleKickUser(member.username)}
@@ -370,7 +406,48 @@ const ChallengeDetail = () => {
                 </div>
             </div>
 
-            {/* Footer */}
+            {/* Modal xác nhận Approve/Reject */}
+            {showConfirmModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+                        <h2 className="text-xl font-bold mb-4 text-gray-700">
+                            Xác nhận {confirmAction === 'confirmed' ? 'Approve' : 'Reject'}?
+                        </h2>
+                        <p className="text-gray-600 mb-4">
+                            Bạn có chắc chắn muốn {confirmAction === 'confirmed' ? 'approve' : 'reject'} challenge này không?
+                        </p>
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Lý do (tuỳ chọn):</label>
+                            <textarea
+                                className="w-full border border-gray-300 rounded p-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                rows="3"
+                                placeholder="Nhập lý do..."
+                                value={reason}
+                                onChange={(e) => setReason(e.target.value)}
+                            />
+                        </div>
+                        <div className="flex justify-end space-x-3">
+                            <button
+                                onClick={() => setShowConfirmModal(false)}
+                                className="px-4 py-2 rounded border border-gray-300 text-gray-600 hover:bg-gray-50"
+                            >
+                                Hủy
+                            </button>
+                            <button
+                                onClick={handleConfirmAction}
+                                className={`px-4 py-2 rounded text-white ${
+                                    confirmAction === 'confirmed'
+                                        ? 'bg-green-500 hover:bg-green-600'
+                                        : 'bg-red-500 hover:bg-red-600'
+                                }`}
+                            >
+                                OK
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <Footer />
         </div>
     );

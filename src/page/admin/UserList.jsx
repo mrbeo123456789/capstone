@@ -266,7 +266,7 @@ const UserList = () => {
                                     ? "bg-green-100 text-green-600 hover:bg-green-200"
                                     : "bg-red-100 text-red-600 hover:bg-red-200"
                             }`}
-                            onClick={() => toggleUserStatus(userData.id, userData.status)}
+                            onClick={() => onToggleStatus(userData.id, userData.status)}
                         >
                             {userData.status?.toLowerCase() === "active" ? "Khóa" : "Mở khóa"}
                         </button>

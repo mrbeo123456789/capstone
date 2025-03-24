@@ -85,7 +85,7 @@ export const adminUserService = createApi({
             providesTags: ["Admin"],
         }),
         getChallenges: builder.query({
-            query: ({ page = 0, size = 10 }) => {
+            query: ({ page = 0, size = 10 } = {}) => {
                 const url = `/admin/challenges/all?page=${page}&size=${size}`;
                 console.log("Fetching Challenges URL:", url);
                 return url;
