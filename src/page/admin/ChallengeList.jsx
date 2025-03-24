@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Search, ChevronDown, CheckCircle, XCircle } from 'lucide-react';
 import Navbar from "../navbar/AdminNavbar.jsx";
 import {useNavigate} from "react-router-dom";
+import Footer from "../../component/footer.jsx";
 
 const ChallengeList = () => {
     // Sample data with more challenges
@@ -499,9 +500,7 @@ const ChallengeList = () => {
 
 
             {/* Footer */}
-            <footer className="bg-gradient-to-r from-red-600 via-orange-500 to-yellow-500 p-4 text-white text-center">
-                <p>© 2025 GoBeyond</p>
-            </footer>
+            <Footer></Footer>
         </div>
     );
 };

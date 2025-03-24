@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import Footer from "../../component/footer.jsx";
 
 const ChallengeDetail = () => {
     const { id } = useParams();
@@ -8,6 +9,12 @@ const ChallengeDetail = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState('Information');
+    const [searchText, setSearchText] = useState('');
+
+    // Sử dụng optional chaining để đảm bảo không gọi .filter trên null
+    const filteredMembers = challenge?.members?.filter(member =>
+        member.username.toLowerCase().includes(searchText.toLowerCase())
+    ) || [];
 
     useEffect(() => {
         const fetchChallengeDetail = async () => {
@@ -323,14 +330,31 @@ const ChallengeDetail = () => {
 
                     {activeTab === 'Members' && (
                         <div className="p-6">
-                            <h2 className="text-xl font-semibold mb-4 text-gray-800">Danh sách thành viên tham gia</h2>
+                            <h2 className="text-xl font-semibold mb-4 text-gray-800">
+                                Danh sách thành viên tham gia
+                            </h2>
+                            {/* Thanh tìm kiếm */}
+                            <div className="mb-4">
+                                <input
+                                    type="text"
+                                    value={searchText}
+                                    onChange={(e) => setSearchText(e.target.value)}
+                                    placeholder="Tìm kiếm thành viên..."
+                                    className="w-full p-2 border border-gray-300 rounded"
+                                />
+                            </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {challenge.members.map((member, index) => (
-                                    <div key={index} className="bg-white shadow p-4 rounded border border-gray-200 flex items-center justify-between">
+                                {filteredMembers.map((member, index) => (
+                                    <div
+                                        key={index}
+                                        className="bg-white shadow p-4 rounded border border-gray-200 flex items-center justify-between"
+                                    >
                                         <div>
                                             <p className="text-gray-800 font-medium">{member.username}</p>
                                             <p className="text-gray-600 text-sm">{member.email}</p>
-                                            <p className="text-gray-500 text-xs">Joined: {member.joinDate}</p>
+                                            <p className="text-gray-500 text-xs">
+                                                Joined: {member.joinDate}
+                                            </p>
                                         </div>
                                         <button
                                             onClick={() => handleKickUser(member.username)}
@@ -347,11 +371,7 @@ const ChallengeDetail = () => {
             </div>
 
             {/* Footer */}
-            <div className="bg-gray-200 py-4 text-center text-gray-600">
-                <div className="container mx-auto">
-                    <p>© 2025 Challenge Platform. All rights reserved.</p>
-                </div>
-            </div>
+            <Footer />
         </div>
     );
 };

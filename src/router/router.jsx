@@ -6,13 +6,13 @@ import RegisterForm from "../page/signin/register.jsx";
 import MemberProfile from "../page/member/MemberProfile.jsx";
 import GroupManagement from "../page/group/groupList.jsx";
 import AuthCallBack from "../page/signin/AuthCallBack.jsx";
-import AdminDashboard from "../page/admin/AdminDashboard.jsx";
+import AdminDashboard from "../page/admin/dashboard/AdminDashboard.jsx";
 import UserList from "../page/admin/UserList.jsx";
 import ChallengeList from "../page/admin/ChallengeList.jsx";
 import EvidenceList from "../page/admin/EvidenceList.jsx";
 import ReportList from "../page/admin/ReportList.jsx";
 import ChallengeEvidencePage from "../page/admin/ChallengeEvidencePage.jsx";
-import ChallengeAndEvidence from "../page/admin/ChallengeAndEvidence.jsx";
+import ChallengeAndEvidence from "../page/admin/dashboard/ChallengeAndEvidence.jsx";
 import ChallengeDetail from "../page/admin/ChallengeDetail.jsx";
 const router = createBrowserRouter([
     {
