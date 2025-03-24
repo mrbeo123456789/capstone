@@ -46,10 +46,27 @@ export const challengeService = createApi({
             }),
             invalidatesTags: ["Challenge"],
         }),
-
         getChallengeTypes: builder.query({
             query: () => "/challenges/challenge-types",
             providesTags: ["ChallengeTypes"], // Optional
+        }),
+        getApprovedChallenges: builder.query({
+            query: ({ page = 0, size = 10 } = {}) => ({
+                url: `/challenges/approved`,
+                params: { page, size },
+            }),
+            providesTags: ["Challenge"],
+        }),
+        joinChallenge: builder.mutation({
+            query: (challengeId) => ({
+                url: `/challenges/join`,
+                method: "POST",
+                body: challengeId,
+                headers: {
+                    "Content-Type": "application/json", // Vì bạn gửi Long đơn giản
+                },
+            }),
+            invalidatesTags: ["Challenge"],
         }),
     }),
 });
@@ -59,6 +76,8 @@ export const {
     useCreateChallengeMutation,
     useUpdateChallengeMutation,
     useDeleteChallengeMutation,
-    useGetChallengeTypesQuery // <- Add this
+    useGetChallengeTypesQuery, // <- Add this
+    useGetApprovedChallengesQuery, // <--- Add this
+    useJoinChallengeMutation // <--- Add this!
 } = challengeService;
 

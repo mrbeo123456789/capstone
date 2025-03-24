@@ -4,9 +4,25 @@ import { MdOutlineCategory } from "react-icons/md";
 import { IoIosPeople } from "react-icons/io";
 import { HiUsers } from "react-icons/hi";
 import { FaRunning } from "react-icons/fa";
+import { useJoinChallengeMutation } from "../../service/challengeService";
+import toast from "react-hot-toast";
+import { useParams } from "react-router-dom";
 
 const ChallengeDetail = () => {
     const [activeTab, setActiveTab] = useState("info");
+    const [joinChallenge, { isLoading }] = useJoinChallengeMutation();
+    const { id } = useParams(); // Lấy challenge ID từ URL
+
+    const handleJoin = async () => {
+        try {
+            await joinChallenge(parseInt(id)).unwrap(); // Pass id from URL
+            toast.success("Joined challenge successfully!");
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to join challenge.");
+        }
+    };
+
 
     return (
         <div className="p-6 flex flex-col items-center h-full w-full">
@@ -20,12 +36,22 @@ const ChallengeDetail = () => {
                 <div className="bg-gray-100 p-6 md:w-1/3 flex flex-col justify-between">
                     <h2 className="text-xl font-bold text-gray-900">MIỄN PHÍ</h2>
                     <div className="bg-orange-500 text-white font-semibold text-center py-2 mt-2 rounded-lg">
-                        ĐÃ KẾT THÚC
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleJoin();
+                            }}
+                            className="bg-orange-500 text-white px-3 py-1 rounded mt-2 hover:bg-orange-600"
+                            disabled={isLoading}
+                        >
+                            {isLoading ? "Joining..." : "Join Now"}
+                        </button>
+
                     </div>
                     <div className="mt-4 flex items-center">
-                        <FaRegClock className="text-gray-500 mr-2" />
+                        <FaRegClock className="text-gray-500 mr-2"/>
                         <p className="text-gray-700 text-sm">
-                            Hạn đăng ký: 18/09/2023 hoặc khi hết suất
+                        Hạn đăng ký: 18/09/2023 hoặc khi hết suất
                         </p>
                     </div>
                     <div className="mt-4 flex items-center">

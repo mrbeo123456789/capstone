@@ -1,6 +1,13 @@
 import React from "react";
+import {useGetApprovedChallengesQuery} from "../../service/challengeService.js";
+import { useNavigate } from "react-router-dom";
+
 
 const HomePage = () => {
+    const { data, isLoading, isError } = useGetApprovedChallengesQuery({ page: 0, size: 5 });
+    console.log(data);
+    const navigate = useNavigate();
+
     return (
         <main className="text-white">
             {/* Hero Section */}
@@ -60,25 +67,36 @@ const HomePage = () => {
             {/* Challenges Section */}
             <section className="container mx-auto py-16 px-4">
                 <h3 className="text-2xl font-bold text-orange-500 text-center">Upcoming Challenges</h3>
+
+                {isLoading && <p className="text-center text-white">Loading challenges...</p>}
+                {isError && <p className="text-center text-red-500">Failed to load challenges.</p>}
+
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-8">
-                    {[...Array(6)].map((_, i) => (
-                        <div key={i} className="bg-gray-900 rounded-lg shadow-lg overflow-hidden">
+                    {data?.content?.map((challenge) => (
+                        <div
+                            key={challenge.id}
+                            onClick={() => navigate(`/challenges/detail/${challenge.id}`)} // Navigate to detail page
+                            className="bg-gray-900 rounded-lg shadow-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform"
+                        >
                             <img
-                                src={`https://loremflickr.com/300/200/running,marathon?random=${i}`}
+                                src={challenge.picture
+                                        ? challenge.picture
+                                        : `https://loremflickr.com/300/200/running,marathon?random=${challenge.id}`}
                                 className="w-full h-48 object-cover"
                                 alt="Challenge"
                             />
                             <div className="p-4">
-                                <h4 className="font-bold text-lg">Challenge {i + 1}</h4>
-                                <p className="text-sm text-gray-300">Run and achieve new goals!</p>
-                                <a href="#" className="text-orange-500 text-sm mt-2 block hover:underline">
-                                    Join Now
-                                </a>
+                                <h4 className="font-bold text-lg">{challenge.name}</h4>
+                                <p className="text-sm text-gray-300">{challenge.summary || "Join and push your limits!"}</p>
+                                <span className="text-orange-500 text-sm mt-2 block hover:underline">
+                                  View Details
+                                </span>
                             </div>
                         </div>
                     ))}
                 </div>
             </section>
+
 
             {/* Prizes Section */}
             <section className="container mx-auto py-16 px-4">
