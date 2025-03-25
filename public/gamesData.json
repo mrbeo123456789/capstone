@@ -1,0 +1,84 @@
+[
+  {
+    "_id": 1,
+    "title": "Running",
+    "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Odio non nobis, molestiae eum quod qui",
+    "level": "Median",
+    "category": "Run",
+    "rating": 3,
+    "discount": 0.5,
+    "price": 79.0,
+    "img": "https://images.herzindagi.info/image/2024/May/things-to-know-about-running.jpg",
+    "trailer": "https://www.youtube.com/embed/vzHrj0MfHPY",
+    "active": true
+  },
+  {
+
+    "_id": 2,
+    "title": "Push-up all the day",
+    "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Odio non nobis, molestiae eum quod qui",
+    "level": "Entry",
+    "category": "Gym",
+    "rating": 3,
+    "discount": 0.3,
+    "price": 52.56,
+    "img": "https://th.bing.com/th/id/OIP.64M3GYAd532V1p1g38T2mQHaGu?rs=1&pid=ImgDetMain",
+    "trailer": "https://www.youtube.com/embed/tKLRN2YpxRE",
+    "active": false
+  },
+  {
+  "_id": 3,
+  "title": "Yoga with me",
+  "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Odio non nobis, molestiae eum quod qui",
+  "level": "Entry",
+  "category": "Yoga",
+  "rating": 3,
+  "discount": 0.3,
+  "price": 52.56,
+  "img": "https://th.bing.com/th/id/R.61a93b6131ecf471af8db61aba5384b3?rik=oLsBE2kQ6rwtvg&riu=http%3a%2f%2fallyogapositions.com%2fwp-content%2fuploads%2f2016%2f07%2fwarrior-i-pose-yoga_17.jpg&ehk=e3S7GqOOrQulFeAd1KRSuanD3bkwNoHph5D%2bo8OX91Y%3d&risl=&pid=ImgRaw&r=0",
+  "trailer": "https://www.youtube.com/embed/tKLRN2YpxRE",
+  "active": false
+  },
+
+    {
+      "_id": 4,
+      "title": "Running",
+      "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Odio non nobis, molestiae eum quod qui",
+      "level": "Median",
+      "category": "Run",
+      "rating": 3,
+      "discount": 0.5,
+      "price": 79.0,
+      "img": "./assets/running.jpg",
+      "trailer": "https://www.youtube.com/embed/vzHrj0MfHPY",
+      "active": true
+    },
+    {
+
+      "_id": 5,
+      "title": "Push-up all the day",
+      "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Odio non nobis, molestiae eum quod qui",
+      "level": "Entry",
+      "category": "Gym",
+      "rating": 3,
+      "discount": 0.3,
+      "price": 52.56,
+      "img": "./assets/pushup.jpg",
+      "trailer": "https://www.youtube.com/embed/tKLRN2YpxRE",
+      "active": false
+    },
+    {
+      "_id": 6,
+      "title": "Yoga with me",
+      "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Odio non nobis, molestiae eum quod qui",
+      "level": "Entry",
+      "category": "Yoga",
+      "rating": 3,
+      "discount": 0.3,
+      "price": 52.56,
+      "img": "./assets/yoga.jpg",
+      "trailer": "https://www.youtube.com/embed/tKLRN2YpxRE",
+      "active": false
+    }
+
+  ]
