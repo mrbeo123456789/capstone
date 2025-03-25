@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ckeditor/ckeditor5-build-classic": "^44.3.0",
     "@hookform/resolvers": "^4.1.2",
     "@mui/material": "^6.4.6",
     "@reduxjs/toolkit": "^2.6.0",

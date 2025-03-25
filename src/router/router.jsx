@@ -26,6 +26,7 @@ import JoinedChallengeDetail from "../page/challenge/JoinedChallengeDetail.jsx";
 import YourChallenge from "../page/challenge/YourChallenge.jsx";
 import GroupUsers from "../page/group/GroupUsers.jsx";
 import GroupForm from "../page/group/GroupForm.jsx";
+import YourGroup from "../page/group/YourGroup.jsx";
 
 const router = createBrowserRouter([
     {
@@ -154,7 +155,7 @@ const router = createBrowserRouter([
             },
             {
                 path:"/groups/joins",
-                element: <GroupPage />
+                element: <YourGroup />
             },
             {
                 path:"/groups/joins/:id",
