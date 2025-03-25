@@ -7,8 +7,6 @@ import {FaWindowClose} from "react-icons/fa";
 import {IoCloudUploadOutline} from "react-icons/io5";
 import {challengeValidation} from "../../utils/validation.js";
 import {yupResolver} from "@hookform/resolvers/yup";
-import { CKEditor } from '@ckeditor/ckeditor5-react';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 const ChallengeForm = () => {
     const [createChallenge, { isLoading }] = useCreateChallengeMutation();
