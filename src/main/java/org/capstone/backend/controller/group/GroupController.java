@@ -5,10 +5,13 @@ import org.capstone.backend.entity.Groups;
 import org.capstone.backend.dto.group.GroupRequest;
 import org.capstone.backend.service.auth.AuthService;
 import org.capstone.backend.service.group.GroupService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -32,10 +35,24 @@ public class GroupController {
         return ResponseEntity.ok(groupService.getGroupsByMemberId(memberId));
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<Groups> createGroup(@RequestBody GroupRequest request) {
-        Long memberId = getAuthenticatedMemberId();
-        return ResponseEntity.ok(groupService.createGroup(request, memberId));
+    @PostMapping(value = "/create", consumes = {"multipart/form-data"})
+    public ResponseEntity<?> createGroup(
+            @Validated @ModelAttribute("data") GroupRequest request,
+            @RequestParam(value = "picture", required = false) MultipartFile picture
+    ) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated() ||
+                    "anonymousUser".equals(authentication.getPrincipal())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body("User is not authenticated");
+            }
+            String username = authentication.getName();
+            return ResponseEntity.ok(groupService.createGroup(request, picture,username));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error creating Group: " + e.getMessage());
+        }
     }
 
     @PutMapping("/edit/{groupId}")

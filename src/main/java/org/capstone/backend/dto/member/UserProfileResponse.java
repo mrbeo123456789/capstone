@@ -16,7 +16,7 @@ public class UserProfileResponse {
     private String avatar;
     private String address;
     private String ward;
-    private String city;
+    private String province;
     private String district;
     private LocalDate dateOfBirth;
 }

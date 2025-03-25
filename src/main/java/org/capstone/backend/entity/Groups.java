@@ -41,6 +41,8 @@ public class Groups {
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<GroupMember> members;
 
+    private String picture;
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();

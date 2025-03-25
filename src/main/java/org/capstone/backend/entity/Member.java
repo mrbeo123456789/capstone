@@ -32,7 +32,7 @@ public class Member {
 
     private String ward;
 
-    private String city;
+    private String province;
 
     private String district;
 

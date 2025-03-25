@@ -47,11 +47,12 @@ public class MemberServiceImpl implements MemberService {
 
         // Cập nhật thông tin profile từ DTO
         member.setFirstName(request.getFirstName());
+        member.setFullName(request.getFullName());
         member.setLastName(request.getLastName());;
         member.setGender(request.getGender());
         member.setPhone(request.getPhone());
         member.setAddress(request.getAddress());
-        member.setCity(request.getCity());
+        member.setProvince(request.getProvince());
         member.setWard(request.getWard());
         member.setDistrict(request.getDistrict());
         member.setDateOfBirth(request.getDateOfBirth());
@@ -88,7 +89,7 @@ public class MemberServiceImpl implements MemberService {
         response.setPhone(member.getPhone());
         response.setAvatar(member.getAvatar());
         response.setAddress(member.getAddress());
-        response.setCity(member.getCity());
+        response.setProvince(member.getProvince());
         response.setDistrict(member.getDistrict());
         response.setWard(member.getWard());
         response.setDateOfBirth(member.getDateOfBirth());

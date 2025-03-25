@@ -51,8 +51,6 @@ public class ChallengeController {
         }
     }
 
-
-
     @GetMapping("/challenge-types")
     public List<ChallengeType> getAllChallengeTypes() {
         return challengeService.getAllTypes();

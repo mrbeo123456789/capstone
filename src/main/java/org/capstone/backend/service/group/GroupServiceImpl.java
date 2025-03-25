@@ -13,11 +13,15 @@ import org.capstone.backend.repository.GroupRepository;
 import org.capstone.backend.repository.MemberRepository;
 import org.capstone.backend.service.group.GroupService;
 import org.capstone.backend.utils.enums.GroupMemberStatus;
+import org.capstone.backend.utils.upload.FirebaseUpload;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -31,42 +35,59 @@ public class GroupServiceImpl implements GroupService {
     private final MemberRepository memberRepository;
     private final GroupMemberRepository groupMemberRepository;
     private final AccountRepository accountRepository;
+    private final FirebaseUpload firebaseUpload;
 
     public GroupServiceImpl(GroupRepository groupRepository,
                             MemberRepository memberRepository,
                             GroupMemberRepository groupMemberRepository,
-                            AccountRepository accountRepository) {
+                            AccountRepository accountRepository,
+                            FirebaseUpload firebaseUpload) {
         this.groupRepository = groupRepository;
         this.memberRepository = memberRepository;
         this.groupMemberRepository = groupMemberRepository;
         this.accountRepository = accountRepository;
+        this.firebaseUpload = firebaseUpload;
     }
 
     @Override
     public List<GroupResponse> getGroupsByMemberId(Long memberId) {
         List<Groups> groups = groupRepository.findByMemberId(memberId);
-
-        return groups.stream().map(this::convertToDTO).collect(Collectors.toList());
+        return groups.stream()
+                .map(group -> convertToDTO(group, memberId))
+                .collect(Collectors.toList());
     }
 
-    private GroupResponse convertToDTO(Groups group) {
+    private GroupResponse convertToDTO(Groups group, Long currentMemberId) {
         GroupResponse dto = new GroupResponse();
         dto.setId(group.getId());
         dto.setName(group.getName());
         dto.setMaxParticipants(group.getMaxParticipants());
+        dto.setPicture(group.getPicture());
         dto.setCreatedAt(group.getCreatedAt());
         dto.setCreatedBy(group.getCreatedBy());
         dto.setUpdatedAt(group.getUpdatedAt());
         dto.setUpdatedBy(group.getUpdatedBy());
 
-        // Convert GroupMembers to DTOs
+        // Member list
         List<GroupMemberResponse> memberDTOs = group.getMembers().stream()
                 .map(this::convertToMemberDTO)
                 .collect(Collectors.toList());
-
         dto.setMembers(memberDTOs);
+        dto.setCurrentParticipants(dto.getMembers().size());
+
+        // 👉 Lấy role của member đang gọi API
+        GroupMember matchedMember = group.getMembers().stream()
+                .filter(m -> m.getMember().getId().equals(currentMemberId))
+                .findFirst()
+                .orElse(null);
+
+        if (matchedMember != null) {
+            dto.setCurrentMemberRole(matchedMember.getRole());
+        }
+
         return dto;
     }
+
 
     private GroupMemberResponse convertToMemberDTO(GroupMember groupMember) {
         GroupMemberResponse dto = new GroupMemberResponse();
@@ -79,18 +100,33 @@ public class GroupServiceImpl implements GroupService {
 
 
     @Override
-    public Groups createGroup(GroupRequest request, Long createdBy) {
+    @Transactional
+    public Groups createGroup(GroupRequest request, MultipartFile picture, String username) {
+        Account account = accountRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
+        Long AccountId = account.getId();
+
+        String pictureUrl = null;
+        try {
+            if (picture != null && !picture.isEmpty()) {
+                pictureUrl = firebaseUpload.uploadFile(picture);
+            }
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error uploading files: " + e.getMessage());
+        }
+
         // 🔥 Step 1: Create the Group
         Groups group = Groups.builder()
                 .name(request.getName())
                 .maxParticipants(request.getMaxParticipants())
-                .createdBy(createdBy)
+                .createdBy(AccountId)
+                .picture(pictureUrl)
                 .build();
 
         Groups savedGroup = groupRepository.save(group); // Save group first
 
         // 🔥 Step 2: Find the Member who is creating the group
-        Member member = memberRepository.findById(createdBy)
+        Member member = memberRepository.findById(AccountId)
                 .orElseThrow(() -> new RuntimeException("Member not found"));
 
         // 🔥 Step 3: Add the creator as a member in GroupMember table
@@ -99,7 +135,7 @@ public class GroupServiceImpl implements GroupService {
                 .member(member)
                 .role("OWNER") // You can change role as needed
                 .status(GroupMemberStatus.ACTIVE) // Default status
-                .createdBy(createdBy)
+                .createdBy(AccountId)
                 .build();
 
         groupMemberRepository.save(groupMember); // Save GroupMember entry

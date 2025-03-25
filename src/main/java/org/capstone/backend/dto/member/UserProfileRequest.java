@@ -19,7 +19,6 @@ public class UserProfileRequest {
         @Size(max = 50, message = "Last name cannot exceed 50 characters")
         private String lastName;
 
-
         @NotBlank(message = "Gender cannot be empty")
         @Pattern(regexp = "Male|Female|Other", message = "Gender must be Male, Female, or Other")
         private String gender;
@@ -34,7 +33,7 @@ public class UserProfileRequest {
 
         private String ward;
 
-        private String city;
+        private String province;
 
         private String district;
 

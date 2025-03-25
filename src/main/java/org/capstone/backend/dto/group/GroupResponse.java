@@ -13,5 +13,8 @@ public class GroupResponse {
     private Long createdBy;
     private LocalDateTime updatedAt;
     private Long updatedBy;
+    private String picture;
     private List<GroupMemberResponse> members; // 🔥 Include only necessary fields
+    private String currentMemberRole; // hoặc memberId hoặc cả hai
+    private Integer currentParticipants;
 }
