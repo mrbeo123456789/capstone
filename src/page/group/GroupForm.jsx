@@ -6,10 +6,12 @@ import { IoPeopleSharp } from "react-icons/io5";
 import MemberListPopup from "../ui/MemberListPopup.jsx";
 import {useCreateGroupMutation} from "../../service/groupService.js";
 import toast from "react-hot-toast";
+import {useNavigate} from "react-router-dom";
 
 const GroupForm = () => {
     const [preview, setPreview] = useState("");
     const [showMemberList, setShowMemberList] = useState(false);
+    const navigate = useNavigate();
 
     const {
         register,
@@ -47,6 +49,7 @@ const GroupForm = () => {
             await createGroup(formData).unwrap();
 
             toast.success("Group Created Successfully!");
+            navigate("/groups/joins");
             reset();
             setPreview("");
         } catch (err) {

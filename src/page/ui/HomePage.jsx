@@ -1,6 +1,7 @@
 import React from "react";
 import {useGetApprovedChallengesQuery} from "../../service/challengeService.js";
 import { useNavigate } from "react-router-dom";
+import GameSwiper from "../../heroBanner/GameSwiper.jsx";
 
 
 const HomePage = () => {
@@ -10,6 +11,7 @@ const HomePage = () => {
 
     return (
         <main className="text-white">
+            <GameSwiper/>
             {/* Hero Section */}
             <section className="container mx-auto py-16 px-4 flex flex-col lg:flex-row items-center">
                 <div className="lg:w-1/2">

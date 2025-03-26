@@ -300,15 +300,6 @@ const ChallengeForm = () => {
                             )}
                         </div>
                         <p className="text-red-600">{errors.description?.message}</p>
-                        <CKEditor
-                            editor={ClassicEditor}
-                            data="<p>Hello from CKEditor!</p>"
-                            onChange={(event, editor) => {
-                                const data = editor.getData(); // contains HTML string
-                                console.log({ data });
-                                // Send this HTML string to your backend
-                            }}
-                        />
                         {/* Buttons */}
                         <div className="flex justify-center gap-6 mt-6">
                             <button type="submit" className="bg-red-600 px-6 py-2 rounded text-white hover:bg-red-700"

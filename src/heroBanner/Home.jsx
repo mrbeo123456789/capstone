@@ -1,6 +1,5 @@
 import React from 'react';
 import GameSwiper from "../heroBanner/GameSwiper.jsx";
-import './home.css';
 function Home({games}) {
     return (
            <section id="home" className="home active">

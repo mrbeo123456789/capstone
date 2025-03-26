@@ -49,7 +49,7 @@
       "rating": 3,
       "discount": 0.5,
       "price": 79.0,
-      "img": "./assets/running.jpg",
+      "img": "https://akm-img-a-in.tosshub.com/indiatoday/images/story/202411/barcelona--female-friends-doing-fitness-in-a-park-054032704-16x9_0.jpg?VersionId=76pQyD2pqrgTO0xwjhBRMu7dn0jzIgm7&size=690:388",
       "trailer": "https://www.youtube.com/embed/vzHrj0MfHPY",
       "active": true
     },
@@ -63,7 +63,7 @@
       "rating": 3,
       "discount": 0.3,
       "price": 52.56,
-      "img": "./assets/pushup.jpg",
+      "img": "https://www.theladders.com/wp-content/uploads/exercise-191001-800x450.jpg",
       "trailer": "https://www.youtube.com/embed/tKLRN2YpxRE",
       "active": false
     },
@@ -76,7 +76,7 @@
       "rating": 3,
       "discount": 0.3,
       "price": 52.56,
-      "img": "./assets/yoga.jpg",
+      "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLVrkahFNBYsVMSSlu6csrL2QXVeby_Gn8CQ&s",
       "trailer": "https://www.youtube.com/embed/tKLRN2YpxRE",
       "active": false
     }

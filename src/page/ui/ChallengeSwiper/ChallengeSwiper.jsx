@@ -1,17 +1,14 @@
 import React, { useState } from 'react';
-// Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react';
-// Import Swiper styles
 import 'swiper/css';
 import 'swiper/css/effect-coverflow';
 import 'swiper/css/navigation';
-import './gameSwiper.css';
-// import required modules
+import './ChallengeSwiper.css';
 import { EffectCoverflow, Navigation, Autoplay } from 'swiper/modules';
 
-import gameData from '../../public/gamesData.json';
+import gameData from '../../../../public/gamesData.json';
 
-function GameSwiper() {
+function ChallengeSwiper() {
     const [active, setActive] = useState(false);
     const handleToggleVideo = () => {
         setActive(!active);
@@ -32,13 +29,13 @@ function GameSwiper() {
                 modifier: 1,
                 slideShadows: true,
             }}
-            // autoplay={{
-            //   delay: 2500,
-            //   disableOnInteraction: false,
-            // }}
+            autoplay={{
+              delay: 2500,
+              disableOnInteraction: false,
+            }}
             modules={[EffectCoverflow, Navigation, Autoplay]}
-            className="gameSwiper"
-        >
+            className="gameSwiper">
+
             {gameData.map(game => (
                 <SwiperSlide key={game._id}>
                     <div className="gameSlider">
@@ -71,4 +68,4 @@ function GameSwiper() {
     );
 }
 
-export default GameSwiper;
+export default ChallengeSwiper;

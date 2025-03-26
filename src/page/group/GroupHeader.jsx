@@ -1,8 +1,20 @@
-import React from "react";
+import React, {useState} from "react";
 import { FaUsers, FaExchangeAlt, FaExclamationCircle, FaSignOutAlt } from "react-icons/fa";
 import {IoCloudUploadOutline} from "react-icons/io5";
+import MemberListPopup from "../ui/MemberListPopup.jsx";
 
 const GroupHeader = () => {
+    const [showPopup, setShowPopup] = useState(false);
+
+    const openMemberList = () => {
+        console.log("openUserDetail");
+        setShowPopup(true);
+    };
+
+    const closeUserDetail = () => {
+        setShowPopup(false);
+    };
+
     return (
         <div className="bg-white rounded flex items-center p-4">
             <div className="w-full p-6 m-2">
@@ -19,6 +31,10 @@ const GroupHeader = () => {
                                 ></div>
                             </div>
                         </div>
+                        <button className="text-white bg-red-600 px-6 py-2 rounded hover:bg-red-900"
+                                onClick={() => openMemberList()}>
+                            Invite
+                        </button>
                         <div className="flex items-center gap-4 mt-2">
                             <FaUsers className="text-xl cursor-pointer hover:text-red-500"/>
                             <FaExchangeAlt className="text-xl cursor-pointer hover:text-yellow-500"/>
@@ -31,6 +47,12 @@ const GroupHeader = () => {
                     </div>
                 </div>
             </div>
+            {/* User Detail Popup */}
+            {showPopup && (
+                <MemberListPopup
+                    onClose={closeUserDetail}
+                />
+            )}
         </div>
     );
 };

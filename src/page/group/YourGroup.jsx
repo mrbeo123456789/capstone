@@ -1,16 +1,30 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {useGetGroupsQuery} from "../../service/groupService.js";
+import {
+    useGetGroupsQuery,
+    useGetPendingInvitationsQuery,
+    useRespondToInvitationMutation
+} from "../../service/groupService.js";
 
 const YourGroup = () => {
     const navigate = useNavigate();
-    const { data: groupsData, isLoading, isError } = useGetGroupsQuery();
+    const { data: groupsData, isLoadingddd, isError } = useGetGroupsQuery();
 
-    // Sample Data
-    const invitations = [
-        { id: 1, inviter: "Member1", group: "Group Alpha" },
-        { id: 2, inviter: "Member2", group: "Group Beta" },
-    ];
+    const { data: invitationsData = [], isLoading, error } = useGetPendingInvitationsQuery();
+    console.log(invitationsData)
+
+    const [respondToInvitation] = useRespondToInvitationMutation();
+
+    const handleRespond = async (groupId, status) => {
+        try {
+            const res = await respondToInvitation({ groupId, status }).unwrap();
+            alert(res); // success message from backend
+        } catch (error) {
+            console.error("Failed to respond to invitation:", error);
+            alert("Có lỗi xảy ra.");
+        }
+    };
+
 
     const joinedGroups = [
         { id: 1, name: "Group One", role: "host", members: 10, image: "https://cdn.pixabay.com/photo/2017/01/10/19/05/group-1979268_1280.jpg" },
@@ -43,25 +57,39 @@ const YourGroup = () => {
 
             {/* Invitations */}
             <div className="border rounded-lg p-4 space-y-4">
-                <h2 className="text-lg font-semibold">Group Invitations ({invitations.length})</h2>
+                <h2 className="text-lg font-semibold">Group Invitations ({invitationsData.length})</h2>
                 <div className="flex gap-6 overflow-x-auto pb-2">
-                    {invitations.map((invite) => (
+                    {invitationsData.map((invite) => (
                         <div
                             key={invite.id}
                             onClick={() => navigate(`/groups/detail/${invite.id}`)} // Navigate to group detail
                             className="cursor-pointer min-w-[200px] p-4 border rounded-lg space-y-2 flex-shrink-0 hover:shadow-lg transition">
                             <p className="text-sm">{invite.inviter} invites you to join</p>
-                            <div className="h-24 bg-gray-200 rounded" />
+                            <div className="h-24 bg-gray-200 rounded">
+                                <img
+                                    src={invite.img || "https://via.placeholder.com/300x200"}
+                                    alt={invite.name}
+                                    className="w-full h-full object-cover rounded"
+                                />
+                            </div>
                             <p className="font-medium">{invite.group}</p>
                             <div className="flex gap-2">
                                 <button
                                     className="bg-green-600 text-white px-3 py-1 rounded"
-                                    onClick={(e) => { e.stopPropagation(); /* Handle Accept */ }}>
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleRespond(invite.groupId, "ACCEPTED");
+                                    }}
+                                >
                                     Accept
                                 </button>
                                 <button
                                     className="border px-3 py-1 rounded"
-                                    onClick={(e) => { e.stopPropagation(); /* Handle Decline */ }}>
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleRespond(invite.groupId, "REJECTED");
+                                    }}
+                                >
                                     Decline
                                 </button>
                             </div>
