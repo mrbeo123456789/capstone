@@ -4,10 +4,14 @@ import { FaWindowClose } from "react-icons/fa";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import { IoPeopleSharp } from "react-icons/io5";
 import MemberListPopup from "../ui/MemberListPopup.jsx";
+import {useCreateGroupMutation} from "../../service/groupService.js";
+import toast from "react-hot-toast";
+import {useNavigate} from "react-router-dom";
 
 const GroupForm = () => {
     const [preview, setPreview] = useState("");
     const [showMemberList, setShowMemberList] = useState(false);
+    const navigate = useNavigate();
 
     const {
         register,
@@ -19,23 +23,51 @@ const GroupForm = () => {
         mode: "all",
     });
 
-    const onSubmit = (data) => {
-        console.log("Group Data:", data);
-        alert("Group Created Successfully!");
-        reset();
-        setPreview("");
+    const [createGroup, { isLoading }] = useCreateGroupMutation();
+
+    const onSubmit = async (data) => {
+        try {
+            const formData = new FormData();
+
+            // Append basic fields
+            formData.append("name", data.name);
+            formData.append("maxParticipants", parseInt(data.maxParticipants));
+            formData.append("privacy", data.privacy);
+            formData.append("description", data.description);
+
+            // Append file if exists
+            if (data.picture) {
+                formData.append("picture", data.picture);
+            }
+
+            console.log("Submitting FormData:");
+            for (let pair of formData.entries()) {
+                console.log(pair[0] + ": " + pair[1]);
+            }
+
+            // Call API
+            await createGroup(formData).unwrap();
+
+            toast.success("Group Created Successfully!");
+            navigate("/groups/joins");
+            reset();
+            setPreview("");
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to create group!");
+        }
     };
 
     const handleFileChange = (event) => {
         const file = event.target.files[0];
-        setValue("avatar", file, { shouldValidate: true });
+        setValue("picture", file, { shouldValidate: true });
         setPreview(URL.createObjectURL(file));
     };
 
     const handleClosePreview = (e) => {
         e.stopPropagation();
         setPreview(null);
-        setValue("avatar", null, { shouldValidate: true });
+        setValue("picture", null, { shouldValidate: true });
     };
 
     return (
@@ -131,7 +163,7 @@ const GroupForm = () => {
                             </div>
                         </label>
                         <input
-                            {...register("avatar")}
+                            {...register("picture")}
                             id="group-image"
                             type="file"
                             accept="image/*"
@@ -146,9 +178,11 @@ const GroupForm = () => {
                             type="button"
                             onClick={handleSubmit(onSubmit)}
                             className="bg-red-600 px-6 py-2 rounded text-white hover:bg-red-700"
+                            disabled={isLoading}
                         >
-                            Create Group
+                            {isLoading ? "Creating..." : "Create Group"}
                         </button>
+
                         <button
                             type="button"
                             className="bg-gray-500 px-6 py-2 rounded text-white hover:bg-gray-600"

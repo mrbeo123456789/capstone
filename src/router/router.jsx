@@ -16,7 +16,6 @@ import AdminDashboard from "../page/admin/AdminDashboard.jsx";
 import ForgotPassword from "../page/signin/ForgotPassword.jsx";
 import EnterOTP from "../page/signin/EnterOtp.jsx";
 import ResetPassword from "../page/signin/ResetPassword.jsx";
-import GroupPage from "../page/group/GroupPage.jsx";
 import ChallengeList from "../page/admin/ChallengeList.jsx";
 import ReportList from "../page/admin/ReportList.jsx";
 import EvidenceList from "../page/admin/EvidenceList.jsx";
@@ -26,6 +25,9 @@ import JoinedChallengeDetail from "../page/challenge/JoinedChallengeDetail.jsx";
 import YourChallenge from "../page/challenge/YourChallenge.jsx";
 import GroupUsers from "../page/group/GroupUsers.jsx";
 import GroupForm from "../page/group/GroupForm.jsx";
+import YourGroup from "../page/group/YourGroup.jsx";
+import Home from "../heroBanner/Home.jsx";
+import ChallengePage from "../page/challenge/ChallengePage.jsx";
 
 import ChallengeEvidencePage from "../page/admin/ChallengeEvidencePage.jsx";
 
@@ -34,7 +36,8 @@ const router = createBrowserRouter([
     {
         path: "/", // ✅ Redirect root to homepage
         element: <Navigate to="/homepage" replace />
-    }, {
+    },
+    {
         path:"/homepage",
         errorElement:<ErrorPage/>,
         element: <Layout></Layout>,
@@ -44,6 +47,11 @@ const router = createBrowserRouter([
                 element: <HomePage />  // Replace with your default component
             }
         ]
+    },
+    {
+        path:"/home",
+        errorElement:<ErrorPage/>,
+        element: <Home/>,
     },
     {
         path:"/admin-dashboard",
@@ -156,7 +164,7 @@ const router = createBrowserRouter([
             },
             {
                 path:"/groups/joins",
-                element: <GroupPage />
+                element: <YourGroup />
             },
             {
                 path:"/groups/joins/:id",
@@ -225,7 +233,7 @@ const router = createBrowserRouter([
         children:[
             {
                 index: true,  // This sets the default page for /member
-                element: <ChallengeForm />  // Replace with your default component
+                element: <ChallengePage />  // Replace with your default component
             },
             {
                 path:"/challenges/joins",

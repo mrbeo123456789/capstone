@@ -188,7 +188,6 @@ const ChallengeForm = () => {
                                onChange={handleFileChange}/>
                         <p className="text-red-600">{errors.picture?.message}</p>
                     </div>
-
                 </div>
             </div>
 

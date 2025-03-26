@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import "../../style/GradientBorder.css";
 import {useChangePasswordMutation} from "../../service/memberService.js";
 
 export const ChangePassword = () => {

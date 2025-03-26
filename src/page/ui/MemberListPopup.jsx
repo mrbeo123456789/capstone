@@ -1,5 +1,7 @@
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import { IoCloseCircle } from "react-icons/io5";
+import { useSearchMembersMutation, useInviteMembersMutation } from "../../service/groupService.js";
+import { useParams } from "react-router-dom";
 
 const dummyMembers = [
     { id: 1, name: "John Doe", email: "john@example.com", avatar: "https://randomuser.me/api/portraits/men/1.jpg" },
@@ -12,10 +14,38 @@ const dummyMembers = [
 
 const PAGE_SIZE = 4;
 
-const MemberListPopup = ({ onClose }) => {
+const MemberListPopup = ({ onClose}) => {
+    const [inviteMembers] = useInviteMembersMutation();
+    const [searchMembers, { data, isLoading }] = useSearchMembersMutation();
+    const { id: groupId } = useParams(); // assuming your route is defined like /groups/joins/:id
     const [searchTerm, setSearchTerm] = useState("");
     const [selected, setSelected] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
+    const [filtered, setFiltered] = useState(null);
+    const displayMembers = filtered || dummyMembers;
+
+    const paginatedMembers = displayMembers.slice(
+        (currentPage - 1) * PAGE_SIZE,
+        currentPage * PAGE_SIZE
+    );
+
+    const handleSearch = async () => {
+        const payload = {
+            keyword: searchTerm,
+        };
+
+        try {
+            const result = await searchMembers(payload).unwrap();
+            setFiltered(result); // New state to display the result
+            setCurrentPage(1);   // Reset pagination to first page
+        } catch (error) {
+            console.error("Search failed:", error);
+        }
+    };
+
+    useEffect(() => {
+        if (searchTerm.trim() === '') setFiltered(null);
+    }, [searchTerm]);
 
     const filteredMembers = dummyMembers.filter(
         (member) =>
@@ -23,7 +53,7 @@ const MemberListPopup = ({ onClose }) => {
             member.email.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const paginatedMembers = filteredMembers.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+    // const paginatedMembers = filteredMembers.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
     const handleCheckboxChange = (id) => {
         if (selected.includes(id)) {
@@ -33,10 +63,27 @@ const MemberListPopup = ({ onClose }) => {
         }
     };
 
-    const handleInvite = () => {
-        const invitedMembers = dummyMembers.filter((member) => selected.includes(member.id));
-        console.log("Inviting:", invitedMembers);
-        alert(`Invited ${invitedMembers.length} members`);
+    const handleInvite = async () => {
+        const memberIds = selected;
+        if (memberIds.length === 0) {
+            alert("Please select at least one member.");
+            return;
+        }
+
+        const payload = {
+            groupId: groupId,
+            memberIds: memberIds
+        };
+
+        try {
+            const res = await inviteMembers(payload).unwrap();
+            alert(res); // e.g., "Lời mời đã được gửi đến các thành viên!"
+            setSelected([]);
+            onClose(); // close popup
+        } catch (error) {
+            console.error("Invite failed:", error);
+            alert("Gửi lời mời thất bại.");
+        }
     };
 
     return (
@@ -59,6 +106,14 @@ const MemberListPopup = ({ onClose }) => {
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="w-full p-2 border rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-orange-400"
                     />
+                    <div className="flex justify-end px-4">
+                        <button
+                            onClick={handleSearch}
+                            className="px-4 py-1 bg-orange-500 text-white rounded hover:bg-orange-600"
+                        >
+                            Search
+                        </button>
+                    </div>
                 </div>
 
                 {/* Member List */}
