@@ -104,7 +104,8 @@ public class GroupController {
 
     @PostMapping("/search")
     public ResponseEntity<List<MemberSearchResponse>> searchMembers(@RequestBody MemberSearchRequest request) {
-        return ResponseEntity.ok(groupService.searchMembers(request));
+        String username = getUsernameFromSecurityContext();
+        return ResponseEntity.ok(groupService.searchMembers(request,username));
     }
 
 

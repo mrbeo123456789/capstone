@@ -20,5 +20,5 @@ public interface GroupService {
     void inviteMembers(GroupInviteRequest request);
     void respondToInvitation(Long groupId, String username, GroupMemberStatus status);
     List<GroupInvitationDTO> getPendingInvitations(String username);
-    List<MemberSearchResponse> searchMembers(MemberSearchRequest request);
+    List<MemberSearchResponse> searchMembers(MemberSearchRequest request,String username);
 }

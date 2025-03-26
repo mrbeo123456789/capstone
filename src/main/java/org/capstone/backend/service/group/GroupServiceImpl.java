@@ -288,29 +288,44 @@ public class GroupServiceImpl implements GroupService {
         return invitations.stream().map(invite -> {
             GroupInvitationDTO dto = new GroupInvitationDTO();
             dto.setGroupId(invite.getGroup().getId());
+            dto.setImg(invite.getGroup().getPicture());
+            dto.setName(invite.getMember().getFullName());
             dto.setGroupName(invite.getGroup().getName());
             dto.setInvitedBy(invite.getCreatedBy().toString()); // Chuyển đổi ID sang String
             return dto;
         }).collect(Collectors.toList());
     }
-    public List<MemberSearchResponse> searchMembers(MemberSearchRequest request) {
+    public List<MemberSearchResponse> searchMembers(MemberSearchRequest request, String username) {
         Pageable pageable = PageRequest.of(0, 5); // Giới hạn 5 kết quả
 
+        Account account = accountRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
+
+        Member currentMember = memberRepository.findByAccount(account)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found"));
+
+        Long currentMemberId = currentMember.getId();
+
         List<Member> members = memberRepository.searchByEmailOrFullName(request.getKeyword(), pageable);
+
+        // Lọc bỏ người đang đăng nhập
+        members.removeIf(member -> member.getId().equals(currentMemberId));
 
         if (request.getGroupId() != null) {
             Groups group = groupRepository.findById(request.getGroupId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nhóm không tồn tại"));
 
-            Set<Long> groupMemberIds = groupMemberRepository.findMemberIdsByGroup(group);
-            members = members.stream()
-                    .filter(member -> !groupMemberIds.contains(member.getId())) // Lọc người đã trong nhóm
-                    .limit(5)
-                    .toList();
+            Set<Long> groupMemberIds = new HashSet<>(groupMemberRepository.findMemberIdsByGroup(group));
+
+            // Lọc bỏ người đã trong nhóm
+            members.removeIf(member -> groupMemberIds.contains(member.getId()));
         }
 
+        // Chỉ lấy tối đa 5 kết quả
         return members.stream()
+                .limit(5)
                 .map(m -> new MemberSearchResponse(m.getId(), m.getAccount().getEmail(), m.getAvatar()))
                 .toList();
     }
+
 }
