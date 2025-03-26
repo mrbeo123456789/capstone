@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import {
     MenuSquare,
@@ -7,25 +7,20 @@ import {
     AlertTriangle,
     PlusCircle,
     UserSquare,
-    ChevronDown,
     ChevronRight,
     LogOut,
     ChevronLeft,
-    ChevronFirst
 } from "lucide-react";
 
+// eslint-disable-next-line react/prop-types
 const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [isGroupsExpanded, setIsGroupsExpanded] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(false);
 
     const toggleMobileMenu = () => {
         setIsMobileMenuOpen(!isMobileMenuOpen);
     };
 
-    const toggleGroupsMenu = () => {
-        setIsGroupsExpanded(!isGroupsExpanded);
-    };
 
     const toggleCollapse = () => {
         setIsCollapsed(!isCollapsed);
@@ -68,7 +63,7 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
                     <ul className="space-y-2">
                         <li>
                             <NavLink
-                                to="/admin-challengelist"
+                                to="/admin/challengelist"
                                 className={({ isActive }) =>
                                     `flex items-center ${isCollapsed ? 'justify-center' : 'px-4'} py-3 rounded-md transition duration-200 ${
                                         isActive
@@ -85,7 +80,7 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
 
                         <li>
                             <NavLink
-                                to="/admin-userlist"
+                                to="/admin/userlist"
                                 className={({ isActive }) =>
                                     `flex items-center ${isCollapsed ? 'justify-center' : 'px-4'} py-3 rounded-md transition duration-200 ${
                                         isActive
@@ -102,11 +97,10 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
 
                         {/* Group List with dropdown */}
                         <li>
-                            {isCollapsed ? (
                                 <NavLink
-                                    to="/admin-groups/all"
+                                    to="/admin/grouplist"
                                     className={({ isActive }) =>
-                                        `flex items-center justify-center py-3 rounded-md transition duration-200 ${
+                                        `flex items-center ${isCollapsed ? 'justify-center' : 'px-4'} py-3 rounded-md transition duration-200 ${
                                             isActive
                                                 ? "bg-gradient-to-r from-orange-100 to-yellow-100 text-orange-600 font-medium"
                                                 : "hover:bg-gray-100"
@@ -114,80 +108,14 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
                                     }
                                     title="Group List"
                                 >
-                                    <UserSquare size={20} />
+                                    <UserSquare size={20} className={isCollapsed ? '' : 'mr-3'} />
+                                    {!isCollapsed && <span>Group List</span>}
                                 </NavLink>
-                            ) : (
-                                <>
-                                    <button
-                                        onClick={toggleGroupsMenu}
-                                        className={`flex items-center justify-between w-full px-4 py-3 rounded-md transition duration-200 ${
-                                            isGroupsExpanded ? "bg-gray-100" : "hover:bg-gray-100"
-                                        }`}
-                                    >
-                                        <div className="flex items-center">
-                                            <UserSquare size={20} className="mr-3" />
-                                            <span>Group List</span>
-                                        </div>
-                                        {isGroupsExpanded ?
-                                            <ChevronDown size={16} /> :
-                                            <ChevronRight size={16} />
-                                        }
-                                    </button>
-
-                                    {/* Group submenu */}
-                                    {isGroupsExpanded && (
-                                        <ul className="pl-10 mt-1 space-y-1">
-                                            <li>
-                                                <NavLink
-                                                    to="/admin-groups/all"
-                                                    className={({ isActive }) =>
-                                                        `block px-4 py-2 rounded-md text-sm transition duration-200 ${
-                                                            isActive
-                                                                ? "bg-gradient-to-r from-orange-100 to-yellow-100 text-orange-600 font-medium"
-                                                                : "hover:bg-gray-100"
-                                                        }`
-                                                    }
-                                                >
-                                                    All Groups
-                                                </NavLink>
-                                            </li>
-                                            <li>
-                                                <NavLink
-                                                    to="/admin-groups/create"
-                                                    className={({ isActive }) =>
-                                                        `block px-4 py-2 rounded-md text-sm transition duration-200 ${
-                                                            isActive
-                                                                ? "bg-gradient-to-r from-orange-100 to-yellow-100 text-orange-600 font-medium"
-                                                                : "hover:bg-gray-100"
-                                                        }`
-                                                    }
-                                                >
-                                                    Create Group
-                                                </NavLink>
-                                            </li>
-                                            <li>
-                                                <NavLink
-                                                    to="/admin-groups/requests"
-                                                    className={({ isActive }) =>
-                                                        `block px-4 py-2 rounded-md text-sm transition duration-200 ${
-                                                            isActive
-                                                                ? "bg-gradient-to-r from-orange-100 to-yellow-100 text-orange-600 font-medium"
-                                                                : "hover:bg-gray-100"
-                                                        }`
-                                                    }
-                                                >
-                                                    Join Requests
-                                                </NavLink>
-                                            </li>
-                                        </ul>
-                                    )}
-                                </>
-                            )}
                         </li>
 
                         <li>
                             <NavLink
-                                to="/admin-evidencelist"
+                                to="/admin/evidencelist"
                                 className={({ isActive }) =>
                                     `flex items-center ${isCollapsed ? 'justify-center' : 'px-4'} py-3 rounded-md transition duration-200 ${
                                         isActive
@@ -204,7 +132,7 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
 
                         <li>
                             <NavLink
-                                to="/admin-reportlist"
+                                to="/admin/reportlist"
                                 className={({ isActive }) =>
                                     `flex items-center ${isCollapsed ? 'justify-center' : 'px-4'} py-3 rounded-md transition duration-200 ${
                                         isActive
@@ -221,7 +149,7 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
 
                         <li>
                             <NavLink
-                                to="/create-challenge"
+                                to="/createChallenge"
                                 className={({ isActive }) =>
                                     `flex items-center ${isCollapsed ? 'justify-center' : 'px-4'} py-3 rounded-md transition duration-200 ${
                                         isActive

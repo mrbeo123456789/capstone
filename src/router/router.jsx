@@ -14,6 +14,7 @@ import ReportList from "../page/admin/ReportList.jsx";
 import ChallengeEvidencePage from "../page/admin/ChallengeEvidencePage.jsx";
 import ChallengeAndEvidence from "../page/admin/dashboard/ChallengeAndEvidence.jsx";
 import ChallengeDetail from "../page/admin/ChallengeDetail.jsx";
+import GroupList from "../page/admin/GroupList.jsx";
 const router = createBrowserRouter([
     {
         path:"/login",
@@ -36,34 +37,47 @@ const router = createBrowserRouter([
         element: <GroupManagement/>,
     },
     {
-        path:"/admin-dashboard",
+        path:"/admin",
         errorElement:<ErrorPage/>,
-        element: <AdminDashboard/>,
-    },
-    {
-        path:"/admin-userlist",
-        errorElement:<ErrorPage/>,
-        element: <UserList/>,
-    },
-    {
-        path:"/admin-evidencelist",
-        errorElement:<ErrorPage/>,
-        element: <ChallengeEvidencePage/>,
-    },
-    {
-        path:"/admin-reportlist",
-        errorElement:<ErrorPage/>,
-        element: <ReportList/>,
-    },
-    {
-        path:"/admin-challengelist",
-        errorElement:<ErrorPage/>,
-        element: <ChallengeList/>,
-    },
-    {
-        path:"/challenge/:id",
-        errorElement:<ErrorPage/>,
-        element: <ChallengeDetail/>,
+        children:[
+            {
+                path:"/admin/dashboard",
+                errorElement:<ErrorPage/>,
+                element: <AdminDashboard/>,
+            },
+            {
+                path:"/admin/userlist",
+                errorElement:<ErrorPage/>,
+                element: <UserList/>,
+            },
+            {
+                path:"/admin/evidencelist",
+                errorElement:<ErrorPage/>,
+                element: <ChallengeEvidencePage/>,
+            },
+            {
+                path:"/admin/reportlist",
+                errorElement:<ErrorPage/>,
+                element: <ReportList/>,
+            },
+            {
+                path:"/admin/grouplist",
+                errorElement:<ErrorPage/>,
+                element: <GroupList/>,
+            },
+            {
+                path:"/admin/challengelist",
+                errorElement:<ErrorPage/>,
+                element: <ChallengeList/>,
+                children:[
+                    {
+                        path:"admin/challenge/:id",
+                        errorElement:<ErrorPage/>,
+                        element: <ChallengeDetail/>,
+                    },
+                ]
+            },
+        ]
     },
     {
         path:"/member",
