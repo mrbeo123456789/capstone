@@ -370,7 +370,7 @@ public class GroupServiceImpl implements GroupService {
         // Chỉ lấy tối đa 5 kết quả
         return members.stream()
                 .limit(5)
-                .map(m -> new MemberSearchResponse(m.getId(), m.getAccount().getEmail(), m.getAvatar()))
+                .map(m -> new MemberSearchResponse(m.getId(), m.getAccount().getEmail(), m.getAvatar(), m.getFullName()))
                 .toList();
     }
 
