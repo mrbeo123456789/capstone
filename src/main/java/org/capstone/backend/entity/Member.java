@@ -1,11 +1,14 @@
 package org.capstone.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Entity
@@ -50,6 +53,14 @@ public class Member {
 
     @Column(name = "created_by")
     private String createdBy;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "member_interest",
+            joinColumns = @JoinColumn(name = "member_id"),
+            inverseJoinColumns = @JoinColumn(name = "interest_id")
+    )
+    @JsonIgnore // Tránh lỗi vòng lặp khi serialize JSON
+    private Set<Interest> interests = new HashSet<>();
 
     @OneToOne
     @JoinColumn(name = "account_id", nullable = false)

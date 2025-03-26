@@ -40,7 +40,7 @@ public class FixedGmailService {
     private static final List<String> SCOPES = Collections.singletonList(GmailScopes.GMAIL_SEND);
 
     private static final Dotenv dotenv = Dotenv.load();
-    private static final String FIXED_SENDER = System.getenv("FIXED_SENDER_EMAIL");
+    private static final String FIXED_SENDER = dotenv.get("FIXED_SENDER_EMAIL");
 
 
     private Gmail getGmailService() throws Exception {

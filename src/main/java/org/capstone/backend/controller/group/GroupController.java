@@ -1,10 +1,11 @@
 package org.capstone.backend.controller.group;
 
-import org.capstone.backend.dto.group.GroupResponse;
+import org.capstone.backend.dto.group.*;
 import org.capstone.backend.entity.Groups;
-import org.capstone.backend.dto.group.GroupRequest;
 import org.capstone.backend.service.auth.AuthService;
 import org.capstone.backend.service.group.GroupService;
+import org.capstone.backend.service.member.MemberService;
+import org.capstone.backend.utils.enums.GroupMemberStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,7 +20,6 @@ public class GroupController {
 
     private final GroupService groupService;
     private final AuthService authService;
-
     public GroupController(GroupService groupService,
                            AuthService authService) {
         this.groupService = groupService;
@@ -76,5 +76,30 @@ public class GroupController {
     private Long getAuthenticatedMemberId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authService.getMemberIdFromAuthentication(authentication);
+    }
+
+    @PostMapping("/invite")
+    public ResponseEntity<String> inviteMembers(@RequestBody GroupInviteRequest request) {
+        groupService.inviteMembers(request);
+        return ResponseEntity.ok("Lời mời đã được gửi đến các thành viên!");
+    }
+    @PostMapping("/search")
+    public ResponseEntity<List<MemberSearchResponse>> searchMembers(@RequestBody MemberSearchRequest request) {
+        return ResponseEntity.ok(groupService.searchMembers(request));
+    }
+
+
+    @PostMapping("/respond")
+    public ResponseEntity<String> respondToInvitation(@RequestBody GroupMemberRequest dto) {
+        String username = getUsernameFromSecurityContext();
+        groupService.respondToInvitation(dto.getGroupId(), username, dto.getStatus());
+        return ResponseEntity.ok(dto.getStatus() == GroupMemberStatus.ACCEPTED ?
+                "Bạn đã chấp nhận lời mời" : "Bạn đã từ chối lời mời");
+    }
+    @GetMapping("/invitations")
+    public ResponseEntity<List<GroupInvitationDTO>> getPendingInvitations() {
+        String username = getUsernameFromSecurityContext();
+        List<GroupInvitationDTO> invitations = groupService.getPendingInvitations(username);
+        return ResponseEntity.ok(invitations);
     }
 }
