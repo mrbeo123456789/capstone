@@ -1,59 +1,124 @@
-import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Sidebar from "../../component/Sidebar.jsx";
+import { useState } from "react";
+import {useNavigate} from "react-router-dom";
 
-const GroupPage = () => {
-    const [groups, setGroups] = useState([]);
-    const [invitations, setInvitations] = useState([]);
+const GroupsPage = () => {
+    const navigate = useNavigate();
 
-    useEffect(() => {
-        fetch("http://localhost:5000/api/groups")
-            .then((res) => res.json())
-            .then((data) => setGroups(data));
+    const [invitations, setInvitations] = useState([
+        { id: 1, user: "User1", groupName: "Group X", status: "Pending", groupImage: "https://firebasestorage.googleapis.com/v0/b/bookstore-f9ac2.appspot.com/o/z6401921430828_462eb669057b59d555bd03ee167b7c97.jpg?alt=media&token=e54d868b-2854-4850-b43a-8ac95f7ff53d" }
+    ]);
 
-        fetch("http://localhost:5000/api/invitations")
-            .then((res) => res.json())
-            .then((data) => setInvitations(data));
-    }, []);
+    const [yourGroups, setYourGroups] = useState([
+        { id: 1, name: "Group A", image: "https://firebasestorage.googleapis.com/v0/b/bookstore-f9ac2.appspot.com/o/z6401921430828_462eb669057b59d555bd03ee167b7c97.jpg?alt=media&token=e54d868b-2854-4850-b43a-8ac95f7ff53d", status: "Joined" }
+    ]);
+
+    const [joinedGroups, setJoinedGroups] = useState([
+        { id: 1, name: "Group 1", image: "https://firebasestorage.googleapis.com/v0/b/bookstore-f9ac2.appspot.com/o/z6401921430828_462eb669057b59d555bd03ee167b7c97.jpg?alt=media&token=e54d868b-2854-4850-b43a-8ac95f7ff53d", status: "Joined" },
+        { id: 2, name: "Group 2", image: "https://firebasestorage.googleapis.com/v0/b/bookstore-f9ac2.appspot.com/o/z6401921430828_462eb669057b59d555bd03ee167b7c97.jpg?alt=media&token=e54d868b-2854-4850-b43a-8ac95f7ff53d", status: "Pending" },
+        { id: 3, name: "Group 3", image: "https://firebasestorage.googleapis.com/v0/b/bookstore-f9ac2.appspot.com/o/z6401921430828_462eb669057b59d555bd03ee167b7c97.jpg?alt=media&token=e54d868b-2854-4850-b43a-8ac95f7ff53d", status: "Joined" }
+    ]);
+
+    const handleAccept = (id) => {
+        const acceptedGroup = invitations.find(invite => invite.id === id);
+        setYourGroups([...yourGroups, { ...acceptedGroup, status: "Joined" }]);
+        setInvitations(invitations.filter(invite => invite.id !== id));
+    };
+
+    const handleDecline = (id) => {
+        setInvitations(invitations.filter(invite => invite.id !== id));
+    };
 
     return (
-        <Router>
-            <div className="flex h-screen text-white bg-gray-900">
-                <Sidebar />
-                <div className="flex-1 p-5 bg-gray-800">
-                    <div className="flex justify-between items-center mb-5">
-                        <input type="text" placeholder="https://" className="w-2/3 p-2 rounded bg-gray-700 text-white border border-gray-600" />
-                        <button className="bg-red-700 hover:bg-red-800 px-4 py-2 rounded">Create a new group</button>
+        <div className="bg-gradient-to-r from-red-700 to-orange-600 rounded-lg w-full p-1">
+            <div className="bg-white flex flex-col rounded-lg shadow-md p-6 h-full">
+                <div className="p-6 flex flex-col items-center w-full">
+
+                    {/* Search & Create Group */}
+                    <div className="flex justify-between w-full">
+                        <input
+                            type="text"
+                            placeholder="Search"
+                            className="w-2/3 p-2 rounded-lg border border-gray-400"
+                        />
+                        <button className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+                            onClick={() => navigate(`/groups/create`)}
+                        >
+                            Create a new group
+                        </button>
                     </div>
 
-                    <div className="bg-gray-700 p-5 rounded mb-5">
-                        <h3 className="text-lg font-bold mb-3">Invitations ({invitations.length})</h3>
-                        {invitations.map((invite) => (
-                            <div key={invite.id} className="flex justify-between items-center bg-gray-600 p-4 rounded mb-2">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-white text-black rounded-full flex justify-center items-center font-bold">
-                                        {invite.user[0]}
+                    {/* Invitations */}
+                    <div className="w-full">
+                        <h2 className="text-orange-400 font-bold">Invitation ({invitations.length})</h2>
+                        {invitations.length > 0 && (
+                            <div className="mt-4 p-4 rounded-lg shadow-lg w-1/3 bg-orange-50">
+                                <p className="text-white">📢 {invitations[0].user} invites you to a group</p>
+                                <div className="p-4 mt-2 rounded-lg flex items-center grid grid-cols-2 gap-6">
+                                    <div>
+                                        <img src={invitations[0].groupImage} alt="Group"
+                                             className="w-20 h-20 mt-2 rounded-lg"/>
+                                        <p className="text-orange-400 font-bold">{invitations[0].groupName}</p>
                                     </div>
-                                    <p><strong>{invite.user}</strong> invites you to join <strong>{invite.group}</strong></p>
-                                </div>
-                                <div className="space-x-2">
-                                    <button className="bg-green-600 hover:bg-green-700 px-3 py-1 rounded">Accept</button>
-                                    <button className="bg-red-600 hover:bg-red-700 px-3 py-1 rounded">Decline</button>
+                                    <div className="flex gap-4 flex flex-col items-center">
+                                        <button
+                                            className="bg-green-600 px-4 py-2 rounded-lg text-white hover:bg-green-700"
+                                            onClick={() => handleAccept(invitations[0].id)}>
+                                            Accept
+                                        </button>
+                                        <button
+                                            className="bg-gray-600 px-4 py-2 rounded-lg text-white hover:bg-gray-700"
+                                            onClick={() => handleDecline(invitations[0].id)}>
+                                            Decline
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        ))}
+                        )}
                     </div>
 
-                    <div className="bg-gray-700 p-5 rounded mb-5">
-                        <h3 className="text-lg font-bold mb-3">Your groups</h3>
-                        {groups.map((group) => (
-                            <div key={group.id} className="bg-red-800 p-4 text-center rounded mb-2">{group.name}</div>
-                        ))}
+                    {/* Your Groups */}
+                    <div className="mt-6 w-full">
+                        <h2 className="text-orange-400 font-bold">Your Groups</h2>
+                        <div className="flex gap-4 mt-2">
+                            {yourGroups.map(group => (
+                                <div key={group.id}
+                                     onClick={() => navigate(`/groups/joins/${group.id}`)}
+                                     className="bg-gray-800 p-4 rounded-lg shadow-lg flex flex-col items-center">
+                                    <img src={group.image} alt={group.name} className="w-20 h-20 rounded-lg"/>
+                                    <p className="text-orange-400 mt-2">{group.name}</p>
+                                    <span className={`px-3 py-1 mt-2 text-white text-xs font-bold rounded-lg 
+                                        ${group.status === "Joined" ? "bg-green-600" : "bg-gray-600"}`}>
+                                        {group.status}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
                     </div>
+
+                    {/* Joined Groups */}
+                    <div>
+                        <h2 className="text-orange-400 font-bold">Joined Groups</h2>
+                        <div className="mt-6 w-full flex items-center">
+                            <div className="flex gap-4 mt-2 overflow-x-auto">
+                                {joinedGroups.map(group => (
+                                    <div key={group.id} className="bg-gray-800 p-4 rounded-lg shadow-lg flex flex-col items-center">
+                                        <img src={group.image} alt={group.name} className="w-20 h-20 rounded-lg"/>
+                                        <p className="text-orange-400 mt-2">{group.name}</p>
+                                        <span className={`px-3 py-1 mt-2 text-white text-xs font-bold rounded-lg 
+                                            ${group.status === "Joined" ? "bg-green-600" : "bg-gray-600"}`}>
+                                            {group.status}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                            <button className="text-orange-400 text-2xl ml-4">{">"}</button>
+                        </div>
+                    </div>
+
                 </div>
             </div>
-        </Router>
+        </div>
     );
 };
 
-export default GroupPage;
+export default GroupsPage;

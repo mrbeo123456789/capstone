@@ -1,4 +1,4 @@
-import {createBrowserRouter} from "react-router-dom";
+import {createBrowserRouter, Navigate} from "react-router-dom";
 import LoginForm from "../page/signin/loginform.jsx";
 import ErrorPage from "../page/error/ErrorPage.jsx";
 import Layout from "../page/ui/Layout.jsx";
@@ -28,7 +28,6 @@ import GroupUsers from "../page/group/GroupUsers.jsx";
 import GroupForm from "../page/group/GroupForm.jsx";
 
 import ChallengeEvidencePage from "../page/admin/ChallengeEvidencePage.jsx";
-import ChallengeAndEvidence from "../page/admin/dashboard/ChallengeAndEvidence.jsx";
 
 import GroupList from "../page/admin/GroupList.jsx";
 const router = createBrowserRouter([
