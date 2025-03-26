@@ -1,7 +1,6 @@
 package org.capstone.backend.service.group;
 
-import org.capstone.backend.dto.group.GroupMemberResponse;
-import org.capstone.backend.dto.group.GroupResponse;
+import org.capstone.backend.dto.group.*;
 import org.capstone.backend.entity.Account;
 import org.capstone.backend.entity.GroupMember;
 import org.capstone.backend.entity.Groups;
@@ -13,6 +12,8 @@ import org.capstone.backend.repository.GroupRepository;
 import org.capstone.backend.repository.MemberRepository;
 import org.capstone.backend.service.group.GroupService;
 import org.capstone.backend.utils.enums.GroupMemberStatus;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.capstone.backend.utils.upload.FirebaseUpload;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -23,9 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -218,6 +217,100 @@ public class GroupServiceImpl implements GroupService {
 
 
 
+    public void inviteMembers(GroupInviteRequest request) {
+        // Lấy thông tin nhóm
+        Groups group = groupRepository.findById(request.getGroupId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nhóm không tồn tại"));
+
+        // Lấy danh sách thành viên từ ID
+        List<Member> membersToInvite = memberRepository.findAllById(request.getMemberIds());
+
+        if (membersToInvite.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Không tìm thấy thành viên nào với ID đã cung cấp");
+        }
+
+        List<GroupMember> invitations = new ArrayList<>();
+        for (Member member : membersToInvite) {
+            // Kiểm tra xem thành viên đã ở trong nhóm chưa
+            boolean alreadyMember = groupMemberRepository.existsByGroupAndMember(group, member);
+            if (alreadyMember) {
+                continue;
+            }
+
+            GroupMember invitation = GroupMember.builder()
+                    .group(group)
+                    .member(member)
+                    .role("MEMBER") // Mặc định là MEMBER khi được mời
+                    .status(GroupMemberStatus.PENDING) // Đánh dấu trạng thái là PENDING
+                    .createdBy(group.getCreatedBy()) // Người gửi lời mời
+                    .build();
+            invitations.add(invitation);
+        }
+
+        if (!invitations.isEmpty()) {
+            groupMemberRepository.saveAll(invitations);
+        }
+    }
+
+    /**
+     * Thành viên phản hồi lời mời (Chấp nhận hoặc từ chối)
+     */
+    public void respondToInvitation(Long groupId, String username, GroupMemberStatus status) {
+        Account account = accountRepository.findByUsername(username).orElse(null);
+
+        if (account == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found");
+        }
 
 
+        Member member = memberRepository.findByAccount(account).orElse(null);
+        Groups group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nhóm không tồn tại"));
+
+        GroupMember groupMember = groupMemberRepository.findByGroupAndMember(group, member)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lời mời không tồn tại"));
+
+        // Cập nhật trạng thái lời mời
+        groupMember.setStatus(status);
+        groupMemberRepository.save(groupMember);
+    }
+    public List<GroupInvitationDTO> getPendingInvitations(String username) {
+        Account account = accountRepository.findByUsername(username).orElse(null);
+
+        if (account == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found");
+        }
+
+        // 🔥 Tìm thành viên tương ứng với tài khoản
+        Member member = memberRepository.findByAccount(account).orElse(null);
+        List<GroupMember> invitations = groupMemberRepository.findByMemberAndStatus(member, GroupMemberStatus.PENDING);
+
+        return invitations.stream().map(invite -> {
+            GroupInvitationDTO dto = new GroupInvitationDTO();
+            dto.setGroupId(invite.getGroup().getId());
+            dto.setGroupName(invite.getGroup().getName());
+            dto.setInvitedBy(invite.getCreatedBy().toString()); // Chuyển đổi ID sang String
+            return dto;
+        }).collect(Collectors.toList());
+    }
+    public List<MemberSearchResponse> searchMembers(MemberSearchRequest request) {
+        Pageable pageable = PageRequest.of(0, 5); // Giới hạn 5 kết quả
+
+        List<Member> members = memberRepository.searchByEmailOrFullName(request.getKeyword(), pageable);
+
+        if (request.getGroupId() != null) {
+            Groups group = groupRepository.findById(request.getGroupId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nhóm không tồn tại"));
+
+            Set<Long> groupMemberIds = groupMemberRepository.findMemberIdsByGroup(group);
+            members = members.stream()
+                    .filter(member -> !groupMemberIds.contains(member.getId())) // Lọc người đã trong nhóm
+                    .limit(5)
+                    .toList();
+        }
+
+        return members.stream()
+                .map(m -> new MemberSearchResponse(m.getId(), m.getAccount().getEmail(), m.getAvatar()))
+                .toList();
+    }
 }

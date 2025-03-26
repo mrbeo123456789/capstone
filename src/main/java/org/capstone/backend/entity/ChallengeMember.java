@@ -2,6 +2,7 @@ package org.capstone.backend.entity;
 
 import lombok.*;
 import jakarta.persistence.*;
+import org.capstone.backend.utils.enums.ChallengeMemberStatus;
 import java.time.LocalDateTime;
 
 @Data
@@ -17,12 +18,10 @@ public class ChallengeMember {
     @Column(name = "challenge_member_id")
     private Long id;
 
-    // Nhiều ChallengeMember thuộc một Challenge
     @ManyToOne
     @JoinColumn(name = "challenge_id", nullable = false)
     private Challenge challenge;
 
-    // Giả sử có entity Member để lưu thông tin thành viên
     @ManyToOne
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
@@ -30,12 +29,24 @@ public class ChallengeMember {
     @Column(name = "join_by")
     private Long joinBy;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    private String status; // pending, active, left,...
+    private ChallengeMemberStatus status;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }

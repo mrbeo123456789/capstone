@@ -12,7 +12,6 @@ public interface ChallengeService {
     String createChallenge(ChallengeRequest request, MultipartFile picture, MultipartFile banner, String username);
     List<ChallengeType> getAllTypes();
     String reviewChallenge(ReviewChallengeRequest request);
-    String inviteMember(InviteMemberRequest request);
     String joinChallenge(Long challengeId);
     Page<AdminChallengesResponse> getChallenges(int page, int size);
     Page<ChallengeResponse> getApprovedChallenges(int page, int size);

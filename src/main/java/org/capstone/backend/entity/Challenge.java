@@ -90,7 +90,5 @@ public class Challenge {
     @Column(name = "admin_note")
     private String adminNote;
 
-    @Column(name = "img")
-    private String img;
 
 }

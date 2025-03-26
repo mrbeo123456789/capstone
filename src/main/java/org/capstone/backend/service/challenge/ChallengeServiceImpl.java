@@ -74,7 +74,7 @@ public class ChallengeServiceImpl implements ChallengeService {
     }
 
 
-    private ChallengeMember createChallengeMember(Challenge challenge, Member member, Long joinBy, String status) {
+    private ChallengeMember createChallengeMember(Challenge challenge, Member member, Long joinBy, ChallengeMemberStatus status) {
         ChallengeMember challengeMember = new ChallengeMember();
         challengeMember.setChallenge(challenge);
         challengeMember.setMember(member);
@@ -96,23 +96,14 @@ public class ChallengeServiceImpl implements ChallengeService {
             return "Challenge is full.";
         }
 
-        ChallengeMember challengeMember = createChallengeMember(challenge, member, member.getId(), "active");
+        ChallengeMember challengeMember = createChallengeMember(challenge, member, member.getId(), ChallengeMemberStatus.JOINED);
         challengeMemberRepository.save(challengeMember);
 
         return "Joined challenge successfully.";
     }
 
-    @Override
-    public String inviteMember(InviteMemberRequest request) {
-        Member invitedBy = getAuthenticatedMember();
-        Challenge challenge = findChallenge(request.getChallengeId());
-        Member member = findMember(request.getMemberId());
 
-        ChallengeMember challengeMember = createChallengeMember(challenge, member, invitedBy.getId(), "pending");
-        challengeMemberRepository.save(challengeMember);
 
-        return "Invitation sent successfully.";
-    }
     @Override
     public String createChallenge(ChallengeRequest request, MultipartFile picture, MultipartFile banner, String username) {
         Member member = getAuthenticatedMember(); // Có thể trả về null nếu là Admin
