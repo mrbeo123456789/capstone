@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import {useChangePasswordMutation} from "../../service/memberService.js";
 
@@ -29,64 +29,75 @@ export const ChangePassword = () => {
     };
 
     return (
-        <div className="gradient-border p-6 flex flex-col items-center h-full w-full relative box-border rounded-xl border-4 border-transparent z-[1]">
-            {/* Outer Gradient Border */}
-            <div className="h-full w-full relative p-1 rounded-lg shadow-md -m-[5px] bg-gradient-to-r from-red-500 to-orange-500 z-[-1]">
-                {/* Inner Content Box */}
-                <div className="bg-black flex flex-col rounded-lg shadow-md items-center p-6" style={{ borderRadius: "1em" }}>
-                    {/* Title */}
-                    <h2 className="text-2xl font-bold text-white mb-6">Change Password</h2>
+        <div className="bg-white min-h-screen flex">
+            {/* Main Content */}
+            <div className="flex-1 flex items-center justify-center p-6">
+                <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 border border-orange-100">
+                    <h2 className="text-3xl font-bold text-orange-700 mb-6 text-center">Change Password</h2>
 
                     {/* Display Success or Error Message */}
-                    {message && <p className="text-green-400">{message}</p>}
-                    {error && <p className="text-red-500">{error}</p>}
+                    {message && (
+                        <div className="bg-green-100 text-green-700 p-3 rounded-lg mb-4 text-center">
+                            {message}
+                        </div>
+                    )}
+                    {error && (
+                        <div className="bg-red-100 text-red-700 p-3 rounded-lg mb-4 text-center">
+                            {error}
+                        </div>
+                    )}
 
                     {/* Form */}
-                    <form className="w-full" onSubmit={handleSubmit}>
-                        <div className="mb-4">
-                            <label className="text-orange-400 block mb-1">Current Password</label>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <div>
+                            <label className="block text-orange-600 mb-2">Current Password</label>
                             <input
                                 type="password"
                                 value={oldPassword}
                                 onChange={(e) => setOldPassword(e.target.value)}
-                                className="bg-gray-800 text-white p-2 rounded-lg focus:ring-2 focus:ring-orange-400 w-2/5"
+                                className="w-full px-3 py-2 border border-orange-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                                 placeholder="Enter current password"
                                 required
                             />
                         </div>
 
-                        <div className="mb-4">
-                            <label className="text-orange-400 block mb-1">New Password</label>
+                        <div>
+                            <label className="block text-orange-600 mb-2">New Password</label>
                             <input
                                 type="password"
                                 value={newPassword}
                                 onChange={(e) => setNewPassword(e.target.value)}
-                                className="bg-gray-800 text-white p-2 rounded-lg focus:ring-2 focus:ring-orange-400 w-2/5"
+                                className="w-full px-3 py-2 border border-orange-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                                 placeholder="Enter new password"
                                 required
                             />
                         </div>
 
-                        <div className="mb-6">
-                            <label className="text-orange-400 block mb-1">Confirm New Password</label>
+                        <div>
+                            <label className="block text-orange-600 mb-2">Confirm New Password</label>
                             <input
                                 type="password"
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
-                                className="bg-gray-800 text-white p-2 rounded-lg focus:ring-2 focus:ring-orange-400 w-2/5"
+                                className="w-full px-3 py-2 border border-orange-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                                 placeholder="Confirm new password"
                                 required
                             />
                         </div>
 
-                        {/* Save Button & Forgot Password Link */}
-                        <div className="mb-4">
-                            <button type="submit" className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700">
-                                Save
+                        <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+                            <button
+                                type="submit"
+                                className="w-full sm:w-auto bg-orange-600 text-white px-6 py-2 rounded-lg hover:bg-orange-700 transition duration-300"
+                            >
+                                Save Changes
                             </button>
-                            <a href="/forgot-password" className="text-blue-400 hover:underline text-sm ml-2">
-                                I forgot my password.
-                            </a>
+                            <Link
+                                to="/forgot-password"
+                                className="text-orange-600 hover:underline text-sm"
+                            >
+                                Forgot Password?
+                            </Link>
                         </div>
                     </form>
                 </div>
