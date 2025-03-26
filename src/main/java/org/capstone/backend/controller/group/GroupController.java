@@ -1,8 +1,7 @@
 package org.capstone.backend.controller.group;
 
-import org.capstone.backend.dto.group.GroupResponse;
+import org.capstone.backend.dto.group.*;
 import org.capstone.backend.entity.Groups;
-import org.capstone.backend.dto.group.GroupRequest;
 import org.capstone.backend.service.auth.AuthService;
 import org.capstone.backend.service.group.GroupService;
 import org.springframework.http.HttpStatus;
@@ -102,6 +101,7 @@ public class GroupController {
         groupService.inviteMembers(request);
         return ResponseEntity.ok("Lời mời đã được gửi đến các thành viên!");
     }
+
     @PostMapping("/search")
     public ResponseEntity<List<MemberSearchResponse>> searchMembers(@RequestBody MemberSearchRequest request) {
         return ResponseEntity.ok(groupService.searchMembers(request));
