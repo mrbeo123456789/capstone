@@ -18,80 +18,66 @@ export const authService = createApi({
     tagTypes: ["Auth"],
     endpoints: (builder) => ({
         register: builder.mutation({
-            query: (data) => {
-                console.log("Register Data:", data);
-                return {
-                    url: "/auth/register",
-                    method: "POST",
-                    body: data,
-                };
-            },
+            query: (data) => ({
+                url: "/auth/register",
+                method: "POST",
+                body: data,
+            }),
+            transformResponse: (response) => ({ message: response }),
+        }),
+
+        login: builder.mutation({
+            query: (data) => ({
+                url: "/auth/login",
+                method: "POST",
+                body: data,
+            }),
             transformResponse: (response) => {
-                console.log("Register Response:", response);
+                if (typeof response === "string") {
+                    return { error: response };
+                }
+                localStorage.setItem("jwt_token", response.token);
+                return response;
+            },
+        }),
+
+        forgotPassword: builder.mutation({
+            query: (email) => ({
+                url: "/auth/forgot-password",
+                method: "POST",
+                body: { email },
+            }),
+            transformResponse: (response) => {
+                console.log("Forgot Password Response:", response);
                 return { message: response };
             },
         }),
 
-        login: builder.mutation({
-            query: (data) => {
-                console.log("Login Data:", data);
-                return {
-                    url: "/auth/login",
-                    method: "POST",
-                    body: data,
-                };
-            },
-            transformResponse: (response) => {
-                console.log("Login Response:", response);
-                localStorage.setItem("jwt_token", response.token);
-                return response;
-            },
+        resetPassword: builder.mutation({
+            query: ({ email, newPassword }) => ({
+                url: "/auth/reset-password",
+                method: "POST",
+                body: { email, newPassword },
+            }),
+            transformResponse: (response) => ({ message: response }),
         }),
 
-        loginWithGoogle: builder.mutation({
-            query: () => {
-                console.log("Login with Google triggered");
-                return {
-                    url: "/oauth2/authorization/google",
-                    method: "GET",
-                };
-            },
+        verifyAccount: builder.mutation({
+            query: ({ email, otp }) => ({
+                url: "/auth/confirm-verification",
+                method: "POST",
+                body: { email, otp },
+            }),
+            transformResponse: (response) => ({ message: response }),
         }),
 
-        handleOAuthCallback: builder.mutation({
-            query: () => {
-                console.log("OAuth Callback triggered");
-                return {
-                    url: "/api/auth/oauth2-login",
-                    method: "GET",
-                    credentials: "include",
-                };
-            },
-            transformResponse: (response) => {
-                console.log("OAuth Callback Response:", response);
-                localStorage.setItem("jwt_token", response.token);
-                return response;
-            },
-        }),
-
-        getUser: builder.query({
-            query: () => {
-                console.log("Fetching user data...");
-                return "/api/auth/me";
-            },
-            providesTags: ["Auth"],
-            transformResponse: (response) => {
-                console.log("User Data Response:", response);
-                return response;
-            },
-        }),
     }),
 });
 
 export const {
     useRegisterMutation,
     useLoginMutation,
-    useLoginWithGoogleMutation,
-    useHandleOAuthCallbackMutation,
-    useGetUserQuery
+    useForgotPasswordMutation,
+    useResetPasswordMutation,
+    useVerifyAccountMutation,
 } = authService;

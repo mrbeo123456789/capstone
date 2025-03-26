@@ -1,16 +1,42 @@
 import * as yup from "yup";
+// Helper function để parse date & so sánh cho dễ
+const today = new Date();
+today.setHours(0, 0, 0, 0); // Reset time về 00:00 để tránh lỗi so sánh
 
 export const validateCandidate = yup.object({
-    firstname: yup.string().required("First name is required!"),
-    lastname: yup.string().required("Last name is required!"),
+
+    fullName: yup.string().required("Full name is required!"),
+    dateOfBirth: yup
+        .string()
+        .required("Date of birth is required!")
+        .test(
+            "is-older-than-16",
+            "You must be older than 16 years old!",
+            function (value) {
+                if (!value) return false;
+                const birthDate = new Date(value);
+                const today = new Date();
+
+                const age = today.getFullYear() - birthDate.getFullYear();
+                const m = today.getMonth() - birthDate.getMonth();
+                const d = today.getDate() - birthDate.getDate();
+
+                if (m < 0 || (m === 0 && d < 0)) {
+                    return age - 1 >= 16;
+                }
+                return age >= 16;
+            }
+        )
+    // firstname: yup.string().required("First name is required!"),
+    // lastname: yup.string().required("Last name is required!"),
     // username: yup.string().required("Username will be auto generated when choose country!")
     //     .min(3, "Username must be greater than 3 characters"),
-    password: yup.string().required("Password is required!")
-        .min(8, "Password must be at least 8 characters!")
-        .matches(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-            "Password must be contain uppercase, lowercase, special character and number!"),
-    email: yup.string().required("Email is required!")
-        .email("Invalid email format!"),
+    // password: yup.string().required("Password is required!")
+    //     .min(8, "Password must be at least 8 characters!")
+    //     .matches(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+    //         "Password must be contain uppercase, lowercase, special character and number!"),
+    // email: yup.string().required("Email is required!")
+    //     .email("Invalid email format!"),
     // phone: yup.string().required("Phone is required!")
     //     .matches(/^[0-9]{10}$/, "Phone number must be exactly 10 digits"),
     // avatar: yup.mixed()
@@ -21,11 +47,72 @@ export const validateCandidate = yup.object({
     // }).test("fileSize","File size must be less than 10MB", (value) => {
     //     return value && value?.size <= 50 * 1024 * 1024;
     // }),
-    address: yup.string().required("Address is required!"),
+    // address: yup.string().required("Address is required!"),
     // city: yup.string().required("City is required!"),
     // country: yup.string().required("Country is required!"),
     // department: yup.string().required("Department is required!"),
     // role: yup.string().required("Role is required!"),
+})
+
+export const challengeValidation = yup.object({
+    name: yup.string()
+        .required("Challenge name is required!")
+        .trim()
+        .min(3, "Challenge name must be at least 3 characters"),
+
+    startDate: yup.date()
+        .required("Start date is required")
+        .min(today, "Start date must be in the future"),
+
+    endDate: yup.string()
+        .strict(true)
+        .required("End date is required")
+        .test(
+            "is-after-start",
+            "End date must be after start date",
+            function (value) {
+                const { startDate } = this.parent;
+                if (!startDate || !value) return false;
+                return new Date(value) > new Date(startDate);
+            }
+        ),
+
+    maxParticipants: yup.number()
+        .typeError("Max participants must be a number")
+        .required("Max participants is required")
+        .positive("Max participants must be greater than 0")
+        .integer("Max participants must be an integer"),
+
+    description: yup.string()
+        .required("Description is required")
+        .trim()
+        .min(10, "Description should be at least 10 characters long"),
+
+    rule: yup.string(),
+
+    picture: yup
+        .mixed()
+        .required("Picture is required")
+        .test(
+            "fileSize",
+            "Picture size must be less than 50MB",
+            (value) => {
+                if (!value) return false; // required
+                return value.size <= 50 * 1024 * 1024; // 50MB in bytes
+            }
+        )
+        .test(
+            "fileType",
+            "Unsupported File Format",
+            (value) => {
+                if (!value) return false;
+                return ["image/jpeg", "image/png", "image/jpg", "image/gif"].includes(value.type);
+            }
+        ),
+
+    challengeTypeId: yup.string()
+        .required("Challenge type is required")
+
 })
 
 export const loginValidation = yup.object({

@@ -1,30 +1,30 @@
-import {Outlet} from "react-router-dom";
-import {Header} from "./Header.jsx";
-import {Footer} from "./Footer.jsx";
-import {SideBar} from "./SideBar.jsx";
-import { PaginationProvider } from "../../context/PageContext.jsx";
-import { SearchProvider } from "../../context/SearchContext.jsx"
+import { Outlet } from "react-router-dom";
+import { Header } from "./Header.jsx";
+import { Footer } from "./Footer.jsx";
+import { SideBar } from "./SideBar.jsx";
+import {useSidebar} from "../../context/SidebarContext.jsx";
 
-function Layout(){
+function Layout() {
+    const { isSidebarOpen, toggleSidebar } = useSidebar();
+    console.log("isSidebarOpen in Layout:", isSidebarOpen);
+
     return (
         <>
-            <SearchProvider>
-            <PaginationProvider>
-                <div class="flex items-start justify-between">
-                    <SideBar/>
-                    <div class="flex flex-col w-full pl-0 md:p-4 md:space-y-4">
-                        <Header/>
-                        <Outlet></Outlet>
-                    </div>
-
+            <Header toggleSidebar={toggleSidebar} />
+            <div
+                className="sm:flex items-start justify-between"
+                style={{
+                    background: "linear-gradient(235deg, rgb(254 225 144), rgb(250 241 221), rgb(252 247 226))",
+                }}
+            >
+                {isSidebarOpen && <SideBar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />}
+                <div className={`w-full transition-all duration-300 pl-0 md:p-4 md:space-y-4`}>
+                    <Outlet />
                 </div>
-
-                <Footer/>
-            </PaginationProvider>
-            </SearchProvider>
+            </div>
+            <Footer />
         </>
-
-    )
+    );
 }
 
 export default Layout;

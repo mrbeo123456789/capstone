@@ -1,11 +1,14 @@
 import {RouterProvider} from "react-router-dom";
 import router from './router/router.jsx';
+import {SidebarProvider} from "./context/SidebarContext.jsx";
 
 const App = () => {
     return (
         <>
-            <RouterProvider router={router}>
-            </RouterProvider>
+            <SidebarProvider>
+                <RouterProvider router={router}>
+                </RouterProvider>
+            </SidebarProvider>
         </>
     )
 }

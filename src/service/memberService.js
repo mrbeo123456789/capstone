@@ -5,13 +5,16 @@ export const memberService = createApi({
     reducerPath: "member",
     baseQuery: fetchBaseQuery({
         baseUrl: BASE_URL,
-        prepareHeaders: (headers) => {
-            const token = localStorage.getItem("token");
+        prepareHeaders: (headers, { getState, endpoint }) => {
+            const token = localStorage.getItem("jwt_token");
             if (token) {
                 console.log(token);
-                //headers.set("Authorization", `Bearer ${token}`);
+                headers.set("Authorization", `Bearer ${token}`);
             }
-            headers.set("Content-Type", "application/json");
+            // ✅ Only set Content-Type for JSON requests, NOT for FormData
+            if (endpoint !== "updateMember") {
+                headers.set("Content-Type", "application/json");
+            }
             return headers;
         },
     }),
@@ -19,13 +22,13 @@ export const memberService = createApi({
     endpoints: (builder) => ({
         // API lấy danh sách thành viên
         getMembers: builder.query({
-            query: () => "/members",
+            query: () => "/member",
             providesTags: ["Member"],
         }),
 
         // API lấy thông tin thành viên theo ID
         getMemberById: builder.query({
-            query: (id) => `/members/${id}`,
+            query: (id) => `/member/${id}`,
             providesTags: ["Member"],
         }),
 
@@ -38,10 +41,24 @@ export const memberService = createApi({
             }),
             invalidatesTags: ["Member"],
         }),
+
+        changePassword: builder.mutation({
+            query: (data) => ({
+                url: "/member/change-password",
+                method: "PUT",
+                body: data,
+            }),
+            transformResponse: (response) => {
+                console.log("Change Password Response:", response);
+                return { message: response };
+            },
+        }),
     }),
 });
 
 export const {
     useGetMembersQuery,
-    useGetMemberByIdQuery, 
-    useUpdateMemberMutation } = memberService;
+    useGetMemberByIdQuery,
+    useUpdateMemberMutation ,
+    useChangePasswordMutation,
+} = memberService;
