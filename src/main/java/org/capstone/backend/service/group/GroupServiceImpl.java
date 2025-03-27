@@ -288,8 +288,8 @@ public class GroupServiceImpl implements GroupService {
         return invitations.stream().map(invite -> {
             GroupInvitationDTO dto = new GroupInvitationDTO();
             dto.setGroupId(invite.getGroup().getId());
+            dto.setName(member.getFullName());
             dto.setImg(invite.getGroup().getPicture());
-            dto.setName(invite.getMember().getFullName());
             dto.setGroupName(invite.getGroup().getName());
             dto.setInvitedBy(invite.getCreatedBy().toString()); // Chuyển đổi ID sang String
             return dto;

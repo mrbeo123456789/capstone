@@ -39,6 +39,7 @@ public class Member {
 
     private String district;
 
+    private String city;
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 

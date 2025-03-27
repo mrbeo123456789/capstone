@@ -2,10 +2,7 @@ package org.capstone.backend.entity;
 
 import lombok.*;
 import jakarta.persistence.*;
-import org.capstone.backend.utils.enums.ChallengeStatus;
-import org.capstone.backend.utils.enums.PrivacyStatus;
-import org.capstone.backend.utils.enums.VerificationMethod;
-import org.capstone.backend.utils.enums.VerificationType;
+import org.capstone.backend.utils.enums.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -89,6 +86,7 @@ public class Challenge {
 
     @Column(name = "admin_note")
     private String adminNote;
+
 
 
 }
