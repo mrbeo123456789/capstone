@@ -13,6 +13,7 @@ import java.util.Optional;
 
 public interface GroupService {
     List<GroupResponse> getGroupsByMemberId(Long memberId);
+    GroupResponse getGroupsDetail(Long groupId, Long memberId);
     Groups createGroup(GroupRequest request, MultipartFile picture , String createdBy);
     Groups updateGroup(Long groupId, GroupRequest request, Long updatedBy);
     void kickMember(Long groupId, Long memberId, String username);

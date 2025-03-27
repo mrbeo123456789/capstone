@@ -35,6 +35,9 @@ public class GroupMember {
     @Column(name = "status", nullable = false)
     private GroupMemberStatus status;
 
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
     @Column(name = "created_by", updatable = false)
     private Long createdBy;
 

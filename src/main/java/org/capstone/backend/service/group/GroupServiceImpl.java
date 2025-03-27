@@ -1,11 +1,13 @@
 package org.capstone.backend.service.group;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.capstone.backend.dto.group.*;
 import org.capstone.backend.entity.Account;
 import org.capstone.backend.entity.GroupMember;
 import org.capstone.backend.entity.Groups;
-import org.capstone.backend.entity.Member;
+
 import org.capstone.backend.dto.group.GroupRequest;
+import org.capstone.backend.entity.Member;
 import org.capstone.backend.repository.AccountRepository;
 import org.capstone.backend.repository.GroupMemberRepository;
 import org.capstone.backend.repository.GroupRepository;
@@ -56,6 +58,14 @@ public class GroupServiceImpl implements GroupService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public GroupResponse getGroupsDetail(Long groupId, Long memberId) {
+        return groupRepository.findById(groupId)
+                .map(group -> convertToGroupDetail(group, memberId))
+                .orElseThrow(() -> new EntityNotFoundException("Group not found with id " + groupId));
+    }
+
+
     private GroupResponse convertToDTO(Groups group, Long currentMemberId) {
         GroupResponse dto = new GroupResponse();
         dto.setId(group.getId());
@@ -71,8 +81,8 @@ public class GroupServiceImpl implements GroupService {
         List<GroupMemberResponse> memberDTOs = group.getMembers().stream()
                 .map(this::convertToMemberDTO)
                 .collect(Collectors.toList());
-        dto.setMembers(memberDTOs);
-        dto.setCurrentParticipants(dto.getMembers().size());
+//        dto.setMembers(memberDTOs);
+        dto.setCurrentParticipants(memberDTOs.size());
 
         // 👉 Lấy role của member đang gọi API
         GroupMember matchedMember = group.getMembers().stream()
@@ -87,11 +97,44 @@ public class GroupServiceImpl implements GroupService {
         return dto;
     }
 
+    private GroupResponse convertToGroupDetail(Groups group, Long currentMemberId) {
+        GroupResponse dto = new GroupResponse();
+        dto.setId(group.getId());
+        dto.setName(group.getName());
+        dto.setMaxParticipants(group.getMaxParticipants());
+        dto.setPicture(group.getPicture());
+        dto.setCreatedAt(group.getCreatedAt());
+        dto.setCreatedBy(group.getCreatedBy());
+        dto.setUpdatedAt(group.getUpdatedAt());
+        dto.setUpdatedBy(group.getUpdatedBy());
+
+        // Member list
+        List<GroupMemberResponse> memberDTOs = group.getMembers().stream()
+                .map(this::convertToMemberDTO)
+                .collect(Collectors.toList());
+        dto.setMembers(memberDTOs);
+
+        // 👉 Lấy role của member đang gọi API
+        GroupMember matchedMember = group.getMembers().stream()
+                .filter(m -> m.getMember().getId().equals(currentMemberId))
+                .findFirst()
+                .orElse(null);
+
+        if (matchedMember != null) {
+            dto.setCurrentMemberRole(matchedMember.getRole());
+        }
+        return dto;
+    }
+
 
     private GroupMemberResponse convertToMemberDTO(GroupMember groupMember) {
         GroupMemberResponse dto = new GroupMemberResponse();
         dto.setId(groupMember.getId());
         dto.setMemberId(groupMember.getMember().getId()); // Return only Member ID
+        Optional<Member> member = memberRepository.findById(dto.getMemberId());
+        dto.setImageUrl(member.map(Member::getAvatar).orElse("https://example.com/default-avatar.png"));
+        dto.setMemberName(member.map(Member::getFullName).orElse("User name not found"));
+        dto.setJoinDate(groupMember.getMember().getCreatedAt());
         dto.setRole(groupMember.getRole());
         dto.setStatus(groupMember.getStatus());
         return dto;
@@ -262,7 +305,6 @@ public class GroupServiceImpl implements GroupService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found");
         }
 
-
         Member member = memberRepository.findByAccount(account).orElse(null);
         Groups group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nhóm không tồn tại"));
@@ -271,9 +313,13 @@ public class GroupServiceImpl implements GroupService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lời mời không tồn tại"));
 
         // Cập nhật trạng thái lời mời
+        if(status == GroupMemberStatus.ACCEPTED) {
+            status = GroupMemberStatus.ACTIVE;
+        }
         groupMember.setStatus(status);
         groupMemberRepository.save(groupMember);
     }
+
     public List<GroupInvitationDTO> getPendingInvitations(String username) {
         Account account = accountRepository.findByUsername(username).orElse(null);
 
@@ -324,7 +370,7 @@ public class GroupServiceImpl implements GroupService {
         // Chỉ lấy tối đa 5 kết quả
         return members.stream()
                 .limit(5)
-                .map(m -> new MemberSearchResponse(m.getId(), m.getAccount().getEmail(), m.getAvatar()))
+                .map(m -> new MemberSearchResponse(m.getId(), m.getAccount().getEmail(), m.getAvatar(), m.getFullName()))
                 .toList();
     }
 

@@ -36,6 +36,12 @@ public class GroupController {
         return ResponseEntity.ok(groupService.getGroupsByMemberId(memberId));
     }
 
+    @GetMapping("/detail/{groupId}")
+    public ResponseEntity<?> getGroupDetail(@PathVariable Long groupId) {
+        Long memberId = getAuthenticatedMemberId();
+        return ResponseEntity.ok(groupService.getGroupsDetail(groupId, memberId));
+    }
+
     @PostMapping(value = "/create", consumes = {"multipart/form-data"})
     public ResponseEntity<?> createGroup(
             @Validated @ModelAttribute("data") GroupRequest request,
@@ -116,6 +122,7 @@ public class GroupController {
         return ResponseEntity.ok(dto.getStatus() == GroupMemberStatus.ACCEPTED ?
                 "Bạn đã chấp nhận lời mời" : "Bạn đã từ chối lời mời");
     }
+
     @GetMapping("/invitations")
     public ResponseEntity<List<GroupInvitationDTO>> getPendingInvitations() {
         String username = getUsernameFromSecurityContext();

@@ -9,4 +9,5 @@ public class MemberSearchResponse {
     private Long id;        // ID thành viên
     private String email;   // Email thành viên
     private String avatar;  // Ảnh đại diện
+    private String name;
 }
