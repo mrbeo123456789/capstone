@@ -151,7 +151,7 @@ public class GroupServiceImpl implements GroupService {
         String pictureUrl = null;
         try {
             if (picture != null && !picture.isEmpty()) {
-                pictureUrl = firebaseUpload.uploadFile(picture);
+                pictureUrl = firebaseUpload.uploadFile(picture, "group");
             }
         } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error uploading files: " + e.getMessage());

@@ -47,18 +47,19 @@ public class TinyDriveTokenController {
     public ResponseEntity<Map<String, String>> getToken() {
         Instant now = Instant.now();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
         String username = auth.getName(); // or extract from auth.getPrincipal()
 
-        String sub = accountRepository.findByUsername(username)
-                .map(Account::getEmail)
-                .orElse("guest@example.com"); // fallback email if not found
-
+        Account account = accountRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Account not found"));
+        String sub = account.getEmail();
 
         String jwt = Jwts.builder()
                 .setSubject(sub)
                 .claim("name",username)  // 👈 name
                 .claim("permissions", new String[]{"file:read", "file:write"})
-                .claim("aud", "tinydrive")
+                .claim("https://claims.tiny.cloud/drive/root", "/" + sub) // ✅ Set root folder
+                .setAudience("tinydrive") // ✅ Must be 'tinydrive'
                 .setIssuedAt(Date.from(now))
                 .setExpiration(Date.from(now.plusSeconds(7200)))
                 .signWith(SignatureAlgorithm.RS256, privateKey)

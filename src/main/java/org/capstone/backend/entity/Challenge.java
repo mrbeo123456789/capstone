@@ -37,7 +37,7 @@ public class Challenge {
     @Column(name = "banner")
     private String banner;
 
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "LONGTEXT")
     private String description;
 
     @Column(name = "rule")

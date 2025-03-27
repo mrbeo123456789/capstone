@@ -120,10 +120,10 @@ public class ChallengeServiceImpl implements ChallengeService {
 
         try {
             if (picture != null && !picture.isEmpty()) {
-                pictureUrl = firebaseUpload.uploadFile(picture);
+                pictureUrl = firebaseUpload.uploadFile(picture, "ChallengePicture");
             }
             if (banner != null && !banner.isEmpty()) {
-                bannerUrl = firebaseUpload.uploadFile(banner);
+                bannerUrl = firebaseUpload.uploadFile(banner,  "ChallengeBanner");
             }
         } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error uploading files: " + e.getMessage());

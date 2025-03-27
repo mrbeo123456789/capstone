@@ -10,16 +10,18 @@ import java.io.IOException;
 @Service
 public class FirebaseUpload {
 
-    public String uploadFile(MultipartFile file) throws IOException {
+    public String uploadFile(MultipartFile file, String path) throws IOException {
         // Lấy tên file gốc
         String fileName = file.getOriginalFilename();
 
-        // Upload file lên Firebase Storage
-        Blob blob = StorageClient.getInstance().bucket().create(fileName, file.getBytes(), file.getContentType());
+        String fullPath = path + "/" + fileName;
 
-        // Trả về URL của file đã upload
+        // Upload file lên Firebase Storage
+        Blob blob = StorageClient.getInstance().bucket().create(fullPath, file.getBytes(), file.getContentType());
+
+        // Return public URL
         return String.format("https://firebasestorage.googleapis.com/v0/b/%s/o/%s?alt=media",
                 StorageClient.getInstance().bucket().getName(),
-                blob.getName());
+                java.net.URLEncoder.encode(blob.getName(), "UTF-8")); // 👈 encode URL
     }
 }

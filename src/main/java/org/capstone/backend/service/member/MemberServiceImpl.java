@@ -41,7 +41,7 @@ public class MemberServiceImpl implements MemberService {
 
         // Upload avatar lên Firebase nếu có file mới
         if (avatar != null && !avatar.isEmpty()) {
-            String avatarUrl = firebaseUpload.uploadFile(avatar);
+            String avatarUrl = firebaseUpload.uploadFile(avatar, "avatar");
             member.setAvatar(avatarUrl);
         }
 
