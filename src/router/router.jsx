@@ -81,24 +81,14 @@ const router = createBrowserRouter([
     {
         path:"/login",
         errorElement:<ErrorPage/>,
-        element: <LoginForm/>,
-    },
-    {
-        path:"/signin",
-        errorElement:<ErrorPage/>,
         element: <LoginPage/>,
     },
     {
         path:"/register",
         errorElement:<ErrorPage/>,
-        element: <Layout></Layout>,
-        children:[
-            {
-                index: true,  // This sets the default page for /member
                 element: <RegisterForm />  // Replace with your default component
-            }
-        ]
     },
+
     {
         path:"/password",
         errorElement:<ErrorPage/>,

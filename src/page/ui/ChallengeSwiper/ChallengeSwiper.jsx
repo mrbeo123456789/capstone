@@ -6,7 +6,7 @@ import 'swiper/css/navigation';
 import './ChallengeSwiper.css';
 import { EffectCoverflow, Navigation, Autoplay } from 'swiper/modules';
 
-import gameData from '../../../../public/gamesData.json';
+import gameData from '../../../../gamesData.json';
 
 function ChallengeSwiper() {
     const [active, setActive] = useState(false);

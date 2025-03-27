@@ -9,7 +9,7 @@ import './gameSwiper.css';
 // import required modules
 import { EffectCoverflow, Navigation, Autoplay } from 'swiper/modules';
 
-import gameData from '../../public/gamesData.json';
+import gameData from '../../gamesData.json';
 
 function GameSwiper() {
     const [active, setActive] = useState(false);
