@@ -2,10 +2,7 @@ package org.capstone.backend.controller.challenge;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import org.capstone.backend.dto.challenge.ChallengeRequest;
-import org.capstone.backend.dto.challenge.ChallengeResponse;
-import org.capstone.backend.dto.challenge.InviteMemberRequest;
-import org.capstone.backend.dto.challenge.MyChallengeResponse;
+import org.capstone.backend.dto.challenge.*;
 import org.capstone.backend.entity.Challenge;
 
 import org.capstone.backend.entity.ChallengeType;
@@ -84,5 +81,9 @@ public class ChallengeController {
         List<MyChallengeResponse> challenges = challengeService.getChallengesByMember(request);
         return ResponseEntity.ok(challenges);
     }
-
+    @GetMapping("/{challengeId}/detail")
+    public ResponseEntity<ChallengeDetailResponse> getChallengeDetail(@PathVariable Long challengeId) {
+        ChallengeDetailResponse detail = challengeService.getChallengeDetail(challengeId);
+        return ResponseEntity.ok(detail);
+    }
 }

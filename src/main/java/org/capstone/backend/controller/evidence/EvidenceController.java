@@ -17,7 +17,6 @@ import org.springframework.web.server.ResponseStatusException;
 public class EvidenceController {
 
     private final EvidenceService evidenceService;
-    private final MemberService memberService;
 
     @PostMapping(value = "/upload", consumes = {"multipart/form-data"})
     public ResponseEntity<?> uploadEvidence(@RequestParam("file") MultipartFile file,
