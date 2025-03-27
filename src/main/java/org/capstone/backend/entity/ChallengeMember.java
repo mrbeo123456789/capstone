@@ -3,6 +3,8 @@ package org.capstone.backend.entity;
 import lombok.*;
 import jakarta.persistence.*;
 import org.capstone.backend.utils.enums.ChallengeMemberStatus;
+import org.capstone.backend.utils.enums.ChallengeRole;
+
 import java.time.LocalDateTime;
 
 @Data
@@ -38,6 +40,10 @@ public class ChallengeMember {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private ChallengeRole role;
 
     @PrePersist
     protected void onCreate() {

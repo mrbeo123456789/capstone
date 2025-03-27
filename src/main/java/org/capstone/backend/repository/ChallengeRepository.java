@@ -2,12 +2,18 @@ package org.capstone.backend.repository;
 
 import org.capstone.backend.dto.challenge.AdminChallengesResponse;
 import org.capstone.backend.dto.challenge.ChallengeResponse;
+import org.capstone.backend.dto.challenge.MyChallengeResponse;
 import org.capstone.backend.entity.Challenge;
+import org.capstone.backend.utils.enums.ChallengeRole;
+import org.capstone.backend.utils.enums.ChallengeStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
@@ -27,9 +33,24 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
            c.id, c.name, c.summary, c.picture
        )
        FROM Challenge c
-       WHERE c.status = 'APPROVED'
+       WHERE c.status = 'APPROVED' 
+       AND c.id NOT IN (
+           SELECT cm.challenge.id FROM ChallengeMember cm WHERE cm.member.id = :memberId
+       )
        ORDER BY c.updatedAt DESC
        """)
-    Page<ChallengeResponse> findApprovedChallenges(Pageable pageable);
+    Page<ChallengeResponse> findApprovedChallengesNotJoined(@Param("memberId") Long memberId, Pageable pageable);
 
+    @Query("""
+           SELECT new org.capstone.backend.dto.challenge.MyChallengeResponse(
+               c.id, c.name, c.picture, c.status, cm.role
+           )
+           FROM ChallengeMember cm
+           JOIN cm.challenge c
+           WHERE cm.member.id = :memberId
+           AND (:status IS NULL OR c.status = :status)
+           ORDER BY c.updatedAt DESC
+           """)
+    List<MyChallengeResponse> findChallengesByMemberAndStatus(@Param("memberId") Long memberId,
+                                                              @Param("status") ChallengeRole role);
 }

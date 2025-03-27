@@ -5,11 +5,13 @@ import jakarta.validation.constraints.NotNull;
 import org.capstone.backend.dto.challenge.ChallengeRequest;
 import org.capstone.backend.dto.challenge.ChallengeResponse;
 import org.capstone.backend.dto.challenge.InviteMemberRequest;
+import org.capstone.backend.dto.challenge.MyChallengeResponse;
 import org.capstone.backend.entity.Challenge;
 
 import org.capstone.backend.entity.ChallengeType;
 import org.capstone.backend.service.challenge.ChallengeService;
 import org.capstone.backend.service.challenge.InvitationService;
+import org.capstone.backend.utils.enums.ChallengeRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -71,6 +73,16 @@ public class ChallengeController {
         Page<ChallengeResponse> challenges = challengeService.getApprovedChallenges(page, size);
         return ResponseEntity.ok(challenges);
     }
+    @PutMapping("/{challengeId}/change-roles/{memberId}")
+    public ResponseEntity<?> toggleCoHost(@PathVariable Long challengeId, @PathVariable Long memberId) {
+        challengeService.toggleCoHost(challengeId, memberId);
+        return ResponseEntity.ok("Cập nhật quyền Co-Host thành công!");
+    }
 
+    @PostMapping("/my-challenges")
+    public ResponseEntity<List<MyChallengeResponse>> getMyChallenges(@RequestBody ChallengeRole request) {
+        List<MyChallengeResponse> challenges = challengeService.getChallengesByMember(request);
+        return ResponseEntity.ok(challenges);
+    }
 
 }

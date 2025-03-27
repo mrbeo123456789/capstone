@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -74,8 +75,9 @@ public class ChallengeServiceImpl implements ChallengeService {
     }
 
 
-    private ChallengeMember createChallengeMember(Challenge challenge, Member member, Long joinBy, ChallengeMemberStatus status) {
+    private ChallengeMember createChallengeMember(Challenge challenge, Member member, Long joinBy, ChallengeMemberStatus status,ChallengeRole role) {
         ChallengeMember challengeMember = new ChallengeMember();
+        challengeMember.setRole(role);
         challengeMember.setChallenge(challenge);
         challengeMember.setMember(member);
         challengeMember.setJoinBy(joinBy);
@@ -96,7 +98,7 @@ public class ChallengeServiceImpl implements ChallengeService {
             return "Challenge is full.";
         }
 
-        ChallengeMember challengeMember = createChallengeMember(challenge, member, member.getId(), ChallengeMemberStatus.JOINED);
+        ChallengeMember challengeMember = createChallengeMember(challenge, member, member.getId(), ChallengeMemberStatus.JOINED,ChallengeRole.MEMBER);
         challengeMemberRepository.save(challengeMember);
 
         return "Joined challenge successfully.";
@@ -117,7 +119,6 @@ public class ChallengeServiceImpl implements ChallengeService {
 
         String pictureUrl = null;
         String bannerUrl = null;
-
         try {
             if (picture != null && !picture.isEmpty()) {
                 pictureUrl = firebaseUpload.uploadFile(picture, "ChallengePicture");
@@ -150,6 +151,8 @@ public class ChallengeServiceImpl implements ChallengeService {
                 .picture(pictureUrl)
                 .banner(bannerUrl)
                 .build();
+        ChallengeMember challengeMember = createChallengeMember(challenge,member, member.getId(), ChallengeMemberStatus.JOINED,ChallengeRole.HOST);
+       challengeMemberRepository.save(challengeMember);
         challengeRepository.save(challenge);
 
         return "Challenge đã được tạo thành công.";
@@ -179,6 +182,28 @@ public class ChallengeServiceImpl implements ChallengeService {
 
         return "Challenge status updated successfully.";
     }
+    @Transactional
+    public void toggleCoHost(Long challengeId, Long memberId) {
+        Member host = getAuthenticatedMember();
+
+        // Kiểm tra xem người gọi API có phải Host không
+        ChallengeMember hostMember = challengeMemberRepository.findHostByChallengeId(challengeId)
+                .orElseThrow(() -> new RuntimeException("Host không tồn tại"));
+
+        if (!hostMember.getMember().getId().equals(host.getId())) {
+            throw new RuntimeException("Bạn không có quyền thay đổi role Co-Host");
+        }
+
+        // Kiểm tra xem thành viên có trong thử thách không
+        ChallengeMember targetMember = challengeMemberRepository.findByChallengeIdAndMemberId(challengeId, memberId)
+                .orElseThrow(() -> new RuntimeException("Thành viên không tham gia thử thách"));
+
+        // Nếu người này đang là Co-Host, hạ xuống Member, ngược lại nâng lên Co-Host
+        ChallengeRole newRole = targetMember.getRole() == ChallengeRole.CO_HOST ? ChallengeRole.MEMBER : ChallengeRole.CO_HOST;
+
+        challengeMemberRepository.updateRole(challengeId, memberId, newRole);
+    }
+
     @Override
     public Page<AdminChallengesResponse> getChallenges(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -186,11 +211,16 @@ public class ChallengeServiceImpl implements ChallengeService {
     }
     @Override
     public Page<ChallengeResponse> getApprovedChallenges(int page, int size) {
+        Member member = getAuthenticatedMember();
         Pageable pageable = PageRequest.of(page, size);
-        return challengeRepository.findApprovedChallenges(pageable);
+
+        return challengeRepository.findApprovedChallengesNotJoined(member.getId(), pageable);
     }
 
-
+    public List<MyChallengeResponse> getChallengesByMember(ChallengeRole role) {
+        Member member = getAuthenticatedMember();
+        return challengeRepository.findChallengesByMemberAndStatus(member.getId(), role);
+    }
 
 
 
