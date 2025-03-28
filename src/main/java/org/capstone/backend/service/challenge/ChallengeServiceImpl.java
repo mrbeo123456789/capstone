@@ -222,6 +222,9 @@ public class ChallengeServiceImpl implements ChallengeService {
         return challengeRepository.findChallengesByMemberAndStatus(member.getId(), role);
     }
 
-
+    public ChallengeDetailResponse getChallengeDetail(Long challengeId) {
+        Member member = getAuthenticatedMember();
+        return challengeRepository.findChallengeDetailByIdAndMemberId(challengeId, member.getId());
+    }
 
 }

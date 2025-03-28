@@ -1,6 +1,7 @@
 package org.capstone.backend.repository;
 
 import org.capstone.backend.dto.challenge.AdminChallengesResponse;
+import org.capstone.backend.dto.challenge.ChallengeDetailResponse;
 import org.capstone.backend.dto.challenge.ChallengeResponse;
 import org.capstone.backend.dto.challenge.MyChallengeResponse;
 import org.capstone.backend.entity.Challenge;
@@ -53,4 +54,22 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
            """)
     List<MyChallengeResponse> findChallengesByMemberAndStatus(@Param("memberId") Long memberId,
                                                               @Param("status") ChallengeRole role);
+    @Query("""
+    SELECT new org.capstone.backend.dto.challenge.ChallengeDetailResponse(
+        c.id, c.name, c.description, c.summary, c.startDate, c.endDate, 
+        c.picture, c.challengeType.name, 
+        CASE WHEN EXISTS (
+            SELECT 1 FROM ChallengeMember cm 
+            WHERE cm.challenge.id = c.id AND cm.member.id = :memberId
+        ) THEN true ELSE false END, 
+        (SELECT COUNT(cm) FROM ChallengeMember cm WHERE cm.challenge.id = c.id)
+    )
+    FROM Challenge c
+    WHERE c.id = :challengeId
+    """)
+    ChallengeDetailResponse findChallengeDetailByIdAndMemberId(
+            @Param("challengeId") Long challengeId,
+            @Param("memberId") Long memberId);
+
+
 }

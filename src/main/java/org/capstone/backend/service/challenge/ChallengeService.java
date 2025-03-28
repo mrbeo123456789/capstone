@@ -19,4 +19,5 @@ public interface ChallengeService {
     Page<ChallengeResponse> getApprovedChallenges(int page, int size);
     void toggleCoHost(Long challengeId, Long memberId);
     List<MyChallengeResponse> getChallengesByMember(ChallengeRole role);
+    ChallengeDetailResponse getChallengeDetail(Long challengeId);
 }
