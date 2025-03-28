@@ -152,9 +152,8 @@ public class ChallengeServiceImpl implements ChallengeService {
                 .banner(bannerUrl)
                 .build();
         ChallengeMember challengeMember = createChallengeMember(challenge,member, member.getId(), ChallengeMemberStatus.JOINED,ChallengeRole.HOST);
-       challengeMemberRepository.save(challengeMember);
         challengeRepository.save(challenge);
-
+        challengeMemberRepository.save(challengeMember);
         return "Challenge đã được tạo thành công.";
     }
 
@@ -219,7 +218,7 @@ public class ChallengeServiceImpl implements ChallengeService {
 
     public List<MyChallengeResponse> getChallengesByMember(ChallengeRole role) {
         Member member = getAuthenticatedMember();
-        return challengeRepository.findChallengesByMemberAndStatus(member.getId(), role);
+        return challengeRepository.findChallengesByMemberAndRole(member.getId(), role);
     }
 
     public ChallengeDetailResponse getChallengeDetail(Long challengeId) {

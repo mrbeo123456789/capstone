@@ -77,8 +77,10 @@ public class ChallengeController {
     }
 
     @PostMapping("/my-challenges")
-    public ResponseEntity<List<MyChallengeResponse>> getMyChallenges(@RequestBody ChallengeRole request) {
-        List<MyChallengeResponse> challenges = challengeService.getChallengesByMember(request);
+    public ResponseEntity<List<MyChallengeResponse>> getMyChallenges(@RequestBody String request) {
+        ChallengeRole role = ChallengeRole.valueOf(request.replace("\"", "").toUpperCase());
+
+        List<MyChallengeResponse> challenges = challengeService.getChallengesByMember(role);
         return ResponseEntity.ok(challenges);
     }
     @GetMapping("/{challengeId}/detail")

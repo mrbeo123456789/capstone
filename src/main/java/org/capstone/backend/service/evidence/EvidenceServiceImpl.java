@@ -35,7 +35,7 @@ public class EvidenceServiceImpl implements EvidenceService {
     private  final AccountRepository accountRepository;
     @Override
     public Evidence uploadAndSubmitEvidence(MultipartFile file, Long challengeId) throws IOException {
-        String fileUrl = firebaseStorageService.uploadFile(file);
+        String fileUrl = firebaseStorageService.uploadFile(file, "evidence");
         Long memberId = getAuthenticatedMember().getId();
         Challenge challenge = challengeRepository.findById(challengeId)
                 .orElseThrow(() -> new EntityNotFoundException("Challenge not found"));
