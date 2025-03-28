@@ -52,12 +52,12 @@ function ChallengeSwiper() {
                                     className={`playBtn ${active ? 'active' : ''}`}
                                     onClick={handleToggleVideo}
                                 >
-                  <span className="pause">
-                    <i className="bi bi-pause-fill"></i>
-                  </span>
-                                    <span className="play">
-                                        <i className="bi bi-play-fill"></i>
-                  </span>
+                              <span className="pause">
+                                <i className="bi bi-pause-fill"></i>
+                              </span>
+                                <span className="play">
+                                    <i className="bi bi-play-fill"></i>
+                                </span>
                                 </a>
                             </div>
                         </div>

@@ -7,13 +7,13 @@ import {FaWindowClose} from "react-icons/fa";
 import {IoCloudUploadOutline} from "react-icons/io5";
 import {challengeValidation} from "../../utils/validation.js";
 import {yupResolver} from "@hookform/resolvers/yup";
+import RichTextEditor from "../ui/RichTextEditor.jsx";
 
 const ChallengeForm = () => {
     const [createChallenge, { isLoading }] = useCreateChallengeMutation();
     const { data: challengeTypes, challengeTypeLoading, isError } = useGetChallengeTypesQuery();
 
     const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState("description");
     const [preview, setPreview] = useState("");
 
     const today = new Date();
@@ -104,6 +104,10 @@ const ChallengeForm = () => {
         setPreview(null);
         setValue("avatar", null,{ shouldValidate: true });
     }
+
+    const handleEditorChange = (content) => {
+        setValue("description", content, { shouldValidate: true });
+    };
 
     return (
         <div className="bg-white p-6 h-full w-full relative box-border rounded-xl border-4 border-transparent z-[1]">
@@ -200,6 +204,7 @@ const ChallengeForm = () => {
             <div className="rounded-lg w-full p-1">
                 <div className="flex flex-col rounded-lg p-6 h-full">
                     <h3 className="mb-4 text-xl font-bold ">Challenge Details</h3>
+
                     <form onSubmit={handleSubmit(onSubmit)} autoComplete="false">
                         <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                             {/* Start & End Date */}
@@ -273,36 +278,22 @@ const ChallengeForm = () => {
                             </div>
                         </div>
 
-                        {/* Tabs Section */}
-                        <div className="flex mt-4 border-b-2 border-gray-600">
-                            <button
-                                type="button"
-                                className={`flex-1 p-2 text-center font-bold ${activeTab === "description" ? "bg-blue-400 text-white" : "hover:bg-gray-600 text-gray-300"}`}
-                                onClick={() => setActiveTab("description")}>
-                                Description
-                            </button>
-                            <button
-                                type="button"
-                                className={`flex-1 p-2 text-center font-bold ${activeTab === "rules" ? "bg-blue-400 text-white" : "hover:bg-gray-600 text-gray-300"}`}
-                                onClick={() => setActiveTab("rules")}>
-                                Rules
-                            </button>
+                        {/* Challenge Type ID */}
+                        <div>
+                            <label className="text-sm font-medium ">Description</label>
+                            <RichTextEditor
+                                onChange={(content) => {
+                                    setValue("description", content, { shouldValidate: true });
+                                    trigger("description"); // Optional: trigger validation
+                                }}
+                            />
+                            <input type="hidden" {...register("description")} />
+                            <p className="text-red-600">{errors.description?.message}</p>
                         </div>
 
-                        {/* Description & Rules Section */}
-                        <div className="p-4 rounded-lg mt-4 h-24">
-                            {activeTab === "description" ? (
-                                <textarea {...register("description")} className="w-full p-2 rounded-lg"
-                                          placeholder="Enter challenge description..."/>
-                            ) : (
-                                <textarea {...register("rule")} className="w-full-700 p-2 rounded-lg"
-                                          placeholder="Enter challenge rules..."/>
-                            )}
-                        </div>
-                        <p className="text-red-600">{errors.description?.message}</p>
                         {/* Buttons */}
                         <div className="flex justify-center gap-6 mt-6">
-                            <button type="submit" className="bg-red-600 px-6 py-2 rounded text-white hover:bg-red-700"
+                        <button type="submit" className="bg-red-600 px-6 py-2 rounded text-white hover:bg-red-700"
                                     disabled={isLoading}>
                                 {isLoading ? "Creating..." : "Create"}
                             </button>

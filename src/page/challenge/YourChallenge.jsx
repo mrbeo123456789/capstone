@@ -1,8 +1,18 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import { useNavigate } from "react-router-dom";
+import {useGetMyChallengesMutation} from "../../service/challengeService.js";
 
 const YourChallenge = () => {
     const navigate = useNavigate();
+    const [activeTab, setActiveTab] = useState("host");
+
+    const [getMyChallenges, { data: joinedChallengeszzz = [], isLoading }] = useGetMyChallengesMutation();
+
+    useEffect(() => {
+        getMyChallenges(activeTab.toUpperCase());
+    }, [activeTab]);
+
+    console.log(joinedChallengeszzz);
 
     const invitations = [
         { id: 1, inviter: "User1", challenge: "Challenge B" },
@@ -17,8 +27,6 @@ const YourChallenge = () => {
         { id: 5, name: "Challenge N", status: "rating", value: 3.8, image: "https://hips.hearstapps.com/hmg-prod/images/gym-workout-66d087d56ef90.jpg?crop=0.628xw:1.00xh;0.100xw,0&resize=1200:*" },
         { id: 6, name: "Challenge M", status: "days", value: "15 days left", locked: true, image: "https://www.cnet.com/a/img/resize/c3a00bfb2ce9fbfa0c2285db0943e433b08250b9/hub/2019/12/18/98fd63aa-d21b-49db-b0d9-570be082efed/wellness-stock-16.jpg?auto=webp&fit=crop&height=675&width=1200" },
     ];
-
-    const [activeTab, setActiveTab] = React.useState("host");
 
     return (
         <div className="p-6 space-y-6 bg-white rounded-lg shadow-lg overflow-hidden">
@@ -91,7 +99,7 @@ const YourChallenge = () => {
             <div>
                 <h2 className="text-lg font-semibold mb-4">Joined challenges</h2>
                 <div className="flex gap-4 overflow-x-auto pb-2">
-                    {joinedChallenges.map((challenge) => (
+                    {joinedChallengeszzz.map((challenge) => (
                         <div
                             key={challenge.id}
                             onClick={() => navigate(`/challenges/joins/detail/${challenge.id}`)}
@@ -99,7 +107,7 @@ const YourChallenge = () => {
                         >
                             <div className="relative w-full h-24 mb-2">
                                 <img
-                                    src={challenge.image}
+                                    src={challenge?.picture}
                                     alt={challenge.name}
                                     className="w-full h-full object-cover rounded"
                                 />
