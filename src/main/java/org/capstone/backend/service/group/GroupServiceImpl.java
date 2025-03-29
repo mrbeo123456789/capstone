@@ -2,30 +2,20 @@ package org.capstone.backend.service.group;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.capstone.backend.dto.group.*;
-import org.capstone.backend.entity.Account;
-import org.capstone.backend.entity.GroupMember;
-import org.capstone.backend.entity.Groups;
-
-import org.capstone.backend.dto.group.GroupRequest;
-import org.capstone.backend.entity.Member;
-import org.capstone.backend.repository.AccountRepository;
-import org.capstone.backend.repository.GroupMemberRepository;
-import org.capstone.backend.repository.GroupRepository;
-import org.capstone.backend.repository.MemberRepository;
-import org.capstone.backend.service.group.GroupService;
+import org.capstone.backend.entity.*;
+import org.capstone.backend.repository.*;
+import org.capstone.backend.service.auth.AuthService;
 import org.capstone.backend.utils.enums.GroupMemberStatus;
+import org.capstone.backend.utils.upload.FirebaseUpload;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.capstone.backend.utils.upload.FirebaseUpload;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,36 +27,41 @@ public class GroupServiceImpl implements GroupService {
     private final GroupMemberRepository groupMemberRepository;
     private final AccountRepository accountRepository;
     private final FirebaseUpload firebaseUpload;
+    private final AuthService authService;
 
     public GroupServiceImpl(GroupRepository groupRepository,
                             MemberRepository memberRepository,
                             GroupMemberRepository groupMemberRepository,
                             AccountRepository accountRepository,
-                            FirebaseUpload firebaseUpload) {
+                            FirebaseUpload firebaseUpload,
+                            AuthService authService) {
         this.groupRepository = groupRepository;
         this.memberRepository = memberRepository;
         this.groupMemberRepository = groupMemberRepository;
         this.accountRepository = accountRepository;
         this.firebaseUpload = firebaseUpload;
+        this.authService = authService;
     }
 
+    // ========================== GET ==========================
+
     @Override
-    public List<GroupResponse> getGroupsByMemberId(Long memberId) {
-        List<Groups> groups = groupRepository.findByMemberId(memberId);
-        return groups.stream()
-                .map(group -> convertToDTO(group, memberId))
+    public List<GroupResponse> getGroupsByMemberId() {
+        Long memberId = authService.getMemberIdFromAuthentication();
+        return groupRepository.findByMemberId(memberId).stream()
+                .map(group -> convertToDTO(group, memberId, false))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public GroupResponse getGroupsDetail(Long groupId, Long memberId) {
-        return groupRepository.findById(groupId)
-                .map(group -> convertToGroupDetail(group, memberId))
+    public GroupResponse getGroupsDetail(Long groupId) {
+        Long memberId = authService.getMemberIdFromAuthentication();
+        Groups group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new EntityNotFoundException("Group not found with id " + groupId));
+        return convertToDTO(group, memberId, true);
     }
 
-
-    private GroupResponse convertToDTO(Groups group, Long currentMemberId) {
+    private GroupResponse convertToDTO(Groups group, Long memberId, boolean includeMembers) {
         GroupResponse dto = new GroupResponse();
         dto.setId(group.getId());
         dto.setName(group.getName());
@@ -77,301 +72,197 @@ public class GroupServiceImpl implements GroupService {
         dto.setUpdatedAt(group.getUpdatedAt());
         dto.setUpdatedBy(group.getUpdatedBy());
 
-        // Member list
-        List<GroupMemberResponse> memberDTOs = group.getMembers().stream()
-                .map(this::convertToMemberDTO)
-                .collect(Collectors.toList());
-//        dto.setMembers(memberDTOs);
-        dto.setCurrentParticipants(memberDTOs.size());
-
-        // 👉 Lấy role của member đang gọi API
-        GroupMember matchedMember = group.getMembers().stream()
-                .filter(m -> m.getMember().getId().equals(currentMemberId))
-                .findFirst()
-                .orElse(null);
-
-        if (matchedMember != null) {
-            dto.setCurrentMemberRole(matchedMember.getRole());
+        if (includeMembers) {
+            List<GroupMemberResponse> memberDTOs = group.getMembers().stream()
+                    .map(this::convertToMemberDTO)
+                    .collect(Collectors.toList());
+            dto.setMembers(memberDTOs);
         }
+
+        dto.setCurrentParticipants(group.getMembers().size());
+
+        group.getMembers().stream()
+                .filter(m -> m.getMember().getId().equals(memberId))
+                .findFirst()
+                .ifPresent(matched -> dto.setCurrentMemberRole(matched.getRole()));
 
         return dto;
     }
-
-    private GroupResponse convertToGroupDetail(Groups group, Long currentMemberId) {
-        GroupResponse dto = new GroupResponse();
-        dto.setId(group.getId());
-        dto.setName(group.getName());
-        dto.setMaxParticipants(group.getMaxParticipants());
-        dto.setPicture(group.getPicture());
-        dto.setCreatedAt(group.getCreatedAt());
-        dto.setCreatedBy(group.getCreatedBy());
-        dto.setUpdatedAt(group.getUpdatedAt());
-        dto.setUpdatedBy(group.getUpdatedBy());
-
-        // Member list
-        List<GroupMemberResponse> memberDTOs = group.getMembers().stream()
-                .map(this::convertToMemberDTO)
-                .collect(Collectors.toList());
-        dto.setMembers(memberDTOs);
-
-        // 👉 Lấy role của member đang gọi API
-        GroupMember matchedMember = group.getMembers().stream()
-                .filter(m -> m.getMember().getId().equals(currentMemberId))
-                .findFirst()
-                .orElse(null);
-
-        if (matchedMember != null) {
-            dto.setCurrentMemberRole(matchedMember.getRole());
-        }
-        return dto;
-    }
-
 
     private GroupMemberResponse convertToMemberDTO(GroupMember groupMember) {
-        GroupMemberResponse dto = new GroupMemberResponse();
-        dto.setId(groupMember.getId());
-        dto.setMemberId(groupMember.getMember().getId()); // Return only Member ID
-        Optional<Member> member = memberRepository.findById(dto.getMemberId());
-        dto.setImageUrl(member.map(Member::getAvatar).orElse("https://example.com/default-avatar.png"));
-        dto.setMemberName(member.map(Member::getFullName).orElse("User name not found"));
-        dto.setJoinDate(groupMember.getMember().getCreatedAt());
-        dto.setRole(groupMember.getRole());
-        dto.setStatus(groupMember.getStatus());
-        return dto;
+        Member member = memberRepository.findById(groupMember.getMember().getId())
+                .orElse(null);
+
+        return GroupMemberResponse.builder()
+                .id(groupMember.getId())
+                .memberId(groupMember.getMember().getId())
+                .imageUrl(member != null ? member.getAvatar() : "https://example.com/default-avatar.png")
+                .memberName(member != null ? member.getFullName() : "User name not found")
+                .joinDate(groupMember.getMember().getCreatedAt())
+                .role(groupMember.getRole())
+                .status(groupMember.getStatus())
+                .build();
     }
 
+    @Override
+    public List<GroupInvitationDTO> getPendingInvitations() {
+        Member member = memberRepository.findById(authService.getMemberIdFromAuthentication())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found"));
+
+        return groupMemberRepository.findByMemberAndStatus(member, GroupMemberStatus.PENDING).stream()
+                .map(invite -> GroupInvitationDTO.builder()
+                        .groupId(invite.getGroup().getId())
+                        .name(member.getFullName())
+                        .img(invite.getGroup().getPicture())
+                        .groupName(invite.getGroup().getName())
+                        .invitedBy(invite.getCreatedBy().toString())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    // ========================== CREATE ==========================
 
     @Override
     @Transactional
-    public Groups createGroup(GroupRequest request, MultipartFile picture, String username) {
-        Account account = accountRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
-        Long AccountId = account.getId();
+    public Groups createGroup(GroupRequest request, MultipartFile picture) {
+        Long memberId = authService.getMemberIdFromAuthentication();
+        String pictureUrl = uploadPicture(picture);
 
-        String pictureUrl = null;
-        try {
-            if (picture != null && !picture.isEmpty()) {
-                pictureUrl = firebaseUpload.uploadFile(picture);
-            }
-        } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error uploading files: " + e.getMessage());
-        }
-
-        // 🔥 Step 1: Create the Group
-        Groups group = Groups.builder()
+        Groups group = groupRepository.save(Groups.builder()
                 .name(request.getName())
                 .maxParticipants(request.getMaxParticipants())
-                .createdBy(AccountId)
                 .picture(pictureUrl)
-                .build();
+                .createdBy(memberId)
+                .build());
 
-        Groups savedGroup = groupRepository.save(group); // Save group first
-
-        // 🔥 Step 2: Find the Member who is creating the group
-        Member member = memberRepository.findById(AccountId)
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("Member not found"));
 
-        // 🔥 Step 3: Add the creator as a member in GroupMember table
-        GroupMember groupMember = GroupMember.builder()
-                .group(savedGroup)
+        groupMemberRepository.save(GroupMember.builder()
+                .group(group)
                 .member(member)
-                .role("OWNER") // You can change role as needed
-                .status(GroupMemberStatus.ACTIVE) // Default status
-                .createdBy(AccountId)
-                .build();
+                .role("OWNER")
+                .status(GroupMemberStatus.ACTIVE)
+                .createdBy(memberId)
+                .build());
 
-        groupMemberRepository.save(groupMember); // Save GroupMember entry
-
-        return savedGroup;
+        return group;
     }
 
+    private String uploadPicture(MultipartFile picture) {
+        try {
+            return (picture != null && !picture.isEmpty()) ? firebaseUpload.uploadFile(picture) : null;
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Upload failed: " + e.getMessage());
+        }
+    }
+
+    // ========================== UPDATE ==========================
 
     @Override
-    public Groups updateGroup(Long groupId, GroupRequest request, Long updatedBy) {
+    public Groups updateGroup(Long groupId, GroupRequest request) {
         Groups group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new RuntimeException("Group not found"));
 
         group.setName(request.getName());
         group.setMaxParticipants(request.getMaxParticipants());
-        group.setUpdatedBy(updatedBy);
-
+        group.setUpdatedBy(authService.getMemberIdFromAuthentication());
         return groupRepository.save(group);
     }
 
+    // ========================== ACTION ==========================
+
     @Override
-    public void kickMember(Long groupId, Long memberId, String username) {
-        // 🔥 Lấy Group cần kick thành viên
-        Groups group = groupRepository.findById(groupId).orElse(null);
+    public void kickMember(Long groupId, Long memberId) {
+        Groups group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Group not found"));
 
-        if (group == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Group not found");
-        }
-
-        // 🔥 Lấy tài khoản yêu cầu kick (phải là owner của group)
-        Account requesterAccount = accountRepository.findByUsername(username).orElse(null);
-
-        if (requesterAccount == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found");
-        }
-
-        if (!group.getCreatedBy().equals(requesterAccount.getId())) {
+        if (!Objects.equals(group.getCreatedBy(), authService.getMemberIdFromAuthentication())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to kick members from this group");
         }
 
-        // 🔥 Lấy ra thành viên cần kick
-        Optional<GroupMember> optionalMember = groupMemberRepository.findByGroupIdAndMemberIdAndStatus(groupId, memberId, GroupMemberStatus.ACTIVE);
+        GroupMember memberToKick = groupMemberRepository.findByGroupIdAndMemberIdAndStatus(groupId, memberId, GroupMemberStatus.ACTIVE)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found in this group"));
 
-        if (optionalMember.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found in this group");
-        }
-
-        GroupMember memberToKick = optionalMember.get();
-        memberToKick.setStatus(GroupMemberStatus.LEFT);
+        memberToKick.setStatus(GroupMemberStatus.BANNED);
         groupMemberRepository.save(memberToKick);
     }
 
     @Override
-    public void leaveGroup(Long groupId, String username) {
-        // 🔥 Lấy tài khoản hiện tại
-        Account account = accountRepository.findByUsername(username).orElse(null);
+    public void leaveGroup(Long groupId) {
+        GroupMember groupMember = groupMemberRepository.findByGroupIdAndMemberIdAndStatus(
+                        groupId,
+                        authService.getMemberIdFromAuthentication(),
+                        GroupMemberStatus.ACTIVE)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "You are not a member of this group"));
 
-        if (account == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found");
-        }
-
-        // 🔥 Tìm thành viên tương ứng với tài khoản
-        Member member = memberRepository.findByAccount(account).orElse(null);
-
-        if (member == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found");
-        }
-
-        // 🔥 Lấy ra mối quan hệ thành viên và nhóm
-        Optional<GroupMember> optionalGroupMember = groupMemberRepository.findByGroupIdAndMemberIdAndStatus(groupId, member.getId(), GroupMemberStatus.ACTIVE);
-
-        if (optionalGroupMember.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "You are not a member of this group");
-        }
-
-        GroupMember groupMember = optionalGroupMember.get();
         groupMember.setStatus(GroupMemberStatus.LEFT);
         groupMemberRepository.save(groupMember);
     }
 
+    // ========================== INVITATION ==========================
 
-
+    @Override
     public void inviteMembers(GroupInviteRequest request) {
-        // Lấy thông tin nhóm
         Groups group = groupRepository.findById(request.getGroupId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nhóm không tồn tại"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Group not found"));
 
-        // Lấy danh sách thành viên từ ID
         List<Member> membersToInvite = memberRepository.findAllById(request.getMemberIds());
-
         if (membersToInvite.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Không tìm thấy thành viên nào với ID đã cung cấp");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No members found with provided IDs");
         }
 
-        List<GroupMember> invitations = new ArrayList<>();
-        for (Member member : membersToInvite) {
-            // Kiểm tra xem thành viên đã ở trong nhóm chưa
-            boolean alreadyMember = groupMemberRepository.existsByGroupAndMember(group, member);
-            if (alreadyMember) {
-                continue;
-            }
-
-            GroupMember invitation = GroupMember.builder()
-                    .group(group)
-                    .member(member)
-                    .role("MEMBER") // Mặc định là MEMBER khi được mời
-                    .status(GroupMemberStatus.PENDING) // Đánh dấu trạng thái là PENDING
-                    .createdBy(group.getCreatedBy()) // Người gửi lời mời
-                    .build();
-            invitations.add(invitation);
-        }
+        List<GroupMember> invitations = membersToInvite.stream()
+                .filter(member -> !groupMemberRepository.existsByGroupAndMember(group, member))
+                .map(member -> GroupMember.builder()
+                        .group(group)
+                        .member(member)
+                        .role("MEMBER")
+                        .status(GroupMemberStatus.PENDING)
+                        .createdBy(group.getCreatedBy())
+                        .build())
+                .collect(Collectors.toList());
 
         if (!invitations.isEmpty()) {
             groupMemberRepository.saveAll(invitations);
         }
     }
 
-    /**
-     * Thành viên phản hồi lời mời (Chấp nhận hoặc từ chối)
-     */
-    public void respondToInvitation(Long groupId, String username, GroupMemberStatus status) {
-        Account account = accountRepository.findByUsername(username).orElse(null);
+    @Override
+    public void respondToInvitation(Long groupId, GroupMemberStatus status) {
+        Member member = memberRepository.findById(authService.getMemberIdFromAuthentication())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found"));
 
-        if (account == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found");
-        }
-
-        Member member = memberRepository.findByAccount(account).orElse(null);
         Groups group = groupRepository.findById(groupId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nhóm không tồn tại"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Group not found"));
 
         GroupMember groupMember = groupMemberRepository.findByGroupAndMember(group, member)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lời mời không tồn tại"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invitation not found"));
 
-        // Cập nhật trạng thái lời mời
-        if(status == GroupMemberStatus.ACCEPTED) {
-            status = GroupMemberStatus.ACTIVE;
-        }
-        groupMember.setStatus(status);
+        groupMember.setStatus(status == GroupMemberStatus.ACCEPTED ? GroupMemberStatus.ACTIVE : status);
         groupMemberRepository.save(groupMember);
     }
 
-    public List<GroupInvitationDTO> getPendingInvitations(String username) {
-        Account account = accountRepository.findByUsername(username).orElse(null);
+    // ========================== SEARCH ==========================
 
-        if (account == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found");
-        }
+    @Override
+    public List<MemberSearchResponse> searchMembers(MemberSearchRequest request) {
+        Pageable pageable = PageRequest.of(0, 5);
 
-        // 🔥 Tìm thành viên tương ứng với tài khoản
-        Member member = memberRepository.findByAccount(account).orElse(null);
-        List<GroupMember> invitations = groupMemberRepository.findByMemberAndStatus(member, GroupMemberStatus.PENDING);
-
-        return invitations.stream().map(invite -> {
-            GroupInvitationDTO dto = new GroupInvitationDTO();
-            dto.setGroupId(invite.getGroup().getId());
-            dto.setName(member.getFullName());
-            dto.setImg(invite.getGroup().getPicture());
-            dto.setGroupName(invite.getGroup().getName());
-            dto.setInvitedBy(invite.getCreatedBy().toString()); // Chuyển đổi ID sang String
-            return dto;
-        }).collect(Collectors.toList());
-    }
-    public List<MemberSearchResponse> searchMembers(MemberSearchRequest request, String username) {
-        Pageable pageable = PageRequest.of(0, 5); // Giới hạn 5 kết quả
-
-        Account account = accountRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
-
-        Member currentMember = memberRepository.findByAccount(account)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found"));
-
-        Long currentMemberId = currentMember.getId();
 
         List<Member> members = memberRepository.searchByEmailOrFullName(request.getKeyword(), pageable);
-
-        // Lọc bỏ người đang đăng nhập
-        members.removeIf(member -> member.getId().equals(currentMemberId));
+        members.removeIf(m -> m.getId().equals(authService.getMemberIdFromAuthentication()));
 
         if (request.getGroupId() != null) {
             Groups group = groupRepository.findById(request.getGroupId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nhóm không tồn tại"));
-
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Group not found"));
             Set<Long> groupMemberIds = new HashSet<>(groupMemberRepository.findMemberIdsByGroup(group));
-
-            // Lọc bỏ người đã trong nhóm
-            members.removeIf(member -> groupMemberIds.contains(member.getId()));
+            members.removeIf(m -> groupMemberIds.contains(m.getId()));
         }
 
-        // Chỉ lấy tối đa 5 kết quả
         return members.stream()
                 .limit(5)
                 .map(m -> new MemberSearchResponse(m.getId(), m.getAccount().getEmail(), m.getAvatar(), m.getFullName()))
                 .toList();
     }
-
 }

@@ -116,8 +116,8 @@ public class FixedGmailService {
             MimeMessage emailContent = createEmail(to, FIXED_SENDER, subject, bodyText);
             Message message = createMessageWithEmail(emailContent);
 
-            message = service.users().messages().send("me", message).execute();
-            System.out.println("Email sent successfully. Message ID: " + message.getId());
+             service.users().messages().send("me", message).execute();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -127,8 +127,5 @@ public class FixedGmailService {
         sendEmail("example@example.com", "Test Email", "This is a test email sent using the FixedGmailService.");
     }
 
-    public static void main(String[] args) {
-        FixedGmailService service = new FixedGmailService();
-        service.sendTestEmail();
-    }
+
 }

@@ -2,14 +2,10 @@ package org.capstone.backend.controller.group;
 
 import org.capstone.backend.dto.group.*;
 import org.capstone.backend.entity.Groups;
-import org.capstone.backend.service.auth.AuthService;
 import org.capstone.backend.service.group.GroupService;
-import org.springframework.http.HttpStatus;
-import org.capstone.backend.service.member.MemberService;
 import org.capstone.backend.utils.enums.GroupMemberStatus;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,111 +18,86 @@ import java.util.Map;
 public class GroupController {
 
     private final GroupService groupService;
-    private final AuthService authService;
 
-    public GroupController(GroupService groupService,
-                           AuthService authService) {
+    public GroupController(GroupService groupService) {
         this.groupService = groupService;
-        this.authService = authService;
     }
 
+    // ✅ Lấy danh sách nhóm của thành viên hiện tại
     @GetMapping("/groupslist")
     public ResponseEntity<List<GroupResponse>> getMyGroupList() {
-        Long memberId = getAuthenticatedMemberId();
-        return ResponseEntity.ok(groupService.getGroupsByMemberId(memberId));
+        return ResponseEntity.ok(groupService.getGroupsByMemberId());
     }
 
+    // ✅ Lấy chi tiết một nhóm
     @GetMapping("/detail/{groupId}")
-    public ResponseEntity<?> getGroupDetail(@PathVariable Long groupId) {
-        Long memberId = getAuthenticatedMemberId();
-        return ResponseEntity.ok(groupService.getGroupsDetail(groupId, memberId));
+    public ResponseEntity<GroupResponse> getGroupDetail(@PathVariable Long groupId) {
+        return ResponseEntity.ok(groupService.getGroupsDetail(groupId));
     }
 
+    // ✅ Tạo nhóm mới
     @PostMapping(value = "/create", consumes = {"multipart/form-data"})
     public ResponseEntity<?> createGroup(
             @Validated @ModelAttribute("data") GroupRequest request,
             @RequestParam(value = "picture", required = false) MultipartFile picture
     ) {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication == null || !authentication.isAuthenticated() ||
-                    "anonymousUser".equals(authentication.getPrincipal())) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body("User is not authenticated");
-            }
-            String username = authentication.getName();
-            return ResponseEntity.ok(groupService.createGroup(request, picture,username));
+            return ResponseEntity.ok(groupService.createGroup(request, picture));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error creating Group: " + e.getMessage());
+                    .body("Error creating group: " + e.getMessage());
         }
     }
 
+    // ✅ Chỉnh sửa nhóm
     @PutMapping("/edit/{groupId}")
     public ResponseEntity<Groups> editGroup(@PathVariable Long groupId, @RequestBody GroupRequest request) {
-        Long memberId = getAuthenticatedMemberId();
-        return ResponseEntity.ok(groupService.updateGroup(groupId, request, memberId));
+        return ResponseEntity.ok(groupService.updateGroup(groupId, request));
     }
+
+    // ✅ Kick thành viên khỏi nhóm
     @PostMapping("/{groupId}/kick")
     public ResponseEntity<String> kickMember(
             @PathVariable Long groupId,
             @RequestBody Map<String, Long> request
     ) {
         Long memberId = request.get("memberId");
-        String username = getUsernameFromSecurityContext();
-
-        groupService.kickMember(groupId, memberId, username);
-        return ResponseEntity.ok("Member has been kicked from the group.");
+        groupService.kickMember(groupId, memberId);
+        return ResponseEntity.ok("Thành viên đã bị loại khỏi nhóm.");
     }
 
-    // API để thành viên tự rời khỏi nhóm
+    // ✅ Thành viên tự rời khỏi nhóm
     @PostMapping("/{groupId}/leave")
     public ResponseEntity<String> leaveGroup(@PathVariable Long groupId) {
-        String username = getUsernameFromSecurityContext();
-
-        groupService.leaveGroup(groupId, username);
-        return ResponseEntity.ok("You have left the group.");
-    }
-    private String getUsernameFromSecurityContext() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated() ||
-                "anonymousUser".equals(authentication.getPrincipal())) {
-            throw new RuntimeException("User is not authenticated");
-        }
-
-        return authentication.getName();
-    }
-    private Long getAuthenticatedMemberId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authService.getMemberIdFromAuthentication(authentication);
+        groupService.leaveGroup(groupId); // không cần username
+        return ResponseEntity.ok("Bạn đã rời khỏi nhóm.");
     }
 
+    // ✅ Mời thành viên vào nhóm
     @PostMapping("/invite")
     public ResponseEntity<String> inviteMembers(@RequestBody GroupInviteRequest request) {
         groupService.inviteMembers(request);
-        return ResponseEntity.ok("Lời mời đã được gửi đến các thành viên!");
+        return ResponseEntity.ok("Lời mời đã được gửi đến các thành viên.");
     }
 
+    // ✅ Tìm kiếm thành viên
     @PostMapping("/search")
     public ResponseEntity<List<MemberSearchResponse>> searchMembers(@RequestBody MemberSearchRequest request) {
-        String username = getUsernameFromSecurityContext();
-        return ResponseEntity.ok(groupService.searchMembers(request,username));
+        // Vẫn cần username vì hàm có tham số username
+        return ResponseEntity.ok(groupService.searchMembers(request));
     }
 
-
+    // ✅ Phản hồi lời mời
     @PostMapping("/respond")
     public ResponseEntity<String> respondToInvitation(@RequestBody GroupMemberRequest dto) {
-        String username = getUsernameFromSecurityContext();
-        groupService.respondToInvitation(dto.getGroupId(), username, dto.getStatus());
+        groupService.respondToInvitation(dto.getGroupId(), dto.getStatus());
         return ResponseEntity.ok(dto.getStatus() == GroupMemberStatus.ACCEPTED ?
-                "Bạn đã chấp nhận lời mời" : "Bạn đã từ chối lời mời");
+                "Bạn đã chấp nhận lời mời." : "Bạn đã từ chối lời mời.");
     }
 
+    // ✅ Xem các lời mời đang chờ xử lý
     @GetMapping("/invitations")
     public ResponseEntity<List<GroupInvitationDTO>> getPendingInvitations() {
-        String username = getUsernameFromSecurityContext();
-        List<GroupInvitationDTO> invitations = groupService.getPendingInvitations(username);
-        return ResponseEntity.ok(invitations);
+        return ResponseEntity.ok(groupService.getPendingInvitations());
     }
 }
