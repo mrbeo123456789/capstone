@@ -1,6 +1,6 @@
 import { useState } from "react";
 import google_icon from "../../assets/google-icon.png";
-import background from "../../assets/rotated_login.png";
+import background from "../../assets/login2.png";
 import { useNavigate } from "react-router-dom";
 import { useLoginMutation } from "../../service/authService.js";
 
@@ -15,7 +15,7 @@ export default function Login() {
     const handleForgotPassword = () => {
         navigate('/forgot-password'); // Chuyển hướng đến trang forgotpassword
     };
-    const handlRegister = () => {
+    const handleRegister = () => {
         navigate('/register'); // Chuyển hướng đến trang forgotpassword
     };
     const handleLogin = async (e) => {
@@ -133,7 +133,7 @@ export default function Login() {
                         <div className="text-center text-gray-400 text-sm">
                             <p>
                                 Bạn mới sử dụng GoBeyond?{" "}
-                                <a onClick={handlRegister} className="text-white hover:underline">
+                                <a onClick={handleRegister} className="text-white hover:underline">
                                     Đăng ký ngay
                                 </a>
                             </p>

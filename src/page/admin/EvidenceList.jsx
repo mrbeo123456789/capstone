@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Search, CheckCircle, Clock, Archive } from 'lucide-react';
-import Navbar from "../navbar/AdminNavbar.jsx";
+import { Search, CheckCircle, Clock, Archive, ChevronLeft, ChevronRight, Eye } from 'lucide-react';
+import Sidebar from "../navbar/AdminNavbar.jsx";
 
 const EvidenceList = () => {
     const [evidenceItems, setEvidenceItems] = useState([]);
@@ -9,6 +9,7 @@ const EvidenceList = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
     const statuses = ['all', 'active', 'pending', 'archived'];
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
     // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
@@ -70,11 +71,11 @@ const EvidenceList = () => {
     const getStatusColor = (status) => {
         switch (status) {
             case 'active':
-                return 'text-green-600 bg-green-100 px-2 py-1 rounded-full';
+                return 'flex items-center text-green-500';
             case 'pending':
-                return 'text-yellow-600 bg-yellow-100 px-2 py-1 rounded-full';
+                return 'flex items-center text-yellow-500';
             case 'archived':
-                return 'text-gray-600 bg-gray-100 px-2 py-1 rounded-full';
+                return 'flex items-center text-gray-500';
             default:
                 return '';
         }
@@ -89,168 +90,151 @@ const EvidenceList = () => {
     const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
 
     // Change page
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
     const nextPage = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
     const prevPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));
 
     return (
-        <div className={"bg-red-50"}> <Navbar/>
-        <div className="container mx-auto p-4 bg-red-50">
-
-            <h1 className="text-2xl font-bold text-orange-600 mb-6">Evidence List</h1>
-
-            <div className="bg-white rounded-lg shadow p-4 mb-6 flex justify-between">
-                <div className="relative max-w-md">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18}/>
-                    <input
-                        type="text"
-                        placeholder="Search evidence..."
-                        className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
+        <div className="flex flex-col min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50">
+            <div className="flex flex-1 overflow-hidden relative">
+                <div className={`transition-all duration-300 ${sidebarCollapsed ? 'w-16' : 'w-64'} flex-shrink-0`}>
+                    <Sidebar sidebarCollapsed={sidebarCollapsed} setSidebarCollapsed={setSidebarCollapsed} />
                 </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow overflow-hidden">
-                {loading ? (
-                    <div className="flex justify-center items-center h-64">
-                        <div
-                            className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
-                    </div>
-                ) : (
-                    <>
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-orange-100">
-                            <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider cursor-pointer">Evidence
-                                    Name
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider cursor-pointer">Type</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider cursor-pointer">Challenge</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider cursor-pointer">Date
-                                    Added
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                                    Status
-                                    <select
-                                        className="ml-2 text-xs border-none bg-transparent focus:ring-0 focus:outline-none"
-                                        value={statusFilter}
-                                        onChange={(e) => setStatusFilter(e.target.value)}
-                                    >
-                                        {statuses.map(status => (
-                                            <option key={status} value={status}>{status.charAt(0).toUpperCase() + status.slice(1)}</option>
-                                        ))}
-                                    </select>
-                                </th>
-                            </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                            {currentItems.map((item) => (
-                                <tr key={item.id} className="hover:bg-orange-50">
-                                    <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{item.name}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">{item.type}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.challenge}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.dateAdded}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                    <span className={getStatusColor(item.status)}>
-                                        {getStatusIcon(item.status)}
-                                        {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
-                                    </span>
-                                    </td>
-                                </tr>
-                            ))}
-                            </tbody>
-                        </table>
-
-                        {/* Pagination - Matching the provided style */}
-                        <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3">
-                            <div className="flex flex-1 justify-between sm:hidden">
-                                <button
-                                    onClick={prevPage}
-                                    disabled={currentPage === 1}
-                                    className={`relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium ${
-                                        currentPage === 1 ? 'text-gray-300' : 'text-gray-700 hover:bg-gray-50'
-                                    }`}
-                                >
-                                    Previous
-                                </button>
-                                <button
-                                    onClick={nextPage}
-                                    disabled={currentPage === totalPages || totalPages === 0}
-                                    className={`relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium ${
-                                        currentPage === totalPages || totalPages === 0 ? 'text-gray-300' : 'text-gray-700 hover:bg-gray-50'
-                                    }`}
-                                >
-                                    Next
-                                </button>
-                            </div>
-                            <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-                                <div>
-                                    <p className="text-sm text-gray-700">
-                                        Showing <span className="font-medium">{indexOfFirstItem + 1}</span> to{' '}
-                                        <span className="font-medium">
-                                        {Math.min(indexOfLastItem, filteredItems.length)}
-                                    </span>{' '}
-                                        of <span className="font-medium">{filteredItems.length}</span> results
-                                    </p>
+                <div className="flex-1 flex flex-col overflow-hidden">
+                    <div className="flex-1 overflow-auto p-4">
+                        <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-orange-100 h-full flex flex-col">
+                            <div className="p-4 border-b border-orange-100 bg-gradient-to-r from-orange-50 to-yellow-50">
+                                <h1 className="text-2xl font-bold text-orange-600 mb-4">Quản lý bằng chứng</h1>
+                                <div className="flex flex-col md:flex-row gap-3 justify-between">
+                                    <div className="relative flex-1">
+                                        <input
+                                            type="text"
+                                            placeholder="Tìm kiếm bằng chứng..."
+                                            className="w-full pl-10 pr-4 py-3 border border-orange-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white"
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                        />
+                                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-orange-400">
+                                            <Search size={18} />
+                                        </div>
+                                    </div>
+                                    <div className="md:w-48">
+                                        <select
+                                            className="w-full p-3 border border-orange-200 rounded-lg bg-white focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-700"
+                                            value={statusFilter}
+                                            onChange={(e) => setStatusFilter(e.target.value)}
+                                        >
+                                            <option value="all">Tất cả trạng thái</option>
+                                            <option value="active">Đang hoạt động</option>
+                                            <option value="pending">Đang chờ xử lý</option>
+                                            <option value="archived">Đã lưu trữ</option>
+                                        </select>
+                                    </div>
                                 </div>
-                                <div>
-                                    <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-                                        <button
-                                            onClick={prevPage}
-                                            disabled={currentPage === 1}
-                                            className={`relative inline-flex items-center rounded-l-md px-2 py-2 ${
-                                                currentPage === 1 ? 'text-gray-300' : 'text-gray-500 hover:bg-gray-50'
-                                            }`}
-                                        >
-                                            <span className="sr-only">Previous</span>
-                                            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                                <path fillRule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clipRule="evenodd" />
-                                            </svg>
-                                        </button>
-
-                                        {/* Page numbers */}
-                                        {[...Array(totalPages).keys()].map(number => (
-                                            <button
-                                                key={number + 1}
-                                                onClick={() => paginate(number + 1)}
-                                                className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
-                                                    currentPage === number + 1
-                                                        ? 'bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 text-white focus:z-20'
-                                                        : 'text-gray-900 hover:bg-gray-50 focus:z-20'
-                                                }`}
-                                            >
-                                                {number + 1}
-                                            </button>
-                                        ))}
-
-                                        <button
-                                            onClick={nextPage}
-                                            disabled={currentPage === totalPages || totalPages === 0}
-                                            className={`relative inline-flex items-center rounded-r-md px-2 py-2 ${
-                                                currentPage === totalPages || totalPages === 0
-                                                    ? 'text-gray-300'
-                                                    : 'text-gray-500 hover:bg-gray-50'
-                                            }`}
-                                        >
-                                            <span className="sr-only">Next</span>
-                                            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                                <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
-                                            </svg>
-                                        </button>
-                                    </nav>
+                            </div>
+                            <div className="flex-1 overflow-auto">
+                                {loading ? (
+                                    <div className="flex justify-center items-center h-64">
+                                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+                                    </div>
+                                ) : (
+                                    <table className="w-full">
+                                        <thead className="bg-gradient-to-r from-orange-100 to-yellow-100 sticky top-0 z-10">
+                                        <tr>
+                                            <th className="p-4 text-left font-bold text-orange-800">Tên bằng chứng</th>
+                                            <th className="p-4 text-left font-bold text-orange-800 hidden md:table-cell">Loại</th>
+                                            <th className="p-4 text-left font-bold text-orange-800">Thử thách</th>
+                                            <th className="p-4 text-left font-bold text-orange-800 hidden md:table-cell">Ngày thêm</th>
+                                            <th className="p-4 text-left font-bold text-orange-800">Trạng thái</th>
+                                            <th className="p-4 text-left font-bold text-orange-800">Thao tác</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {currentItems.length === 0 ? (
+                                            <tr>
+                                                <td colSpan="6" className="p-4 text-center text-gray-500">
+                                                    Không có bằng chứng nào phù hợp với tìm kiếm của bạn.
+                                                </td>
+                                            </tr>
+                                        ) : (
+                                            currentItems.map((item) => (
+                                                <tr key={item.id} className="border-b border-orange-50 hover:bg-orange-50 transition-colors">
+                                                    <td className="p-4">
+                                                            <span className="font-medium text-orange-600 hover:text-orange-800 cursor-pointer hover:underline">
+                                                                {item.name}
+                                                            </span>
+                                                    </td>
+                                                    <td className="p-4 hidden md:table-cell text-gray-600 capitalize">{item.type}</td>
+                                                    <td className="p-4 text-gray-600">{item.challenge}</td>
+                                                    <td className="p-4 hidden md:table-cell text-gray-600">{item.dateAdded}</td>
+                                                    <td className="p-4">
+                                                        <div className={getStatusColor(item.status)}>
+                                                            {getStatusIcon(item.status)}
+                                                            <span className="text-sm font-medium">
+                                                                    {item.status === 'active' && 'Đang hoạt động'}
+                                                                {item.status === 'pending' && 'Đang chờ xử lý'}
+                                                                {item.status === 'archived' && 'Đã lưu trữ'}
+                                                                </span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="p-4">
+                                                        <div className="flex space-x-2">
+                                                            <button
+                                                                className="p-2 bg-orange-100 text-orange-600 rounded-md hover:bg-orange-200 transition-colors"
+                                                                title="Xem chi tiết"
+                                                            >
+                                                                <Eye size={18} />
+                                                            </button>
+                                                            <button
+                                                                className={`p-2 rounded-md transition-colors ${
+                                                                    item.status === 'archived'
+                                                                        ? "bg-green-100 text-green-600 hover:bg-green-200"
+                                                                        : "bg-red-100 text-red-600 hover:bg-red-200"
+                                                                }`}
+                                                                title={item.status === 'archived' ? "Khôi phục" : "Lưu trữ"}
+                                                            >
+                                                                <Archive size={18} />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        )}
+                                        </tbody>
+                                    </table>
+                                )}
+                            </div>
+                            <div className="bg-gradient-to-r from-orange-50 to-yellow-50 p-4 flex flex-col md:flex-row md:items-center justify-between border-t border-orange-100 gap-4">
+                                <div className="text-gray-600">
+                                    Hiển thị <span className="font-medium">{currentItems.length > 0 ? indexOfFirstItem + 1 : 0}</span> đến <span className="font-medium">{indexOfFirstItem + currentItems.length}</span> trong tổng số <span className="font-medium">{filteredItems.length}</span> bằng chứng
+                                </div>
+                                <div className="flex space-x-2 self-center md:self-auto">
+                                    <button
+                                        className="p-2 rounded-md bg-white border border-orange-200 text-orange-600 hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        onClick={prevPage}
+                                        disabled={currentPage === 1}
+                                    >
+                                        <ChevronLeft size={18} />
+                                    </button>
+                                    <div className="bg-white border border-orange-200 rounded-md px-4 py-2 flex items-center">
+                                        <span className="text-orange-600 font-medium">{currentPage}</span>
+                                        <span className="mx-1 text-gray-400">/</span>
+                                        <span className="text-gray-600">{totalPages}</span>
+                                    </div>
+                                    <button
+                                        className="p-2 rounded-md bg-white border border-orange-200 text-orange-600 hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        onClick={nextPage}
+                                        disabled={currentPage === totalPages}
+                                    >
+                                        <ChevronRight size={18} />
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                    </>
-                )}
-
-
+                    </div>
+                </div>
             </div>
-        </div>
             {/* Footer */}
-            <footer className="bg-gradient-to-r from-red-600 via-orange-500 to-yellow-500 p-4 text-white text-center">
+            <footer className="bg-gradient-to-r from-orange-600 to-red-600 p-4 text-white text-center">
                 <p>© 2025 GoBeyond</p>
             </footer>
         </div>

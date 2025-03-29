@@ -1,107 +1,62 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { BASE_URL } from "../contant/contant.js";
-import { decode } from "jsonwebtoken-esm";
+import {jwtDecode} from "jwt-decode";
 
 export const adminUserService = createApi({
     reducerPath: "adminUser",
     baseQuery: fetchBaseQuery({
         baseUrl: BASE_URL,
-        prepareHeaders: (headers) => {
+        prepareHeaders: async (headers) => {
             try {
-                const token = localStorage.getItem("jwt_token");
+                const response = await fetch(`${BASE_URL}/auth/token`, { method: "GET", credentials: "include" });
+                if (!response.ok) {
+                    throw new Error("Failed to fetch token");
+                }
+                const data = await response.json();
+                const token = data.token;
 
                 if (token) {
-                    // Sử dụng template literal với backticks
                     headers.set("Authorization", `Bearer ${token}`);
-
-                    try {
-                        const decodedToken = decode(token);
-
-                        if (!decodedToken || !decodedToken.roles || !decodedToken.roles.includes("ADMIN")) {
-                            console.error("User does not have ADMIN role.");
-                            throw new Error("Unauthorized: Admin access required");
-                        }
-                    } catch (decodeError) {
-                        console.error("Invalid token or decoding failed:", decodeError.message);
-                        throw new Error("Unauthorized: Invalid token.");
+                    const decodedToken = jwtDecode(token);
+                    if (!decodedToken.roles || !decodedToken.roles.includes("ADMIN")) {
+                        throw new Error("Unauthorized: Admin access required");
                     }
-                } else {
-                    console.error("Token not found in localStorage.");
-                    throw new Error("Unauthorized: No token provided.");
                 }
             } catch (error) {
-                console.error("Error fetching token or unauthorized access:", error.message);
-                throw error;
+                console.error("Error fetching token or unauthorized access:", error);
+                throw new Error("Unauthorized: Admin access required");
             }
-
             headers.set("Content-Type", "application/json");
             return headers;
-        }
+        },
     }),
-    tagTypes: ["Admin"],
+    tagTypes: ["User"],
     endpoints: (builder) => ({
         getUsers: builder.query({
-            query: ({ page = 0, size = 10 }) => {
-                const url = `/admin/accounts/get?page=${page}&size=${size}`;
-                console.log("Fetching URL:", url);
-                return url;
-            },
-            providesTags: ["Admin"],
+            query: ({ page = 0, size = 10 }) => `/admin/accounts/get?page=${page}&size=${size}`,
+            providesTags: ["User"],
         }),
         getUserById: builder.query({
-            query: (id) => {
-                const url = `/admin/accounts/getDetail/${id}`;
-                console.log("Fetching URL:", url);
-                return url;
-            },
-            providesTags: ["Admin"],
+            query: (id) => `/admin/accounts/${id}`,
+            providesTags: ["User"],
         }),
         banUser: builder.mutation({
-            query: ({ id }) => {
-                console.log("Banning User with ID:", id);
-                return {
-                    url: `/admin/accounts/ban/${id}`,
-                    method: "PUT",
-                };
-            },
-            invalidatesTags: ["Admin"],
+            query: ({ id }) => ({
+                url: `/admin/accounts/ban/${id}`,
+                method: "PUT",
+            }),
+            invalidatesTags: ["User"],
         }),
         unbanUser: builder.mutation({
-            query: ({ id }) => {
-                console.log("Unbanning User with ID:", id);
-                return {
-                    url: `/admin/accounts/unban/${id}`,
-                    method: "PUT",
-                };
-            },
-            invalidatesTags: ["Admin"],
+            query: ({ id }) => ({
+                url: `/admin/accounts/unban/${id}`,
+                method: "PUT",
+            }),
+            invalidatesTags: ["User"],
         }),
         searchUsers: builder.query({
-            query: (query) => {
-                const url = `/admin/accounts/get?search=${query}`;
-                console.log("Searching Users with URL:", url);
-                return url;
-            },
-            providesTags: ["Admin"],
-        }),
-        getChallenges: builder.query({
-            query: ({ page = 0, size = 10 } = {}) => {
-                const url = `/admin/challenges/all?page=${page}&size=${size}`;
-                console.log("Fetching Challenges URL:", url);
-                return url;
-            },
-            providesTags: ["Admin"],
-        }),
-        reviewChallenge: builder.mutation({
-            query: (reviewRequest) => {
-                console.log("Reviewing Challenge:", reviewRequest);
-                return {
-                    url: `/admin/challenges/review`,
-                    method: "POST",
-                    body: reviewRequest,
-                };
-            },
-            invalidatesTags: ["Admin"],
+            query: (query) => `/admin/accounts/get?search=${query}`,
+            providesTags: ["User"],
         }),
     }),
 });
@@ -111,7 +66,5 @@ export const {
     useGetUserByIdQuery,
     useBanUserMutation,
     useUnbanUserMutation,
-    useSearchUsersQuery,
-    useGetChallengesQuery,
-    useReviewChallengeMutation
+    useSearchUsersQuery
 } = adminUserService;

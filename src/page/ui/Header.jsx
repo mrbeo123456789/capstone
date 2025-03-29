@@ -11,7 +11,7 @@ export const Header = ({ toggleSidebar }) => {
     };
 
     const menuItems = [
-        { href: "/about", title: "About", text: "About" },
+        { href: "/aboutus", title: "About", text: "About" },
         { href: "/guide", title: "Guide", text: "Guide" },
         { href: "/challenges", title: "Challenges", text: "Challenges" },
         { href: "/ranking", title: "Leaderboard", text: "Leaderboard" },
