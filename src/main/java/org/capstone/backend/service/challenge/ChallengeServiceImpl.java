@@ -3,14 +3,13 @@ package org.capstone.backend.service.challenge;
 import org.capstone.backend.dto.challenge.*;
 import org.capstone.backend.entity.*;
 import org.capstone.backend.repository.*;
+import org.capstone.backend.service.auth.AuthService;
 import org.capstone.backend.utils.enums.*;
 import org.capstone.backend.utils.upload.FirebaseUpload;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,15 +28,30 @@ public class ChallengeServiceImpl implements ChallengeService {
     private final ChallengeTypeRepository challengeTypeRepository;
     private final ChallengeMemberRepository challengeMemberRepository;
     private final FirebaseUpload firebaseUpload;
-    public ChallengeServiceImpl(ChallengeRepository challengeRepository, AccountRepository accountRepository,
-                                MemberRepository memberRepository, ChallengeTypeRepository challengeTypeRepository,
-                                ChallengeMemberRepository challengeMemberRepository, FirebaseUpload firebaseUpload) {
+    private final AuthService authService;
+
+    public ChallengeServiceImpl(
+            ChallengeRepository challengeRepository,
+            AccountRepository accountRepository,
+            MemberRepository memberRepository,
+            ChallengeTypeRepository challengeTypeRepository,
+            ChallengeMemberRepository challengeMemberRepository,
+            FirebaseUpload firebaseUpload,
+            AuthService authService
+    ) {
         this.challengeRepository = challengeRepository;
         this.accountRepository = accountRepository;
         this.memberRepository = memberRepository;
         this.challengeTypeRepository = challengeTypeRepository;
         this.challengeMemberRepository = challengeMemberRepository;
         this.firebaseUpload = firebaseUpload;
+        this.authService = authService;
+    }
+
+    private Member getCurrentMember() {
+        Long memberId = authService.getMemberIdFromAuthentication();
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found"));
     }
 
     private Challenge findChallenge(Long challengeId) {
@@ -45,118 +59,97 @@ public class ChallengeServiceImpl implements ChallengeService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Challenge not found."));
     }
 
-    private Member findMember(Long memberId) {
-        return memberRepository.findById(memberId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found."));
+    private String uploadImageIfPresent(MultipartFile file) {
+        try {
+            if (file != null && !file.isEmpty()) {
+                return firebaseUpload.uploadFile(file);
+            }
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Upload failed: " + e.getMessage());
+        }
+        return null;
     }
 
-    private Member getAuthenticatedMember() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated() ||
-                "anonymousUser".equals(authentication.getPrincipal())) {
-            throw new RuntimeException("User is not authenticated");
-        }
-
-        String username = authentication.getName();
-
-        // Tìm tài khoản trong hệ thống
-        Account account = accountRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
-
-        // Nếu là Admin thì không cần tìm Member
-        if (account.getRole().equals(Role.ADMIN)) {
-            return null;  // Hoặc trả về một giá trị Member đặc biệt nếu cần thiết
-        }
-
-        // Tìm Member dựa trên Account
-        return memberRepository.findByAccount(account)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found"));
-    }
-
-
-    private ChallengeMember createChallengeMember(Challenge challenge, Member member, Long joinBy, ChallengeMemberStatus status,ChallengeRole role) {
-        ChallengeMember challengeMember = new ChallengeMember();
-        challengeMember.setRole(role);
-        challengeMember.setChallenge(challenge);
-        challengeMember.setMember(member);
-        challengeMember.setJoinBy(joinBy);
-        challengeMember.setStatus(status);
-        challengeMember.setCreatedAt(LocalDateTime.now());
-        return challengeMember;
+    private ChallengeMember createChallengeMember(Challenge challenge, Member member, Long joinBy, ChallengeMemberStatus status, ChallengeRole role) {
+        return ChallengeMember.builder()
+                .challenge(challenge)
+                .member(member)
+                .role(role)
+                .status(status)
+                .joinBy(joinBy)
+                .createdAt(LocalDateTime.now())
+                .build();
     }
 
     @Override
     public String joinChallenge(Long challengeId) {
-        Member member = getAuthenticatedMember();
+        Member member = getCurrentMember();
         Challenge challenge = findChallenge(challengeId);
 
-        if (challenge.getStatus() != ChallengeStatus.APPROVED) {
-            return "Challenge is not active.";
-        }
-        if (challenge.getChallengeMembers().size() >= challenge.getMaxParticipants()) {
-            return "Challenge is full.";
-        }
+        if (challenge.getStatus() != ChallengeStatus.APPROVED) return "Challenge is not active.";
+        if (challenge.getChallengeMembers().size() >= challenge.getMaxParticipants()) return "Challenge is full.";
 
-        ChallengeMember challengeMember = createChallengeMember(challenge, member, member.getId(), ChallengeMemberStatus.JOINED,ChallengeRole.MEMBER);
+        ChallengeMember challengeMember = createChallengeMember(
+                challenge, member, member.getId(), ChallengeMemberStatus.JOINED, ChallengeRole.MEMBER);
         challengeMemberRepository.save(challengeMember);
 
         return "Joined challenge successfully.";
     }
-
-
-
     @Override
-    public String createChallenge(ChallengeRequest request, MultipartFile picture, MultipartFile banner, String username) {
-        Member member = getAuthenticatedMember(); // Có thể trả về null nếu là Admin
-        Account account = accountRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
+    public String createChallenge(ChallengeRequest request, MultipartFile picture, MultipartFile banner) {
+        Long memberId = authService.getMemberIdFromAuthentication(); // null nếu là admin
+        Member member = null;
+        Account account;
 
-        boolean isAdmin = account.getRole().equals(Role.ADMIN);  // Kiểm tra xem user có quyền ADMIN không
+        if (memberId == null) {
+            // 👉 Admin mặc định có ID = 1
+            account = accountRepository.findByUsername("admin")
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Admin account not found"));
+        } else {
+            member = memberRepository.findById(memberId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found"));
+            account = member.getAccount();
+        }
+
 
         ChallengeType challengeType = challengeTypeRepository.findById(request.getChallengeTypeId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ChallengeType not found"));
 
-        String pictureUrl = null;
-        String bannerUrl = null;
-        try {
-            if (picture != null && !picture.isEmpty()) {
-                pictureUrl = firebaseUpload.uploadFile(picture);
-            }
-            if (banner != null && !banner.isEmpty()) {
-                bannerUrl = firebaseUpload.uploadFile(banner);
-            }
-        } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error uploading files: " + e.getMessage());
-        }
-
-        Long createdBy = (member != null) ? member.getId() : null;
+        String pictureUrl = uploadImageIfPresent(picture);
+        String bannerUrl = uploadImageIfPresent(banner);
 
         Challenge challenge = Challenge.builder()
                 .name(request.getName())
                 .description(request.getDescription())
                 .rule(request.getRule())
                 .privacy(request.getPrivacy())
-                .status(isAdmin ? ChallengeStatus.APPROVED : ChallengeStatus.PENDING)  // Nếu là Admin thì duyệt luôn
+                .status(member == null ? ChallengeStatus.APPROVED : ChallengeStatus.PENDING) // ✅ Duyệt tự động nếu là admin
                 .verificationType(request.getVerificationType())
                 .verificationMethod(request.getVerificationMethod())
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
                 .maxParticipants(request.getMaxParticipants())
-                .createdBy(createdBy)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .updatedBy(createdBy != null ? createdBy : account.getId()) // Nếu là Admin thì lấy ID của Account
+                .createdBy(memberId)
+                .updatedBy(memberId != null ? memberId : account.getId())
                 .challengeType(challengeType)
                 .picture(pictureUrl)
                 .banner(bannerUrl)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .build();
-        ChallengeMember challengeMember = createChallengeMember(challenge,member, member.getId(), ChallengeMemberStatus.JOINED,ChallengeRole.HOST);
-       challengeMemberRepository.save(challengeMember);
+
         challengeRepository.save(challenge);
+
+        // ✅ Nếu là member, tự động trở thành HOST
+        if (member != null) {
+            ChallengeMember challengeMember = createChallengeMember(
+                    challenge, member, member.getId(), ChallengeMemberStatus.JOINED, ChallengeRole.HOST);
+            challengeMemberRepository.save(challengeMember);
+        }
 
         return "Challenge đã được tạo thành công.";
     }
+
 
 
     @Override
@@ -166,8 +159,7 @@ public class ChallengeServiceImpl implements ChallengeService {
 
     @Override
     public String reviewChallenge(ReviewChallengeRequest request) {
-        Challenge challenge = challengeRepository.findById(request.getChallengeId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Challenge not found."));
+        Challenge challenge = findChallenge(request.getChallengeId());
 
         ChallengeStatus status;
         try {
@@ -182,11 +174,12 @@ public class ChallengeServiceImpl implements ChallengeService {
 
         return "Challenge status updated successfully.";
     }
+
+    @Override
     @Transactional
     public void toggleCoHost(Long challengeId, Long memberId) {
-        Member host = getAuthenticatedMember();
+        Member host = getCurrentMember();
 
-        // Kiểm tra xem người gọi API có phải Host không
         ChallengeMember hostMember = challengeMemberRepository.findHostByChallengeId(challengeId)
                 .orElseThrow(() -> new RuntimeException("Host không tồn tại"));
 
@@ -194,12 +187,11 @@ public class ChallengeServiceImpl implements ChallengeService {
             throw new RuntimeException("Bạn không có quyền thay đổi role Co-Host");
         }
 
-        // Kiểm tra xem thành viên có trong thử thách không
         ChallengeMember targetMember = challengeMemberRepository.findByChallengeIdAndMemberId(challengeId, memberId)
                 .orElseThrow(() -> new RuntimeException("Thành viên không tham gia thử thách"));
 
-        // Nếu người này đang là Co-Host, hạ xuống Member, ngược lại nâng lên Co-Host
-        ChallengeRole newRole = targetMember.getRole() == ChallengeRole.CO_HOST ? ChallengeRole.MEMBER : ChallengeRole.CO_HOST;
+        ChallengeRole newRole = targetMember.getRole() == ChallengeRole.CO_HOST
+                ? ChallengeRole.MEMBER : ChallengeRole.CO_HOST;
 
         challengeMemberRepository.updateRole(challengeId, memberId, newRole);
     }
@@ -209,22 +201,23 @@ public class ChallengeServiceImpl implements ChallengeService {
         Pageable pageable = PageRequest.of(page, size);
         return challengeRepository.findAllByPriority(pageable);
     }
+
     @Override
     public Page<ChallengeResponse> getApprovedChallenges(int page, int size) {
-        Member member = getAuthenticatedMember();
+        Long memberId = authService.getMemberIdFromAuthentication();
         Pageable pageable = PageRequest.of(page, size);
-
-        return challengeRepository.findApprovedChallengesNotJoined(member.getId(), pageable);
+        return challengeRepository.findApprovedChallengesNotJoined(memberId, pageable);
     }
 
+    @Override
     public List<MyChallengeResponse> getChallengesByMember(ChallengeRole role) {
-        Member member = getAuthenticatedMember();
-        return challengeRepository.findChallengesByMemberAndStatus(member.getId(), role);
+        Long memberId = authService.getMemberIdFromAuthentication();
+        return challengeRepository.findChallengesByMemberAndRole(memberId, role);
     }
 
+    @Override
     public ChallengeDetailResponse getChallengeDetail(Long challengeId) {
-        Member member = getAuthenticatedMember();
-        return challengeRepository.findChallengeDetailByIdAndMemberId(challengeId, member.getId());
+        Long memberId = authService.getMemberIdFromAuthentication();
+        return challengeRepository.findChallengeDetailByIdAndMemberId(challengeId, memberId);
     }
-
 }

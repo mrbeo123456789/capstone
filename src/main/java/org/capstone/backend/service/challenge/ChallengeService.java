@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface ChallengeService {
-    String createChallenge(ChallengeRequest request, MultipartFile picture, MultipartFile banner, String username);
+    String createChallenge(ChallengeRequest request, MultipartFile picture, MultipartFile banner);
     List<ChallengeType> getAllTypes();
     String reviewChallenge(ReviewChallengeRequest request);
     String joinChallenge(Long challengeId);

@@ -17,6 +17,7 @@ public interface AuthService {
 
     void sendOtpForPasswordReset(String email) throws Exception;
 
-    boolean resetPassword(String email,  String newPassword);
-    Long getMemberIdFromAuthentication(Authentication authentication);
+    boolean resetPassword(String email, String newPassword);
+
+    Long getMemberIdFromAuthentication();
 }

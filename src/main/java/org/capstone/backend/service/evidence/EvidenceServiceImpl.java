@@ -2,6 +2,7 @@ package org.capstone.backend.service.evidence;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.capstone.backend.dto.evidence.EvidenceReviewRequest;
 import org.capstone.backend.entity.*;
 import org.capstone.backend.repository.*;
 import org.capstone.backend.utils.enums.ChallengeMemberStatus;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -127,5 +129,43 @@ public class EvidenceServiceImpl implements EvidenceService {
         return memberRepository.findByAccount(account)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found"));
     }
+
+    @Override
+    @Transactional
+    public void reviewEvidence(EvidenceReviewRequest request) {
+
+        Long reviewerId = getAuthenticatedMember().getId();
+        Evidence evidence = evidenceRepository.findById(request.getEvidenceId())
+                .orElseThrow(() -> new EntityNotFoundException("Evidence not found"));
+
+        EvidenceReport report = evidenceReportRepository.findByEvidenceId(reviewerId)
+                .orElseThrow(() -> new IllegalArgumentException("Không có người chấm cho bằng chứng này."));
+
+        if (!report.getReviewer().getId().equals(reviewerId)) {
+            throw new IllegalArgumentException("Bạn không được phép chấm bằng chứng này.");
+        }
+
+        // Cập nhật trạng thái evidence
+        if (request.getIsApproved()) {
+            evidence.setStatus(EvidenceStatus.APPROVED);
+        } else {
+            evidence.setStatus(EvidenceStatus.REJECTED);
+
+        }
+
+        evidence.setUpdatedAt(LocalDateTime.now());
+        evidence.setUpdatedBy(reviewerId);
+
+        // Cập nhật báo cáo
+        report.setIsApproved(request.getIsApproved());
+        report.setFeedback(request.getFeedback());
+        report.setReviewedAt(LocalDateTime.now());
+        report.setUpdatedAt(LocalDateTime.now());
+        report.setUpdatedBy(reviewerId);
+
+        evidenceRepository.save(evidence);
+        evidenceReportRepository.save(report);
+    }
+
 
 }

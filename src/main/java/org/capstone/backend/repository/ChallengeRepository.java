@@ -43,17 +43,20 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
     Page<ChallengeResponse> findApprovedChallengesNotJoined(@Param("memberId") Long memberId, Pageable pageable);
 
     @Query("""
-           SELECT new org.capstone.backend.dto.challenge.MyChallengeResponse(
-               c.id, c.name, c.picture, c.status, cm.role
-           )
-           FROM ChallengeMember cm
-           JOIN cm.challenge c
-           WHERE cm.member.id = :memberId
-           AND (:status IS NULL OR c.status = :status)
-           ORDER BY c.updatedAt DESC
-           """)
-    List<MyChallengeResponse> findChallengesByMemberAndStatus(@Param("memberId") Long memberId,
-                                                              @Param("status") ChallengeRole role);
+       SELECT new org.capstone.backend.dto.challenge.MyChallengeResponse(
+           c.id, c.name, c.picture, c.status, cm.role
+       )
+       FROM ChallengeMember cm
+       JOIN cm.challenge c
+       WHERE cm.member.id = :memberId
+       AND (:role IS NULL OR cm.role = :role) 
+       ORDER BY c.updatedAt DESC
+       """)
+    List<MyChallengeResponse> findChallengesByMemberAndRole(@Param("memberId") Long memberId,
+                                                            @Param("role") ChallengeRole role);
+
+    // Đúng kiểu
+
     @Query("""
     SELECT new org.capstone.backend.dto.challenge.ChallengeDetailResponse(
         c.id, c.name, c.description, c.summary, c.startDate, c.endDate, 
