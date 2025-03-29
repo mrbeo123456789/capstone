@@ -2,10 +2,7 @@ package org.capstone.backend.config;
 
 import org.capstone.backend.entity.*;
 import org.capstone.backend.repository.*;
-import org.capstone.backend.utils.enums.AccountStatus;
-import org.capstone.backend.utils.enums.ChallengeStatus;
-import org.capstone.backend.utils.enums.PrivacyStatus;
-import org.capstone.backend.utils.enums.Role;
+import org.capstone.backend.utils.enums.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,17 +25,22 @@ class DataInitializer {
     private final PasswordEncoder passwordEncoder;
     private final ChallengeRepository challengeRepository;
 
+    private final ChallengeMemberRepository challengeMemberRepository;
+
     public DataInitializer(AccountRepository accountRepository,
                            ChallengeTypeRepository challengeTypeRepository,
                            MemberRepository memberRepository,
                            InterestRepository interestRepository,
-                           PasswordEncoder passwordEncoder, ChallengeRepository challengeRepository) {
+                           PasswordEncoder passwordEncoder,
+                           ChallengeRepository challengeRepository,
+                           ChallengeMemberRepository challengeMemberRepository) {
         this.accountRepository = accountRepository;
         this.challengeTypeRepository = challengeTypeRepository;
         this.memberRepository = memberRepository;
         this.interestRepository = interestRepository;
         this.passwordEncoder = passwordEncoder;
         this.challengeRepository = challengeRepository;
+        this.challengeMemberRepository = challengeMemberRepository;
     }
 
     @Bean
@@ -131,35 +133,57 @@ class DataInitializer {
 
             interestRepository.saveAll(interests);
         }
-        if (challengeRepository.count() == 0) {
-            List<ChallengeType> types = challengeTypeRepository.findAll();
-            ChallengeType fitnessType = types.stream().filter(t -> t.getName().equals("Fitness")).findFirst().orElse(null);
-            ChallengeType learningType = types.stream().filter(t -> t.getName().equals("Learning")).findFirst().orElse(null);
+        if (challengeMemberRepository.count() == 0) {
+            List<Member> members = memberRepository.findAll();
+            List<Challenge> challenges = challengeRepository.findAll();
 
-            Member adminMember = memberRepository.findByEmail("user1@example.com").orElse(null);
+            if (!members.isEmpty() && !challenges.isEmpty()) {
+                Member host = members.get(0);
+                Member coHost = members.size() > 1 ? members.get(1) : null;
+                Member member = members.size() > 2 ? members.get(2) : null;
 
-            if (fitnessType != null && learningType != null && adminMember != null) {
-                for (int i = 1; i <= 10; i++) {
-                    Challenge challenge = Challenge.builder()
-                            .name("Thử thách " + i)
-                            .description("Mô tả thử thách số " + i)
-                            .startDate(LocalDate.now().plusDays(i))
-                            .endDate(LocalDate.now().plusDays(i + 30))
-                            .maxParticipants(100)
-                            .status(ChallengeStatus.PENDING)
-                            .challengeType(i % 2 == 0 ? fitnessType : learningType)
-                            .createdBy(adminMember.getId())
+                for (int i = 0; i < challenges.size(); i++) {
+                    Challenge challenge = challenges.get(i);
+
+                    ChallengeMember hostMember = ChallengeMember.builder()
+                            .challenge(challenge)
+                            .member(host)
+                            .status(ChallengeMemberStatus.JOINED)
+                            .role(ChallengeRole.HOST)
                             .createdAt(LocalDateTime.now())
                             .updatedAt(LocalDateTime.now())
-                            .privacy(PrivacyStatus.PUBLIC)
                             .build();
+                    challengeMemberRepository.save(hostMember);
 
-                    challengeRepository.save(challenge);
+                    if (coHost != null) {
+                        ChallengeMember coHostMember = ChallengeMember.builder()
+                                .challenge(challenge)
+                                .member(coHost)
+                                .status(ChallengeMemberStatus.JOINED)
+                                .role(ChallengeRole.CO_HOST)
+                                .createdAt(LocalDateTime.now())
+                                .updatedAt(LocalDateTime.now())
+                                .build();
+                        challengeMemberRepository.save(coHostMember);
+                    }
+
+                    if (member != null) {
+                        ChallengeMember normalMember = ChallengeMember.builder()
+                                .challenge(challenge)
+                                .member(member)
+                                .status(ChallengeMemberStatus.JOINED)
+                                .role(ChallengeRole.MEMBER)
+                                .createdAt(LocalDateTime.now())
+                                .updatedAt(LocalDateTime.now())
+                                .build();
+                        challengeMemberRepository.save(normalMember);
+                    }
                 }
             }
         }
 
-            return true;
+
+        return true;
         }
     }
 
