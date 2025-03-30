@@ -21,6 +21,7 @@ export default function Login() {
     const handleLogin = async (e) => {
         e.preventDefault();
         setError(null);
+
         if (!username.trim()) {
             setError("Username cannot be empty");
             return;
