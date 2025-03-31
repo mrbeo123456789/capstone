@@ -10,8 +10,14 @@ import { useParams } from "react-router-dom";
 
 const ChallengeDetail = () => {
     const [activeTab, setActiveTab] = useState("info");
+    const { id } = useParams();
     const [joinChallenge, { isLoading }] = useJoinChallengeMutation();
+    const { data, isLoadingDetail, error } = useGetChallengeDetailQuery(id);
 
+    if (isLoadingDetail) return <p>Loading...</p>;
+    if (error) return <p>Error loading challenge detail</p>;
+
+    const challenge = data; // ✅ để dễ xử lý
 
     const handleJoin = async () => {
         try {
@@ -23,18 +29,24 @@ const ChallengeDetail = () => {
         }
     };
 
+    const formatDate = (dateArray) => {
+        if (!Array.isArray(dateArray)) return "N/A";
+        const [year, month, day] = dateArray;
+        return `${day.toString().padStart(2, "0")}/${month.toString().padStart(2, "0")}/${year}`;
+    };
+
 
     return (
         <div className="p-6 flex flex-col items-center h-full w-full">
             {/* Challenge Banner Section */}
             <div className="w-full flex flex-col md:flex-row bg-white rounded-lg shadow-lg overflow-hidden">
                 <img
-                    src="https://mvpvisuals.com/cdn/shop/articles/mvpvisuals-ultimate-guide-event-branding-for-fun-runs.jpg?v=1689864293"
-                    alt="Challenge Banner"
+                    src={challenge?.picture}
+                    alt={challenge?.name}
                     className="w-full md:w-2/3 object-cover"
                 />
                 <div className="bg-gray-100 p-6 md:w-1/3 flex flex-col justify-between">
-                    <h2 className="text-xl font-bold text-gray-900">MIỄN PHÍ</h2>
+                <h2 className="text-xl font-bold text-gray-900">MIỄN PHÍ</h2>
                     <div className="bg-orange-500 text-white font-semibold text-center py-2 mt-2 rounded-lg">
                         <button
                             onClick={(e) => {
@@ -69,7 +81,7 @@ const ChallengeDetail = () => {
             </div>
 
             {/* Tabs Section */}
-            <div className="mt-6 w-full max-w-4xl">
+            <div className="mt-6 w-full">
                 <div className="flex border-b">
                     {["info", "rules", "team", "individual"].map((tab) => (
                         <button
@@ -95,26 +107,18 @@ const ChallengeDetail = () => {
                 <div className="p-6 bg-white shadow-md rounded-lg mt-4">
                     {activeTab === "info" && (
                         <div>
-                            <h2 className="text-2xl font-bold text-gray-900">
-                                21 năm An Phát Holdings
-                            </h2>
+                            <h2 className="text-2xl font-bold text-gray-900">{challenge?.name}</h2>
                             <p className="text-gray-500 mt-2">
-                                01/09/2023 (00:00) - 21/09/2023 (23:59)
+                                {formatDate(challenge?.startDate)} - {formatDate(challenge?.endDate)}
                             </p>
                             <p className="text-sm text-gray-700 mt-2">
-                                Thử thách: <span className="text-orange-500 font-semibold">Chạy bộ</span> | Được tạo
-                                bởi:{" "}
-                                <span className="text-blue-500 font-semibold">APH Phạm Thùy Tiên</span>
+                                Thử thách: <span
+                                className="text-orange-500 font-semibold">{challenge?.challengeType}</span>
                             </p>
-
-                            <div className="mt-6 border-t pt-4">
-                                <h3 className="text-lg font-semibold text-gray-800">
-                                    ĐIỀU LỆ GIẢI CHẠY 21 NĂM AN PHÁT HOLDINGS
-                                </h3>
-                                <p className="text-gray-700 mt-2">
-                                    Tăng tốc - Bứt phá - Làm chủ tương lai
-                                </p>
-                            </div>
+                            <div
+                                className="mt-6 border-t pt-4 text-gray-700"
+                                dangerouslySetInnerHTML={{__html: challenge?.description}}
+                            />
                         </div>
                     )}
                     {activeTab === "rules" && (

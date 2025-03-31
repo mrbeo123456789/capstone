@@ -1,0 +1,122 @@
+import React, { useState, useEffect, useRef } from "react";
+import { IoCloudUploadOutline } from "react-icons/io5";
+
+const MediaUpload = ({ date, onClose, onSubmit, challengeId }) => {
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [preview, setPreview] = useState(null);
+    const fileInputRef = useRef(null);
+
+    // Generate preview URL
+    useEffect(() => {
+        if (!selectedFile) return;
+
+        const objectUrl = URL.createObjectURL(selectedFile);
+        setPreview(objectUrl);
+
+        return () => URL.revokeObjectURL(objectUrl); // cleanup on unmount
+    }, [selectedFile]);
+
+    const isVideo = selectedFile?.type.startsWith("video");
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setSelectedFile(file);
+        }
+    };
+
+    const handleSubmit = () => {
+        if (selectedFile) {
+            onSubmit(date, selectedFile);
+            setSelectedFile(null);
+            setPreview(null);
+        }
+    };
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg w-4/6 h-4/6 shadow-lg relative">
+                <h2 className="text-xl font-bold mb-4 text-center mt-3">
+                    Submit Evidence for {date?.toDateString()}
+                </h2>
+
+                {/* Upload Preview */}
+                <div
+                    className="relative group w-full h-4/5 mb-4 cursor-pointer justify-items-center"
+                    onClick={() => fileInputRef.current.click()}
+                >
+                    <input
+                        type="file"
+                        accept="image/*,video/*"
+                        onChange={handleFileChange}
+                        ref={fileInputRef}
+                        className="hidden"
+                    />
+
+                    {preview ? (
+                        isVideo ? (
+                            <video
+                                src={preview}
+                                controls
+                                className="w-11/12 h-full object-contain rounded-lg"
+                            />
+                        ) : (
+                            <img
+                                src={preview}
+                                alt="Preview"
+                                className="w-11/12 h-full object-contain rounded-lg"
+                            />
+                        )
+                    ) : (
+                        <div
+                            className="w-11/12 h-full flex flex-col items-center justify-center border-2 border-gray-300 border-dashed rounded-lg bg-gray-50">
+                            <IoCloudUploadOutline className="text-2xl" />
+                            <p className="mb-2 text-sm text-gray-500">
+                                <span className="font-semibold">Click to upload</span> or drag and drop
+                            </p>
+                            <p className="text-xs text-gray-500">JPG, PNG, MP4, GIF (max 800x400px)</p>
+                        </div>
+                    )}
+
+                    {/* Hover Overlay */}
+                    {preview && !isVideo && (
+                        <div
+                            className="w-11/12 h-full justify-self-center absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
+                            <span className="text-white font-semibold">Change File</span>
+                        </div>
+                    )}
+
+                </div>
+
+                {/* Submit / Cancel */}
+                <div className="flex justify-end space-x-3 me-2.5">
+                    <button
+                        onClick={() => fileInputRef.current.click()}
+                        className="text-sm text-blue-600 underline hover:text-blue-800"
+                    >
+                        Change File
+                    </button>
+                    <button
+                        className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                        onClick={() => {
+                            setSelectedFile(null);
+                            setPreview(null);
+                            onClose();
+                        }}
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                        onClick={handleSubmit}
+                        disabled={!selectedFile}
+                    >
+                        Submit
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default MediaUpload;

@@ -7,17 +7,17 @@ import MemberListPopup from "../ui/MemberListPopup.jsx";
 import {useParams} from "react-router-dom";
 import {useGetChallengeDetailQuery} from "../../service/challengeService.js";
 import Description from "./description.jsx";
+import ProgressTracking from "./ProgressTracking.jsx";
 
 const JoinedChallengeDetail = () => {
     const [activeTab, setActiveTab] = useState("proof");
-    const progress = 60;
     const [showPopup, setShowPopup] = useState(false);
 
     const { id } = useParams(); // Lấy challenge ID từ URL
-    const { data, isLoadingz, error } = useGetChallengeDetailQuery(id);
+    const { data, isLoading, error } = useGetChallengeDetailQuery(id);
     console.log(data)
 
-    if (isLoadingz) return <p>Loading...</p>;
+    if (isLoading) return <p>Loading...</p>;
     if (error) return <p>Error loading challenge detail</p>;
 
     const challenge = data;
@@ -31,42 +31,45 @@ const JoinedChallengeDetail = () => {
         setShowPopup(false);
     };
 
+    const formatDate = (dateArray) => {
+        if (!Array.isArray(dateArray)) return "N/A";
+        const [year, month, day] = dateArray;
+        return `${day.toString().padStart(2, "0")}/${month.toString().padStart(2, "0")}/${year}`;
+    };
+
     return (
         <div className="w-full">
             <div className="mx-auto bg-white rounded-lg shadow-lg p-6 m-2">
                 <div className="flex flex-col md:flex-row justify-between items-center">
-                    <div className="md:w-2/3">
-                        <h1 className="text-2xl font-bold text-red-600">{challenge?.name}</h1>
-                        <p className="text-gray-700">Start Date: {challenge?.startDate.join("-")}</p>
-                        <p className="text-gray-700">End Date: {challenge?.endDate.join("-")}</p>
-                        <button className="text-white bg-red-600 px-6 py-2 rounded hover:bg-red-900"
-                        onClick={() => openMemberList()}>
-                            Invite
-                        </button>
-                        <div className="mt-4">
-                            <p className="text-gray-700">Progress: {progress}%</p>
-                            <div className="w-full bg-gray-300 rounded-full h-3 mt-2">
-                                <div
-                                    className="bg-blue-500 h-3 rounded-full"
-                                    style={{width: `${progress}%`}}
-                                ></div>
-                            </div>
+                    <div className="w-full md:w-3/5">
+                        <h2 className="text-2xl font-bold text-gray-900">{challenge?.name}</h2>
+                        <p className="text-gray-500 mt-2">
+                            {formatDate(challenge?.startDate)} - {formatDate(challenge?.endDate)}
+                        </p>
+                        <p className="text-sm text-gray-700 mt-2">
+                            Thử thách: <span
+                            className="text-orange-500 font-semibold">{challenge?.challengeType}</span>
+                        </p>
+                        <div className="">
+                            <ProgressTracking/>
                         </div>
                     </div>
-                    <div className="w-40 h-40 bg-gray-200 flex items-center justify-center rounded-lg">
+                    <div className="bg-gray-200 flex items-center justify-center rounded-lg md:w-2/5">
                         <img
                             src={challenge?.picture}
                             alt={challenge?.name}
                             className="w-full h-full object-cover rounded"
                         />
-
-                        <IoCloudUploadOutline className="text-gray-500 text-4xl"/>
                     </div>
                 </div>
+                <button className="text-white bg-red-600 px-6 py-2 rounded hover:bg-red-900"
+                        onClick={() => openMemberList()}>
+                    Invite
+                </button>
             </div>
 
             <div className="mt-6 w-full mx-auto">
-            <div className="flex border-b-2 border-gray-300">
+                <div className="flex border-b-2 border-gray-300">
                     <button
                         className={`flex-1 p-2 text-center font-bold ${
                             activeTab === "proof" ? "bg-blue-500 text-white" : "hover:bg-gray-200 text-gray-700"

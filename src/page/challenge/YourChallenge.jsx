@@ -4,29 +4,37 @@ import {useGetMyChallengesMutation} from "../../service/challengeService.js";
 
 const YourChallenge = () => {
     const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState("host");
+    const [activeTab, setActiveTab] = useState("All");
 
-    const [getMyChallenges, { data: joinedChallengeszzz = [], isLoading }] = useGetMyChallengesMutation();
+    const [getMyChallenges, { data: joinedChallenges = [], isLoading }] = useGetMyChallengesMutation();
 
     useEffect(() => {
         getMyChallenges(activeTab.toUpperCase());
     }, [activeTab]);
 
-    console.log(joinedChallengeszzz);
+    console.log(joinedChallenges);
 
     const invitations = [
         { id: 1, inviter: "User1", challenge: "Challenge B" },
         { id: 2, inviter: "User2", challenge: "Challenge C" },
     ];
 
-    const joinedChallenges = [
-        { id: 1, name: "Challenge A", status: "rating", value: 4.5, image: "https://exerciseright.com.au/wp-content/uploads/2020/05/image-from-rawpixel-id-2107431-jpeg-compressed.jpg" },
-        { id: 2, name: "Challenge X", status: "days", value: "2 days left", image: "https://www.theladders.com/wp-content/uploads/exercise-191001-800x450.jpg" },
-        { id: 3, name: "Challenge Y", status: "on-going", image: "https://images.squarespace-cdn.com/content/v1/603a73e7e541b709395810f2/1701721840754-V0GOQTIPSNBDTVD2ECJW/image-asset.jpeg" },
-        { id: 4, name: "Challenge Z", status: "on-going", image: "https://media.cnn.com/api/v1/images/stellar/prod/gettyimages-1626192387.jpg?c=original" },
-        { id: 5, name: "Challenge N", status: "rating", value: 3.8, image: "https://hips.hearstapps.com/hmg-prod/images/gym-workout-66d087d56ef90.jpg?crop=0.628xw:1.00xh;0.100xw,0&resize=1200:*" },
-        { id: 6, name: "Challenge M", status: "days", value: "15 days left", locked: true, image: "https://www.cnet.com/a/img/resize/c3a00bfb2ce9fbfa0c2285db0943e433b08250b9/hub/2019/12/18/98fd63aa-d21b-49db-b0d9-570be082efed/wellness-stock-16.jpg?auto=webp&fit=crop&height=675&width=1200" },
-    ];
+    // 💡 Đặt ở đầu file hoặc phía trên component
+    const getStatusStyle = (status) => {
+        switch (status) {
+            case "APPROVED":
+                return { text: "Approved", bg: "bg-green-100", textColor: "text-green-700" };
+            case "PENDING":
+                return { text: "Pending", bg: "bg-gray-200", textColor: "text-gray-600" };
+            case "REJECTED":
+                return { text: "Rejected", bg: "bg-red-100", textColor: "text-red-700" };
+            case "CANCELED":
+                return { text: "Canceled", bg: "bg-yellow-100", textColor: "text-yellow-800" };
+            default:
+                return { text: status, bg: "bg-gray-100", textColor: "text-gray-700" };
+        }
+    };
+
 
     return (
         <div className="p-6 space-y-6 bg-white rounded-lg shadow-lg overflow-hidden">
@@ -59,18 +67,22 @@ const YourChallenge = () => {
                             className="cursor-pointer min-w-[200px] p-4 border rounded-lg space-y-2 flex-shrink-0 hover:shadow-lg transition"
                         >
                             <p className="text-sm">{invite.inviter} invite you to a challenge</p>
-                            <div className="h-24 bg-gray-200 rounded" />
+                            <div className="h-24 bg-gray-200 rounded"/>
                             <p className="font-medium">{invite.challenge}</p>
                             <div className="flex gap-2">
                                 <button
                                     className="bg-green-600 text-white px-3 py-1 rounded"
-                                    onClick={(e) => { e.stopPropagation(); /* Handle Accept */ }}
+                                    onClick={(e) => {
+                                        e.stopPropagation(); /* Handle Accept */
+                                    }}
                                 >
                                     Accept
                                 </button>
                                 <button
                                     className="border px-3 py-1 rounded"
-                                    onClick={(e) => { e.stopPropagation(); /* Handle Decline */ }}
+                                    onClick={(e) => {
+                                        e.stopPropagation(); /* Handle Decline */
+                                    }}
                                 >
                                     Decline
                                 </button>
@@ -82,7 +94,7 @@ const YourChallenge = () => {
 
             {/* Filter Tabs */}
             <div className="flex gap-4">
-                {["host", "cohost", "member"].map((tab) => (
+                {["All", "host", "cohost", "member"].map((tab) => (
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
@@ -99,7 +111,7 @@ const YourChallenge = () => {
             <div>
                 <h2 className="text-lg font-semibold mb-4">Joined challenges</h2>
                 <div className="flex gap-4 overflow-x-auto pb-2">
-                    {joinedChallengeszzz.map((challenge) => (
+                    {joinedChallenges.map((challenge) => (
                         <div
                             key={challenge.id}
                             onClick={() => navigate(`/challenges/joins/detail/${challenge.id}`)}
@@ -111,24 +123,32 @@ const YourChallenge = () => {
                                     alt={challenge.name}
                                     className="w-full h-full object-cover rounded"
                                 />
-                                {challenge.locked && (
-                                    <span className="absolute top-2 right-2 text-gray-600">🔒</span>
+                                {/* 👑 Crown Icon for Host */}
+                                {challenge.role === "HOST" && (
+                                    <span
+                                        className="absolute top-2 left-2 text-yellow-400 text-xl drop-shadow-md">👑</span>
                                 )}
                             </div>
-                            <p className="font-medium text-center mb-2">{challenge.name}</p>
-                            {challenge.status === "rating" && (
-                                <div className="flex items-center gap-1 text-sm bg-pink-100 px-2 py-1 rounded">
-                                    ⭐ {challenge.value}
-                                </div>
-                            )}
-                            {challenge.status === "days" && (
-                                <div className="bg-yellow-100 text-sm px-2 py-1 rounded">{challenge.value}</div>
-                            )}
-                            {challenge.status === "on-going" && (
-                                <div className="border text-sm px-2 py-1 rounded">On-going</div>
-                            )}
-                        </div>
 
+                            {/* Challenge Name */}
+                            <p className="font-medium text-center mb-2">{challenge.name}</p>
+
+                            {(() => {
+                                const { text, bg, textColor } = getStatusStyle(challenge.status);
+                                return (
+                                    <div className={`${bg} ${textColor} text-xs px-2 py-1 rounded mb-1`}>
+                                        {text}
+                                    </div>
+                                );
+                            })()}
+
+
+
+                            {/* Role Display */}
+                            <div className="bg-gray-200 text-gray-800 text-xs px-2 py-1 rounded mt-auto mb-2">
+                                {challenge.role}
+                            </div>
+                        </div>
                     ))}
                 </div>
             </div>
