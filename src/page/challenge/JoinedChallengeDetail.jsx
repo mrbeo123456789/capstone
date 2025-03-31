@@ -51,7 +51,7 @@ const JoinedChallengeDetail = () => {
                             className="text-orange-500 font-semibold">{challenge?.challengeType}</span>
                         </p>
                         <div className="">
-                            <ProgressTracking/>
+                            <ProgressTracking challenge={challenge} />
                         </div>
                     </div>
                     <div className="bg-gray-200 flex items-center justify-center rounded-lg md:w-2/5">

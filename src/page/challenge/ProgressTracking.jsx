@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import MediaUpload from "../ui/MediaUpload.jsx";
+import toast from "react-hot-toast";
 
 const LOCAL_STORAGE_KEY = "markedDays";
 
-export default function ProgressTracking() {
+export default function ProgressTracking({ challenge }) {
     const [markedDays, setMarkedDays] = useState({});
     const today = new Date();
     const [currentMonth, setCurrentMonth] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
@@ -11,6 +12,16 @@ export default function ProgressTracking() {
     const [showModal, setShowModal] = useState(false);
     const [selectedDate, setSelectedDate] = useState(null);
 
+    const challengeId = challenge?.id;
+
+// Convert startDate & endDate from [YYYY, MM, DD] to Date objects
+    const startDate = challenge?.startDate
+        ? new Date(challenge.startDate[0], challenge.startDate[1] - 1, challenge.startDate[2])
+        : null;
+
+    const endDate = challenge?.endDate
+        ? new Date(challenge.endDate[0], challenge.endDate[1] - 1, challenge.endDate[2])
+        : null;
 
 
     // Load from localStorage
@@ -61,13 +72,15 @@ export default function ProgressTracking() {
         setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
     };
 
-    const startDate = new Date(2025, 3, 1); // April = 3 (0-based index)
-    const endDate = new Date(2025, 3, 17);
-
     const isWithinChallenge = (date) => {
-        return date >= startDate && date <= endDate;
+        return startDate && endDate && date >= startDate && date <= endDate;
     };
 
+// On success
+    toast.success("✅ Nộp bằng chứng thành công!");
+
+// On error
+    toast.error("❌ Hôm nay không nằm trong thời gian thử thách.");
 
     return (
         <div className="bg-white shadow-md rounded-lg p-4 mx-auto">
@@ -121,15 +134,8 @@ export default function ProgressTracking() {
             {showModal && (
                 <MediaUpload
                     date={selectedDate}
+                    challengeId={challengeId}
                     onClose={() => setShowModal(false)}
-                    onSubmit={(date, file) => {
-                        console.log("Submit evidence for:", date);
-                        console.log("File:", file);
-
-                        // Later: handle upload logic here
-
-                        setShowModal(false);
-                    }}
                 />
             )}
 

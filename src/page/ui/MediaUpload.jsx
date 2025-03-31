@@ -1,10 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
 import { IoCloudUploadOutline } from "react-icons/io5";
+import { useUploadEvidenceMutation } from "../../service/evidenceService.js";
+import { toast } from "react-toastify"; // ✅
 
-const MediaUpload = ({ date, onClose, onSubmit, challengeId }) => {
+const MediaUpload = ({ date, onClose, challengeId }) => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [preview, setPreview] = useState(null);
     const fileInputRef = useRef(null);
+    const [uploadEvidence, { isLoading }] = useUploadEvidenceMutation();
+
+    const isVideo = selectedFile?.type.startsWith("video");
 
     // Generate preview URL
     useEffect(() => {
@@ -13,10 +18,8 @@ const MediaUpload = ({ date, onClose, onSubmit, challengeId }) => {
         const objectUrl = URL.createObjectURL(selectedFile);
         setPreview(objectUrl);
 
-        return () => URL.revokeObjectURL(objectUrl); // cleanup on unmount
+        return () => URL.revokeObjectURL(objectUrl); // cleanup
     }, [selectedFile]);
-
-    const isVideo = selectedFile?.type.startsWith("video");
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -25,11 +28,19 @@ const MediaUpload = ({ date, onClose, onSubmit, challengeId }) => {
         }
     };
 
-    const handleSubmit = () => {
-        if (selectedFile) {
-            onSubmit(date, selectedFile);
+    const handleSubmit = async () => {
+        if (!selectedFile) return;
+
+        try {
+            await uploadEvidence({ file: selectedFile, challengeId }).unwrap();
+            toast.success("✅ Nộp bằng chứng thành công!");
             setSelectedFile(null);
             setPreview(null);
+            onClose();
+        } catch (err) {
+            console.error(err);
+            const errorMessage = err?.data?.error || "❌ Đã xảy ra lỗi khi nộp bằng chứng.";
+            toast.error(errorMessage);
         }
     };
 
@@ -69,7 +80,8 @@ const MediaUpload = ({ date, onClose, onSubmit, challengeId }) => {
                         )
                     ) : (
                         <div
-                            className="w-11/12 h-full flex flex-col items-center justify-center border-2 border-gray-300 border-dashed rounded-lg bg-gray-50">
+                            className="w-11/12 h-full flex flex-col items-center justify-center border-2 border-gray-300 border-dashed rounded-lg bg-gray-50"
+                        >
                             <IoCloudUploadOutline className="text-2xl" />
                             <p className="mb-2 text-sm text-gray-500">
                                 <span className="font-semibold">Click to upload</span> or drag and drop
@@ -81,11 +93,11 @@ const MediaUpload = ({ date, onClose, onSubmit, challengeId }) => {
                     {/* Hover Overlay */}
                     {preview && !isVideo && (
                         <div
-                            className="w-11/12 h-full justify-self-center absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
+                            className="w-11/12 h-full justify-self-center absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg"
+                        >
                             <span className="text-white font-semibold">Change File</span>
                         </div>
                     )}
-
                 </div>
 
                 {/* Submit / Cancel */}
@@ -107,11 +119,11 @@ const MediaUpload = ({ date, onClose, onSubmit, challengeId }) => {
                         Cancel
                     </button>
                     <button
-                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
                         onClick={handleSubmit}
-                        disabled={!selectedFile}
+                        disabled={!selectedFile || isLoading}
                     >
-                        Submit
+                        {isLoading ? "Uploading..." : "Submit"}
                     </button>
                 </div>
             </div>
