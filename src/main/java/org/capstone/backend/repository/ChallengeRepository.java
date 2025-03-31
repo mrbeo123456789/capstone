@@ -14,6 +14,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -29,7 +30,6 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
            c.createdAt DESC
        """)
     Page<AdminChallengesResponse> findAllByPriority(Pageable pageable);
-
     @Query("""
        SELECT new org.capstone.backend.dto.challenge.ChallengeResponse(
            c.id, c.name, c.summary, c.picture
@@ -50,11 +50,13 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
        FROM ChallengeMember cm
        JOIN cm.challenge c
        WHERE cm.member.id = :memberId
-       AND (:role IS NULL OR cm.role = :role)
+       AND (:role IS NULL OR cm.role = :role) 
        ORDER BY c.updatedAt DESC
        """)
     List<MyChallengeResponse> findChallengesByMemberAndRole(@Param("memberId") Long memberId,
                                                             @Param("role") ChallengeRole role);
+
+    // Đúng kiểu
 
     @Query("""
     SELECT new org.capstone.backend.dto.challenge.ChallengeDetailResponse(
@@ -73,5 +75,9 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
             @Param("challengeId") Long challengeId,
             @Param("memberId") Long memberId);
 
+    @Query("SELECT c.id FROM Challenge c WHERE :today BETWEEN c.startDate AND c.endDate")
+    List<Long> findChallengesHappeningToday(@Param("today") LocalDate today);
 
+    @Query("SELECT c.id FROM Challenge c WHERE c.endDate = :today")
+    List<Long> findChallengesEndingToday(@Param("today") LocalDate today);
 }

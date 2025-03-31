@@ -9,6 +9,7 @@ import org.capstone.backend.utils.enums.Role;
 import org.capstone.backend.utils.jwt.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
@@ -151,11 +152,9 @@ public class AuthServiceImpl implements AuthService {
 
         return true;
     }
-    public Long getMemberIdFromAuthentication(Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
-            throw new RuntimeException("User is not authenticated");
-        }
-        // 🔥 Get username from Authentication
+    public Long getMemberIdFromAuthentication() {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();  // Usually the `sub` from JWT
         // 🔥 Find the Account using username
         Account account = accountRepository.findByUsername(username)
@@ -165,4 +164,5 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(() -> new RuntimeException("Member not found"));
         return member.getId();
     }
+
 }

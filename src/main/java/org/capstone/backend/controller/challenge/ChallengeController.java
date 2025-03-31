@@ -35,15 +35,7 @@ public class ChallengeController {
             @RequestParam(value = "banner", required = false) MultipartFile banner
     ) {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication == null || !authentication.isAuthenticated() ||
-                    "anonymousUser".equals(authentication.getPrincipal())) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body("User is not authenticated");
-            }
-
-            String username = authentication.getName();
-            String resultMessage = challengeService.createChallenge(request, picture, banner, username);
+            String resultMessage = challengeService.createChallenge(request, picture, banner);
             return ResponseEntity.ok(resultMessage);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -77,12 +69,17 @@ public class ChallengeController {
     }
 
     @PostMapping("/my-challenges")
-    public ResponseEntity<List<MyChallengeResponse>> getMyChallenges(@RequestBody String request) {
-        ChallengeRole role = ChallengeRole.valueOf(request.replace("\"", "").toUpperCase());
-
-        List<MyChallengeResponse> challenges = challengeService.getChallengesByMember(role);
-        return ResponseEntity.ok(challenges);
+    public ResponseEntity<?> getMyChallenges(@RequestBody MyChallengeRequest request) {
+        try {
+            System.out.println("Received role: " + request.getRole()); // Debug request
+            ChallengeRole role = ChallengeRole.valueOf(request.getRole().toUpperCase().trim());
+            List<MyChallengeResponse> challenges = challengeService.getChallengesByMember(role);
+            return ResponseEntity.ok(challenges);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid role: " + request.getRole());
+        }
     }
+
     @GetMapping("/{challengeId}/detail")
     public ResponseEntity<ChallengeDetailResponse> getChallengeDetail(@PathVariable Long challengeId) {
         ChallengeDetailResponse detail = challengeService.getChallengeDetail(challengeId);

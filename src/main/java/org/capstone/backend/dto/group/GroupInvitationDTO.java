@@ -1,7 +1,8 @@
 package org.capstone.backend.dto.group;
 
+import lombok.Builder;
 import lombok.Data;
-
+@Builder
 @Data
 public class GroupInvitationDTO {
     private Long groupId;

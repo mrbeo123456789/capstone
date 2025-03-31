@@ -3,8 +3,12 @@ package org.capstone.backend;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
+@EnableScheduling
+@EnableAsync
 public class BackEndApplication {
 
     public static void main(String[] args) {
@@ -12,8 +16,7 @@ public class BackEndApplication {
         Dotenv dotenv = Dotenv.configure()
                 .ignoreIfMissing() // Cho phép chạy tiếp nếu không có file .env
                 .load();
-        // In ra một biến để kiểm tra xem đã load thành công hay chưa
-        System.out.println("DATABASE_URL = " + dotenv.get("DATABASE_URL"));
+
 
         // Nếu cần tích hợp với Spring Boot, bạn có thể chuyển các giá trị từ dotenv vào System properties:
         dotenv.entries().forEach(entry ->

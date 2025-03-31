@@ -1,5 +1,6 @@
 package org.capstone.backend.utils.upload;
 
+import com.google.cloud.storage.Bucket;
 import com.google.firebase.cloud.StorageClient;
 import com.google.cloud.storage.Blob;
 import org.springframework.stereotype.Service;
@@ -24,4 +25,20 @@ public class FirebaseUpload {
                 StorageClient.getInstance().bucket().getName(),
                 java.net.URLEncoder.encode(blob.getName(), "UTF-8")); // 👈 encode URL
     }
+    public String uploadFileWithOverwrite(MultipartFile file, String path) throws IOException {
+        Bucket bucket = StorageClient.getInstance().bucket();
+
+        // ❌ Nếu đã có file cũ, xóa đi trước khi ghi đè
+        Blob existingBlob = bucket.get(path);
+        if (existingBlob != null && existingBlob.exists()) {
+            existingBlob.delete();
+        }
+
+        // ✅ Upload file mới với cùng path
+        Blob blob = bucket.create(path, file.getInputStream(), file.getContentType());
+
+        // 🔗 Lấy URL có thể dùng (tuỳ bạn dùng signed URL hay media link)
+        return blob.getMediaLink(); // Hoặc generate signed URL nếu cần bảo mật
+    }
+
 }
