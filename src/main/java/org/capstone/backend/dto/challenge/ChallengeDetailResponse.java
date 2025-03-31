@@ -20,4 +20,5 @@ public class ChallengeDetailResponse {
     private String challengeType;
     private boolean joined;
     private long participantCount;
+    private long duration; // Thêm trường duration
 }
