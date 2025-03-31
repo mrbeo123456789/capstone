@@ -28,7 +28,18 @@ export const evidenceService = createApi({
                 };
             },
         }),
+        getMyEvidencesByChallenge: builder.query({
+            query: (challengeId) => ({
+                url: `/evidences/${challengeId}/my-evidences`,
+                method: "GET",
+            }),
+        }),
+
     }),
 });
 
-export const { useUploadEvidenceMutation } = evidenceService;
+export const {
+    useUploadEvidenceMutation,
+    useGetMyEvidencesByChallengeQuery, // ✅ Export hook here
+
+} = evidenceService;

@@ -4,15 +4,28 @@ import toast from "react-hot-toast";
 
 const LOCAL_STORAGE_KEY = "markedDays";
 
-export default function ProgressTracking({ challenge }) {
+export default function ProgressTracking({ challenge, evidence }) {
     const [markedDays, setMarkedDays] = useState({});
+    console.log("HEllodasd")
+    console.log(evidence);
+    console.log("this is challenge", challenge);
+    const submittedEvidenceDates = new Set(
+        evidence?.map((e) => {
+            const [year, month, day] = e.submittedAt;
+            console.log("Hello" + `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`)
+            return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+        })
+    );
+
+
     const today = new Date();
+    const challengeId = challenge?.id;
     const [currentMonth, setCurrentMonth] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
 
     const [showModal, setShowModal] = useState(false);
     const [selectedDate, setSelectedDate] = useState(null);
 
-    const challengeId = challenge?.id;
+
 
 // Convert startDate & endDate from [YYYY, MM, DD] to Date objects
     const startDate = challenge?.startDate
@@ -42,22 +55,26 @@ export default function ProgressTracking({ challenge }) {
 
     const getCalendarGrid = () => {
         const startDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
-        const endDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
-        const startDayOfWeek = startDate.getDay();
+        const startDayOfWeek = startDate.getDay(); // 0 = Sunday, 6 = Saturday
 
-        const totalDays = startDayOfWeek + endDate.getDate();
-        const totalCells = Math.ceil(totalDays / 7) * 7;
+        const daysInMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
+        const totalCells = Math.ceil((startDayOfWeek + daysInMonth) / 7) * 7;
 
         const days = [];
 
         for (let i = 0; i < totalCells; i++) {
-            const date = new Date(startDate);
-            date.setDate(date.getDate() - startDayOfWeek + i);
-            days.push(date);
+            const day = new Date(
+                currentMonth.getFullYear(),
+                currentMonth.getMonth(),
+                i - startDayOfWeek + 1
+            );
+            days.push(day);
         }
 
         return days;
     };
+
+
 
 
     const calendarDays = getCalendarGrid();
@@ -98,18 +115,25 @@ export default function ProgressTracking({ challenge }) {
 
             <div className="grid grid-cols-7 gap-1 text-center text-sm">
                 {calendarDays.map((date, idx) => {
-                    const dateStr = date.toISOString().split("T")[0];
+                    const dateStr = date.toLocaleDateString("sv-SE"); // ✅ returns "YYYY-MM-DD"
                     const isToday = date.toDateString() === new Date().toDateString();
                     const isMarked = markedDays[dateStr];
                     const isCurrentMonth = date.getMonth() === currentMonth.getMonth();
                     const isWithinChallenge = date >= startDate && date <= endDate;
+                    const hasEvidence = submittedEvidenceDates.has(dateStr);
+                    const isPast = date < today && isWithinChallenge;
+                    const showRedX = isPast && !hasEvidence;
 
                     return (
                         <div
                             key={idx}
                             className={`relative h-10 flex items-center justify-center rounded transition-all
                                             ${isCurrentMonth ? "cursor-pointer hover:bg-gray-400 text-gray-800" : "text-gray-400 opacity-50"}
-                                            ${isMarked ? "bg-red-100" : isWithinChallenge ? "bg-gray-200" : ""}
+                                            ${hasEvidence ? "bg-green-200"
+                                : showRedX ? "bg-red-200"
+                                    : isWithinChallenge ? "bg-gray-200"
+                                        : ""}
+
                                             ${isToday ? "border border-blue-500" : ""}
                                         `}
                             onClick={() => {
@@ -120,13 +144,13 @@ export default function ProgressTracking({ challenge }) {
                             }}
                         >
                             {date.getDate()}
-                            {isMarked && (
-                                <img
-                                    src="https://darebee.com/images/content/x.png"
-                                    alt="X"
-                                    className="absolute w-4 h-4"
-                                />
-                            )}
+                            {hasEvidence ? (
+                                <span className="absolute top-0 right-1 text-green-700 text-lg font-bold">✓</span>
+                            ) : showRedX ? (
+                                <span className="absolute top-0 right-1 text-red-600 text-lg font-bold">✕</span>
+                            ) : null}
+
+
                         </div>
                     );
                 })}

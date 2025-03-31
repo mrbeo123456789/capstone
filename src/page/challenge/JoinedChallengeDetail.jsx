@@ -8,6 +8,7 @@ import {useParams} from "react-router-dom";
 import {useGetChallengeDetailQuery} from "../../service/challengeService.js";
 import Description from "./description.jsx";
 import ProgressTracking from "./ProgressTracking.jsx";
+import {useGetMyEvidencesByChallengeQuery} from "../../service/evidenceService.js";
 
 const JoinedChallengeDetail = () => {
     const [activeTab, setActiveTab] = useState("proof");
@@ -15,6 +16,9 @@ const JoinedChallengeDetail = () => {
 
     const { id } = useParams(); // Lấy challenge ID từ URL
     const { data, isLoading, error } = useGetChallengeDetailQuery(id);
+    const {data: evidenceData, isEvidenceLoading, errorEvidence } = useGetMyEvidencesByChallengeQuery(id);
+    console.log("This is data from getttt",evidenceData);
+
     console.log(data)
 
     if (isLoading) return <p>Loading...</p>;
@@ -51,7 +55,10 @@ const JoinedChallengeDetail = () => {
                             className="text-orange-500 font-semibold">{challenge?.challengeType}</span>
                         </p>
                         <div className="">
-                            <ProgressTracking challenge={challenge} />
+                            <ProgressTracking
+                                challenge={challenge}
+                                evidence={evidenceData}
+                            />
                         </div>
                     </div>
                     <div className="bg-gray-200 flex items-center justify-center rounded-lg md:w-2/5">
