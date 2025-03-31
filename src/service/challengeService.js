@@ -68,6 +68,16 @@ export const challengeService = createApi({
             }),
             invalidatesTags: ["Challenge"],
         }),
+        getMyChallenges: builder.mutation({
+            query: (challengeRole) => ({
+                url: '/challenges/my-challenges',
+                method: 'POST',
+                body: challengeRole,
+            }),
+        }),
+        getChallengeDetail: builder.query({
+            query: (challengeId) => `/challenges/${challengeId}/detail`,
+        }),
     }),
 });
 
@@ -78,6 +88,8 @@ export const {
     useDeleteChallengeMutation,
     useGetChallengeTypesQuery, // <- Add this
     useGetApprovedChallengesQuery, // <--- Add this
-    useJoinChallengeMutation // <--- Add this!
+    useJoinChallengeMutation, // <--- Add this!
+    useGetMyChallengesMutation,
+    useGetChallengeDetailQuery, // ✅ Thêm dòng này
 } = challengeService;
 

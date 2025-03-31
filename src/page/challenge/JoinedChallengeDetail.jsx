@@ -4,17 +4,23 @@ import ProofUploads from "./ProofUploads";
 import RankingList from "./RankingList";
 import VoteOther from "./VoteOther";
 import MemberListPopup from "../ui/MemberListPopup.jsx";
+import {useParams} from "react-router-dom";
+import {useGetChallengeDetailQuery} from "../../service/challengeService.js";
+import Description from "./description.jsx";
 
 const JoinedChallengeDetail = () => {
     const [activeTab, setActiveTab] = useState("proof");
     const progress = 60;
     const [showPopup, setShowPopup] = useState(false);
 
-    const challenge = {
-        name: "Challenge Name",
-        startDate: "01/04/2024",
-        endDate: "30/04/2024",
-    };
+    const { id } = useParams(); // Lấy challenge ID từ URL
+    const { data, isLoadingz, error } = useGetChallengeDetailQuery(id);
+    console.log(data)
+
+    if (isLoadingz) return <p>Loading...</p>;
+    if (error) return <p>Error loading challenge detail</p>;
+
+    const challenge = data;
 
     const openMemberList = () => {
         console.log("openUserDetail");
@@ -30,9 +36,9 @@ const JoinedChallengeDetail = () => {
             <div className="mx-auto bg-white rounded-lg shadow-lg p-6 m-2">
                 <div className="flex flex-col md:flex-row justify-between items-center">
                     <div className="md:w-2/3">
-                        <h1 className="text-2xl font-bold text-red-600">{challenge.name}</h1>
-                        <p className="text-gray-700">Start Date: {challenge.startDate}</p>
-                        <p className="text-gray-700">End Date: {challenge.endDate}</p>
+                        <h1 className="text-2xl font-bold text-red-600">{challenge?.name}</h1>
+                        <p className="text-gray-700">Start Date: {challenge?.startDate.join("-")}</p>
+                        <p className="text-gray-700">End Date: {challenge?.endDate.join("-")}</p>
                         <button className="text-white bg-red-600 px-6 py-2 rounded hover:bg-red-900"
                         onClick={() => openMemberList()}>
                             Invite
@@ -48,13 +54,19 @@ const JoinedChallengeDetail = () => {
                         </div>
                     </div>
                     <div className="w-40 h-40 bg-gray-200 flex items-center justify-center rounded-lg">
-                    <IoCloudUploadOutline className="text-gray-500 text-4xl" />
+                        <img
+                            src={challenge?.picture}
+                            alt={challenge?.name}
+                            className="w-full h-full object-cover rounded"
+                        />
+
+                        <IoCloudUploadOutline className="text-gray-500 text-4xl"/>
                     </div>
                 </div>
             </div>
 
             <div className="mt-6 w-full mx-auto">
-                <div className="flex border-b-2 border-gray-300">
+            <div className="flex border-b-2 border-gray-300">
                     <button
                         className={`flex-1 p-2 text-center font-bold ${
                             activeTab === "proof" ? "bg-blue-500 text-white" : "hover:bg-gray-200 text-gray-700"
@@ -79,12 +91,21 @@ const JoinedChallengeDetail = () => {
                     >
                         Vote Other
                     </button>
+                    <button
+                        className={`flex-1 p-2 text-center font-bold ${
+                            activeTab === "descriptions" ? "bg-blue-500 text-white" : "hover:bg-gray-200 text-gray-700"
+                        }`}
+                        onClick={() => setActiveTab("description")}
+                    >
+                        Description
+                    </button>
                 </div>
             </div>
 
-            {activeTab === "proof" && <ProofUploads />}
-            {activeTab === "ranking" && <RankingList />}
-            {activeTab === "voteOther" && <VoteOther />}
+            {activeTab === "proof" && <ProofUploads/>}
+            {activeTab === "ranking" && <RankingList/>}
+            {activeTab === "voteOther" && <VoteOther/>}
+            {activeTab === "description" && <Description content={challenge?.description} />}
             {/* User Detail Popup */}
             {showPopup && (
                 <MemberListPopup
