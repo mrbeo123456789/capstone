@@ -1,5 +1,4 @@
 import {createBrowserRouter, Navigate} from "react-router-dom";
-import LoginForm from "../page/signin/loginform.jsx";
 import ErrorPage from "../page/error/ErrorPage.jsx";
 import Layout from "../page/ui/Layout.jsx";
 import RegisterForm from "../page/signin/register.jsx";
@@ -28,10 +27,9 @@ import GroupForm from "../page/group/GroupForm.jsx";
 import YourGroup from "../page/group/YourGroup.jsx";
 import Home from "../heroBanner/Home.jsx";
 import ChallengePage from "../page/challenge/ChallengePage.jsx";
-
 import ChallengeEvidencePage from "../page/admin/ChallengeEvidencePage.jsx";
-
 import GroupList from "../page/admin/GroupList.jsx";
+import AboutUsPage from "../page/ui/AboutUs.jsx";
 const router = createBrowserRouter([
     {
         path: "/", // ✅ Redirect root to homepage
@@ -54,51 +52,46 @@ const router = createBrowserRouter([
         element: <Home/>,
     },
     {
-        path:"/admin-dashboard",
+        path:"/admin/dashboard",
         errorElement:<ErrorPage/>,
         element: <AdminDashboard/>,
     },
     {
-        path:"/admin-userlist",
+        path:"/admin/userlist",
         errorElement:<ErrorPage/>,
         element: <UserList/>,
     },
     {
-        path:"/admin-evidencelist",
+        path:"/admin/evidencelist",
         errorElement:<ErrorPage/>,
         element: <EvidenceList/>,
     },
     {
-        path:"/admin-reportlist",
+        path:"/admin/reportlist",
         errorElement:<ErrorPage/>,
         element: <ReportList/>,
     },
     {
-        path:"/admin-challengelist",
+        path:"/admin/challengelist",
         errorElement:<ErrorPage/>,
         element: <ChallengeList/>,
     },
     {
         path:"/login",
         errorElement:<ErrorPage/>,
-        element: <LoginForm/>,
-    },
-    {
-        path:"/signin",
-        errorElement:<ErrorPage/>,
         element: <LoginPage/>,
     },
     {
         path:"/register",
         errorElement:<ErrorPage/>,
-        element: <Layout></Layout>,
-        children:[
-            {
-                index: true,  // This sets the default page for /member
                 element: <RegisterForm />  // Replace with your default component
-            }
-        ]
     },
+    {
+        path:"/aboutus",
+        errorElement:<ErrorPage/>,
+                element: <AboutUsPage />  // Replace with your default component
+    },
+
     {
         path:"/password",
         errorElement:<ErrorPage/>,

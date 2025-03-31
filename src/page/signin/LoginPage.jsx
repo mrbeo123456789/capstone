@@ -1,6 +1,7 @@
 import { useState } from "react";
 import google_icon from "../../assets/google-icon.png";
-import background from "../../assets/login.png";
+import background from "../../assets/login2.png";
+import { useNavigate } from "react-router-dom";
 import { useLoginMutation } from "../../service/authService.js";
 
 export default function Login() {
@@ -9,32 +10,62 @@ export default function Login() {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
     const [login] = useLoginMutation();
+    const navigate = useNavigate();
 
+    const handleForgotPassword = () => {
+        navigate('/forgot-password'); // Chuyển hướng đến trang forgotpassword
+    };
+    const handleRegister = () => {
+        navigate('/register'); // Chuyển hướng đến trang forgotpassword
+    };
     const handleLogin = async (e) => {
         e.preventDefault();
         setError(null);
-        setLoading(true);
 
-        try {
-            const response = await login({username, password });
-            console.log("Login Response:", response);
-            window.location.href = "/member/detail"; // Chuyển hướng sau khi đăng nhập
-        } catch (err) {
-            setError(err.message || "Đăng nhập thất bại");
+        if (!username.trim()) {
+            setError("Username cannot be empty");
+            return;
+        }
+        if (password.length < 6) {
+            setError("Password must be at least 6 characters long");
+            return;
         }
 
+        setLoading(true);
+        try {
+            const response = await login({ username, password }).unwrap(); // unwrap giúp lấy dữ liệu JSON chuẩn
+            console.log("Login Response:", response);
+
+            if (response.token) {
+                localStorage.setItem("jwt_token", response.token);
+                navigate("/homepage");
+            } else {
+                setError("Unexpected response from server");
+            }
+        } catch (err) {
+            console.error("Login Error:", err);
+
+            if (err.data && err.data.error) {
+                setError(err.data.error);
+            } else if (err.status === 401) {
+                setError("Thông tin không chính xác");
+            } else {
+                setError("Login failed. Please try again.");
+            }
+        }
         setLoading(false);
     };
     // Chuyển hướng người dùng đến Google OAuth
     const loginWithGoogle = () => {
         window.location.href = "http://localhost:8080/oauth2/authorization/google";
     };
+
     return (
         <div className="relative min-h-screen bg-black">
             {/* Background overlay */}
             <div style={{ backgroundImage: `url(${background})` }} className="absolute inset-0 w-full h-screen bg-cover bg-center opacity-50"></div>
 
-            {/* Netflix Logo */}
+            {/* Sport Logo */}
             <div className="absolute top-5 left-5">
                 <h1 className="text-red-600 text-4xl font-bold">GoBeyond</h1>
             </div>
@@ -89,21 +120,21 @@ export default function Login() {
                         </button>
 
                         {/* Remember Me & Forgot Password */}
-                        <div className="flex justify-between items-center text-sm text-gray-400">
-                            <label className="flex items-center">
-                                <input type="checkbox" className="mr-2 accent-red-600" />
-                                Ghi nhớ tôi
-                            </label>
-                            <a href="#" className="text-white hover:underline">
-                                Bạn quên mật khẩu?
-                            </a>
+                        <div className="text-right">
+                            <button
+                                type="button"
+                                onClick={handleForgotPassword}
+                                className="text-sm text-blue-500 hover:underline"
+                            >
+                                Quên mật khẩu?
+                            </button>
                         </div>
 
                         {/* Sign Up Link */}
                         <div className="text-center text-gray-400 text-sm">
                             <p>
                                 Bạn mới sử dụng GoBeyond?{" "}
-                                <a href="/register.jsx" className="text-white hover:underline">
+                                <a onClick={handleRegister} className="text-white hover:underline">
                                     Đăng ký ngay
                                 </a>
                             </p>
