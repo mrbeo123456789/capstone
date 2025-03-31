@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
     MenuSquare,
     Users,
@@ -16,15 +16,21 @@ import {
 const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const navigate = useNavigate();
 
     const toggleMobileMenu = () => {
         setIsMobileMenuOpen(!isMobileMenuOpen);
     };
 
-
     const toggleCollapse = () => {
         setIsCollapsed(!isCollapsed);
         setSidebarCollapsed(!sidebarCollapsed);
+    };
+
+    const handleLogout = () => {
+        // Xóa JWT token và chuyển hướng về trang login
+        localStorage.removeItem("jwt_token");
+        navigate("/login");
     };
 
     return (
@@ -41,20 +47,34 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
 
             {/* Sidebar Container - hidden on mobile unless toggled */}
             <div
-                className={`bg-white text-gray-700 h-screen fixed left-0 top-0 z-40 ${isCollapsed ? 'w-16' : 'w-64'} shadow-lg transition-all duration-300 transform 
-        ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
+                className={`bg-white text-gray-700 h-screen fixed left-0 top-0 z-40 ${
+                    isCollapsed ? "w-16" : "w-64"
+                } shadow-lg transition-all duration-300 transform 
+                ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
             >
                 {/* Logo Container */}
                 <div className="py-6 px-4 bg-orange-50 flex justify-between items-center">
-                    {!isCollapsed && <div className="text-orange-600 text-2xl font-bold">GOBEYOND</div>}
-                    {isCollapsed && <div className="text-orange-600 text-2xl font-bold mx-auto">G</div>}
+                    {!isCollapsed && (
+                        <div className="text-orange-600 text-2xl font-bold">
+                            GOBEYOND
+                        </div>
+                    )}
+                    {isCollapsed && (
+                        <div className="text-orange-600 text-2xl font-bold mx-auto">
+                            G
+                        </div>
+                    )}
 
                     {/* Collapse/Expand toggle button - hidden on mobile */}
                     <button
                         onClick={toggleCollapse}
                         className="hidden md:block p-1 rounded-full hover:bg-orange-100 text-orange-500"
                     >
-                        {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+                        {isCollapsed ? (
+                            <ChevronRight size={20} />
+                        ) : (
+                            <ChevronLeft size={20} />
+                        )}
                     </button>
                 </div>
 
@@ -65,7 +85,9 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
                             <NavLink
                                 to="/admin/challengelist"
                                 className={({ isActive }) =>
-                                    `flex items-center ${isCollapsed ? 'justify-center' : 'px-4'} py-3 rounded-md transition duration-200 ${
+                                    `flex items-center ${
+                                        isCollapsed ? "justify-center" : "px-4"
+                                    } py-3 rounded-md transition duration-200 ${
                                         isActive
                                             ? "bg-gradient-to-r from-orange-100 to-yellow-100 text-orange-600 font-medium"
                                             : "hover:bg-gray-100"
@@ -73,7 +95,10 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
                                 }
                                 title="Challenge List"
                             >
-                                <MenuSquare size={20} className={isCollapsed ? '' : 'mr-3'} />
+                                <MenuSquare
+                                    size={20}
+                                    className={isCollapsed ? "" : "mr-3"}
+                                />
                                 {!isCollapsed && <span>Challenge List</span>}
                             </NavLink>
                         </li>
@@ -82,7 +107,9 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
                             <NavLink
                                 to="/admin/userlist"
                                 className={({ isActive }) =>
-                                    `flex items-center ${isCollapsed ? 'justify-center' : 'px-4'} py-3 rounded-md transition duration-200 ${
+                                    `flex items-center ${
+                                        isCollapsed ? "justify-center" : "px-4"
+                                    } py-3 rounded-md transition duration-200 ${
                                         isActive
                                             ? "bg-gradient-to-r from-orange-100 to-yellow-100 text-orange-600 font-medium"
                                             : "hover:bg-gray-100"
@@ -90,34 +117,44 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
                                 }
                                 title="User List"
                             >
-                                <Users size={20} className={isCollapsed ? '' : 'mr-3'} />
+                                <Users
+                                    size={20}
+                                    className={isCollapsed ? "" : "mr-3"}
+                                />
                                 {!isCollapsed && <span>User List</span>}
                             </NavLink>
                         </li>
 
                         {/* Group List with dropdown */}
                         <li>
-                                <NavLink
-                                    to="/admin/grouplist"
-                                    className={({ isActive }) =>
-                                        `flex items-center ${isCollapsed ? 'justify-center' : 'px-4'} py-3 rounded-md transition duration-200 ${
-                                            isActive
-                                                ? "bg-gradient-to-r from-orange-100 to-yellow-100 text-orange-600 font-medium"
-                                                : "hover:bg-gray-100"
-                                        }`
-                                    }
-                                    title="Group List"
-                                >
-                                    <UserSquare size={20} className={isCollapsed ? '' : 'mr-3'} />
-                                    {!isCollapsed && <span>Group List</span>}
-                                </NavLink>
+                            <NavLink
+                                to="/admin/grouplist"
+                                className={({ isActive }) =>
+                                    `flex items-center ${
+                                        isCollapsed ? "justify-center" : "px-4"
+                                    } py-3 rounded-md transition duration-200 ${
+                                        isActive
+                                            ? "bg-gradient-to-r from-orange-100 to-yellow-100 text-orange-600 font-medium"
+                                            : "hover:bg-gray-100"
+                                    }`
+                                }
+                                title="Group List"
+                            >
+                                <UserSquare
+                                    size={20}
+                                    className={isCollapsed ? "" : "mr-3"}
+                                />
+                                {!isCollapsed && <span>Group List</span>}
+                            </NavLink>
                         </li>
 
                         <li>
                             <NavLink
                                 to="/admin/evidencelist"
                                 className={({ isActive }) =>
-                                    `flex items-center ${isCollapsed ? 'justify-center' : 'px-4'} py-3 rounded-md transition duration-200 ${
+                                    `flex items-center ${
+                                        isCollapsed ? "justify-center" : "px-4"
+                                    } py-3 rounded-md transition duration-200 ${
                                         isActive
                                             ? "bg-gradient-to-r from-orange-100 to-yellow-100 text-orange-600 font-medium"
                                             : "hover:bg-gray-100"
@@ -125,7 +162,10 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
                                 }
                                 title="Evidence List"
                             >
-                                <FileText size={20} className={isCollapsed ? '' : 'mr-3'} />
+                                <FileText
+                                    size={20}
+                                    className={isCollapsed ? "" : "mr-3"}
+                                />
                                 {!isCollapsed && <span>Evidence List</span>}
                             </NavLink>
                         </li>
@@ -134,7 +174,9 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
                             <NavLink
                                 to="/admin/reportlist"
                                 className={({ isActive }) =>
-                                    `flex items-center ${isCollapsed ? 'justify-center' : 'px-4'} py-3 rounded-md transition duration-200 ${
+                                    `flex items-center ${
+                                        isCollapsed ? "justify-center" : "px-4"
+                                    } py-3 rounded-md transition duration-200 ${
                                         isActive
                                             ? "bg-gradient-to-r from-orange-100 to-yellow-100 text-orange-600 font-medium"
                                             : "hover:bg-gray-100"
@@ -142,7 +184,10 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
                                 }
                                 title="Report List"
                             >
-                                <AlertTriangle size={20} className={isCollapsed ? '' : 'mr-3'} />
+                                <AlertTriangle
+                                    size={20}
+                                    className={isCollapsed ? "" : "mr-3"}
+                                />
                                 {!isCollapsed && <span>Report List</span>}
                             </NavLink>
                         </li>
@@ -151,7 +196,9 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
                             <NavLink
                                 to="/createChallenge"
                                 className={({ isActive }) =>
-                                    `flex items-center ${isCollapsed ? 'justify-center' : 'px-4'} py-3 rounded-md transition duration-200 ${
+                                    `flex items-center ${
+                                        isCollapsed ? "justify-center" : "px-4"
+                                    } py-3 rounded-md transition duration-200 ${
                                         isActive
                                             ? "bg-gradient-to-r from-orange-100 to-yellow-100 text-orange-600 font-medium"
                                             : "hover:bg-gray-100"
@@ -159,7 +206,10 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
                                 }
                                 title="Create Challenge"
                             >
-                                <PlusCircle size={20} className={isCollapsed ? '' : 'mr-3'} />
+                                <PlusCircle
+                                    size={20}
+                                    className={isCollapsed ? "" : "mr-3"}
+                                />
                                 {!isCollapsed && <span>Create Challenge</span>}
                             </NavLink>
                         </li>
@@ -168,14 +218,16 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
 
                 {/* Logout section at bottom */}
                 <div className="absolute bottom-0 left-0 right-0 p-4">
-                    <NavLink
-                        to="/logout"
-                        className={`flex items-center ${isCollapsed ? 'justify-center' : 'px-4'} py-3 rounded-md transition duration-200 hover:bg-gray-100 text-gray-500 hover:text-gray-700`}
+                    <button
+                        onClick={handleLogout}
+                        className={`flex items-center ${
+                            isCollapsed ? "justify-center" : "px-4"
+                        } py-3 rounded-md transition duration-200 hover:bg-gray-100 text-gray-500 hover:text-gray-700`}
                         title="Logout"
                     >
-                        <LogOut size={20} className={isCollapsed ? '' : 'mr-3'} />
+                        <LogOut size={20} className={isCollapsed ? "" : "mr-3"} />
                         {!isCollapsed && <span>Logout</span>}
-                    </NavLink>
+                    </button>
                 </div>
             </div>
 

@@ -258,17 +258,29 @@ const UserList = () => {
                     </div>
 
                     {/* Footer: nút Khóa/Mở khóa và Đóng */}
-                    <div className="bg-gray-50 px-6 py-4 flex justify-end space-x-3 border-t border-gray-200">
-                        <button
-                            className={`p-2 rounded-md transition-colors ${
-                                userData.status.toLowerCase() === "banned"
-                                    ? "bg-green-100 text-green-600 hover:bg-green-200"
-                                    : "bg-red-100 text-red-600 hover:bg-red-200"
-                            }`}
-                            onClick={() => onToggleStatus(userData.id, userData.status)}
-                        >
-                            {userData.status?.toLowerCase() === "active" ? "Khóa" : "Mở khóa"}
-                        </button>
+                    <div className="bg-gray-50 px-6 py-4 flex justify-end items-center border-t border-gray-200 space-x-3">
+                        {/* Toggle Switch */}
+                        <label htmlFor="toggleSwitch" className="relative inline-block w-12 h-6">
+                            <input
+                                id="toggleSwitch"
+                                type="checkbox"
+                                className="opacity-0 w-0 h-0"
+                                checked={userData.status?.toLowerCase() === "active"}
+                                onChange={() => onToggleStatus(userId, userData.status)}
+                            />
+                            <span
+                                className={`absolute cursor-pointer top-0 left-0 right-0 bottom-0 rounded-full transition-all duration-300 ${
+                                    userData.status?.toLowerCase() === "active" ? "bg-red-500" : "bg-green-500"
+                                }`}
+                            ></span>
+                            <span
+                                className={`absolute left-1 top-1 w-4 h-4 rounded-full bg-white transition-transform duration-300 ${
+                                    userData.status?.toLowerCase() === "active" ? "translate-x-6" : "translate-x-0"
+                                }`}
+                            ></span>
+                        </label>
+
+                        {/* Nút Đóng */}
                         <button
                             onClick={onClose}
                             className="px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
@@ -276,6 +288,8 @@ const UserList = () => {
                             Đóng
                         </button>
                     </div>
+
+
                 </div>
             </div>
         );

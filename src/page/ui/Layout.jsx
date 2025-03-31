@@ -10,7 +10,9 @@ function Layout() {
 
     return (
         <>
-            <Header toggleSidebar={toggleSidebar} />
+            <div className="sticky top-0 z-50">
+            <Header toggleSidebar={toggleSidebar}/>
+            </div>
             <div
                 className="sm:flex items-start justify-between h-full min-h-screen"
                 style={{
