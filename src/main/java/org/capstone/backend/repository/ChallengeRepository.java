@@ -14,6 +14,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -74,5 +75,9 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
             @Param("challengeId") Long challengeId,
             @Param("memberId") Long memberId);
 
+    @Query("SELECT c.id FROM Challenge c WHERE :today BETWEEN c.startDate AND c.endDate")
+    List<Long> findChallengesHappeningToday(@Param("today") LocalDate today);
 
+    @Query("SELECT c.id FROM Challenge c WHERE c.endDate = :today")
+    List<Long> findChallengesEndingToday(@Param("today") LocalDate today);
 }

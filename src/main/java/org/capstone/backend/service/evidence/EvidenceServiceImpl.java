@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class EvidenceServiceImpl implements EvidenceService {
@@ -62,151 +65,174 @@ private  final FixedGmailService fixedGmailService;
     }
 
     @Override
-    public Evidence uploadAndSubmitEvidence(MultipartFile file, Long challengeId) throws IOException {
+    public void uploadAndSubmitEvidence(MultipartFile file, Long challengeId) throws IOException {
         Long memberId = authService.getMemberIdFromAuthentication();
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new EntityNotFoundException("Member not found"));
 
         Challenge challenge = challengeRepository.findById(challengeId)
                 .orElseThrow(() -> new EntityNotFoundException("Challenge not found"));
 
+        LocalDate today = LocalDate.now();
+        LocalTime now = LocalTime.now();
+
+        // ✅ Kiểm tra thời gian nộp
+        if (today.isBefore(challenge.getStartDate()) || today.isAfter(challenge.getEndDate())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Hôm nay không nằm trong thời gian thử thách.");
+        }
+
+        if (today.equals(challenge.getEndDate()) && now.isAfter(LocalTime.of(21, 0))) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bạn chỉ được nộp trước 21:00 trong ngày cuối.");
+        }
+
+        // ✅ Kiểm tra người tham gia
         boolean isParticipant = challengeMemberRepository.existsByChallengeIdAndMemberIdAndStatus(
                 challengeId, memberId, ChallengeMemberStatus.JOINED);
 
         if (!isParticipant) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không tham gia thử thách này.");
+            throw new IllegalStateException("Bạn không tham gia thử thách này.");
         }
 
-        // Check evidence tồn tại trong ngày
-        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
-        LocalDateTime endOfDay = LocalDate.now().atTime(LocalTime.MAX);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new EntityNotFoundException("Member not found"));
 
-        boolean existsTodayEvidence = evidenceRepository
-                .existsByMemberIdAndChallengeIdAndSubmittedAtBetweenAndStatusIn(
-                        memberId, challengeId, startOfDay, endOfDay,
-                        List.of(EvidenceStatus.PENDING, EvidenceStatus.APPROVED));
+        // ✅ Tìm evidence cũ trong ngày
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
 
-        if (existsTodayEvidence) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Bạn đã nộp bằng chứng hôm nay rồi.");
+        Evidence oldEvidence = evidenceRepository.findFirstByMemberIdAndChallengeIdAndSubmittedAtBetweenAndStatus(
+                memberId, challengeId, startOfDay, endOfDay, EvidenceStatus.PENDING
+        ).orElse(null);
+
+        // ✅ Tạo path file để ghi đè
+        String path = String.format("evidences/challenge_%d/member_%d/%s.mp4",
+                challengeId, memberId, today.toString());
+
+        // ✅ Ghi đè file cũ nếu có
+        String fileUrl = firebaseStorageService.uploadFileWithOverwrite(file, path);
+
+        // ✅ Nếu đã tồn tại evidence hôm nay → update URL
+        if (oldEvidence != null) {
+            oldEvidence.setEvidenceUrl(fileUrl);
+            oldEvidence.setUpdatedAt(LocalDateTime.now());
+            evidenceRepository.save(oldEvidence);
+            return;
         }
 
-        // Upload file
-        String fileUrl = firebaseStorageService.uploadFile(file);
-
-        Evidence evidence = Evidence.builder()
+        // ✅ Tạo mới evidence nếu chưa tồn tại
+        Evidence newEvidence = Evidence.builder()
                 .challenge(challenge)
                 .member(member)
                 .evidenceUrl(fileUrl)
                 .status(EvidenceStatus.PENDING)
-                .submittedAt(LocalDateTime.now())
                 .build();
 
-        evidence = evidenceRepository.save(evidence);
+      evidenceRepository.save(newEvidence);
 
-        // Gán reviewer (nếu có)
-        Member reviewer = selectReviewer(challengeId, memberId);
-        if (reviewer != null) {
-            EvidenceReport report = EvidenceReport.builder()
-                    .evidence(evidence)
-                    .reviewer(reviewer)
-                    .build();
-            evidenceReportRepository.save(report);
-        }
 
-        return evidence;
     }
 
     @Override
     @Transactional
     public void reviewEvidence(EvidenceReviewRequest request) {
         Long reviewerId = authService.getMemberIdFromAuthentication();
-        Member reviewer = memberRepository.findById(reviewerId)
-                .orElseThrow(() -> new EntityNotFoundException("Reviewer not found"));
 
         Evidence evidence = evidenceRepository.findById(request.getEvidenceId())
                 .orElseThrow(() -> new EntityNotFoundException("Evidence not found"));
 
-        EvidenceReport report = evidenceReportRepository.findByEvidenceId(request.getEvidenceId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không có bản chấm nào."));
+        EvidenceReport report = evidenceReportRepository.findByEvidenceId(evidence.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Không có người chấm cho bằng chứng này."));
 
-        Long originalReviewerId = report.getReviewer().getId();
+        boolean isReviewer = report.getReviewer().getId().equals(reviewerId);
 
-        // Nếu người hiện tại ≠ người chấm ban đầu → kiểm tra quyền sửa
-        if (!originalReviewerId.equals(reviewerId)) {
-            // 👉 Check role của người CHẤM BAN ĐẦU
-            ChallengeRole originalRole = challengeMemberRepository
-                    .findByChallengeIdAndMemberId(evidence.getChallenge().getId(), originalReviewerId)
-                    .map(ChallengeMember::getRole)
-                    .orElse(ChallengeRole.MEMBER); // fallback
+        // Kiểm tra người gọi có phải Host/Co-host
+        ChallengeRole callerRole = challengeMemberRepository
+                .findByChallengeIdAndMemberId(evidence.getChallenge().getId(), reviewerId)
+                .map(ChallengeMember::getRole)
+                .orElse(null);
 
-            // Nếu người đầu tiên là Host/Co-host → cấm sửa
-            if (originalRole == ChallengeRole.HOST || originalRole == ChallengeRole.CO_HOST) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                        "Không thể chấm lại: Bằng chứng đã được chấm bởi Host hoặc Co-host.");
+        boolean isHostOrCoHost = callerRole == ChallengeRole.HOST || callerRole == ChallengeRole.CO_HOST;
+
+        boolean isAlreadyReviewed = report.getIsApproved() != null;
+
+        if (isAlreadyReviewed) {
+            if (!isHostOrCoHost) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền sửa bằng chứng đã chấm.");
             }
 
-            // 👉 Check role của người hiện tại
-            ChallengeRole currentRole = challengeMemberRepository
-                    .findByChallengeIdAndMemberId(evidence.getChallenge().getId(), reviewerId)
+            // Kiểm tra role của người đã chấm đầu
+            ChallengeRole originalReviewerRole = challengeMemberRepository
+                    .findByChallengeIdAndMemberId(evidence.getChallenge().getId(), report.getReviewer().getId())
                     .map(ChallengeMember::getRole)
-                    .orElse(null);
+                    .orElse(ChallengeRole.MEMBER);
 
-            if (currentRole != ChallengeRole.HOST && currentRole != ChallengeRole.CO_HOST) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền sửa kết quả đã chấm.");
+            if (originalReviewerRole != ChallengeRole.MEMBER) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Không thể sửa nếu người chấm đầu là Host/Co-host.");
+            }
+        } else {
+            // Lần đầu chấm → chỉ Reviewer hoặc Host/Co-host mới được
+            if (!isReviewer && !isHostOrCoHost) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không được phép chấm bằng chứng này.");
             }
         }
 
-        // ✅ Cho phép chấm / sửa chấm
+        // ✅ Check thời gian được phép chấm
+        LocalDate submittedDate = evidence.getSubmittedAt().toLocalDate();
+        LocalTime now = LocalTime.now();
+        LocalDate today = LocalDate.now();
+        boolean isEndDate = submittedDate.equals(evidence.getChallenge().getEndDate());
+
+        boolean isTooEarlyToReview =
+                (!isEndDate && today.isBefore(submittedDate.plusDays(1))) ||
+                        (isEndDate && today.equals(submittedDate) && now.isBefore(LocalTime.of(21, 0)));
+
+        if (isTooEarlyToReview) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Chưa đến thời gian được chấm bằng chứng.");
+        }
+
+        // ✅ Cập nhật trạng thái evidence
         evidence.setStatus(request.getIsApproved() ? EvidenceStatus.APPROVED : EvidenceStatus.REJECTED);
         evidence.setUpdatedAt(LocalDateTime.now());
         evidence.setUpdatedBy(reviewerId);
 
+        // ✅ Cập nhật report
         report.setIsApproved(request.getIsApproved());
         report.setFeedback(request.getFeedback());
         report.setReviewedAt(LocalDateTime.now());
         report.setUpdatedAt(LocalDateTime.now());
         report.setUpdatedBy(reviewerId);
-        report.setReviewer(reviewer); // Cập nhật reviewer mới nếu sửa
-// Sau khi evidence & report đã được save
+
         evidenceRepository.save(evidence);
         evidenceReportRepository.save(report);
 
-// ✅ Gửi mail cho người nộp
-        String toEmail = evidence.getMember().getAccount().getEmail();
-        String subject = "Bằng chứng của bạn đã được chấm";
-        String body = String.format("""
-    Xin chào %s,
+        // ✅ Gửi mail cho người nộp
+        try {
+            String toEmail = evidence.getMember().getAccount().getEmail();
+            String subject = "Bằng chứng của bạn đã được chấm";
+            String body = String.format("""
+            Xin chào %s,
 
-    Bằng chứng bạn đã nộp cho thử thách "%s" đã được %s.
+            Bằng chứng bạn đã nộp cho thử thách "%s" đã được %s.
 
-    Trạng thái: %s
-    Góp ý: %s
+            Trạng thái: %s
+            Góp ý: %s
 
-    Vui lòng truy cập GoBeyond để xem chi tiết.
+            Vui lòng truy cập GoBeyond để xem chi tiết.
 
-    Trân trọng,
-    Đội ngũ GoBeyond
-    """,
-                evidence.getMember().getFullName(),
-                evidence.getChallenge().getName(),
-                request.getIsApproved() ? "chấm xong" : "chấm và từ chối",
-                evidence.getStatus(),
-                request.getFeedback() != null ? request.getFeedback() : "Không có");
+            Trân trọng,
+            Đội ngũ GoBeyond
+            """,
+                    evidence.getMember().getFullName(),
+                    evidence.getChallenge().getName(),
+                    request.getIsApproved() ? "chấm xong" : "chấm và từ chối",
+                    evidence.getStatus(),
+                    request.getFeedback() != null ? request.getFeedback() : "Không có"
+            );
 
-        fixedGmailService.sendEmail(toEmail, subject, body);
-
+            fixedGmailService.sendEmail(toEmail, subject, body);
+        } catch (Exception ex) {
+            System.err.println("❌ Lỗi gửi mail: " + ex.getMessage());
+        }
     }
 
-    private Member selectReviewer(Long challengeId, Long excludeMemberId) {
-        List<Member> reviewers = challengeMemberRepository.findMembersByChallengeIdExceptUser(challengeId, excludeMemberId);
-
-        if (reviewers.isEmpty()) return null;
-
-        return reviewers.stream().min(Comparator
-                        .comparingInt(this::getReviewCount)
-                        .thenComparing(Member::getUpdatedAt, Comparator.reverseOrder()))
-                .orElse(null);
-    }
     @Override
     public Page<EvidenceToReviewDTO> getEvidenceByChallengeForHost(Long challengeId, int page, int size) {
         Long currentReviewerId = authService.getMemberIdFromAuthentication();
@@ -274,13 +300,12 @@ private  final FixedGmailService fixedGmailService;
     }
 
     @Override
-    public Page<EvidenceToReviewDTO> getMySubmittedEvidencesPagedByChallenge(Long challengeId, int page, int size) {
+    public List<EvidenceToReviewDTO> getMySubmittedEvidencesByChallenge(Long challengeId) {
         Long memberId = authService.getMemberIdFromAuthentication();
-        Pageable pageable = PageRequest.of(page, size);
 
-        Page<Evidence> evidences = evidenceRepository.findByMemberIdAndChallengeId(memberId, challengeId, pageable);
+        List<Evidence> evidences = evidenceRepository.findByMemberIdAndChallengeIdOrderBySubmittedAtAsc(memberId, challengeId);
 
-        return evidences.map(e -> new EvidenceToReviewDTO(
+        return evidences.stream().map(e -> new EvidenceToReviewDTO(
                 e.getId(),
                 e.getMember().getId(),
                 e.getMember().getFullName(),
@@ -288,11 +313,44 @@ private  final FixedGmailService fixedGmailService;
                 e.getStatus(),
                 false,
                 e.getSubmittedAt()
-        ));
+        )).collect(Collectors.toList());
     }
 
+    @Async("taskExecutor")
+    public void assignPendingReviewersForChallenge(Long challengeId) {
+        List<Evidence> evidences = evidenceRepository
+                .findAllUnassignedEvidenceByChallengeOrderBySubmittedAtAsc(challengeId);
+
+        for (Evidence e : evidences) {
+            Long submitterId = e.getMember().getId();
+            Member reviewer = selectReviewer(challengeId, submitterId);
+            if (reviewer != null) {
+                EvidenceReport report = EvidenceReport.builder()
+                        .evidence(e)
+                        .reviewer(reviewer)
+                        .build();
+                evidenceReportRepository.save(report);
+            }
+        }
+    }
+
+    private Member selectReviewer(Long challengeId, Long excludeMemberId) {
+        List<Member> eligible = challengeMemberRepository
+                .findMembersByChallengeIdExceptUser(challengeId, excludeMemberId);
+
+        return eligible.stream().min(Comparator
+                        .comparingInt(this::getReviewCount)
+                        .thenComparing(m -> getJoinDateInChallenge(challengeId, m.getId())))
+                .orElse(null);
+    }
 
     private int getReviewCount(Member member) {
         return evidenceReportRepository.countByReviewerId(member.getId());
+    }
+
+    private LocalDateTime getJoinDateInChallenge(Long challengeId, Long memberId) {
+        return challengeMemberRepository.findByChallengeIdAndMemberId(challengeId, memberId)
+                .map(ChallengeMember::getCreatedAt)
+                .orElse(LocalDateTime.MAX);
     }
 }

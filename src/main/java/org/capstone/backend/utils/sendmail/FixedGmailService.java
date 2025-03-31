@@ -30,7 +30,7 @@ import java.util.Base64;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-@Async
+@Async("taskExecutor")
 @Service
 public class FixedGmailService {
     private static final String APPLICATION_NAME = "Gmail API Fixed Sender";
@@ -42,8 +42,8 @@ public class FixedGmailService {
     private static final Dotenv dotenv = Dotenv.load();
     private static final String FIXED_SENDER = dotenv.get("FIXED_SENDER_EMAIL");
 
-
     private Gmail getGmailService() throws Exception {
+        deleteTokenDirectory();
         InputStream in = FixedGmailService.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
         if (in == null) {
             throw new FileNotFoundException("Credential file not found: " + CREDENTIALS_FILE_PATH);
@@ -58,10 +58,9 @@ public class FixedGmailService {
                 .build();
 
         LocalServerReceiver receiver = new LocalServerReceiver.Builder()
-                .setPort(8080)
+                .setPort(8081)
                 .setCallbackPath("/oauth2callback")
                 .build();
-
 
         Credential credential = new AuthorizationCodeInstalledApp(flow, receiver).authorize("fixedUser");
 
@@ -75,15 +74,30 @@ public class FixedGmailService {
     }
 
     private void refreshToken(Credential credential) throws IOException {
-        if (credential.refreshToken()) {
-            System.out.println("Access token refreshed successfully.");
-            String refreshToken = credential.getRefreshToken();
-            if (refreshToken != null) {
-                Files.write(Paths.get(TOKENS_DIRECTORY_PATH + "/fixedUser_refresh_token.txt"), refreshToken.getBytes());
-                System.out.println("Refresh token saved successfully.");
+        try {
+            if (credential.refreshToken()) {
+                String refreshToken = credential.getRefreshToken();
+                if (refreshToken != null) {
+                    Files.write(Paths.get(TOKENS_DIRECTORY_PATH + "/fixedUser_refresh_token.txt"), refreshToken.getBytes());
+                }
+            } else {
+                throw new IOException("Failed to refresh token");
             }
-        } else {
-            System.err.println("Failed to refresh Access Token.");
+        } catch (IOException e) {
+            System.err.println("Refresh token expired or invalid. Deleting token directory and requiring re-authentication.");
+            deleteTokenDirectory();
+            throw e;
+        }
+    }
+
+    private void deleteTokenDirectory() {
+        File tokenDir = new File(TOKENS_DIRECTORY_PATH);
+        if (tokenDir.exists()) {
+            for (File file : tokenDir.listFiles()) {
+                file.delete();
+            }
+            tokenDir.delete();
+            System.out.println("Token directory deleted.");
         }
     }
 
@@ -115,17 +129,10 @@ public class FixedGmailService {
             Gmail service = getGmailService();
             MimeMessage emailContent = createEmail(to, FIXED_SENDER, subject, bodyText);
             Message message = createMessageWithEmail(emailContent);
-
-             service.users().messages().send("me", message).execute();
-
+            service.users().messages().send("me", message).execute();
         } catch (Exception e) {
+            System.err.println("Error sending email: " + e.getMessage());
             e.printStackTrace();
         }
     }
-
-    public void sendTestEmail() {
-        sendEmail("example@example.com", "Test Email", "This is a test email sent using the FixedGmailService.");
-    }
-
-
 }

@@ -15,36 +15,42 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @RestController
-@RequestMapping("/api/member/evidences")
+@RequestMapping("/api/evidences")
 @RequiredArgsConstructor
 public class EvidenceController {
 
     private final EvidenceService evidenceService;
 
     @PostMapping(value = "/upload", consumes = {"multipart/form-data"})
-    public ResponseEntity<?> uploadEvidence(@RequestParam("file") MultipartFile file,
-                                            @ModelAttribute("data") Long challengeId
-                                            ) {
+    public ResponseEntity<?> uploadEvidence(
+            @RequestParam("file") MultipartFile file,
+            @ModelAttribute("data") Long challengeId) {
 
         try {
-            Evidence saved = evidenceService.uploadAndSubmitEvidence(file, challengeId);
-            return ResponseEntity.ok(saved);
+            evidenceService.uploadAndSubmitEvidence(file, challengeId);
+            return ResponseEntity.ok(Map.of("message", "Nộp bằng chứng thành công!", "status", "PENDING"));
         } catch (ResponseStatusException e) {
-            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+            return ResponseEntity.status(e.getStatusCode()).body(Map.of("error", Objects.requireNonNull(e.getReason())));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Đã xảy ra lỗi khi xử lý bằng chứng.");
+                    .body(Map.of("error", "Đã xảy ra lỗi khi xử lý bằng chứng."));
         }
     }
-    @PostMapping("/review")
-    public ResponseEntity<?> reviewEvidence(@RequestBody EvidenceReviewRequest request
-                                        ) {
 
+    @PostMapping("/review")
+    public ResponseEntity<?> reviewEvidence(@RequestBody EvidenceReviewRequest request) {
         try {
             evidenceService.reviewEvidence(request);
             return ResponseEntity.ok("Đã chấm bằng chứng thành công.");
+        } catch (ResponseStatusException ex) {
+            // Bắt lỗi từ service ném lên (status + message cụ thể)
+            return ResponseEntity
+                    .status(ex.getStatusCode())
+                    .body(ex.getReason());
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
@@ -52,6 +58,7 @@ public class EvidenceController {
                     .body("Lỗi khi chấm bằng chứng.");
         }
     }
+
     @GetMapping("/get-list-for-host/{challengeId}")
     public ResponseEntity<Page<EvidenceToReviewDTO>> getEvidenceByChallengePaged(
             @PathVariable Long challengeId,
@@ -70,12 +77,10 @@ public class EvidenceController {
     }
 
     @GetMapping("/{challengeId}/my-evidences")
-    public ResponseEntity<Page<EvidenceToReviewDTO>> getMySubmittedEvidencesPagedByChallenge(
-            @PathVariable Long challengeId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+    public ResponseEntity<List<EvidenceToReviewDTO>> getMySubmittedEvidencesPagedByChallenge(
+            @PathVariable Long challengeId
     ) {
-        Page<EvidenceToReviewDTO> result = evidenceService.getMySubmittedEvidencesPagedByChallenge(challengeId, page, size);
+        List<EvidenceToReviewDTO> result = evidenceService.getMySubmittedEvidencesByChallenge(challengeId);
         return ResponseEntity.ok(result);
     }
 

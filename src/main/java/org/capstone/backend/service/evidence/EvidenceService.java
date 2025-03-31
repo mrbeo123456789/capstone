@@ -12,9 +12,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 public interface EvidenceService {
-    Evidence uploadAndSubmitEvidence(MultipartFile file, Long challengeId) throws IOException;
+    void uploadAndSubmitEvidence(MultipartFile file, Long challengeId) throws IOException;
     void reviewEvidence(EvidenceReviewRequest request);
     Page<EvidenceToReviewDTO> getEvidenceByChallengeForHost(Long challengeId, int page, int size) ;
     List<EvidenceToReviewDTO> getEvidenceAssignedForMemberToReview(Long challengeId);
-     Page<EvidenceToReviewDTO> getMySubmittedEvidencesPagedByChallenge(Long challengeId, int page, int size);
+    List<EvidenceToReviewDTO> getMySubmittedEvidencesByChallenge(Long challengeId);
+    void assignPendingReviewersForChallenge(Long challengeId);
+
 }
