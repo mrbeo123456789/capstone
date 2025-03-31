@@ -66,7 +66,8 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
             SELECT 1 FROM ChallengeMember cm 
             WHERE cm.challenge.id = c.id AND cm.member.id = :memberId
         ) THEN true ELSE false END, 
-        (SELECT COUNT(cm) FROM ChallengeMember cm WHERE cm.challenge.id = c.id)
+        (SELECT COUNT(cm) FROM ChallengeMember cm WHERE cm.challenge.id = c.id),
+        DATEDIFF(c.endDate, c.startDate)
     )
     FROM Challenge c
     WHERE c.id = :challengeId
@@ -74,6 +75,7 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
     ChallengeDetailResponse findChallengeDetailByIdAndMemberId(
             @Param("challengeId") Long challengeId,
             @Param("memberId") Long memberId);
+
 
     @Query("SELECT c.id FROM Challenge c WHERE :today BETWEEN c.startDate AND c.endDate")
     List<Long> findChallengesHappeningToday(@Param("today") LocalDate today);
