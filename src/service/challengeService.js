@@ -75,6 +75,9 @@ export const challengeService = createApi({
                 body: challengeRole,
             }),
         }),
+        getChallengeDetail: builder.query({
+            query: (challengeId) => `/challenges/${challengeId}/detail`,
+        }),
     }),
 });
 
@@ -87,5 +90,6 @@ export const {
     useGetApprovedChallengesQuery, // <--- Add this
     useJoinChallengeMutation, // <--- Add this!
     useGetMyChallengesMutation,
+    useGetChallengeDetailQuery, // ✅ Thêm dòng này
 } = challengeService;
 

@@ -4,14 +4,14 @@ import { MdOutlineCategory } from "react-icons/md";
 import { IoIosPeople } from "react-icons/io";
 import { HiUsers } from "react-icons/hi";
 import { FaRunning } from "react-icons/fa";
-import { useJoinChallengeMutation } from "../../service/challengeService";
+import {useGetChallengeDetailQuery, useJoinChallengeMutation} from "../../service/challengeService";
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 
 const ChallengeDetail = () => {
     const [activeTab, setActiveTab] = useState("info");
     const [joinChallenge, { isLoading }] = useJoinChallengeMutation();
-    const { id } = useParams(); // Lấy challenge ID từ URL
+
 
     const handleJoin = async () => {
         try {
