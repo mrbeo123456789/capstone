@@ -1,5 +1,5 @@
 import React from "react";
-import { FaRunning, FaUsers, FaUser, FaLock, FaTrophy, FaChartBar, FaBars } from "react-icons/fa";
+import { FaRunning, FaUsers, FaUser, FaLock, FaTrophy, FaChartBar } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 export const SideBar = ({ isOpen, toggleSidebar }) => {

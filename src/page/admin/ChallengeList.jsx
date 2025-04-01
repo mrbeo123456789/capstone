@@ -68,7 +68,7 @@ const ChallengeList = () => {
 
     // Navigation tới chi tiết thử thách
     const navigateToChallengeDetail = (challenge) => {
-        navigate(`/challenge/${challenge.id}`);
+        navigate(`/admin/challenge/${challenge.id}/detail`);
     };
 
     // Hàm xử lý review: Approve hoặc Reject

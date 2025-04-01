@@ -17,7 +17,6 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(false);
     const navigate = useNavigate();
-
     const toggleMobileMenu = () => {
         setIsMobileMenuOpen(!isMobileMenuOpen);
     };
@@ -26,6 +25,9 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
         setIsCollapsed(!isCollapsed);
         setSidebarCollapsed(!sidebarCollapsed);
     };
+    const handleHomepage = () => {
+        navigate("/admin/dashboard");
+    }
 
     const handleLogout = () => {
         // Xóa JWT token và chuyển hướng về trang login
@@ -53,9 +55,9 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
                 ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
             >
                 {/* Logo Container */}
-                <div className="py-6 px-4 bg-orange-50 flex justify-between items-center">
+                <div  className="py-6 px-4 bg-orange-50 flex justify-between items-center">
                     {!isCollapsed && (
-                        <div className="text-orange-600 text-2xl font-bold">
+                        <div onClick={handleHomepage} className="text-orange-600 text-2xl font-bold">
                             GOBEYOND
                         </div>
                     )}
@@ -194,7 +196,7 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
 
                         <li>
                             <NavLink
-                                to="/createChallenge"
+                                to="/challenges/create"
                                 className={({ isActive }) =>
                                     `flex items-center ${
                                         isCollapsed ? "justify-center" : "px-4"

@@ -68,6 +68,10 @@ export const challengeService = createApi({
             }),
             invalidatesTags: ["Challenge"],
         }),
+        getChallengeDetail: builder.query({
+            query: (challengeId) => `/challenges/${challengeId}/detail`,
+            providesTags: ["Challenge"],
+        }),
     }),
 });
 
@@ -78,6 +82,7 @@ export const {
     useDeleteChallengeMutation,
     useGetChallengeTypesQuery, // <- Add this
     useGetApprovedChallengesQuery, // <--- Add this
-    useJoinChallengeMutation // <--- Add this!
+    useJoinChallengeMutation,
+    useGetChallengeDetailQuery// <--- Add this!
 } = challengeService;
 
