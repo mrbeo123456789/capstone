@@ -2,10 +2,12 @@ package org.capstone.backend.config;
 
 import lombok.RequiredArgsConstructor;
 import org.capstone.backend.entity.Challenge;
+import org.capstone.backend.event.AchievementTriggerEvent;
 import org.capstone.backend.repository.ChallengeRepository;
 import org.capstone.backend.service.evidence.EvidenceService;
 import org.capstone.backend.service.ranking.RankingService;
 import org.capstone.backend.utils.enums.ChallengeStatus;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +21,7 @@ public class Schedule {
     private final EvidenceService assignmentService;
     private final ChallengeRepository challengeRepository;
     private final RankingService rankingService;
+    private ApplicationEventPublisher eventPublisher;
 
     // 🕒 Chạy mỗi ngày lúc 00:05
     @Scheduled(cron = "0 5 0 * * *")
@@ -42,6 +45,9 @@ public class Schedule {
             List<Challenge> finishingChallenges = challengeRepository.findByStatusAndEndDate(ChallengeStatus.ONGOING, today);
             for (Challenge challenge : finishingChallenges) {
                 challenge.setStatus(ChallengeStatus.FINISH);
+               // eventPublisher.publishEvent(
+                 //       new AchievementTriggerEvent(memberId, AchievementTriggerEvent.TriggerType.COMPLETE_CHALLENGE)
+             //   );
 
 
             }

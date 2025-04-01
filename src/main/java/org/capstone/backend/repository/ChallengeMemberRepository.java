@@ -52,6 +52,7 @@ public interface ChallengeMemberRepository extends JpaRepository<ChallengeMember
     void updateRole(@Param("challengeId") Long challengeId,
                     @Param("memberId") Long memberId,
                     @Param("newRole") ChallengeRole newRole);
-
+    int countByMemberId(Long memberId);
+    int countByMemberIdAndIsCompletedTrue(Long memberId);
     List<ChallengeMember> findByChallengeId(Long challengeId);
 }

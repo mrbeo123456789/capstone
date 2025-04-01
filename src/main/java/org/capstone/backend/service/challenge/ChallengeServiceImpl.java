@@ -2,10 +2,12 @@ package org.capstone.backend.service.challenge;
 
 import org.capstone.backend.dto.challenge.*;
 import org.capstone.backend.entity.*;
+import org.capstone.backend.event.AchievementTriggerEvent;
 import org.capstone.backend.repository.*;
 import org.capstone.backend.service.auth.AuthService;
 import org.capstone.backend.utils.enums.*;
 import org.capstone.backend.utils.upload.FirebaseUpload;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +32,7 @@ public class ChallengeServiceImpl implements ChallengeService {
     private final ChallengeMemberRepository challengeMemberRepository;
     private final FirebaseUpload firebaseUpload;
     private final AuthService authService;
+    private ApplicationEventPublisher eventPublisher;
 
     public ChallengeServiceImpl(
             ChallengeRepository challengeRepository,
@@ -38,7 +41,7 @@ public class ChallengeServiceImpl implements ChallengeService {
             ChallengeTypeRepository challengeTypeRepository,
             ChallengeMemberRepository challengeMemberRepository,
             FirebaseUpload firebaseUpload,
-            AuthService authService
+            AuthService authService, ApplicationEventPublisher eventPublisher
     ) {
         this.challengeRepository = challengeRepository;
         this.accountRepository = accountRepository;
@@ -47,6 +50,7 @@ public class ChallengeServiceImpl implements ChallengeService {
         this.challengeMemberRepository = challengeMemberRepository;
         this.firebaseUpload = firebaseUpload;
         this.authService = authService;
+        this.eventPublisher = eventPublisher;
     }
 
     private Member getCurrentMember() {
@@ -101,7 +105,9 @@ public class ChallengeServiceImpl implements ChallengeService {
         ChallengeMember challengeMember = createChallengeMember(
                 challenge, member, member.getId(), ChallengeMemberStatus.JOINED, ChallengeRole.MEMBER);
         challengeMemberRepository.save(challengeMember);
-
+        eventPublisher.publishEvent(
+                new AchievementTriggerEvent(member.getId(), AchievementTriggerEvent.TriggerType.JOIN_CHALLENGE)
+        );
         return "Joined challenge successfully.";
     }
 
@@ -156,6 +162,10 @@ public class ChallengeServiceImpl implements ChallengeService {
                     challenge, member, member.getId(), ChallengeMemberStatus.JOINED, ChallengeRole.HOST);
             challengeMemberRepository.save(challengeMember);
         }
+
+        eventPublisher.publishEvent(
+                new AchievementTriggerEvent(memberId, AchievementTriggerEvent.TriggerType.CREATE_CHALLENGE)
+        );
 
         return "Challenge đã được tạo thành công.";
     }
