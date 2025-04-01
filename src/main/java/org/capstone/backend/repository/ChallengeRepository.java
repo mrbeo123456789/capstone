@@ -15,6 +15,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -92,4 +93,15 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
 
     @Query("SELECT c.id FROM Challenge c WHERE c.endDate = :today")
     List<Long> findChallengesEndingToday(@Param("today") LocalDate today);
+
+    @Query("SELECT COUNT(*) FROM Challenge WHERE createdAt BETWEEN :start AND :end")
+    Long countNewChallengesBetween(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
+    @Query("SELECT DATE(c.createdAt), COUNT(c) FROM Challenge c WHERE c.createdAt BETWEEN :start AND :end GROUP BY DATE(c.createdAt) ORDER BY DATE(c.createdAt)")
+    List<Object[]> countNewChallengesGroupedByDate(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+    Long countByStatus(ChallengeStatus status);
+
+    @Query("SELECT c.status, COUNT(c) FROM Challenge c GROUP BY c.status")
+    List<Object[]> countChallengesByStatus();
+
 }

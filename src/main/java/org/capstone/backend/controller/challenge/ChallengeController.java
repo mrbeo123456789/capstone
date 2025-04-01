@@ -2,12 +2,15 @@ package org.capstone.backend.controller.challenge;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
 import org.capstone.backend.dto.challenge.*;
+import org.capstone.backend.dto.report.ChallengeReportRequestDTO;
 import org.capstone.backend.entity.Challenge;
 
 import org.capstone.backend.entity.ChallengeType;
 import org.capstone.backend.service.challenge.ChallengeService;
 import org.capstone.backend.service.challenge.InvitationService;
+import org.capstone.backend.service.report.ChallengeReportService;
 import org.capstone.backend.utils.enums.ChallengeRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,9 +26,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/challenges")
+@RequiredArgsConstructor
 public class ChallengeController {
-    @Autowired
+
     private ChallengeService challengeService;
+    private final ChallengeReportService challengeReportService;
 
 
     @PostMapping(value = "/create", consumes = {"multipart/form-data"})
@@ -85,4 +90,10 @@ public class ChallengeController {
         ChallengeDetailResponse detail = challengeService.getChallengeDetail(challengeId);
         return ResponseEntity.ok(detail);
     }
+    @PostMapping("/report")
+    public ResponseEntity<?> reportChallenge(@RequestBody ChallengeReportRequestDTO dto) {
+        challengeReportService.reportChallenge(dto);
+        return ResponseEntity.ok("Report submitted successfully.");
+    }
+
 }

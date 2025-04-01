@@ -1,0 +1,61 @@
+package org.capstone.backend.service.report;
+
+import lombok.RequiredArgsConstructor;
+import org.capstone.backend.dto.report.ChallengeReportRequestDTO;
+import org.capstone.backend.dto.report.ChallengeReportResponseDTO;
+import org.capstone.backend.entity.Challenge;
+import org.capstone.backend.entity.ChallengeReport;
+import org.capstone.backend.entity.Member;
+import org.capstone.backend.repository.ChallengeReportRepository;
+import org.capstone.backend.repository.ChallengeRepository;
+import org.capstone.backend.repository.MemberRepository;
+import org.capstone.backend.service.auth.AuthService;
+import org.capstone.backend.utils.enums.ReportStatus;
+import org.capstone.backend.utils.enums.ReportType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+public class ChallengeReportServiceImpl implements ChallengeReportService {
+
+    private final ChallengeReportRepository challengeReportRepository;
+    private final ChallengeRepository challengeRepository;
+    private final MemberRepository memberRepository;
+    private final AuthService authService;
+    @Override
+    @Transactional
+    public void reportChallenge( ChallengeReportRequestDTO dto) {
+        Challenge challenge = challengeRepository.findById(dto.getChallengeId())
+                .orElseThrow(() -> new RuntimeException("Challenge not found"));
+
+        Member member = memberRepository.findById(authService.getMemberIdFromAuthentication())
+                .orElseThrow(() -> new RuntimeException("Member not found"));
+
+        ChallengeReport report = ChallengeReport.builder()
+                .challenge(challenge)
+                .reporter(member)
+                .content(dto.getContent())
+                .build();
+
+        challengeReportRepository.save(report);
+    }
+    @Override
+    public Page<ChallengeReportResponseDTO> filterReports(ReportType type, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return challengeReportRepository.filterReportsForAdmin(type, pageable);
+    }
+
+
+    @Override
+    @Transactional
+    public void updateReportStatus(Long reportId, ReportStatus newStatus) {
+        ChallengeReport report = challengeReportRepository.findById(reportId)
+                .orElseThrow(() -> new RuntimeException("Report not found"));
+        report.setStatus(newStatus);
+    }
+
+}
