@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -86,15 +87,24 @@ public class ChallengeServiceImpl implements ChallengeService {
         Member member = getCurrentMember();
         Challenge challenge = findChallenge(challengeId);
 
-        if (challenge.getStatus() != ChallengeStatus.APPROVED) return "Challenge is not active.";
-        if (challenge.getChallengeMembers().size() >= challenge.getMaxParticipants()) return "Challenge is full.";
+        // Chỉ cho phép tham gia nếu thử thách đang ở trạng thái ONGOING
+        if (challenge.getStatus() != ChallengeStatus.UPCOMING) {
+            return "Challenge is not currently available for joining.";
+        }
 
+        // Kiểm tra thử thách có đủ chỗ không
+        if (challenge.getChallengeMembers().size() >= challenge.getMaxParticipants()) {
+            return "Challenge is full.";
+        }
+
+        // Tạo bản ghi tham gia thử thách
         ChallengeMember challengeMember = createChallengeMember(
                 challenge, member, member.getId(), ChallengeMemberStatus.JOINED, ChallengeRole.MEMBER);
         challengeMemberRepository.save(challengeMember);
 
         return "Joined challenge successfully.";
     }
+
     @Override
     public String createChallenge(ChallengeRequest request, MultipartFile picture, MultipartFile banner) {
         Long memberId = authService.getMemberIdFromAuthentication(); // null nếu là admin
@@ -168,6 +178,21 @@ public class ChallengeServiceImpl implements ChallengeService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid status value.");
         }
 
+        LocalDate now = LocalDate.now();
+
+        if (status == ChallengeStatus.APPROVED) {
+            if (challenge.getEndDate().isBefore(now)) {
+                // Nếu đã kết thúc thì chuyển thành CANCELED
+                status = ChallengeStatus.CANCELED;
+            } else if (challenge.getStartDate().isAfter(now)) {
+                // Nếu chưa bắt đầu thì chuyển thành UPCOMING
+                status = ChallengeStatus.UPCOMING;
+            } else {
+                // Nếu đang diễn ra thì chuyển thành ONGOING
+                status = ChallengeStatus.ONGOING;
+            }
+        }
+
         challenge.setStatus(status);
         challenge.setAdminNote(request.getAdminNote());
         challengeRepository.save(challenge);
@@ -196,11 +221,11 @@ public class ChallengeServiceImpl implements ChallengeService {
         challengeMemberRepository.updateRole(challengeId, memberId, newRole);
     }
 
-    @Override
-    public Page<AdminChallengesResponse> getChallenges(int page, int size) {
+    public Page<AdminChallengesResponse> getChallenges(String name, ChallengeStatus status, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return challengeRepository.findAllByPriority(pageable);
+        return challengeRepository.findAllByStatusAndPriority(name, status, pageable);
     }
+
 
     @Override
     public Page<ChallengeResponse> getApprovedChallenges(int page, int size) {

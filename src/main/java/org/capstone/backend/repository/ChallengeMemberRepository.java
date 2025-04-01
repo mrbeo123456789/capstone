@@ -53,4 +53,5 @@ public interface ChallengeMemberRepository extends JpaRepository<ChallengeMember
                     @Param("memberId") Long memberId,
                     @Param("newRole") ChallengeRole newRole);
 
+    List<ChallengeMember> findByChallengeId(Long challengeId);
 }

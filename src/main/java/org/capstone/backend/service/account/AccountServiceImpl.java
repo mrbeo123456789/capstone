@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,16 +28,11 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     private MemberRepository memberRepository;
 
-    @Override
-    public Page<AccountDTO> getAllAccounts(int page, int size) {
-        Page<Account> accounts = accountRepository.findByRoleNot(
-                Role.ADMIN,
-                PageRequest.of(page, size)
-        );
-        List<AccountDTO> accountDTOs = accounts.stream().map(this::toDTO).collect(Collectors.toList());
-
-        return new PageImpl<>(accountDTOs, accounts.getPageable(), accounts.getTotalElements());
+    public Page<AccountDTO> getAllAccounts(String email, String username, AccountStatus status, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return accountRepository.findAllByFiltersExcludingAdmin(email, username, status, pageable);
     }
+
 
 
     @Override

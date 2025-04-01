@@ -25,11 +25,19 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
        )
        FROM Challenge c
        JOIN c.challengeType ct
+       WHERE (:name IS NULL OR c.name LIKE %:name%) 
+       AND (:status IS NULL OR c.status = :status)
        ORDER BY 
            CASE WHEN c.status = 'PENDING' THEN 0 ELSE 1 END,
-           c.createdAt DESC
+           c.createdAt DESC NULLS LAST
        """)
-    Page<AdminChallengesResponse> findAllByPriority(Pageable pageable);
+    Page<AdminChallengesResponse> findAllByStatusAndPriority(
+            @Param("name") String name,
+            @Param("status") ChallengeStatus status,
+            Pageable pageable);
+
+
+
     @Query("""
        SELECT new org.capstone.backend.dto.challenge.ChallengeResponse(
            c.id, c.name, c.summary, c.picture
@@ -79,6 +87,8 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
 
     @Query("SELECT c.id FROM Challenge c WHERE :today BETWEEN c.startDate AND c.endDate")
     List<Long> findChallengesHappeningToday(@Param("today") LocalDate today);
+    List<Challenge> findByStatusAndStartDate(ChallengeStatus status, LocalDate startDate);
+    List<Challenge> findByStatusAndEndDate(ChallengeStatus status, LocalDate endDate);
 
     @Query("SELECT c.id FROM Challenge c WHERE c.endDate = :today")
     List<Long> findChallengesEndingToday(@Param("today") LocalDate today);
