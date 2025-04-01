@@ -1,109 +1,71 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { FaRegClock } from "react-icons/fa";
+import { FaRunning } from "react-icons/fa";
+import { HiUsers } from "react-icons/hi";
+import { CheckCircle, XCircle, UserX, ArrowLeft } from "lucide-react";
 import Footer from "../../component/footer.jsx";
-import { CheckCircle, XCircle } from "lucide-react";
+import { useGetChallengeDetailQuery } from "../../service/challengeService.js";
 
 const ChallengeDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [challenge, setChallenge] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [activeTab, setActiveTab] = useState('Information');
-    const [searchText, setSearchText] = useState('');
+    const [activeTab, setActiveTab] = useState("info");
     const [showConfirmModal, setShowConfirmModal] = useState(false);
-    const [confirmAction, setConfirmAction] = useState(null); // 'confirmed' (approve) hoặc 'rejected' (reject)
-    const [confirmChallengeId, setConfirmChallengeId] = useState(null);
-    const [reason, setReason] = useState(""); // lý do người dùng nhập
+    const [confirmAction, setConfirmAction] = useState(null); // 'confirmed' or 'rejected'
+    const [reason, setReason] = useState("");
+    const [showKickModal, setShowKickModal] = useState(false);
+    const [memberToKick, setMemberToKick] = useState(null);
 
-    const filteredMembers = challenge?.members?.filter(member =>
-        member.username.toLowerCase().includes(searchText.toLowerCase())
-    ) || [];
-
-    useEffect(() => {
-        const fetchChallengeDetail = async () => {
-            try {
-                setLoading(true);
-                // Giả lập API call – trong thực tế bạn sẽ gọi API thực
-                const mockData = {
-                    id: 1,
-                    title: "Challenge name",
-                    description: "Đây là mô tả chi tiết về challenge này.",
-                    type: "Running",
-                    startDate: "2025-03-10T10:00:00",
-                    endDate: "2025-04-15T23:59:59",
-                    creator: "AdminUser",
-                    difficulty: "Trung bình",
-                    points: 500,
-                    submissionCount: 245,
-                    successRate: 68,
-                    requirements: [
-                        "Phải hoàn thành trong thời gian quy định",
-                        "Phải đáp ứng các yêu cầu kỹ thuật",
-                        "Phải xử lý được tất cả các trường hợp đặc biệt"
-                    ],
-                    tutorial: {
-                        type: "text",
-                        content: "Hướng dẫn chi tiết về cách thực hiện challenge này."
-                    },
-                    ranking: [
-                        { username: "user1", score: 980, time: "00:45:23" },
-                        { username: "user2", score: 950, time: "00:48:12" },
-                        { username: "user3", score: 920, time: "00:50:05" }
-                    ],
-                    members: [
-                        { username: "member1", email: "member1@example.com", joinDate: "2025-03-12" },
-                        { username: "member2", email: "member2@example.com", joinDate: "2025-03-13" },
-                        { username: "member3", email: "member3@example.com", joinDate: "2025-03-14" },
-                        { username: "member4", email: "member4@example.com", joinDate: "2025-03-15" }
-                    ],
-                    status: "pending", // Giá trị từ backend: pending, approved, rejected
-                    createdAt: "2025-03-10T10:00:00",
-                    tags: ["Algorithm", "Data Structure", "Optimization"]
-                };
-
-                setTimeout(() => {
-                    setChallenge(mockData);
-                    setLoading(false);
-                }, 500);
-            } catch (err) {
-                setError("Có lỗi xảy ra khi tải thông tin challenge!");
-                setLoading(false);
-                console.error("Error fetching challenge:", err);
-            }
-        };
-
-        fetchChallengeDetail();
-    }, [id]);
+    // Sử dụng API thật qua hook RTK Query để lấy chi tiết challenge
+    const { data: challenge, error, isLoading } = useGetChallengeDetailQuery(id);
 
     const handleGoBack = () => {
         navigate(-1);
     };
 
-    const handleKickUser = (username) => {
-        alert(`Kick user: ${username}`);
+    const handleGoToList = () => {
+        navigate('/admin/challengelist'); // Adjust this path to your actual challenge list route
     };
 
-    // Mở modal confirm với challengeId và action
+    // Mở modal xác nhận với challenge_id và hành động (approve/reject)
     const openConfirmModal = (challengeId, action) => {
-        setConfirmChallengeId(challengeId);
-        setConfirmAction(action); // 'confirmed' hoặc 'rejected'
+        setConfirmAction(action);
         setReason("");
         setShowConfirmModal(true);
     };
 
-    // Khi ấn OK trong modal confirm, cập nhật trạng thái trong state (giả lập)
+    // Xử lý khi nhấn OK trên modal xác nhận
     const handleConfirmAction = () => {
-        const newStatus = confirmAction === 'confirmed' ? 'approved' : 'rejected';
-        setChallenge(prev => ({
-            ...prev,
-            status: newStatus
-        }));
-        alert(`Challenge #${challenge.id} ${confirmAction === 'confirmed' ? 'approved' : 'rejected'} with reason: "${reason}"`);
+        // Ở đây bạn có thể gọi API cập nhật trạng thái challenge nếu cần.
+        alert(`Challenge #${challenge.challenge_id} ${confirmAction === 'confirmed' ? 'approved' : 'rejected'} with reason: "${reason}"`);
         setShowConfirmModal(false);
     };
 
-    if (loading) {
+    // Mở modal kick thành viên
+    const openKickModal = (member) => {
+        setMemberToKick(member);
+        setReason("");
+        setShowKickModal(true);
+    };
+
+    // Xử lý khi kick thành viên
+    const handleKickMember = () => {
+        // Ở đây bạn có thể gọi API để kick thành viên khỏi challenge
+        alert(`Đã kick thành viên ${memberToKick.name} với lý do: "${reason}"`);
+        setShowKickModal(false);
+    };
+
+    // Mock data cho bảng xếp hạng - thay thế bằng dữ liệu thật từ API
+    const mockParticipants = [
+        { id: 1, name: "Nguyễn Văn A", score: 1250, rank: 1, avatar: "https://i.pravatar.cc/150?img=1" },
+        { id: 2, name: "Trần Thị B", score: 980, rank: 2, avatar: "https://i.pravatar.cc/150?img=2" },
+        { id: 3, name: "Lê Văn C", score: 875, rank: 3, avatar: "https://i.pravatar.cc/150?img=3" },
+        { id: 4, name: "Phạm Thị D", score: 720, rank: 4, avatar: "https://i.pravatar.cc/150?img=4" },
+        { id: 5, name: "Hoàng Văn E", score: 650, rank: 5, avatar: "https://i.pravatar.cc/150?img=5" }
+    ];
+
+    if (isLoading) {
         return (
             <div className="flex items-center justify-center min-h-screen bg-gray-100">
                 <div className="text-center">
@@ -119,12 +81,12 @@ const ChallengeDetail = () => {
             <div className="min-h-screen flex items-center justify-center bg-gray-100">
                 <div className="bg-white p-6 rounded-lg shadow-md">
                     <h2 className="text-red-600 text-xl font-bold mb-2">Lỗi</h2>
-                    <p className="text-gray-700">{error}</p>
+                    <p className="text-gray-700">Có lỗi xảy ra khi tải thông tin challenge!</p>
                     <button
                         className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded"
-                        onClick={() => window.location.reload()}
+                        onClick={handleGoBack}
                     >
-                        Thử lại
+                        Quay lại
                     </button>
                 </div>
             </div>
@@ -150,259 +112,211 @@ const ChallengeDetail = () => {
 
     return (
         <div className="flex flex-col min-h-screen bg-gradient-to-br from-orange-100 to-yellow-100">
-            {/* Challenge header với nút ban/unban ở bên phải */}
-            <div className="bg-white shadow">
-                <div className="container mx-auto p-4 flex items-center justify-between">
-                    <div className="flex items-center">
-                        <div className="w-24 h-24 bg-gray-200 rounded-md overflow-hidden border border-gray-300 flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            {/* Return button - added to top left */}
+            <div className="p-4">
+                <button
+                    onClick={handleGoToList}
+                    className="flex items-center px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 shadow-md transition-colors"
+                >
+                    <ArrowLeft size={18} className="mr-2" />
+                    Trở về danh sách
+                </button>
+            </div>
+
+            <div className="p-6 flex flex-col items-center w-full">
+                {/* Challenge Banner Section */}
+                <div className="w-full flex flex-col md:flex-row bg-white rounded-lg shadow-lg overflow-hidden">
+                    {challenge.picture ? (
+                        <img
+                            src={challenge.picture}
+                            alt={challenge.name}
+                            className="w-full md:w-2/3 object-cover"
+                        />
+                    ) : (
+                        <div className="w-full md:w-2/3 bg-gray-200 flex items-center justify-center h-64">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-24 w-24 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                         </div>
-                        <div className="ml-4">
-                            <h1 className="text-2xl font-bold text-gray-800">{challenge.title}</h1>
-                            <div className="flex flex-wrap gap-2 mt-2">
-                                {challenge.tags.map((tag, index) => (
-                                    <span key={index} className="px-2 py-1 bg-indigo-100 text-indigo-800 text-xs rounded-full">
-                    {tag}
-                  </span>
-                                ))}
-                            </div>
+                    )}
+                    <div className="bg-gray-100 p-6 md:w-1/3 flex flex-col justify-between">
+                        <h2 className="text-xl font-bold text-gray-900">ĐÁNH GIÁ</h2>
+                        <div className="mt-2">
+                            {challenge.status === "PENDING" ? (
+                                <div className="flex space-x-2">
+                                    <button
+                                        onClick={() => openConfirmModal(challenge.challenge_id, 'confirmed')}
+                                        className="flex-1 bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 flex items-center justify-center"
+                                    >
+                                        <CheckCircle className="h-5 w-5 mr-1" /> Approve
+                                    </button>
+                                    <button
+                                        onClick={() => openConfirmModal(challenge.challenge_id, 'rejected')}
+                                        className="flex-1 bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 flex items-center justify-center"
+                                    >
+                                        <XCircle className="h-5 w-5 mr-1" /> Reject
+                                    </button>
+                                </div>
+                            ) : (
+                                <button
+                                    className={`w-full py-2 rounded-lg text-white flex items-center justify-center ${
+                                        challenge.status === "APPROVED"
+                                            ? "bg-red-500 hover:bg-red-600"
+                                            : "bg-green-500 hover:bg-green-600"
+                                    }`}
+                                    onClick={() =>
+                                        challenge.status === "APPROVED"
+                                            ? openConfirmModal(challenge.challenge_id, 'rejected')
+                                            : openConfirmModal(challenge.challenge_id, 'confirmed')
+                                    }
+                                >
+                                    {challenge.status === "APPROVED" ? (
+                                        <><XCircle className="h-5 w-5 mr-1" /> Reject</>
+                                    ) : (
+                                        <><CheckCircle className="h-5 w-5 mr-1" /> Approve</>
+                                    )}
+                                </button>
+                            )}
+                        </div>
+                        <div className="mt-4 flex items-center">
+                            <FaRegClock className="text-gray-500 mr-2"/>
+                            <p className="text-gray-700 text-sm">
+                                Thời gian: {new Date(challenge.startDate).toLocaleDateString('vi-VN')} - {new Date(challenge.endDate).toLocaleDateString('vi-VN')}
+                            </p>
+                        </div>
+                        <div className="mt-4 flex items-center">
+                            <FaRunning className="text-gray-500 mr-2" />
+                            <p className="text-gray-700 text-sm">Trạng thái: {challenge.challengeType}</p>
+                        </div>
+                        <div className="mt-4 flex items-center text-lg font-semibold text-orange-500">
+                            <HiUsers className="mr-2" />
+                            <p>{challenge.participantCount} người đã tham gia</p>
                         </div>
                     </div>
-                    {/* Nút ban/unban */}
-                    <div>
-                        {challenge.status === "pending" ? (
-                            <>
-                                <button
-                                    className="p-2 bg-green-100 text-green-600 rounded-md hover:bg-green-200 transition-colors mr-2"
-                                    onClick={() => openConfirmModal(challenge.id, 'confirmed')}
-                                >
-                                    <CheckCircle className="h-5 w-5" />
-                                </button>
-                                <button
-                                    className="p-2 bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition-colors"
-                                    onClick={() => openConfirmModal(challenge.id, 'rejected')}
-                                >
-                                    <XCircle className="h-5 w-5" />
-                                </button>
-                            </>
-                        ) : (
-                            <button
-                                className={`p-2 rounded-md transition-colors ${
-                                    challenge.status === "approved"
-                                        ? "bg-red-100 text-red-600 hover:bg-red-200"
-                                        : "bg-green-100 text-green-600 hover:bg-green-200"
-                                }`}
-                                onClick={() =>
-                                    challenge.status === "approved"
-                                        ? openConfirmModal(challenge.id, 'rejected')
-                                        : openConfirmModal(challenge.id, 'confirmed')
-                                }
-                            >
-                                {challenge.status === "approved" ? (
-                                    <XCircle className="h-5 w-5" />
-                                ) : (
-                                    <CheckCircle className="h-5 w-5" />
-                                )}
-                            </button>
-                        )}
-                    </div>
                 </div>
-            </div>
 
-            {/* Tabs */}
-            <div className="bg-white shadow-sm">
-                <div className="container mx-auto">
-                    <div className="flex">
-                        {['Information', 'Tutorial', 'Ranking', 'Members'].map((tab) => (
+                {/* Tabs Section */}
+                <div className="mt-6 w-full max-w-4xl">
+                    <div className="flex border-b">
+                        {["info", "rules", "rankings"].map((tab) => (
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
-                                className={`px-8 py-3 font-medium text-sm transition-colors duration-200 ${
+                                className={`flex-1 text-center py-3 font-semibold ${
                                     activeTab === tab
-                                        ? 'bg-indigo-100 text-indigo-800 border-b-2 border-indigo-600'
-                                        : 'bg-white text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                                        ? "text-orange-500 border-b-4 border-orange-500"
+                                        : "text-gray-500 hover:text-gray-800"
                                 }`}
                             >
-                                {tab}
+                                {tab === "info"
+                                    ? "Thông tin"
+                                    : tab === "rules"
+                                        ? "Quy định"
+                                        : "Bảng xếp hạng"}
                             </button>
                         ))}
                     </div>
-                </div>
-            </div>
+                    {/* Tab Content */}
+                    <div className="p-6 bg-white shadow-md rounded-lg mt-4">
+                        {activeTab === "info" && (
+                            <div>
+                                <h2 className="text-2xl font-bold text-gray-900">
+                                    {challenge.name}
+                                </h2>
+                                <p className="text-gray-500 mt-2">
+                                    {new Date(challenge.startDate).toLocaleDateString('vi-VN')} - {new Date(challenge.endDate).toLocaleDateString('vi-VN')}
+                                </p>
+                                <p className="text-sm text-gray-700 mt-2">
+                                    Người tạo: <span className="text-blue-500 font-semibold">{challenge.created_by}</span>
+                                </p>
+                                <p className="text-sm text-gray-700 mt-2">
+                                    Số người tham gia: <span className="text-blue-500 font-semibold">{challenge.participantCount}</span>
+                                </p>
 
-            {/* Nội dung các tab */}
-            <div className="container mx-auto p-4 flex-grow">
-                <div className="bg-white shadow rounded-lg overflow-hidden">
-                    {activeTab === 'Information' && (
-                        <div className="p-6">
-                            <h2 className="text-lg font-semibold text-gray-800 mb-2">Thông tin cơ bản</h2>
-                            <p className="text-gray-700 mb-2">
-                                <span className="font-medium">Mô tả: </span>{challenge.description}
-                            </p>
-                            <p className="text-gray-700 mb-2">
-                                <span className="font-medium">Loại: </span>{challenge.type}
-                            </p>
-                            <p className="text-gray-700 mb-2">
-                                <span className="font-medium">Ngày bắt đầu: </span>{new Date(challenge.startDate).toLocaleDateString('vi-VN')}
-                            </p>
-                            <p className="text-gray-700 mb-2">
-                                <span className="font-medium">Ngày kết thúc: </span>{new Date(challenge.endDate).toLocaleDateString('vi-VN')}
-                            </p>
-                            <p className="text-gray-700 mb-2">
-                                <span className="font-medium">Người tạo: </span>{challenge.creator}
-                            </p>
-
-                            {(challenge.status === 'approved' || challenge.status === 'rejected') ? (
-                                <>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 bg-gray-50 p-4 rounded-lg mt-4">
-                                        <div>
-                                            <p className="mb-2">
-                                                <span className="font-medium text-gray-700">Độ khó:</span>
-                                                <span className="text-indigo-600"> {challenge.difficulty}</span>
-                                            </p>
-                                            <p className="mb-2">
-                                                <span className="font-medium text-gray-700">Điểm số:</span>
-                                                <span className="text-indigo-600"> {challenge.points}</span>
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <p className="mb-2">
-                                                <span className="font-medium text-gray-700">Số lần nộp bài:</span>
-                                                <span className="text-gray-600"> {challenge.submissionCount}</span>
-                                            </p>
-                                            <p className="mb-2">
-                                                <span className="font-medium text-gray-700">Tỷ lệ thành công:</span>
-                                                <span className="text-green-600"> {challenge.successRate}%</span>
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <h3 className="text-lg font-semibold mb-3 text-gray-800">Yêu cầu</h3>
-                                        <ul className="list-disc pl-5 space-y-2 text-gray-700">
-                                            {challenge.requirements.map((req, index) => (
-                                                <li key={index}>{req}</li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                </>
-                            ) : (
-                                <div className="p-4 bg-gray-50 text-gray-500 mt-4">
-                                    Challenge chưa được phê duyệt. Thông tin chi tiết sẽ hiện thị sau khi được duyệt.
+                                <div className="mt-6 border-t pt-4">
+                                    <h3 className="text-lg font-semibold text-gray-800">
+                                        MÔ TẢ
+                                    </h3>
+                                    <p className="text-gray-700 mt-2">
+                                        {challenge.description}
+                                    </p>
                                 </div>
-                            )}
-                        </div>
-                    )}
 
-                    {activeTab === 'Tutorial' && (
-                        <div className="p-6">
-                            <h2 className="text-xl font-semibold mb-4 text-gray-800">Hướng dẫn</h2>
-                            <div className="prose max-w-none text-gray-700">
-                                {challenge.tutorial.type === 'text' && (
-                                    <p>{challenge.tutorial.content}</p>
-                                )}
-                                {challenge.tutorial.type === 'image' && (
-                                    <img src={challenge.tutorial.content} alt="Tutorial" className="w-full rounded" />
-                                )}
-                                {challenge.tutorial.type === 'video' && (
-                                    <video controls className="w-full rounded">
-                                        <source src={challenge.tutorial.content} type="video/mp4" />
-                                        Trình duyệt của bạn không hỗ trợ video.
-                                    </video>
-                                )}
-                                <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                                    <h3 className="text-lg font-medium mb-2 text-gray-800">Lưu ý quan trọng</h3>
-                                    <p className="text-gray-700">
-                                        Hãy đọc kỹ hướng dẫn và làm theo từng bước. Nếu gặp khó khăn, tham khảo các gợi ý được cung cấp.
+                                {/* Moved summary section into info tab */}
+                                <div className="mt-6 border-t pt-4">
+                                    <h3 className="text-lg font-semibold text-gray-800">
+                                        TÓM TẮT
+                                    </h3>
+                                    <p className="text-gray-700 mt-2">
+                                        {challenge.summary || "Không có tóm tắt được cung cấp cho thử thách này."}
                                     </p>
                                 </div>
                             </div>
-                        </div>
-                    )}
-
-                    {activeTab === 'Ranking' && (
-                        <div className="p-6">
-                            <h2 className="text-xl font-semibold mb-4 text-gray-800">Bảng xếp hạng</h2>
-                            <div className="overflow-x-auto">
-                                <table className="min-w-full divide-y divide-gray-200">
-                                    <thead>
-                                    <tr className="bg-gray-50">
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Thứ hạng
-                                        </th>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Người dùng
-                                        </th>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Điểm số
-                                        </th>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Thời gian
-                                        </th>
-                                    </tr>
-                                    </thead>
-                                    <tbody className="bg-white divide-y divide-gray-200">
-                                    {challenge.ranking.map((user, index) => (
-                                        <tr key={index} className={index === 0 ? "bg-yellow-50" : ""}>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className={`flex items-center justify-center w-6 h-6 rounded-full ${
-                                                    index === 0 ? "bg-yellow-400" : index === 1 ? "bg-gray-300" : index === 2 ? "bg-yellow-700" : "bg-gray-100"
-                                                } text-sm font-medium ${index < 3 ? "text-white" : "text-gray-700"}`}>
-                                                    {index + 1}
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm font-medium text-gray-900">{user.username}</div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm font-medium text-indigo-600">{user.score}</div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-600">{user.time}</div>
-                                            </td>
+                        )}
+                        {activeTab === "rules" && (
+                            <div>
+                                <h3 className="text-lg font-semibold text-gray-800">QUY ĐỊNH</h3>
+                                <p className="text-gray-700 mt-2">
+                                    {challenge.rule || "Không có quy định được cung cấp cho thử thách này."}
+                                </p>
+                            </div>
+                        )}
+                        {activeTab === "rankings" && (
+                            <div>
+                                <h3 className="text-lg font-semibold text-gray-800">BẢNG XẾP HẠNG</h3>
+                                <div className="mt-4 overflow-x-auto">
+                                    <table className="min-w-full bg-white">
+                                        <thead>
+                                        <tr className="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
+                                            <th className="py-3 px-6 text-left">Xếp hạng</th>
+                                            <th className="py-3 px-6 text-left">Thành viên</th>
+                                            <th className="py-3 px-6 text-right">Điểm số</th>
+                                            <th className="py-3 px-6 text-center">Hành động</th>
                                         </tr>
-                                    ))}
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody className="text-gray-600 text-sm">
+                                        {mockParticipants.map((participant) => (
+                                            <tr key={participant.id} className="border-b border-gray-200 hover:bg-gray-50">
+                                                <td className="py-3 px-6 text-left whitespace-nowrap">
+                                                    <div className="flex items-center">
+                                                            <span className={`
+                                                                w-8 h-8 rounded-full flex items-center justify-center
+                                                                ${participant.rank === 1 ? 'bg-yellow-400' :
+                                                                participant.rank === 2 ? 'bg-gray-300' :
+                                                                    participant.rank === 3 ? 'bg-orange-300' : 'bg-gray-200'}
+                                                                text-white font-bold
+                                                            `}>
+                                                                {participant.rank}
+                                                            </span>
+                                                    </div>
+                                                </td>
+                                                <td className="py-3 px-6 text-left">
+                                                    <div className="flex items-center">
+                                                        <div className="mr-2">
+                                                            <img className="w-8 h-8 rounded-full" src={participant.avatar} alt={participant.name} />
+                                                        </div>
+                                                        <span>{participant.name}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="py-3 px-6 text-right">
+                                                    <span className="font-bold">{participant.score}</span>
+                                                </td>
+                                                <td className="py-3 px-6 text-center">
+                                                    <button
+                                                        onClick={() => openKickModal(participant)}
+                                                        className="bg-red-100 text-red-600 py-1 px-3 rounded-full text-xs flex items-center justify-center mx-auto hover:bg-red-200"
+                                                    >
+                                                        <UserX className="h-3 w-3 mr-1" /> Kick
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
-                        </div>
-                    )}
-
-                    {activeTab === 'Members' && (
-                        <div className="p-6">
-                            <h2 className="text-xl font-semibold mb-4 text-gray-800">Danh sách thành viên tham gia</h2>
-                            <div className="mb-4">
-                                <input
-                                    type="text"
-                                    value={searchText}
-                                    onChange={(e) => setSearchText(e.target.value)}
-                                    placeholder="Tìm kiếm thành viên..."
-                                    className="w-full p-2 border border-gray-300 rounded"
-                                />
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {filteredMembers.map((member, index) => (
-                                    <div
-                                        key={index}
-                                        className="bg-white shadow p-4 rounded border border-gray-200 flex items-center justify-between"
-                                    >
-                                        <div>
-                                            <p className="text-gray-800 font-medium">{member.username}</p>
-                                            <p className="text-gray-600 text-sm">{member.email}</p>
-                                            <p className="text-gray-500 text-xs">Joined: {member.joinDate}</p>
-                                        </div>
-                                        <button
-                                            onClick={() => handleKickUser(member.username)}
-                                            className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-xs font-medium rounded"
-                                        >
-                                            Kick
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
             </div>
 
@@ -442,6 +356,49 @@ const ChallengeDetail = () => {
                                 }`}
                             >
                                 OK
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal xác nhận Kick thành viên */}
+            {showKickModal && memberToKick && (
+                <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+                        <h2 className="text-xl font-bold mb-4 text-gray-700">
+                            Xác nhận loại bỏ thành viên
+                        </h2>
+                        <div className="flex items-center mb-4">
+                            <img className="w-10 h-10 rounded-full mr-3" src={memberToKick.avatar} alt={memberToKick.name} />
+                            <span className="font-medium">{memberToKick.name}</span>
+                        </div>
+                        <p className="text-gray-600 mb-4">
+                            Bạn có chắc chắn muốn loại bỏ thành viên này khỏi challenge không?
+                        </p>
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Lý do loại bỏ:</label>
+                            <textarea
+                                className="w-full border border-gray-300 rounded p-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                rows="3"
+                                placeholder="Nhập lý do loại bỏ thành viên..."
+                                value={reason}
+                                onChange={(e) => setReason(e.target.value)}
+                                required
+                            />
+                        </div>
+                        <div className="flex justify-end space-x-3">
+                            <button
+                                onClick={() => setShowKickModal(false)}
+                                className="px-4 py-2 rounded border border-gray-300 text-gray-600 hover:bg-gray-50"
+                            >
+                                Hủy
+                            </button>
+                            <button
+                                onClick={handleKickMember}
+                                className="px-4 py-2 rounded text-white bg-red-500 hover:bg-red-600"
+                            >
+                                Xác nhận
                             </button>
                         </div>
                     </div>

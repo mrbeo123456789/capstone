@@ -17,7 +17,6 @@ import EnterOTP from "../page/signin/EnterOtp.jsx";
 import ResetPassword from "../page/signin/ResetPassword.jsx";
 import ChallengeList from "../page/admin/ChallengeList.jsx";
 import ReportList from "../page/admin/ReportList.jsx";
-import EvidenceList from "../page/admin/EvidenceList.jsx";
 import UserList from "../page/admin/UserList.jsx";
 import ChallengeDetail from "../page/challenge/ChallengeDetail.jsx";
 import JoinedChallengeDetail from "../page/challenge/JoinedChallengeDetail.jsx";
@@ -30,6 +29,7 @@ import ChallengePage from "../page/challenge/ChallengePage.jsx";
 import ChallengeEvidencePage from "../page/admin/ChallengeEvidencePage.jsx";
 import GroupList from "../page/admin/GroupList.jsx";
 import AboutUsPage from "../page/ui/AboutUs.jsx";
+import AdminChallengeDetail from "../page/admin/ChallengeDetail.jsx"
 const router = createBrowserRouter([
     {
         path: "/", // ✅ Redirect root to homepage
@@ -50,31 +50,6 @@ const router = createBrowserRouter([
         path:"/home",
         errorElement:<ErrorPage/>,
         element: <Home/>,
-    },
-    {
-        path:"/admin/dashboard",
-        errorElement:<ErrorPage/>,
-        element: <AdminDashboard/>,
-    },
-    {
-        path:"/admin/userlist",
-        errorElement:<ErrorPage/>,
-        element: <UserList/>,
-    },
-    {
-        path:"/admin/evidencelist",
-        errorElement:<ErrorPage/>,
-        element: <EvidenceList/>,
-    },
-    {
-        path:"/admin/reportlist",
-        errorElement:<ErrorPage/>,
-        element: <ReportList/>,
-    },
-    {
-        path:"/admin/challengelist",
-        errorElement:<ErrorPage/>,
-        element: <ChallengeList/>,
     },
     {
         path:"/login",
@@ -198,13 +173,11 @@ const router = createBrowserRouter([
                 path:"/admin/challengelist",
                 errorElement:<ErrorPage/>,
                 element: <ChallengeList/>,
-                children:[
-                    {
-                        path:"admin/challenge/:id",
-                        errorElement:<ErrorPage/>,
-                        element: <ChallengeDetail/>,
-                    },
-                ]
+            },
+            {
+                path:"/admin/challenge/:id/detail",
+                errorElement:<ErrorPage/>,
+                element: <AdminChallengeDetail/>,
             },
         ]
     },
