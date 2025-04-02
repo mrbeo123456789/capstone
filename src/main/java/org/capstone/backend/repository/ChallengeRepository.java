@@ -21,17 +21,17 @@ import java.util.List;
 @Repository
 public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
     @Query("""
-       SELECT new org.capstone.backend.dto.challenge.AdminChallengesResponse(
-           c.id, c.name, c.startDate, c.endDate, ct.name, c.status
-       )
-       FROM Challenge c
-       JOIN c.challengeType ct
-       WHERE (:name IS NULL OR c.name LIKE %:name%) 
-       AND (:status IS NULL OR c.status = :status)
-       ORDER BY 
-           CASE WHEN c.status = 'PENDING' THEN 0 ELSE 1 END,
-           c.createdAt DESC NULLS LAST
-       """)
+   SELECT new org.capstone.backend.dto.challenge.AdminChallengesResponse(
+       c.id, c.name, c.startDate, c.endDate, ct.name, c.status
+   )
+   FROM Challenge c
+   JOIN c.challengeType ct
+   WHERE (:name IS NULL OR LOWER(c.name) LIKE LOWER(CONCAT('%', :name, '%')))
+     AND (:status IS NULL OR c.status = :status)
+   ORDER BY 
+       CASE WHEN c.status = org.capstone.backend.utils.enums.ChallengeStatus.PENDING THEN 0 ELSE 1 END,
+       c.createdAt DESC
+""")
     Page<AdminChallengesResponse> findAllByStatusAndPriority(
             @Param("name") String name,
             @Param("status") ChallengeStatus status,
@@ -44,12 +44,12 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
            c.id, c.name, c.summary, c.picture
        )
        FROM Challenge c
-       WHERE c.status = 'APPROVED' 
+       WHERE c.status = 'APPROVED'\s
        AND c.id NOT IN (
            SELECT cm.challenge.id FROM ChallengeMember cm WHERE cm.member.id = :memberId
        )
        ORDER BY c.updatedAt DESC
-       """)
+      \s""")
     Page<ChallengeResponse> findApprovedChallengesNotJoined(@Param("memberId") Long memberId, Pageable pageable);
 
     @Query("""

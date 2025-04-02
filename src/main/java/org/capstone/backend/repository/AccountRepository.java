@@ -22,15 +22,15 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
        a.id, a.username, a.email, a.role, a.status, a.createdAt, a.updatedAt
    )
    FROM Account a
-   WHERE (:email IS NULL OR LOWER(a.email) LIKE LOWER(CONCAT('%', :email, '%')))
-   AND (:username IS NULL OR LOWER(a.username) LIKE LOWER(CONCAT('%', :username, '%')))
-   AND (:status IS NULL OR a.status = :status)
-   AND a.role <> org.capstone.backend.utils.enums.Role.ADMIN
+   WHERE (:keyword IS NULL OR 
+         LOWER(a.email) LIKE LOWER(CONCAT('%', :keyword, '%')) 
+      OR LOWER(COALESCE(a.username, '')) LIKE LOWER(CONCAT('%', :keyword, '%')))
+     AND (:status IS NULL OR a.status = :status)
+     AND a.role <> org.capstone.backend.utils.enums.Role.ADMIN
    ORDER BY a.createdAt DESC
-  """)
-    Page<AccountDTO> findAllByFiltersExcludingAdmin(
-            @Param("email") String email,
-            @Param("username") String username,
+""")
+    Page<AccountDTO> findAllByKeywordAndStatus(
+            @Param("keyword") String keyword,
             @Param("status") AccountStatus status,
             Pageable pageable);
 

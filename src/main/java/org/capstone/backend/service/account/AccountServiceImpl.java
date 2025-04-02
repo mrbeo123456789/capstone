@@ -28,9 +28,9 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     private MemberRepository memberRepository;
 
-    public Page<AccountDTO> getAllAccounts(String email, String username, AccountStatus status, int page, int size) {
+    public Page<AccountDTO> getAllAccounts(String keyword, AccountStatus status, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return accountRepository.findAllByFiltersExcludingAdmin(email, username, status, pageable);
+        return accountRepository.findAllByKeywordAndStatus(keyword, status, pageable);
     }
 
 

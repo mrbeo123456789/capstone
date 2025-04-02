@@ -17,12 +17,11 @@ public class ManageAccountController {
 
     @GetMapping("/get")
     public ResponseEntity<Page<AccountDTO>> getAllAccounts(
-            @RequestParam(required = false) String email,
-            @RequestParam(required = false) String username,
+            @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String status,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        Page<AccountDTO> accounts = accountService.getAllAccounts(email, username, AccountStatus.valueOf(status), page, size);
+        Page<AccountDTO> accounts = accountService.getAllAccounts( keyword, AccountStatus.valueOf(status), page, size);
         return ResponseEntity.ok(accounts);
     }
 
