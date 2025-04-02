@@ -1,6 +1,6 @@
 import { useState } from "react";
 import google_icon from "../../assets/google-icon.png";
-import background from "../../assets/login2.png";
+import background from "../../assets/login1.png";
 import { useNavigate } from "react-router-dom";
 import { useLoginMutation } from "../../service/authService.js";
 
