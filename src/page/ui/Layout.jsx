@@ -6,27 +6,32 @@ import {useSidebar} from "../../context/SidebarContext.jsx";
 
 function Layout() {
     const { isSidebarOpen, toggleSidebar } = useSidebar();
-    console.log("isSidebarOpen in Layout:", isSidebarOpen);
 
     return (
         <>
-            <div className="sticky top-0 z-50">
-            <Header toggleSidebar={toggleSidebar}/>
+            {/* Header luôn ở trên cùng, full width */}
+            <div className="sticky top-0 z-50 w-full">
+                <Header toggleSidebar={toggleSidebar} />
             </div>
-            <div
-                className="sm:flex items-start justify-between h-full min-h-screen"
-                style={{
-                    background: "linear-gradient(235deg, rgb(254 225 144), rgb(250 241 221), rgb(252 247 226))",
-                }}
-            >
-                {isSidebarOpen && <SideBar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />}
-                <div className={`w-full transition-all duration-300 pl-0 md:p-4 md:space-y-4`}>
+
+            {/* Body layout: Sidebar dưới header và nằm bên trái */}
+            <div className="flex min-h-screen bg-[linear-gradient(235deg,_rgb(254,225,144),_rgb(250,241,221),_rgb(252,247,226))]">
+
+                {/* Sidebar chỉ chiếm chiều cao còn lại sau header */}
+                <div>
+                    {isSidebarOpen && <SideBar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />}
+                </div>
+
+                {/* Nội dung chính */}
+                <div className="flex-1 p-4 space-y-4">
                     <Outlet />
+
                 </div>
             </div>
             <Footer />
         </>
     );
 }
+
 
 export default Layout;

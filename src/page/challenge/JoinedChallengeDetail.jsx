@@ -9,23 +9,29 @@ import {useGetChallengeDetailQuery} from "../../service/challengeService.js";
 import Description from "./description.jsx";
 import ProgressTracking from "./ProgressTracking.jsx";
 import {useGetMyEvidencesByChallengeQuery} from "../../service/evidenceService.js";
+import {FaCheckCircle, FaInfoCircle, FaTrophy, FaVoteYea} from "react-icons/fa";
 
 const JoinedChallengeDetail = () => {
     const [activeTab, setActiveTab] = useState("proof");
     const [showPopup, setShowPopup] = useState(false);
 
+    const tabItems = [
+        { key: "proof", label: "Proof", icon: <FaCheckCircle /> },
+        { key: "ranking", label: "Ranking", icon: <FaTrophy /> },
+        { key: "voteOther", label: "Vote Other", icon: <FaVoteYea /> },
+        { key: "description", label: "Description", icon: <FaInfoCircle /> },
+    ];
+
     const { id } = useParams(); // Lấy challenge ID từ URL
     const { data, isLoading, error } = useGetChallengeDetailQuery(id);
     const {data: evidenceData, isEvidenceLoading, errorEvidence } = useGetMyEvidencesByChallengeQuery(id);
-    console.log("This is data from getttt",evidenceData);
-
-    console.log(data)
 
     if (isLoading) return <p>Loading...</p>;
     if (error) return <p>Error loading challenge detail</p>;
 
     const challenge = data;
 
+    // Invite Section
     const openMemberList = () => {
         console.log("openUserDetail");
         setShowPopup(true);
@@ -34,6 +40,7 @@ const JoinedChallengeDetail = () => {
     const closeUserDetail = () => {
         setShowPopup(false);
     };
+    // ENd of invite section
 
     const formatDate = (dateArray) => {
         if (!Array.isArray(dateArray)) return "N/A";
@@ -75,53 +82,42 @@ const JoinedChallengeDetail = () => {
                 </button>
             </div>
 
-            <div className="mt-6 w-full mx-auto">
-                <div className="flex border-b-2 border-gray-300">
-                    <button
-                        className={`flex-1 p-2 text-center font-bold ${
-                            activeTab === "proof" ? "bg-blue-500 text-white" : "hover:bg-gray-200 text-gray-700"
-                        }`}
-                        onClick={() => setActiveTab("proof")}
-                    >
-                        Proof
-                    </button>
-                    <button
-                        className={`flex-1 p-2 text-center font-bold ${
-                            activeTab === "ranking" ? "bg-blue-500 text-white" : "hover:bg-gray-200 text-gray-700"
-                        }`}
-                        onClick={() => setActiveTab("ranking")}
-                    >
-                        Ranking
-                    </button>
-                    <button
-                        className={`flex-1 p-2 text-center font-bold ${
-                            activeTab === "voteOther" ? "bg-blue-500 text-white" : "hover:bg-gray-200 text-gray-700"
-                        }`}
-                        onClick={() => setActiveTab("voteOther")}
-                    >
-                        Vote Other
-                    </button>
-                    <button
-                        className={`flex-1 p-2 text-center font-bold ${
-                            activeTab === "descriptions" ? "bg-blue-500 text-white" : "hover:bg-gray-200 text-gray-700"
-                        }`}
-                        onClick={() => setActiveTab("description")}
-                    >
-                        Description
-                    </button>
+            <div className="w-full">
+                <div className="rounded-lg flex w-full bg-black text-white text-sm font-semibold">
+                    {tabItems.map((tab) => (
+                        <button
+                            key={tab.key}
+                            onClick={() => setActiveTab(tab.key)}
+                            className={`flex-1 flex flex-col sm:flex-row items-center justify-center px-4 py-3 transition-all
+                            ${activeTab === tab.key ? "border-t-4 border-red-500 bg-orange-300 text-black" : "bg-white text-black"}
+                            hover:bg-orange-100 hover:text-black`}
+                        >
+                            <span className="text-lg mr-2">{tab.icon}</span>
+                            <span>{tab.label}</span>
+                        </button>
+                    ))}
                 </div>
+                {activeTab === "proof" && (
+                    isLoading || isEvidenceLoading ? (
+                        <p className="text-center py-4">Loading proof data...</p>
+                    ) : (
+                        <ProofUploads
+                            challenge={challenge}
+                            evidence={evidenceData}
+                        />
+                    )
+                )}
+                {activeTab === "ranking" && <RankingList/>}
+                {activeTab === "voteOther" && <VoteOther/>}
+                {activeTab === "description" && <Description content={challenge?.description}/>}
+                {/* User Detail Popup */}
+                {showPopup && (
+                    <MemberListPopup
+                        onClose={closeUserDetail}
+                    />
+                )}
             </div>
 
-            {activeTab === "proof" && <ProofUploads/>}
-            {activeTab === "ranking" && <RankingList/>}
-            {activeTab === "voteOther" && <VoteOther/>}
-            {activeTab === "description" && <Description content={challenge?.description} />}
-            {/* User Detail Popup */}
-            {showPopup && (
-                <MemberListPopup
-                    onClose={closeUserDetail}
-                />
-            )}
         </div>
     );
 };

@@ -6,9 +6,6 @@ const LOCAL_STORAGE_KEY = "markedDays";
 
 export default function ProgressTracking({ challenge, evidence }) {
     const [markedDays, setMarkedDays] = useState({});
-    console.log("HEllodasd")
-    console.log(evidence);
-    console.log("this is challenge", challenge);
     const submittedEvidenceDates = new Set(
         evidence?.map((e) => {
             const [year, month, day] = e.submittedAt;
@@ -17,15 +14,12 @@ export default function ProgressTracking({ challenge, evidence }) {
         })
     );
 
-
     const today = new Date();
     const challengeId = challenge?.id;
     const [currentMonth, setCurrentMonth] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
 
     const [showModal, setShowModal] = useState(false);
     const [selectedDate, setSelectedDate] = useState(null);
-
-
 
 // Convert startDate & endDate from [YYYY, MM, DD] to Date objects
     const startDate = challenge?.startDate
@@ -35,7 +29,6 @@ export default function ProgressTracking({ challenge, evidence }) {
     const endDate = challenge?.endDate
         ? new Date(challenge.endDate[0], challenge.endDate[1] - 1, challenge.endDate[2])
         : null;
-
 
     // Load from localStorage
     useEffect(() => {
@@ -70,12 +63,8 @@ export default function ProgressTracking({ challenge, evidence }) {
             );
             days.push(day);
         }
-
         return days;
     };
-
-
-
 
     const calendarDays = getCalendarGrid();
     const monthName = currentMonth.toLocaleString("default", { month: "long" });
@@ -92,12 +81,6 @@ export default function ProgressTracking({ challenge, evidence }) {
     const isWithinChallenge = (date) => {
         return startDate && endDate && date >= startDate && date <= endDate;
     };
-
-// On success
-    toast.success("✅ Nộp bằng chứng thành công!");
-
-// On error
-    toast.error("❌ Hôm nay không nằm trong thời gian thử thách.");
 
     return (
         <div className="bg-white shadow-md rounded-lg p-4 mx-auto">
@@ -123,7 +106,6 @@ export default function ProgressTracking({ challenge, evidence }) {
                     const hasEvidence = submittedEvidenceDates.has(dateStr);
                     const isPast = date < today && isWithinChallenge;
                     const showRedX = isPast && !hasEvidence;
-
                     return (
                         <div
                             key={idx}
@@ -133,7 +115,6 @@ export default function ProgressTracking({ challenge, evidence }) {
                                 : showRedX ? "bg-red-200"
                                     : isWithinChallenge ? "bg-gray-200"
                                         : ""}
-
                                             ${isToday ? "border border-blue-500" : ""}
                                         `}
                             onClick={() => {

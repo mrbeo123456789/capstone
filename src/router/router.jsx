@@ -198,7 +198,7 @@ const router = createBrowserRouter([
     },
     {
         path:"/challenges",
-        errorElement:<ErrorPage/>,
+        // errorElement:<ErrorPage/>,
         element: <Layout></Layout>,
         children:[
             {
