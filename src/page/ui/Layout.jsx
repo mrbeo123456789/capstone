@@ -14,7 +14,7 @@ function Layout() {
             <Header toggleSidebar={toggleSidebar}/>
             </div>
             <div
-                className="sm:flex items-start justify-between"
+                className="sm:flex items-start justify-between h-full min-h-screen"
                 style={{
                     background: "linear-gradient(235deg, rgb(254 225 144), rgb(250 241 221), rgb(252 247 226))",
                 }}
