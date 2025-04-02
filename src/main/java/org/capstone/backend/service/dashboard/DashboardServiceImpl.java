@@ -68,11 +68,15 @@ public class DashboardServiceImpl implements DashboardService {
         List<Object[]> memberStats = memberRepository.countNewMembersGroupedByDate(startDate, now);
         List<Object[]> challengeStats = challengeRepository.countNewChallengesGroupedByDate(startDate, now);
 
+        // ✅ Sửa lỗi ép kiểu: o[0] là Date, không phải String
         Map<String, Integer> memberMap = memberStats.stream().collect(Collectors.toMap(
-                o -> (String) o[0], o -> ((Long) o[1]).intValue()
+                o -> o[0].toString(), // ✅ chuyển thành chuỗi bằng toString()
+                o -> ((Long) o[1]).intValue()
         ));
+
         Map<String, Integer> challengeMap = challengeStats.stream().collect(Collectors.toMap(
-                o -> (String) o[0], o -> ((Long) o[1]).intValue()
+                o -> o[0].toString(), // ✅ tương tự
+                o -> ((Long) o[1]).intValue()
         ));
 
         List<String> dates = Stream.concat(memberMap.keySet().stream(), challengeMap.keySet().stream())
@@ -87,4 +91,5 @@ public class DashboardServiceImpl implements DashboardService {
                 .newChallenges(newChallenges)
                 .build();
     }
+
 }
