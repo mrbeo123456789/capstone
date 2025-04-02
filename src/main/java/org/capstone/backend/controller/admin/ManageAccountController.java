@@ -21,7 +21,17 @@ public class ManageAccountController {
             @RequestParam(required = false) String status,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        Page<AccountDTO> accounts = accountService.getAllAccounts( keyword, AccountStatus.valueOf(status), page, size);
+
+        AccountStatus statusEnum = null;
+        if (status != null && !status.isBlank()) {
+            try {
+                statusEnum = AccountStatus.valueOf(status.toUpperCase()); // chuyển về enum an toàn
+            } catch (IllegalArgumentException ex) {
+                return ResponseEntity.badRequest().build(); // hoặc custom message nếu cần
+            }
+        }
+
+        Page<AccountDTO> accounts = accountService.getAllAccounts(keyword, statusEnum, page, size);
         return ResponseEntity.ok(accounts);
     }
 

@@ -27,9 +27,20 @@ public class ManageChallengeController {
             @RequestParam(required = false) String status,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        Page<AdminChallengesResponse> challenges = challengeService.getChallenges(name, ChallengeStatus.valueOf(status), page, size);
+
+        ChallengeStatus statusEnum = null;
+        if (status != null && !status.isBlank()) {
+            try {
+                statusEnum = ChallengeStatus.valueOf(status.toUpperCase());
+            } catch (IllegalArgumentException ex) {
+                return ResponseEntity.badRequest().build(); // hoặc trả về message rõ hơn
+            }
+        }
+
+        Page<AdminChallengesResponse> challenges = challengeService.getChallenges(name, statusEnum, page, size);
         return ResponseEntity.ok(challenges);
     }
+
 
 
 
