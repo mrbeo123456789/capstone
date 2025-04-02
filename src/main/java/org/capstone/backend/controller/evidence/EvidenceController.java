@@ -28,7 +28,7 @@ public class EvidenceController {
     @PostMapping(value = "/upload", consumes = {"multipart/form-data"})
     public ResponseEntity<?> uploadEvidence(
             @RequestParam("file") MultipartFile file,
-            @ModelAttribute("data") Long challengeId) {
+            @RequestParam("data") Long challengeId) {
 
         try {
             evidenceService.uploadAndSubmitEvidence(file, challengeId);

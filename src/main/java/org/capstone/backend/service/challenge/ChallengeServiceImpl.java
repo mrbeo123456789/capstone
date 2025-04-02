@@ -67,7 +67,7 @@ public class ChallengeServiceImpl implements ChallengeService {
     private String uploadImageIfPresent(MultipartFile file) {
         try {
             if (file != null && !file.isEmpty()) {
-                return firebaseUpload.uploadFile(file);
+                return firebaseUpload.uploadFile(file, "evidence");
             }
         } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Upload failed: " + e.getMessage());

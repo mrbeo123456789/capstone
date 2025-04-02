@@ -74,14 +74,19 @@ public class ChallengeController {
     }
 
     @PostMapping("/my-challenges")
-    public ResponseEntity<?> getMyChallenges(@RequestBody MyChallengeRequest request) {
+    public ResponseEntity<?> getMyChallenges(@RequestBody String request) {
         try {
-            System.out.println("Received role: " + request.getRole()); // Debug request
-            ChallengeRole role = ChallengeRole.valueOf(request.getRole().toUpperCase().trim());
+            System.out.println("Received role: " + request); // Debug request
+            ChallengeRole role = null;
+
+            if (!"ALL".equalsIgnoreCase(request.trim())) {
+                role = ChallengeRole.valueOf(request.toUpperCase().trim());
+            }
+
             List<MyChallengeResponse> challenges = challengeService.getChallengesByMember(role);
             return ResponseEntity.ok(challenges);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid role: " + request.getRole());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid role: " + request);
         }
     }
 
