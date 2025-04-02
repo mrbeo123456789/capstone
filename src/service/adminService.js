@@ -41,13 +41,19 @@ export const adminUserService = createApi({
     tagTypes: ["Admin"],
     endpoints: (builder) => ({
         getUsers: builder.query({
-            query: ({ page = 0, size = 10 }) => {
-                const url = `/admin/accounts/get?page=${page}&size=${size}`;
+            query: ({ page = 0, size = 10, keyword = "", status = "" } = {}) => {
+                const params = new URLSearchParams();
+                params.append("page", page);
+                params.append("size", size);
+                if (keyword.trim()) params.append("keyword", keyword.trim());
+                if (status.trim()) params.append("status", status.trim());
+                const url = `/admin/accounts/get?${params.toString()}`;
                 console.log("Fetching URL:", url);
                 return url;
             },
             providesTags: ["Admin"],
         }),
+
         getUserById: builder.query({
             query: (id) => {
                 const url = `/admin/accounts/getDetail/${id}`;
@@ -85,13 +91,23 @@ export const adminUserService = createApi({
             providesTags: ["Admin"],
         }),
         getChallenges: builder.query({
-            query: ({ page = 0, size = 10 } = {}) => {
-                const url = `/admin/challenges/all?page=${page}&size=${size}`;
+            query: ({ page = 0, size = 10, name = "", status = "" } = {}) => {
+                const params = new URLSearchParams();
+                params.append("page", page);
+                params.append("size", size);
+                if (name.trim()) {
+                    params.append("name", name.trim());
+                }
+                if (status.trim()) {
+                    params.append("status", status.trim());
+                }
+                const url = `/admin/challenges/all?${params.toString()}`;
                 console.log("Fetching Challenges URL:", url);
                 return url;
             },
             providesTags: ["Admin"],
         }),
+
         getGroups: builder.query({
             query: ({ page = 0, size = 10 } = {}) => {
                 const url = `/admin/groups/all?page=${page}&size=${size}`;
@@ -121,17 +137,21 @@ export const adminUserService = createApi({
             invalidatesTags: ["Admin"],
         }),
         // API filter reports: lấy danh sách báo cáo với tham số reportType, page, size
-        filterReports: builder.query({
-            query: ({ reportType, page = 0, size = 10 } = {}) => {
-                let url = `/admin/reports/all?page=${page}&size=${size}`;
-                if (reportType) {
-                    url += `&reportType=${encodeURIComponent(reportType)}`;
+        getReports: builder.query({
+            query: ({ reportType = "", page = 0, size = 10 } = {}) => {
+                const params = new URLSearchParams();
+                params.append("page", page);
+                params.append("size", size);
+                if (reportType.trim()) {
+                    params.append("reportType", reportType.trim());
                 }
+                const url = `/admin/reports/all?${params.toString()}`;
                 console.log("Fetching Reports URL:", url);
                 return url;
             },
             providesTags: ["Admin"],
         }),
+
         // API update report status: cập nhật trạng thái của báo cáo dựa vào reportId và status
         updateReportStatus: builder.mutation({
             query: ({ reportId, status }) => ({
@@ -154,6 +174,6 @@ export const {
     useGetGroupsQuery,
     useGetSummaryQuery,
     useGetGrowthQuery,
-    useFilterReportsQuery,
+    useGetReportsQuery,
     useUpdateReportStatusMutation,
 } = adminUserService;
