@@ -24,12 +24,9 @@ public interface EvidenceRepository extends JpaRepository<Evidence, Long> {
     List<Evidence> findByMemberIdAndChallengeIdOrderBySubmittedAtAsc(Long memberId, Long challengeId);
     List<Evidence> findByChallengeIdAndStatus(Long challengeId, EvidenceStatus status);
 
-    Optional<Evidence> findFirstByMemberIdAndChallengeIdAndSubmittedAtBetweenAndStatus(
-            Long memberId,
-            Long challengeId,
-            LocalDateTime start,
-            LocalDateTime end,
-            EvidenceStatus status
+    Optional<Evidence> findFirstByMemberIdAndChallengeIdAndSubmittedAtBetween(
+            Long memberId, Long challengeId, LocalDateTime start, LocalDateTime end
     );
+
     Page<Evidence> findByChallengeId(Long challengeId, Pageable pageable);
 }

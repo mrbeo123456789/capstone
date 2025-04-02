@@ -74,19 +74,17 @@ private  final FixedGmailService fixedGmailService;
         LocalDate today = LocalDate.now();
         LocalTime now = LocalTime.now();
 
-        // ✅ Kiểm tra thời gian nộp
+        // ✅ Kiểm tra thời gian hợp lệ
         if (today.isBefore(challenge.getStartDate()) || today.isAfter(challenge.getEndDate())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Hôm nay không nằm trong thời gian thử thách.");
         }
 
         if (today.equals(challenge.getEndDate()) && now.isAfter(LocalTime.of(21, 0))) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bạn chỉ được nộp trước 21:00 trong ngày cuối.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bạn chỉ được nộp bằng chứng trước 21:00 trong ngày cuối.");
         }
 
-        // ✅ Kiểm tra người tham gia
         boolean isParticipant = challengeMemberRepository.existsByChallengeIdAndMemberIdAndStatus(
                 challengeId, memberId, ChallengeMemberStatus.JOINED);
-
         if (!isParticipant) {
             throw new IllegalStateException("Bạn không tham gia thử thách này.");
         }
@@ -94,40 +92,34 @@ private  final FixedGmailService fixedGmailService;
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new EntityNotFoundException("Member not found"));
 
-        // ✅ Tìm evidence cũ trong ngày
         LocalDateTime startOfDay = today.atStartOfDay();
         LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
 
-        Evidence oldEvidence = evidenceRepository.findFirstByMemberIdAndChallengeIdAndSubmittedAtBetweenAndStatus(
-                memberId, challengeId, startOfDay, endOfDay, EvidenceStatus.PENDING
+        Evidence todayEvidence = evidenceRepository.findFirstByMemberIdAndChallengeIdAndSubmittedAtBetween(
+                memberId, challengeId, startOfDay, endOfDay
         ).orElse(null);
 
-        // ✅ Tạo path file để ghi đè
         String path = String.format("evidences/challenge_%d/member_%d/%s.mp4",
                 challengeId, memberId, today.toString());
 
-        // ✅ Ghi đè file cũ nếu có
         String fileUrl = firebaseStorageService.uploadFileWithOverwrite(file, path);
 
-        // ✅ Nếu đã tồn tại evidence hôm nay → update URL
-        if (oldEvidence != null) {
-            oldEvidence.setEvidenceUrl(fileUrl);
-            oldEvidence.setUpdatedAt(LocalDateTime.now());
-            evidenceRepository.save(oldEvidence);
+        if (todayEvidence != null) {
+            todayEvidence.setEvidenceUrl(fileUrl);
+            todayEvidence.setUpdatedAt(LocalDateTime.now());
+            evidenceRepository.save(todayEvidence);
             return;
         }
 
-        // ✅ Tạo mới evidence nếu chưa tồn tại
         Evidence newEvidence = Evidence.builder()
                 .challenge(challenge)
                 .member(member)
                 .evidenceUrl(fileUrl)
                 .status(EvidenceStatus.PENDING)
+                .submittedAt(LocalDateTime.now())
                 .build();
 
-      evidenceRepository.save(newEvidence);
-
-
+        evidenceRepository.save(newEvidence);
     }
 
     @Override
