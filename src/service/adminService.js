@@ -92,6 +92,14 @@ export const adminUserService = createApi({
             },
             providesTags: ["Admin"],
         }),
+        getGroups: builder.query({
+            query: ({ page = 0, size = 10 } = {}) => {
+                const url = `/admin/groups/all?page=${page}&size=${size}`;
+                console.log("Fetching Challenges URL:", url);
+                return url;
+            },
+            providesTags: ["Admin"],
+        }),
 
         reviewChallenge: builder.mutation({
             query: (reviewRequest) => {
@@ -114,5 +122,6 @@ export const {
     useUnbanUserMutation,
     useSearchUsersQuery,
     useGetChallengesQuery,
-    useReviewChallengeMutation
+    useReviewChallengeMutation,
+    useGetGroupsQuery,
 } = adminUserService;

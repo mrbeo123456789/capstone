@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CheckCircle, XCircle, Ban } from "lucide-react";
 import Sidebar from "../navbar/AdminNavbar.jsx";
-import { useGetChallengesQuery } from "../../service/adminService.js";
+import { useGetChallengesQuery, useReviewChallengeMutation } from "../../service/adminService.js";
 
 const ChallengeList = () => {
     // State management
@@ -20,7 +20,11 @@ const ChallengeList = () => {
         data: challengesResponse = {},
         isLoading,
         isError,
+        refetch,
     } = useGetChallengesQuery({ page: currentPage - 1, size: itemsPerPage });
+
+    // Sử dụng mutation reviewChallenge
+    const [reviewChallenge] = useReviewChallengeMutation();
 
     // Giả định API trả về dữ liệu có property "content"
     const allChallenges = challengesResponse?.content || [];
@@ -64,38 +68,29 @@ const ChallengeList = () => {
 
     // Navigation tới chi tiết thử thách
     const navigateToChallengeDetail = (challenge) => {
-        navigate(`/challenge/${challenge.id}`);
+        navigate(`/admin/challenge/${challenge.id}/detail`);
     };
 
-    // Hành động cho challenge:
-    // Nếu status là PENDING: hiển thị nút Approve và Reject.
-    // Nếu status là REJECTED: chỉ hiển thị nút Approve.
-    // Với các trạng thái khác: giữ nguyên nút toggle theo logic cũ.
+    // Hàm xử lý review: Approve hoặc Reject
     const handleAction = async (challengeId, action) => {
+        const newStatus = action === "confirmed" ? "APPROVED" : "REJECTED";
         try {
-            const newStatus = action === "confirmed" ? "APPROVED" : "REJECTED";
-            console.log(`Would change status for challenge ${challengeId} to ${newStatus}`);
-            // TODO: Gọi API cập nhật trạng thái nếu cần
+            const reviewRequest = { challengeId, status: newStatus };
+            const response = await reviewChallenge(reviewRequest).unwrap();
+            console.log("Review challenge response:", response);
+            refetch();
         } catch (error) {
             console.error(`Error ${action} challenge:`, error);
         }
     };
 
-    const toggleChallengeStatus = async (challengeId, currentStatus) => {
-        const newStatus = currentStatus.toUpperCase() === "APPROVED" ? "REJECTED" : "APPROVED";
-        try {
-            console.log(`Would toggle status for challenge ${challengeId} to ${newStatus}`);
-            // TODO: Gọi API cập nhật trạng thái nếu cần
-        } catch (error) {
-            console.error("Error updating challenge status:", error);
-        }
-    };
-
-    // Hành động ban cho các challenge nếu cần (có thể bổ sung tùy ý)
+    // Hàm xử lý ban: cập nhật status thành BANNED
     const banChallenge = async (challengeId) => {
         try {
-            console.log(`Would ban challenge ${challengeId}`);
-            // TODO: Gọi API cập nhật trạng thái thành BANNED nếu cần
+            const reviewRequest = { challengeId, status: "BANNED" };
+            const response = await reviewChallenge(reviewRequest).unwrap();
+            console.log("Ban challenge response:", response);
+            refetch();
         } catch (error) {
             console.error("Error banning challenge:", error);
         }
@@ -164,25 +159,25 @@ const ChallengeList = () => {
                                         onClick={toggleStatusDropdown}
                                         className="px-4 py-2 border border-orange-200 rounded-lg bg-white flex items-center justify-between min-w-[180px]"
                                     >
-                    <span>
-                      {filterStatus === "APPROVED"
-                          ? "Đã duyệt"
-                          : filterStatus === "REJECTED"
-                              ? "Đã từ chối"
-                              : filterStatus === "PENDING"
-                                  ? "Đang chờ"
-                                  : filterStatus === "BANNED"
-                                    ? "Bị ban"
-                                    : filterStatus === "CANCELLED"
-                                        ? "Bị hủy"
-                                        : filterStatus === "FINISH"
-                                            ? "Đã kết thúc"
-                                            : filterStatus === "ONGOING"
-                                                ? "Đang diễn ra"
-                                                : filterStatus === "UPCOMING"
-                                                    ? "Sắp diễn ra"
-                                                    : "Tất cả trạng thái"}
-                    </span>
+                                        <span>
+                                            {filterStatus === "APPROVED"
+                                                ? "Đã duyệt"
+                                                : filterStatus === "REJECTED"
+                                                    ? "Đã từ chối"
+                                                    : filterStatus === "PENDING"
+                                                        ? "Đang chờ"
+                                                        : filterStatus === "BANNED"
+                                                            ? "Đã ban"
+                                                            : filterStatus === "CANCELED"
+                                                                ? "Bị hủy"
+                                                                : filterStatus === "FINISH"
+                                                                    ? "Đã kết thúc"
+                                                                    : filterStatus === "ONGOING"
+                                                                        ? "Đang diễn ra"
+                                                                        : filterStatus === "UPCOMING"
+                                                                            ? "Sắp diễn ra"
+                                                                            : "Tất cả trạng thái"}
+                                        </span>
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
                                             className={`h-5 w-5 transition-transform ${isStatusDropdownOpen ? "rotate-180" : ""}`}
@@ -216,7 +211,8 @@ const ChallengeList = () => {
                                                 </button>
                                                 <button onClick={() => handleStatusFilter("FINISH")} className="block w-full text-left px-4 py-2 hover:bg-orange-50">
                                                     Đã kết thúc
-                                                </button><button onClick={() => handleStatusFilter("ONGOING")} className="block w-full text-left px-4 py-2 hover:bg-orange-50">
+                                                </button>
+                                                <button onClick={() => handleStatusFilter("ONGOING")} className="block w-full text-left px-4 py-2 hover:bg-orange-50">
                                                     Đang diễn ra
                                                 </button>
                                                 <button onClick={() => handleStatusFilter("UPCOMING")} className="block w-full text-left px-4 py-2 hover:bg-orange-50">
@@ -272,35 +268,35 @@ const ChallengeList = () => {
                                                             className="font-medium text-orange-600 hover:text-orange-800 cursor-pointer hover:underline"
                                                             onClick={() => navigateToChallengeDetail(challenge)}
                                                         >
-                                {challenge.name}
-                              </span>
+                                                                {challenge.name}
+                                                            </span>
                                                     </div>
                                                 </td>
                                                 <td className="p-4">
-                            <span className="font-medium">
-                              {computeDuration(challenge)}
-                            </span>
+                                                        <span className="font-medium">
+                                                            {computeDuration(challenge)}
+                                                        </span>
                                                 </td>
                                                 <td className="p-4">
-                            <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                                challenge.status.toUpperCase() === "APPROVED"
-                                    ? "bg-green-100 text-green-700"
-                                    : challenge.status.toUpperCase() === "REJECTED"
-                                        ? "bg-red-100 text-red-700"
-                                        : challenge.status.toUpperCase() === "BANNED" ||
-                                        challenge.status.toUpperCase() === "FINISH"
-                                            ? "bg-gray-100 text-gray-700"
-                                            : "bg-yellow-100 text-yellow-700"
-                            }`}>
-                              {challenge.status.toUpperCase()}
-                            </span>
+                                                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                                                            challenge.status.toUpperCase() === "APPROVED"
+                                                                ? "bg-green-100 text-green-700"
+                                                                : challenge.status.toUpperCase() === "REJECTED"
+                                                                    ? "bg-red-100 text-red-700"
+                                                                    : challenge.status.toUpperCase() === "BANNED" ||
+                                                                    challenge.status.toUpperCase() === "FINISH"
+                                                                        ? "bg-gray-100 text-gray-700"
+                                                                        : "bg-yellow-100 text-yellow-700"
+                                                        }`}>
+                                                            {challenge.status.toUpperCase()}
+                                                        </span>
                                                 </td>
                                                 <td className="p-4">
                                                     <div className="flex space-x-2 justify-center">
                                                         {(() => {
                                                             const status = challenge.status.toUpperCase();
                                                             if (status === "PENDING") {
-                                                                // Hiển thị 2 nút: Approve và Reject
+                                                                // Hiển thị nút Approve và Reject cho trạng thái PENDING
                                                                 return (
                                                                     <>
                                                                         <button
@@ -318,7 +314,7 @@ const ChallengeList = () => {
                                                                     </>
                                                                 );
                                                             } else if (status === "APPROVED") {
-                                                                // Nếu đã approve, chỉ cho phép chuyển sang rejected
+                                                                // Nếu đã approve, cho phép chuyển sang rejected
                                                                 return (
                                                                     <button
                                                                         className="p-2 bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition-colors"
@@ -328,7 +324,7 @@ const ChallengeList = () => {
                                                                     </button>
                                                                 );
                                                             } else if (status === "REJECTED") {
-                                                                // Nếu đã reject, chỉ cho phép chuyển sang approved
+                                                                // Nếu đã reject, cho phép chuyển sang approved
                                                                 return (
                                                                     <button
                                                                         className="p-2 bg-green-100 text-green-600 rounded-md hover:bg-green-200 transition-colors"
@@ -338,10 +334,10 @@ const ChallengeList = () => {
                                                                     </button>
                                                                 );
                                                             } else if (status === "BANNED" || status === "FINISH" || status === "CANCELED") {
-                                                                // Không hiển thị action nếu status là BANNED hoặc FINISH
+                                                                // Không hiển thị hành động nếu status là BANNED, FINISH hoặc CANCELED
                                                                 return null;
                                                             } else {
-                                                                // Các trạng thái khác sẽ có nút ban
+                                                                // Các trạng thái khác sẽ hiển thị nút ban
                                                                 return (
                                                                     <button
                                                                         className="p-2 bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition-colors"
@@ -354,7 +350,6 @@ const ChallengeList = () => {
                                                         })()}
                                                     </div>
                                                 </td>
-
                                             </tr>
                                         ))
                                     )}
@@ -368,12 +363,12 @@ const ChallengeList = () => {
                             <div className="text-gray-600">
                                 Hiển thị{" "}
                                 <span className="font-medium">
-                  {currentChallenges.length > 0 ? indexOfFirstChallenge + 1 : 0}
-                </span>{" "}
+                                    {currentChallenges.length > 0 ? indexOfFirstChallenge + 1 : 0}
+                                </span>{" "}
                                 đến{" "}
                                 <span className="font-medium">
-                  {indexOfFirstChallenge + currentChallenges.length}
-                </span>{" "}
+                                    {indexOfFirstChallenge + currentChallenges.length}
+                                </span>{" "}
                                 trong tổng số{" "}
                                 <span className="font-medium">{sortedChallenges.length}</span> thử thách
                             </div>
