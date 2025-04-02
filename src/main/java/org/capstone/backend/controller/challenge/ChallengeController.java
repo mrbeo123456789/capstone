@@ -29,7 +29,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ChallengeController {
 
-    private ChallengeService challengeService;
+    private final ChallengeService challengeService;
     private final ChallengeReportService challengeReportService;
 
 
