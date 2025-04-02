@@ -4,8 +4,8 @@ import { FaRegClock } from "react-icons/fa";
 import { FaRunning } from "react-icons/fa";
 import { HiUsers } from "react-icons/hi";
 import { CheckCircle, XCircle, UserX, ArrowLeft } from "lucide-react";
-import Footer from "../../component/footer.jsx";
-import { useGetChallengeDetailQuery } from "../../service/challengeService.js";
+import Footer from "../../../component/footer.jsx";
+import { useGetChallengeDetailQuery } from "../../../service/challengeService.js";
 
 const ChallengeDetail = () => {
     const { id } = useParams();
