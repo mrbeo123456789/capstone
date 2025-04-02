@@ -63,7 +63,6 @@ private  final FixedGmailService fixedGmailService;
         this.authService = authService;
         this.fixedGmailService = fixedGmailService;
     }
-
     @Override
     public void uploadAndSubmitEvidence(MultipartFile file, Long challengeId) throws IOException {
         Long memberId = authService.getMemberIdFromAuthentication();
@@ -74,7 +73,6 @@ private  final FixedGmailService fixedGmailService;
         LocalDate today = LocalDate.now();
         LocalTime now = LocalTime.now();
 
-        // ✅ Kiểm tra thời gian hợp lệ
         if (today.isBefore(challenge.getStartDate()) || today.isAfter(challenge.getEndDate())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Hôm nay không nằm trong thời gian thử thách.");
         }
@@ -95,22 +93,27 @@ private  final FixedGmailService fixedGmailService;
         LocalDateTime startOfDay = today.atStartOfDay();
         LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
 
-        Evidence todayEvidence = evidenceRepository.findFirstByMemberIdAndChallengeIdAndSubmittedAtBetween(
-                memberId, challengeId, startOfDay, endOfDay
-        ).orElse(null);
+        // ✅ Tìm evidence đã nộp hôm nay
+        Evidence todayEvidence = evidenceRepository
+                .findTodayEvidence(memberId, challengeId, today)
+                .orElse(null);
 
-        String path = String.format("evidences/challenge_%d/member_%d/%s.mp4",
-                challengeId, memberId, today.toString());
+
+
+        String path = String.format("evidences/challenge_%d/member_%d/%s/%s.mp4",
+                challengeId, memberId, today, System.currentTimeMillis());
 
         String fileUrl = firebaseStorageService.uploadFileWithOverwrite(file, path);
 
         if (todayEvidence != null) {
+            // ✅ Ghi đè nội dung vào record hôm nay
             todayEvidence.setEvidenceUrl(fileUrl);
             todayEvidence.setUpdatedAt(LocalDateTime.now());
             evidenceRepository.save(todayEvidence);
             return;
         }
 
+        // ✅ Chưa có evidence → tạo mới
         Evidence newEvidence = Evidence.builder()
                 .challenge(challenge)
                 .member(member)

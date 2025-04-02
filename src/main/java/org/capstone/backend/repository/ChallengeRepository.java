@@ -1,9 +1,6 @@
 package org.capstone.backend.repository;
 
-import org.capstone.backend.dto.challenge.AdminChallengesResponse;
-import org.capstone.backend.dto.challenge.ChallengeDetailResponse;
-import org.capstone.backend.dto.challenge.ChallengeResponse;
-import org.capstone.backend.dto.challenge.MyChallengeResponse;
+import org.capstone.backend.dto.challenge.*;
 import org.capstone.backend.entity.Challenge;
 import org.capstone.backend.utils.enums.ChallengeRole;
 import org.capstone.backend.utils.enums.ChallengeStatus;
@@ -21,22 +18,21 @@ import java.util.List;
 @Repository
 public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
     @Query("""
-   SELECT new org.capstone.backend.dto.challenge.AdminChallengesResponse(
-       c.id, c.name, c.startDate, c.endDate, ct.name, c.status
-   )
-   FROM Challenge c
-   JOIN c.challengeType ct
-   WHERE (:name IS NULL OR LOWER(c.name) LIKE LOWER(CONCAT('%', :name, '%')))
-     AND (:status IS NULL OR c.status = :status)
-   ORDER BY 
-       CASE WHEN c.status = org.capstone.backend.utils.enums.ChallengeStatus.PENDING THEN 0 ELSE 1 END,
-       c.createdAt DESC
-""")
+       SELECT new org.capstone.backend.dto.challenge.AdminChallengesResponse(
+           c.id, c.name, c.startDate, c.endDate, ct.name, c.status
+       )
+       FROM Challenge c
+       JOIN c.challengeType ct
+       WHERE (:name IS NULL OR LOWER(c.name) LIKE LOWER(CONCAT('%', :name, '%')))
+         AND (:status IS NULL OR c.status = :status)
+       ORDER BY 
+           CASE c.status WHEN org.capstone.backend.utils.enums.ChallengeStatus.PENDING THEN 0 ELSE 1 END ASC,
+           c.createdAt DESC
+    """)
     Page<AdminChallengesResponse> findAllByStatusAndPriority(
             @Param("name") String name,
             @Param("status") ChallengeStatus status,
             Pageable pageable);
-
 
 
     @Query("""
@@ -53,19 +49,18 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
     Page<ChallengeResponse> findApprovedChallengesNotJoined(@Param("memberId") Long memberId, Pageable pageable);
 
     @Query("""
-       SELECT new org.capstone.backend.dto.challenge.MyChallengeResponse(
-           c.id, c.name, c.picture, c.status, cm.role
-       )
-       FROM ChallengeMember cm
-       JOIN cm.challenge c
-       WHERE cm.member.id = :memberId
-       AND (:role IS NULL OR cm.role = :role) 
-       ORDER BY c.updatedAt DESC
-       """)
-    List<MyChallengeResponse> findChallengesByMemberAndRole(@Param("memberId") Long memberId,
-                                                            @Param("role") ChallengeRole role);
-
-    // Đúng kiểu
+   SELECT new org.capstone.backend.dto.challenge.MyChallengeBaseResponse(
+       c.id, c.name, c.picture, c.status, cm.role, c.startDate, c.endDate
+   )
+   FROM ChallengeMember cm
+   JOIN cm.challenge c
+   WHERE cm.member.id = :memberId
+   AND (:role IS NULL OR cm.role = :role) 
+   ORDER BY c.updatedAt DESC
+""")
+    List<MyChallengeBaseResponse> findChallengesByMemberAndRole(@Param("memberId") Long memberId,
+                                                                @Param("role") ChallengeRole role);
+    ;
 
     @Query("""
     SELECT new org.capstone.backend.dto.challenge.ChallengeDetailResponse(

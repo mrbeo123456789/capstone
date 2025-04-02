@@ -20,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -32,8 +33,8 @@ public class ChallengeServiceImpl implements ChallengeService {
     private final ChallengeMemberRepository challengeMemberRepository;
     private final FirebaseUpload firebaseUpload;
     private final AuthService authService;
-    private ApplicationEventPublisher eventPublisher;
-
+    private final ApplicationEventPublisher eventPublisher;
+    private final EvidenceVoteRepository evidenceVoteRepository;
     public ChallengeServiceImpl(
             ChallengeRepository challengeRepository,
             AccountRepository accountRepository,
@@ -41,7 +42,7 @@ public class ChallengeServiceImpl implements ChallengeService {
             ChallengeTypeRepository challengeTypeRepository,
             ChallengeMemberRepository challengeMemberRepository,
             FirebaseUpload firebaseUpload,
-            AuthService authService, ApplicationEventPublisher eventPublisher
+            AuthService authService, ApplicationEventPublisher eventPublisher, EvidenceVoteRepository evidenceVoteRepository
     ) {
         this.challengeRepository = challengeRepository;
         this.accountRepository = accountRepository;
@@ -51,6 +52,7 @@ public class ChallengeServiceImpl implements ChallengeService {
         this.firebaseUpload = firebaseUpload;
         this.authService = authService;
         this.eventPublisher = eventPublisher;
+        this.evidenceVoteRepository = evidenceVoteRepository;
     }
 
     private Member getCurrentMember() {
@@ -247,8 +249,34 @@ public class ChallengeServiceImpl implements ChallengeService {
     @Override
     public List<MyChallengeResponse> getChallengesByMember(ChallengeRole role) {
         Long memberId = authService.getMemberIdFromAuthentication();
-        return challengeRepository.findChallengesByMemberAndRole(memberId, role);
+        List<MyChallengeBaseResponse> baseList = challengeRepository.findChallengesByMemberAndRole(memberId, role);
+
+        LocalDate today = LocalDate.now();
+
+        return baseList.stream().map(c -> {
+            Long remainingDays = null;
+            Double avgVotes = null;
+
+            if (c.getStatus() == ChallengeStatus.UPCOMING) {
+                remainingDays = ChronoUnit.DAYS.between(today, c.getStartDate()); // nếu có startDate
+            } else if (c.getStatus() == ChallengeStatus.ONGOING) {
+                remainingDays = ChronoUnit.DAYS.between(today, c.getEndDate());
+            } else if (c.getStatus() == ChallengeStatus.FINISH) {
+                avgVotes = evidenceVoteRepository.getAverageScoreByMemberInChallenge(memberId,c.getId()); // tùy bạn xử lý
+            }
+
+            return new MyChallengeResponse(
+                    c.getId(),
+                    c.getName(),
+                    c.getPicture(),
+                    c.getStatus(),
+                    c.getRole(),
+                    remainingDays,
+                    avgVotes
+            );
+        }).toList();
     }
+
 
     @Override
     public ChallengeDetailResponse getChallengeDetail(Long challengeId) {

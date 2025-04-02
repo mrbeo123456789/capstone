@@ -16,5 +16,12 @@ public interface EvidenceVoteRepository extends JpaRepository<EvidenceVote, Long
     @Query("SELECT COUNT(ev) FROM EvidenceVote ev WHERE ev.voter.id = :voterId")
     int countByVoterId(@Param("voterId") Long voterId);
 
-
+    @Query("""
+        SELECT AVG(ev.score)
+        FROM EvidenceVote ev
+        JOIN ev.evidence e
+        WHERE ev.voter.id = :memberId
+          AND e.challenge.id = :challengeId
+    """)
+    Double getAverageScoreByMemberInChallenge(Long memberId, Long challengeId);
 }
