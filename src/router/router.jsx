@@ -1,23 +1,22 @@
 import {createBrowserRouter, Navigate} from "react-router-dom";
-import ErrorPage from "../page/error/ErrorPage.jsx";
+import ErrorPage from "../component/ErrorPage.jsx";
 import Layout from "../page/ui/Layout.jsx";
 import RegisterForm from "../page/signin/register.jsx";
 import MemberProfile from "../page/member/MemberProfile.jsx";
 import AuthCallBack from "../page/signin/AuthCallBack.jsx";
 import LoginPage from "../page/signin/LoginPage.jsx";
-import NotificationEmail from "../page/ui/NotificationEmail.jsx";
 import OTPPage from "../page/ui/Otp.jsx";
 import GroupMember from "../page/group/GroupMember.jsx";
 import ChallengeForm from "../page/challenge/ChallengeForm.jsx";
 import ChangePassword from "../page/signin/ChangePassword.jsx";
 import HomePage from "../page/ui/HomePage.jsx";
-import AdminDashboard from "../page/admin/AdminDashboard.jsx";
+import AdminDashboard from "../page/admin/dashboard/AdminDashboard.jsx";
 import ForgotPassword from "../page/signin/ForgotPassword.jsx";
 import EnterOTP from "../page/signin/EnterOtp.jsx";
 import ResetPassword from "../page/signin/ResetPassword.jsx";
-import ChallengeList from "../page/admin/ChallengeList.jsx";
-import ReportList from "../page/admin/ReportList.jsx";
-import UserList from "../page/admin/UserList.jsx";
+import ChallengeList from "../page/admin/list/ChallengeList.jsx";
+import ReportList from "../page/admin/list/ReportList.jsx";
+import UserList from "../page/admin/list/UserList.jsx";
 import ChallengeDetail from "../page/challenge/ChallengeDetail.jsx";
 import JoinedChallengeDetail from "../page/challenge/JoinedChallengeDetail.jsx";
 import YourChallenge from "../page/challenge/YourChallenge.jsx";
@@ -26,14 +25,19 @@ import GroupForm from "../page/group/GroupForm.jsx";
 import YourGroup from "../page/group/YourGroup.jsx";
 import Home from "../heroBanner/Home.jsx";
 import ChallengePage from "../page/challenge/ChallengePage.jsx";
-import ChallengeEvidencePage from "../page/admin/ChallengeEvidencePage.jsx";
-import GroupList from "../page/admin/GroupList.jsx";
+import ChallengeEvidencePage from "../page/admin/list/EvidenceList.jsx";
+import GroupList from "../page/admin/list/GroupList.jsx";
 import AboutUsPage from "../page/ui/AboutUs.jsx";
 import AdminChallengeDetail from "../page/admin/ChallengeDetail.jsx"
+import NotFoundPage from "../component/NotFoundPage.jsx";
 const router = createBrowserRouter([
     {
         path: "/", // ✅ Redirect root to homepage
         element: <Navigate to="/homepage" replace />
+    },
+    {
+        path: "*", // ✅ Redirect root to homepage
+        element: <NotFoundPage></NotFoundPage>
     },
     {
         path:"/homepage",

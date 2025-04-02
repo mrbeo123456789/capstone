@@ -100,6 +100,14 @@ export const adminUserService = createApi({
             },
             providesTags: ["Admin"],
         }),
+        getSummary: builder.query({
+            query: () => 'admin/dashboard/summary',
+            providesTags: ['Admin'],
+        }),
+        getGrowth: builder.query({
+            query: ({ range = 'MONTH' } = {}) => `admin/dashboard/growth?range=${encodeURIComponent(range)}`,
+            providesTags: ['Dashboard'],
+        }),
 
         reviewChallenge: builder.mutation({
             query: (reviewRequest) => {
@@ -110,6 +118,26 @@ export const adminUserService = createApi({
                     body: reviewRequest,
                 };
             },
+            invalidatesTags: ["Admin"],
+        }),
+        // API filter reports: lấy danh sách báo cáo với tham số reportType, page, size
+        filterReports: builder.query({
+            query: ({ reportType, page = 0, size = 10 } = {}) => {
+                let url = `/admin/reports/all?page=${page}&size=${size}`;
+                if (reportType) {
+                    url += `&reportType=${encodeURIComponent(reportType)}`;
+                }
+                console.log("Fetching Reports URL:", url);
+                return url;
+            },
+            providesTags: ["Admin"],
+        }),
+        // API update report status: cập nhật trạng thái của báo cáo dựa vào reportId và status
+        updateReportStatus: builder.mutation({
+            query: ({ reportId, status }) => ({
+                url: `/admin/reports/${reportId}?status=${encodeURIComponent(status)}`,
+                method: "PUT",
+            }),
             invalidatesTags: ["Admin"],
         }),
     }),
@@ -124,4 +152,8 @@ export const {
     useGetChallengesQuery,
     useReviewChallengeMutation,
     useGetGroupsQuery,
+    useGetSummaryQuery,
+    useGetGrowthQuery,
+    useFilterReportsQuery,
+    useUpdateReportStatusMutation,
 } = adminUserService;

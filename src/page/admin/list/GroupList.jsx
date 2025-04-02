@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CheckCircle, XCircle, Eye, Check, Ban, Search } from "lucide-react";
-import Sidebar from "../navbar/AdminNavbar.jsx";
-import { useGetGroupsQuery } from "../../service/adminService.js"; // Điều chỉnh đường dẫn nếu cần
+import Sidebar from "../../navbar/AdminNavbar.jsx";
+import { useGetGroupsQuery } from "../../../service/adminService.js"; // Điều chỉnh đường dẫn nếu cần
 
 const GroupList = () => {
     // State quản lý phân trang, tìm kiếm (UI tĩnh), và sidebar

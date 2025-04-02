@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import Charts from "./Charts.jsx";
-import ExtraCharts from "./ExtraCharts.jsx";
-import { FaPlus, FaChartBar, FaUsers, FaClipboardList, FaTrophy } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 import Navbar from "../../navbar/AdminNavbar.jsx";
 
@@ -38,12 +37,6 @@ const AdminDashboard = () => {
                             <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-orange-500">
                                 <h2 className="text-xl font-bold mb-4 text-gray-800">Overview Stats</h2>
                                 {Charts && <Charts />}
-                            </div>
-
-                            {/* Card 2 - Additional Charts (now below the first card) */}
-                            <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-orange-500">
-                                <h2 className="text-xl font-bold mb-4 text-gray-800">Performance Metrics</h2>
-                                {ExtraCharts && <ExtraCharts />}
                             </div>
                         </div>
                     </>
