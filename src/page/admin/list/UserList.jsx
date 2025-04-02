@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import Sidebar from "../navbar/AdminNavbar.jsx";
+import Sidebar from "../../navbar/AdminNavbar.jsx";
 import { FaSort, FaCheckCircle, FaTimesCircle, FaUser, FaEnvelope, FaIdCard, FaPhone, FaBirthdayCake, FaMapMarkerAlt } from "react-icons/fa";
 import {
     useGetUsersQuery,
@@ -7,7 +7,7 @@ import {
     useUnbanUserMutation,
     useSearchUsersQuery,
     useGetUserByIdQuery
-} from "../../service/adminService.js";
+} from "../../../service/adminService.js";
 
 const UserList = () => {
     const [currentPage, setCurrentPage] = useState(0); // API is 0-indexed

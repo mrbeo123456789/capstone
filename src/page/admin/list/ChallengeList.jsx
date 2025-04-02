@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CheckCircle, XCircle, Ban } from "lucide-react";
-import Sidebar from "../navbar/AdminNavbar.jsx";
-import { useGetChallengesQuery, useReviewChallengeMutation } from "../../service/adminService.js";
+import Sidebar from "../../navbar/AdminNavbar.jsx";
+import { useGetChallengesQuery, useReviewChallengeMutation } from "../../../service/adminService.js";
 
 const ChallengeList = () => {
     // State management

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, CheckCircle, Clock, Archive, ThumbsUp, ThumbsDown, HourglassIcon } from 'lucide-react';
-import Sidebar from "../navbar/AdminNavbar.jsx";
-import EvidenceDetailModal from "../../component/ChallengeDetailModal.jsx";
+import Sidebar from "../../navbar/AdminNavbar.jsx";
+import EvidenceDetailModal from "../../../component/ChallengeDetailModal.jsx";
 
 const ChallengeAndEvidenceList = () => {
     const [evidenceItems, setEvidenceItems] = useState([]);
@@ -17,7 +17,7 @@ const ChallengeAndEvidenceList = () => {
 
     // Pagination state for challenges
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(8);
+    const [itemsPerPage] = useState(10);
 
     useEffect(() => {
         setTimeout(() => {
@@ -213,19 +213,6 @@ const ChallengeAndEvidenceList = () => {
             <div className="container mx-auto p-4 flex-grow">
                 <h1 className="text-2xl font-bold text-orange-600 mb-6">Challenge and Evidence Management</h1>
 
-                {/* Search bar */}
-                <div className="bg-white rounded-lg shadow p-4 mb-6">
-                    <div className="relative max-w-md">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                        <input
-                            type="text"
-                            placeholder="Search challenges..."
-                            className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                    </div>
-                </div>
 
                 {loading ? (
                     <div className="flex justify-center items-center h-64">
@@ -236,16 +223,36 @@ const ChallengeAndEvidenceList = () => {
                         {/* Left panel - Challenge List */}
                         <div className="w-full md:w-1/2 bg-white rounded-lg shadow overflow-hidden">
                             <div className="bg-orange-100 px-6 py-3 border-b">
-                                <h2 className="text-lg font-semibold text-gray-800">Challenges</h2>
-                            </div>
-                            <div className="overflow-y-auto" style={{ maxHeight: '600px' }}>
-                                <table className="min-w-full divide-y divide-gray-200">
-                                    <thead className="bg-orange-50">
-                                    <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Challenge Name</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Type</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Evidence Count</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Status</th>
+                                <div className="flex justify-between items-center">
+                                    <h2 className="text-lg font-semibold text-gray-800">Challenges</h2>
+
+                                    {/* Search bar moved to the right */}
+                                    <div className="relative max-w-md">
+                                        <Search
+                                            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                                            size={18}/>
+                                        <input
+                                            type="text"
+                                            placeholder="Search challenges..."
+                                            className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                        </div>
+                        <div className="overflow-y-auto" style={{maxHeight: '600px'}}>
+                            <table className="min-w-full divide-y divide-gray-200">
+                                <thead className="bg-orange-50">
+                                <tr>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Challenge
+                                        Name
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Type</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Evidence
+                                        Count
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Status</th>
                                     </tr>
                                     </thead>
                                     <tbody className="bg-white divide-y divide-gray-200">

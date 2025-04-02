@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Search, CheckCircle, Clock, Archive, ChevronLeft, ChevronRight, Eye } from 'lucide-react';
-import Sidebar from "../navbar/AdminNavbar.jsx";
+import Sidebar from "../../navbar/AdminNavbar.jsx";
 import {FaSort} from "react-icons/fa";
 
 const EvidenceList = () => {
