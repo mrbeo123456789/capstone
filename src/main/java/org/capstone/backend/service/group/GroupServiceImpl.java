@@ -7,6 +7,7 @@ import org.capstone.backend.repository.*;
 import org.capstone.backend.service.auth.AuthService;
 import org.capstone.backend.utils.enums.GroupMemberStatus;
 import org.capstone.backend.utils.upload.FirebaseUpload;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -264,5 +265,10 @@ public class GroupServiceImpl implements GroupService {
                 .limit(5)
                 .map(m -> new MemberSearchResponse(m.getId(), m.getAccount().getEmail(), m.getAvatar(), m.getFullName()))
                 .toList();
+    }
+
+    @Override
+    public Page<GroupSummaryDTO> searchGroups(String keyword, int page, int size) {
+        return groupRepository.searchGroupsByName(keyword, PageRequest.of(page, size));
     }
 }

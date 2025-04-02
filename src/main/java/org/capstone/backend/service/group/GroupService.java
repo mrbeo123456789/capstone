@@ -4,6 +4,7 @@ import org.capstone.backend.dto.group.*;
 import org.capstone.backend.entity.Groups;
 import org.capstone.backend.dto.group.GroupRequest;
 import org.capstone.backend.entity.Member;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.multipart.MultipartFile;
 import org.capstone.backend.utils.enums.GroupMemberStatus;
@@ -27,6 +28,7 @@ public interface GroupService {
     void inviteMembers(GroupInviteRequest request);
     void respondToInvitation(Long groupId, GroupMemberStatus status);
     List<GroupInvitationDTO> getPendingInvitations();
+    Page<GroupSummaryDTO> searchGroups(String keyword, int page, int size);
 
     // ✅ SEARCH
     List<MemberSearchResponse> searchMembers(MemberSearchRequest request);

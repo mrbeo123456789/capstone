@@ -45,6 +45,9 @@ public class ChallengeMember {
     @Column(name = "role", nullable = false)
     private ChallengeRole role;
 
+    @Column(name = "is_completed")
+    private Boolean isCompleted = false;
+    
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();

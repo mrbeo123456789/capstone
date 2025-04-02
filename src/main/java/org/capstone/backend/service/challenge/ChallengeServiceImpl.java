@@ -2,10 +2,12 @@ package org.capstone.backend.service.challenge;
 
 import org.capstone.backend.dto.challenge.*;
 import org.capstone.backend.entity.*;
+import org.capstone.backend.event.AchievementTriggerEvent;
 import org.capstone.backend.repository.*;
 import org.capstone.backend.service.auth.AuthService;
 import org.capstone.backend.utils.enums.*;
 import org.capstone.backend.utils.upload.FirebaseUpload;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -29,6 +32,7 @@ public class ChallengeServiceImpl implements ChallengeService {
     private final ChallengeMemberRepository challengeMemberRepository;
     private final FirebaseUpload firebaseUpload;
     private final AuthService authService;
+    private ApplicationEventPublisher eventPublisher;
 
     public ChallengeServiceImpl(
             ChallengeRepository challengeRepository,
@@ -37,7 +41,7 @@ public class ChallengeServiceImpl implements ChallengeService {
             ChallengeTypeRepository challengeTypeRepository,
             ChallengeMemberRepository challengeMemberRepository,
             FirebaseUpload firebaseUpload,
-            AuthService authService
+            AuthService authService, ApplicationEventPublisher eventPublisher
     ) {
         this.challengeRepository = challengeRepository;
         this.accountRepository = accountRepository;
@@ -46,6 +50,7 @@ public class ChallengeServiceImpl implements ChallengeService {
         this.challengeMemberRepository = challengeMemberRepository;
         this.firebaseUpload = firebaseUpload;
         this.authService = authService;
+        this.eventPublisher = eventPublisher;
     }
 
     private Member getCurrentMember() {
@@ -86,15 +91,26 @@ public class ChallengeServiceImpl implements ChallengeService {
         Member member = getCurrentMember();
         Challenge challenge = findChallenge(challengeId);
 
-        if (challenge.getStatus() != ChallengeStatus.APPROVED) return "Challenge is not active.";
-        if (challenge.getChallengeMembers().size() >= challenge.getMaxParticipants()) return "Challenge is full.";
+        // Chỉ cho phép tham gia nếu thử thách đang ở trạng thái ONGOING
+        if (challenge.getStatus() != ChallengeStatus.UPCOMING) {
+            return "Challenge is not currently available for joining.";
+        }
 
+        // Kiểm tra thử thách có đủ chỗ không
+        if (challenge.getChallengeMembers().size() >= challenge.getMaxParticipants()) {
+            return "Challenge is full.";
+        }
+
+        // Tạo bản ghi tham gia thử thách
         ChallengeMember challengeMember = createChallengeMember(
                 challenge, member, member.getId(), ChallengeMemberStatus.JOINED, ChallengeRole.MEMBER);
         challengeMemberRepository.save(challengeMember);
-
+        eventPublisher.publishEvent(
+                new AchievementTriggerEvent(member.getId(), AchievementTriggerEvent.TriggerType.JOIN_CHALLENGE)
+        );
         return "Joined challenge successfully.";
     }
+
     @Override
     public String createChallenge(ChallengeRequest request, MultipartFile picture, MultipartFile banner) {
         Long memberId = authService.getMemberIdFromAuthentication(); // null nếu là admin
@@ -147,6 +163,10 @@ public class ChallengeServiceImpl implements ChallengeService {
             challengeMemberRepository.save(challengeMember);
         }
 
+        eventPublisher.publishEvent(
+                new AchievementTriggerEvent(memberId, AchievementTriggerEvent.TriggerType.CREATE_CHALLENGE)
+        );
+
         return "Challenge đã được tạo thành công.";
     }
 
@@ -166,6 +186,21 @@ public class ChallengeServiceImpl implements ChallengeService {
             status = ChallengeStatus.valueOf(request.getStatus().toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid status value.");
+        }
+
+        LocalDate now = LocalDate.now();
+
+        if (status == ChallengeStatus.APPROVED) {
+            if (challenge.getEndDate().isBefore(now)) {
+                // Nếu đã kết thúc thì chuyển thành CANCELED
+                status = ChallengeStatus.CANCELED;
+            } else if (challenge.getStartDate().isAfter(now)) {
+                // Nếu chưa bắt đầu thì chuyển thành UPCOMING
+                status = ChallengeStatus.UPCOMING;
+            } else {
+                // Nếu đang diễn ra thì chuyển thành ONGOING
+                status = ChallengeStatus.ONGOING;
+            }
         }
 
         challenge.setStatus(status);
@@ -196,11 +231,11 @@ public class ChallengeServiceImpl implements ChallengeService {
         challengeMemberRepository.updateRole(challengeId, memberId, newRole);
     }
 
-    @Override
-    public Page<AdminChallengesResponse> getChallenges(int page, int size) {
+    public Page<AdminChallengesResponse> getChallenges(String name, ChallengeStatus status, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return challengeRepository.findAllByPriority(pageable);
+        return challengeRepository.findAllByStatusAndPriority(name, status, pageable);
     }
+
 
     @Override
     public Page<ChallengeResponse> getApprovedChallenges(int page, int size) {

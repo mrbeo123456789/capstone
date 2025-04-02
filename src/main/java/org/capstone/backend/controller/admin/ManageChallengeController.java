@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.capstone.backend.dto.challenge.AdminChallengesResponse;
 import org.capstone.backend.dto.challenge.ReviewChallengeRequest;
 import org.capstone.backend.service.challenge.ChallengeService;
+import org.capstone.backend.utils.enums.ChallengeStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,10 +23,14 @@ public class ManageChallengeController {
     }
     @GetMapping("/all")
     public ResponseEntity<Page<AdminChallengesResponse>> getChallenges(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String status,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        Page<AdminChallengesResponse> challenges = challengeService.getChallenges(page, size);
+        Page<AdminChallengesResponse> challenges = challengeService.getChallenges(name, ChallengeStatus.valueOf(status), page, size);
         return ResponseEntity.ok(challenges);
     }
+
+
 
 }

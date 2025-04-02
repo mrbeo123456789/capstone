@@ -15,6 +15,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -25,11 +26,19 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
        )
        FROM Challenge c
        JOIN c.challengeType ct
+       WHERE (:name IS NULL OR c.name LIKE %:name%) 
+       AND (:status IS NULL OR c.status = :status)
        ORDER BY 
            CASE WHEN c.status = 'PENDING' THEN 0 ELSE 1 END,
-           c.createdAt DESC
+           c.createdAt DESC NULLS LAST
        """)
-    Page<AdminChallengesResponse> findAllByPriority(Pageable pageable);
+    Page<AdminChallengesResponse> findAllByStatusAndPriority(
+            @Param("name") String name,
+            @Param("status") ChallengeStatus status,
+            Pageable pageable);
+
+
+
     @Query("""
        SELECT new org.capstone.backend.dto.challenge.ChallengeResponse(
            c.id, c.name, c.summary, c.picture
@@ -79,7 +88,21 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
 
     @Query("SELECT c.id FROM Challenge c WHERE :today BETWEEN c.startDate AND c.endDate")
     List<Long> findChallengesHappeningToday(@Param("today") LocalDate today);
+    List<Challenge> findByStatusAndStartDate(ChallengeStatus status, LocalDate startDate);
+    List<Challenge> findByStatusAndEndDate(ChallengeStatus status, LocalDate endDate);
 
     @Query("SELECT c.id FROM Challenge c WHERE c.endDate = :today")
     List<Long> findChallengesEndingToday(@Param("today") LocalDate today);
+
+    @Query("SELECT COUNT(*) FROM Challenge WHERE createdAt BETWEEN :start AND :end")
+    Long countNewChallengesBetween(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
+    @Query("SELECT DATE(c.createdAt), COUNT(c) FROM Challenge c WHERE c.createdAt BETWEEN :start AND :end GROUP BY DATE(c.createdAt) ORDER BY DATE(c.createdAt)")
+    List<Object[]> countNewChallengesGroupedByDate(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+    Long countByStatus(ChallengeStatus status);
+
+    @Query("SELECT c.status, COUNT(c) FROM Challenge c GROUP BY c.status")
+    List<Object[]> countChallengesByStatus();
+    int countByCreatedBy(Long memberId); // hoặc createdBy = username nếu dùng String
+
 }

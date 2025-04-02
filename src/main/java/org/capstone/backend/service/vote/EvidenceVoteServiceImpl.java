@@ -57,21 +57,17 @@ public class EvidenceVoteServiceImpl implements EvidenceVoteService {
     public List<EvidenceVoteResponse> getEvidenceToVoteByChallenge(Long challengeId) {
         Long voterId = authService.getMemberIdFromAuthentication();
 
-        Member voter = memberRepository.findById(voterId)
-                .orElseThrow(() -> new RuntimeException("Voter not found"));
-
-
-        // Lấy danh sách evidence APPROVED trong thử thách
+        // 1. Lấy danh sách evidence đã duyệt trong challenge
         List<Evidence> approvedEvidence = evidenceRepository
                 .findByChallengeIdAndStatus(challengeId, EvidenceStatus.APPROVED);
 
-        // Lọc ra evidence hợp lệ: chưa vote, không phải của chính mình
+        // 2. Lọc evidence hợp lệ: không phải của mình & chưa vote
         List<Evidence> validToVote = approvedEvidence.stream()
                 .filter(e -> !e.getMember().getId().equals(voterId))
-                .filter(e -> !evidenceVoteRepository.existsByEvidenceAndVoter(e, voter))
+                .filter(e -> !evidenceVoteRepository.existsByEvidenceIdAndVoterId(e.getId(), voterId))
                 .collect(Collectors.toList());
 
-        // Random và giới hạn 3 evidence
+        // 3. Random & limit
         Collections.shuffle(validToVote);
 
         return validToVote.stream()
@@ -82,6 +78,7 @@ public class EvidenceVoteServiceImpl implements EvidenceVoteService {
                         .build())
                 .collect(Collectors.toList());
     }
+
 
 
 }

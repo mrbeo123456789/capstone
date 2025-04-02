@@ -15,7 +15,7 @@ public interface ChallengeService {
     List<ChallengeType> getAllTypes();
     String reviewChallenge(ReviewChallengeRequest request);
     String joinChallenge(Long challengeId);
-    Page<AdminChallengesResponse> getChallenges(int page, int size);
+    Page<AdminChallengesResponse> getChallenges(String name, ChallengeStatus status, int page, int size);
     Page<ChallengeResponse> getApprovedChallenges(int page, int size);
     void toggleCoHost(Long challengeId, Long memberId);
     List<MyChallengeResponse> getChallengesByMember(ChallengeRole role);
