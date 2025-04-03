@@ -28,17 +28,18 @@ public class FirebaseUpload {
     public String uploadFileWithOverwrite(MultipartFile file, String path) throws IOException {
         Bucket bucket = StorageClient.getInstance().bucket();
 
-        // ❌ Nếu đã có file cũ, xóa đi trước khi ghi đè
+        // ❌ Xóa file cũ nếu tồn tại
         Blob existingBlob = bucket.get(path);
         if (existingBlob != null && existingBlob.exists()) {
             existingBlob.delete();
         }
 
-        // ✅ Upload file mới với cùng path
+        // ✅ Upload file mới
         Blob blob = bucket.create(path, file.getInputStream(), file.getContentType());
 
-        // 🔗 Lấy URL có thể dùng (tuỳ bạn dùng signed URL hay media link)
-        return blob.getMediaLink(); // Hoặc generate signed URL nếu cần bảo mật
+        // ✅ Trả về URL công khai cho phép xem trực tiếp trên web
+        return String.format("https://firebasestorage.googleapis.com/v0/b/%s/o/%s?alt=media",
+                bucket.getName(),
+                java.net.URLEncoder.encode(blob.getName(), "UTF-8"));
     }
-
 }
