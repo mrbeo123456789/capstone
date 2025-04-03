@@ -24,4 +24,18 @@ public interface EvidenceVoteRepository extends JpaRepository<EvidenceVote, Long
           AND e.challenge.id = :challengeId
     """)
     Double getAverageScoreByMemberInChallenge(Long memberId, Long challengeId);
+
+    // Tính tổng sao và số lượng vote mỗi người đã nhận trong challenge
+    @Query("SELECT ev.evidence.member.id, SUM(ev.score), COUNT(ev.id) " +
+            "FROM EvidenceVote ev " +
+            "WHERE ev.evidence.challenge.id = :challengeId " +
+            "GROUP BY ev.evidence.member.id")
+    List<Object[]> calculateReceivedRatingStats(@Param("challengeId") Long challengeId);
+
+    // Số lượt vote người này đã chấm cho người khác trong thử thách
+    @Query("SELECT COUNT(ev) FROM EvidenceVote ev " +
+            "WHERE ev.voter.id = :memberId AND ev.evidence.challenge.id = :challengeId")
+    int countVotesGivenByMemberInChallenge(@Param("memberId") Long memberId,
+                                           @Param("challengeId") Long challengeId);
+
 }

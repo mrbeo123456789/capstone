@@ -3,6 +3,7 @@ package org.capstone.backend.service.ranking;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.capstone.backend.dto.rank.ChallengeProgressRankingResponse;
+import org.capstone.backend.dto.rank.ChallengeStarRatingResponse;
 import org.capstone.backend.entity.*;
 import org.capstone.backend.repository.*;
 import org.capstone.backend.utils.enums.EvidenceStatus;
@@ -10,8 +11,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -27,6 +30,7 @@ public class RankingServiceImpl implements RankingService {
     private final EvidenceVoteRepository evidenceVoteRepository;
     private final ChallengeProgressRankingRepository rankingRepository;
  private  final  MemberRepository memberRepository;
+ private  final   ChallengeStarRatingRepository challengeStarRatingRepository;
     @Override
     public void recalculateAllChallengeProgressRankings() {
         List<Challenge> allChallenges = challengeRepository.findAll();
@@ -80,25 +84,71 @@ public class RankingServiceImpl implements RankingService {
 
     }
     @Override
-    public Page<ChallengeProgressRankingResponse> getPaginatedRankingByChallengeId(Long challengeId, Pageable pageable) {
-        Page<ChallengeProgressRanking> page = rankingRepository.findByChallengeId(challengeId, pageable);
+    public List<ChallengeProgressRankingResponse> getTop3RankingByChallengeId(Long challengeId) {
+        List<ChallengeProgressRanking> rankings = rankingRepository
+                .findTop3ByChallengeIdOrderByScoreDesc(challengeId);
 
-        int startRank = (int) pageable.getOffset() + 1;
-
-        List<ChallengeProgressRankingResponse> content = IntStream.range(0, page.getContent().size())
+        return IntStream.range(0, rankings.size())
                 .mapToObj(i -> {
-                    ChallengeProgressRanking r = page.getContent().get(i);
+                    ChallengeProgressRanking r = rankings.get(i);
                     return ChallengeProgressRankingResponse.builder()
                             .memberId(r.getMemberId())
-                            .memberName( memberRepository.getReferenceById(r.getMemberId()).getFirstName())  // có thể thay bằng service lấy tên thật
-                            .rank(startRank + i)
+                            .memberName(memberRepository.getReferenceById(r.getMemberId()).getFirstName())
+                            .rank(i + 1)
                             .build();
                 })
+                .toList();
+    }
+
+
+    @Transactional
+    public void updateChallengeStarRatings() {
+        List<Long> challengeIds = challengeRepository.findAllOngoingChallengeIds();
+
+        for (Long challengeId : challengeIds) {
+            // Tính sao trung bình cho từng member trong thử thách
+            List<Object[]> ratings = evidenceVoteRepository.calculateReceivedRatingStats(challengeId);
+
+            for (Object[] row : ratings) {
+                Long memberId = (Long) row[0];
+                int totalStar = ((Number) row[1]).intValue();
+                int receivedCount = ((Number) row[2]).intValue();
+                double average = receivedCount == 0 ? 0.0 : ((double) totalStar / receivedCount);
+
+                int givenCount = evidenceVoteRepository
+                        .countVotesGivenByMemberInChallenge(memberId, challengeId);
+
+                ChallengeStarRating rating = challengeStarRatingRepository
+                        .findByChallengeIdAndMemberId(challengeId, memberId)
+                        .orElse(new ChallengeStarRating());
+
+                rating.setChallengeId(challengeId);
+                rating.setMemberId(memberId);
+                rating.setTotalStar(totalStar);
+                rating.setTotalRatingCount(receivedCount);
+                rating.setAverageStar(average);
+                rating.setGivenRatingCount(givenCount);
+                rating.setUpdatedAt(LocalDateTime.now());
+
+                challengeStarRatingRepository.save(rating);
+            }
+        }
+    }
+    @Override
+    public Page<ChallengeStarRatingResponse> getStarRatingsByChallengeId(Long challengeId, Pageable pageable) {
+        Page<ChallengeStarRating> page = challengeStarRatingRepository
+                .findByChallengeIdOrderByAverageStarDescTotalRatingCountDescGivenRatingCountDesc(challengeId, pageable);
+
+        List<ChallengeStarRatingResponse> content = page.getContent().stream()
+                .map(rating -> ChallengeStarRatingResponse.builder()
+                        .memberId(rating.getMemberId())
+                        .memberName(memberRepository.getReferenceById(rating.getMemberId()).getFirstName())
+                        .averageStar(rating.getAverageStar())
+                        .build())
                 .toList();
 
         return new PageImpl<>(content, pageable, page.getTotalElements());
     }
-
 
 
 }

@@ -13,6 +13,6 @@ public interface ChallengeProgressRankingRepository extends JpaRepository<Challe
 
     void deleteByChallengeId(Long challengeId);
 
-    Page<ChallengeProgressRanking> findByChallengeId(Long challengeId, Pageable pageable);
+    List<ChallengeProgressRanking> findTop3ByChallengeIdOrderByScoreDesc(Long challengeId);
 
 }

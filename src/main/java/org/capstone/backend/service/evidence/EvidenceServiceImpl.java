@@ -29,9 +29,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -90,8 +88,7 @@ private  final FixedGmailService fixedGmailService;
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new EntityNotFoundException("Member not found"));
 
-        LocalDateTime startOfDay = today.atStartOfDay();
-        LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
+
 
         // ✅ Tìm evidence đã nộp hôm nay
         Evidence todayEvidence = evidenceRepository
@@ -330,13 +327,46 @@ private  final FixedGmailService fixedGmailService;
     }
 
     private Member selectReviewer(Long challengeId, Long excludeMemberId) {
-        List<Member> eligible = challengeMemberRepository
-                .findMembersByChallengeIdExceptUser(challengeId, excludeMemberId);
 
-        return eligible.stream().min(Comparator
-                        .comparingInt(this::getReviewCount)
-                        .thenComparing(m -> getJoinDateInChallenge(challengeId, m.getId())))
-                .orElse(null);
+        // Lấy danh sách thành viên eligible và chỉ chọn những người có số lượng review dưới 3
+        List<Member> eligible = challengeMemberRepository
+                .findMembersByChallengeIdExceptUser(challengeId, excludeMemberId)
+                .stream()
+                .filter(member -> {
+                    int reviewCount = getReviewCount(member);
+                    System.out.println("Member " + member.getId() + " có review count: " + reviewCount);
+                    return reviewCount < 3;
+                })
+                .toList();
+
+
+        if (eligible.isEmpty()) {
+            System.out.println("Không tìm thấy eligible member nào cho challenge " + challengeId + " khi loại trừ member " + excludeMemberId);
+            return null;
+        }
+
+        // Nhóm theo số lượng review
+        Map<Integer, List<Member>> groupedByReviewCount = eligible.stream()
+                .collect(Collectors.groupingBy(this::getReviewCount));
+
+
+        int minReviewCount = groupedByReviewCount.keySet().stream().min(Integer::compareTo).orElse(0);
+
+        List<Member> leastReviewers = groupedByReviewCount.get(minReviewCount);
+
+        // Nhóm tiếp theo theo ngày tham gia challenge
+        Map<LocalDateTime, List<Member>> groupedByJoinDate = leastReviewers.stream()
+                .collect(Collectors.groupingBy(m -> {
+                    LocalDateTime joinDate = getJoinDateInChallenge(challengeId, m.getId());
+                    System.out.println("Member " + m.getId() + " có ngày join: " + joinDate);
+                    return joinDate;
+                }));
+
+        LocalDateTime earliestJoinDate = groupedByJoinDate.keySet().stream().min(LocalDateTime::compareTo).orElse(null);
+        List<Member> earliestJoiners = groupedByJoinDate.get(earliestJoinDate);
+
+        // Nếu còn nhiều hơn 1 thành viên, chọn ngẫu nhiên 1
+        return earliestJoiners.get(new Random().nextInt(earliestJoiners.size()));
     }
 
     private int getReviewCount(Member member) {

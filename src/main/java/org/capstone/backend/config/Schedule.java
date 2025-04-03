@@ -7,6 +7,7 @@ import org.capstone.backend.repository.ChallengeRepository;
 import org.capstone.backend.service.evidence.EvidenceService;
 import org.capstone.backend.service.ranking.RankingService;
 import org.capstone.backend.utils.enums.ChallengeStatus;
+import org.capstone.backend.utils.enums.VerificationType;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -58,21 +59,29 @@ public class Schedule {
         }
 
 
-    //@Scheduled(cron = "0 * * * * *") // mỗi phút
+
     // 00:10 mỗi ngày thường
     @Scheduled(cron = "0 10 0 * * *") // 00:10 mỗi ngày
+  //  @Scheduled(cron = "0 * * * * *") // mỗi phút
+
     public void scheduleAssignmentForNormalDays() {
-        LocalDate today = LocalDate.now();
-        List<Long> challengeIds = challengeRepository.findChallengesHappeningToday(today);
+        List<Long> challengeIds = challengeRepository.findCrossCheckChallengesHappeningToday(ChallengeStatus.ONGOING, VerificationType.CROSS_CHECK);
         challengeIds.forEach(assignmentService::assignPendingReviewersForChallenge);
     }
 
 
     // 21:10 mỗi ngày cuối
+   // @Scheduled(cron = "0 * * * * *") // mỗi phút
     @Scheduled(cron = "0 10 21 * * *")
     public void scheduleAssignmentForEndDays() {
         LocalDate today = LocalDate.now();
         List<Long> challengeIds = challengeRepository.findChallengesEndingToday(today);
         challengeIds.forEach(assignmentService::assignPendingReviewersForChallenge);
     }
+
+    @Scheduled(cron = "0 35 0 * * *") // Chạy 00:35 mỗi đêm
+    public void scheduledStarRatingUpdate() {
+        rankingService.updateChallengeStarRatings();
+    }
+
 }

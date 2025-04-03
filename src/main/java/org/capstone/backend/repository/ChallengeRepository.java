@@ -2,8 +2,10 @@ package org.capstone.backend.repository;
 
 import org.capstone.backend.dto.challenge.*;
 import org.capstone.backend.entity.Challenge;
+import org.capstone.backend.entity.ChallengeStarRating;
 import org.capstone.backend.utils.enums.ChallengeRole;
 import org.capstone.backend.utils.enums.ChallengeStatus;
+import org.capstone.backend.utils.enums.VerificationType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -81,8 +83,13 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
             @Param("memberId") Long memberId);
 
 
-    @Query("SELECT c.id FROM Challenge c WHERE :today BETWEEN c.startDate AND c.endDate")
-    List<Long> findChallengesHappeningToday(@Param("today") LocalDate today);
+    @Query("SELECT c.id FROM Challenge c " +
+            "WHERE c.status = :status " +
+            "AND c.verificationType = :verificationType")
+    List<Long> findCrossCheckChallengesHappeningToday(@Param("status") ChallengeStatus status,
+                                                      @Param("verificationType") VerificationType verificationType);
+
+
     List<Challenge> findByStatusAndStartDate(ChallengeStatus status, LocalDate startDate);
     List<Challenge> findByStatusAndEndDate(ChallengeStatus status, LocalDate endDate);
 
@@ -99,5 +106,7 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
     @Query("SELECT c.status, COUNT(c) FROM Challenge c GROUP BY c.status")
     List<Object[]> countChallengesByStatus();
     int countByCreatedBy(Long memberId); // hoặc createdBy = username nếu dùng String
+    @Query("SELECT c.id FROM Challenge c WHERE c.status = 'ONGOING'")
+    List<Long> findAllOngoingChallengeIds();
 
 }

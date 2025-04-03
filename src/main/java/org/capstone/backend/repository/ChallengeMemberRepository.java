@@ -21,7 +21,7 @@ public interface ChallengeMemberRepository extends JpaRepository<ChallengeMember
     int countByChallengeAndStatus(Challenge challenge, ChallengeMemberStatus status);
     boolean existsByChallengeIdAndMemberIdAndStatus(Long challengeId, Long memberId, ChallengeMemberStatus status);
     @Query("SELECT cm.member FROM ChallengeMember cm " +
-            "WHERE cm.challenge.id = :challengeId AND cm.member.id <> :excludeMemberId AND cm.status = 'ACTIVE'")
+            "WHERE cm.challenge.id = :challengeId AND cm.member.id <> :excludeMemberId AND cm.status = 'JOINED' ")
     List<Member> findMembersByChallengeIdExceptUser(@Param("challengeId") Long challengeId,
                                                     @Param("excludeMemberId") Long excludeMemberId);
     // Tìm Host của Challenge
