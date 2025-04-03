@@ -220,6 +220,8 @@ const Charts = () => {
                                         <span className="text-xs text-gray-500">
                                             ({totalChallenges > 0 ? ((item.value / totalChallenges) * 100).toFixed(0) : "0"}%)
                                         </span>
+                      ({totalChallenges > 0 ? ((item.value / totalChallenges) * 100).toFixed(0) : "0"}%)
+                    </span>
                                     </div>
                                 </div>
                             </div>

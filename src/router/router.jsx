@@ -28,8 +28,9 @@ import ChallengePage from "../page/challenge/ChallengePage.jsx";
 import ChallengeEvidencePage from "../page/admin/list/EvidenceList.jsx";
 import GroupList from "../page/admin/list/GroupList.jsx";
 import AboutUsPage from "../page/ui/AboutUs.jsx";
-import AdminChallengeDetail from "../page/admin/ChallengeDetail.jsx"
+import AdminChallengeDetail from "../page/admin/detailmodal/ChallengeDetail.jsx"
 import NotFoundPage from "../component/NotFoundPage.jsx";
+import ReportDetail from "../page/admin/detailmodal/ReportDetail.jsx";
 const router = createBrowserRouter([
     {
         path: "/", // ✅ Redirect root to homepage
@@ -167,6 +168,11 @@ const router = createBrowserRouter([
                 path:"/admin/reportlist",
                 errorElement:<ErrorPage/>,
                 element: <ReportList/>,
+            },
+            {
+                path:"/admin/reportdetail",
+                errorElement:<ErrorPage/>,
+                element: <ReportDetail/>,
             },
             {
                 path:"/admin/grouplist",
