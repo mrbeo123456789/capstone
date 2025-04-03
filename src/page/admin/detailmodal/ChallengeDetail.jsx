@@ -6,6 +6,7 @@ import { HiUsers } from "react-icons/hi";
 import { CheckCircle, XCircle, UserX, ArrowLeft } from "lucide-react";
 import Footer from "../../../component/footer.jsx";
 import { useGetChallengeDetailQuery } from "../../../service/challengeService.js";
+import EvidenceList from "../list/EvidenceList.jsx"; // Import the EvidenceList component
 
 const ChallengeDetail = () => {
     const { id } = useParams();
@@ -198,7 +199,7 @@ const ChallengeDetail = () => {
                 {/* Tabs Section */}
                 <div className="mt-6 w-full max-w-4xl">
                     <div className="flex border-b">
-                        {["info", "rules", "rankings"].map((tab) => (
+                        {["info", "rules", "rankings", "evidence"].map((tab) => (
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
@@ -212,7 +213,9 @@ const ChallengeDetail = () => {
                                     ? "Thông tin"
                                     : tab === "rules"
                                         ? "Quy định"
-                                        : "Bảng xếp hạng"}
+                                        : tab === "rankings"
+                                            ? "Bảng xếp hạng"
+                                            : "Bằng chứng"}
                             </button>
                         ))}
                     </div>
@@ -316,6 +319,9 @@ const ChallengeDetail = () => {
                                 </div>
                             </div>
                         )}
+                        {activeTab === "evidence" && (
+                            <EvidenceList challengeData={challenge} />
+                        )}
                     </div>
                 </div>
             </div>
@@ -398,7 +404,7 @@ const ChallengeDetail = () => {
                                 onClick={handleKickMember}
                                 className="px-4 py-2 rounded text-white bg-red-500 hover:bg-red-600"
                             >
-                                Xác nhận
+                                Loại bỏ
                             </button>
                         </div>
                     </div>
