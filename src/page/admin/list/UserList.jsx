@@ -1,19 +1,20 @@
 import { useState, useEffect } from "react";
 import Sidebar from "../../navbar/AdminNavbar.jsx";
-import { FaSort, FaCheckCircle, FaTimesCircle, FaUser, FaEnvelope, FaIdCard, FaPhone, FaBirthdayCake, FaMapMarkerAlt } from "react-icons/fa";
+import {
+    FaSort, FaCheckCircle, FaTimesCircle, FaUser, FaEnvelope, FaIdCard, FaPhone, FaBirthdayCake, FaMapMarkerAlt
+} from "react-icons/fa";
 import {
     useGetUsersQuery,
     useBanUserMutation,
     useUnbanUserMutation,
-    useSearchUsersQuery,
     useGetUserByIdQuery
 } from "../../../service/adminService.js";
 
 const UserList = () => {
-    const [currentPage, setCurrentPage] = useState(0); // API is 0-indexed
+    // State quản lý trang, tìm kiếm, sắp xếp, …
+    const [currentPage, setCurrentPage] = useState(0); // API 0-indexed
     const [searchTerm, setSearchTerm] = useState("");
     const [sortConfig, setSortConfig] = useState([]);
-    // Lưu trữ selectedUserId thay vì toàn bộ object
     const [selectedUserId, setSelectedUserId] = useState(null);
     const [showPopup, setShowPopup] = useState(false);
     const [roleFilter, setRoleFilter] = useState("all");
@@ -21,44 +22,31 @@ const UserList = () => {
     const usersPerPage = 10;
     const [debouncedSearch, setDebouncedSearch] = useState("");
 
-    // API calls
-    const {
-        data: usersData,
-        isLoading: isLoadingUsers,
-        isError: isErrorUsers,
-        refetch: refetchUsers
-    } = useGetUsersQuery({ page: currentPage, size: usersPerPage });
-
-    const {
-        data: searchResults,
-        isLoading: isLoadingSearch,
-        isError: isErrorSearch
-    } = useSearchUsersQuery(debouncedSearch, { skip: !debouncedSearch });
-
-    const [banUser] = useBanUserMutation();
-    const [unbanUser] = useUnbanUserMutation();
-
-    // Debounce search input
+    // Debounce cho tìm kiếm (500ms)
     useEffect(() => {
         const timeoutId = setTimeout(() => {
-            if (searchTerm.trim()) {
-                setDebouncedSearch(searchTerm);
-            } else {
-                setDebouncedSearch("");
-            }
+            setDebouncedSearch(searchTerm.trim());
         }, 500);
         return () => clearTimeout(timeoutId);
     }, [searchTerm]);
 
-    // Determine which data to use based on search state
-    const users = debouncedSearch ? searchResults?.content || [] : usersData?.content || [];
-    const totalElements = debouncedSearch ? searchResults?.totalElements || 0 : usersData?.totalElements || 0;
-    const totalPages = debouncedSearch ? searchResults?.totalPages || 1 : usersData?.totalPages || 1;
-    const isLoading = isLoadingUsers || isLoadingSearch;
-    const isError = isErrorUsers || isErrorSearch;
+    // Dùng 1 endpoint duy nhất, truyền keyword nếu có
+    const {
+        data: usersData,
+        isLoading,
+        isError,
+        refetch: refetchUsers
+    } = useGetUsersQuery({ page: currentPage, size: usersPerPage, keyword: debouncedSearch });
 
-    const allRoles = ["ADMIN", "USER"];
+    const [banUser] = useBanUserMutation();
+    const [unbanUser] = useUnbanUserMutation();
 
+    // Xử lý dữ liệu trả về từ API
+    const users = usersData?.content || [];
+    const totalElements = usersData?.totalElements || 0;
+    const totalPages = usersData?.totalPages || 1;
+
+    // Hàm xử lý sắp xếp theo key
     const handleSort = (key) => {
         setSortConfig((prev) => {
             const existingSort = prev.find((s) => s.key === key);
@@ -83,7 +71,6 @@ const UserList = () => {
         }
     };
 
-    // Khi mở chi tiết, lưu lại id của user và mở modal
     const openUserDetail = (user) => {
         setSelectedUserId(user.id);
         setShowPopup(true);
@@ -94,11 +81,12 @@ const UserList = () => {
         setSelectedUserId(null);
     };
 
+    // Lọc theo role nếu cần (client-side)
     const filteredUsers = users.filter(user => {
-        const matchesRole = roleFilter === "all" || user.role === roleFilter;
-        return matchesRole;
+        return roleFilter === "all" || user.role === roleFilter;
     });
 
+    // Sắp xếp dữ liệu theo các tiêu chí đã chọn
     const sortedUsers = [...filteredUsers].sort((a, b) => {
         for (const { key, direction } of sortConfig) {
             if (a[key] < b[key]) return direction === "asc" ? -1 : 1;
@@ -107,7 +95,7 @@ const UserList = () => {
         return 0;
     });
 
-    // Sửa các trường cho đúng theo dữ liệu backend: firstName, lastName, phone, dob, address, avatar,...
+    // Format dữ liệu cho hiển thị (sửa avatar, tên, …)
     const formatUserForDisplay = (user) => {
         return {
             id: user.id,
@@ -118,13 +106,13 @@ const UserList = () => {
             address: user.address || "N/A",
             role: user.role?.includes("ADMIN") ? "Admin" : "Member",
             status: user.status ? user.status.toUpperCase() : "ACTIVE",
-            avatar: user.avatar || `/assets/default-avatar.png`
+            avatar: user.avatar || "/assets/default-avatar.png"
         };
     };
 
     const currentUsers = sortedUsers.map(formatUserForDisplay);
 
-    // Component UserDetailPopup: chỉ cho xem, hiển thị role luôn là "Member"
+    // Component Popup hiển thị chi tiết người dùng
     const UserDetailPopup = ({ userId, onClose, onToggleStatus }) => {
         const { data: userDetail, isLoading: isLoadingDetail, isError: isErrorDetail } = useGetUserByIdQuery(userId);
         const [userData, setUserData] = useState(null);
@@ -200,7 +188,6 @@ const UserList = () => {
                                 </div>
                                 <div className="text-gray-800 pl-6">{userData.username}</div>
                             </div>
-
                             {/* EMAIL */}
                             <div className="bg-orange-50 p-3 rounded-lg">
                                 <div className="flex items-center mb-1 text-orange-700">
@@ -209,7 +196,6 @@ const UserList = () => {
                                 </div>
                                 <div className="text-gray-800 pl-6">{userData.email}</div>
                             </div>
-
                             {/* PHONE */}
                             <div className="bg-orange-50 p-3 rounded-lg">
                                 <div className="flex items-center mb-1 text-orange-700">
@@ -218,25 +204,22 @@ const UserList = () => {
                                 </div>
                                 <div className="text-gray-800 pl-6">{userData.phone}</div>
                             </div>
-
                             {/* DOB */}
                             <div className="bg-orange-50 p-3 rounded-lg">
                                 <div className="flex items-center mb-1 text-orange-700">
                                     <FaBirthdayCake className="mr-2" />
                                     <span className="text-sm font-medium">Ngày sinh</span>
                                 </div>
-                                <div className="text-gray-800 pl-6">{userData.dob}</div>
+                                <div className="text-gray-800 pl-6">{userData.dateOfBirth || "N/A"}</div>
                             </div>
-
                             {/* ADDRESS */}
                             <div className="bg-orange-50 p-3 rounded-lg md:col-span-2">
                                 <div className="flex items-center mb-1 text-orange-700">
                                     <FaMapMarkerAlt className="mr-2" />
                                     <span className="text-sm font-medium">Địa chỉ</span>
                                 </div>
-                                <div className="text-gray-800 pl-6">{userData.address}</div>
+                                <div className="text-gray-800 pl-6">{userData.address || "N/A"}</div>
                             </div>
-
                             {/* STATUS */}
                             <div className="bg-orange-50 p-3 rounded-lg md:col-span-2">
                                 <div className="flex items-center mb-1 text-orange-700">
@@ -257,9 +240,8 @@ const UserList = () => {
                         </div>
                     </div>
 
-                    {/* Footer: nút Khóa/Mở khóa và Đóng */}
+                    {/* Footer với toggle trạng thái và nút Đóng */}
                     <div className="bg-gray-50 px-6 py-4 flex justify-end items-center border-t border-gray-200 space-x-3">
-                        {/* Toggle Switch */}
                         <label htmlFor="toggleSwitch" className="relative inline-block w-12 h-6">
                             <input
                                 id="toggleSwitch"
@@ -269,18 +251,12 @@ const UserList = () => {
                                 onChange={() => onToggleStatus(userId, userData.status)}
                             />
                             <span
-                                className={`absolute cursor-pointer top-0 left-0 right-0 bottom-0 rounded-full transition-all duration-300 ${
-                                    userData.status?.toLowerCase() === "active" ? "bg-red-500" : "bg-green-500"
-                                }`}
+                                className={`absolute cursor-pointer top-0 left-0 right-0 bottom-0 rounded-full transition-all duration-300 ${userData.status?.toLowerCase() === "active" ? "bg-red-500" : "bg-green-500"}`}
                             ></span>
                             <span
-                                className={`absolute left-1 top-1 w-4 h-4 rounded-full bg-white transition-transform duration-300 ${
-                                    userData.status?.toLowerCase() === "active" ? "translate-x-6" : "translate-x-0"
-                                }`}
+                                className={`absolute left-1 top-1 w-4 h-4 rounded-full bg-white transition-transform duration-300 ${userData.status?.toLowerCase() === "active" ? "translate-x-6" : "translate-x-0"}`}
                             ></span>
                         </label>
-
-                        {/* Nút Đóng */}
                         <button
                             onClick={onClose}
                             className="px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
@@ -288,8 +264,6 @@ const UserList = () => {
                             Đóng
                         </button>
                     </div>
-
-
                 </div>
             </div>
         );
@@ -313,7 +287,10 @@ const UserList = () => {
                                             placeholder="Tìm kiếm theo tên hoặc email..."
                                             className="w-full pl-10 pr-4 py-3 border border-orange-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white"
                                             value={searchTerm}
-                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                            onChange={(e) => {
+                                                setSearchTerm(e.target.value);
+                                                setCurrentPage(0); // reset trang khi có tìm kiếm mới
+                                            }}
                                         />
                                         <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-orange-400">
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -337,7 +314,7 @@ const UserList = () => {
                                         <thead className="bg-gradient-to-r from-orange-100 to-yellow-100 sticky top-0 z-10">
                                         <tr>
                                             <th className="p-4 text-left font-bold text-orange-800">
-                                                <button className="flex items-center" onClick={() => handleSort("name")}>
+                                                <button className="flex items-center" onClick={() => handleSort("username")}>
                                                     Tên
                                                     <FaSort className="ml-1 text-orange-500" />
                                                 </button>
@@ -433,7 +410,16 @@ const UserList = () => {
                             </div>
                             <div className="bg-gradient-to-r from-orange-50 to-yellow-50 p-4 flex flex-col md:flex-row md:items-center justify-between border-t border-orange-100 gap-4">
                                 <div className="text-gray-600">
-                                    Hiển thị <span className="font-medium">{currentUsers.length > 0 ? (currentPage * usersPerPage) + 1 : 0}</span> đến <span className="font-medium">{(currentPage * usersPerPage) + currentUsers.length}</span> trong tổng số <span className="font-medium">{totalElements}</span> người dùng
+                                    Hiển thị{" "}
+                                    <span className="font-medium">
+                                        {currentUsers.length > 0 ? (currentPage * usersPerPage) + 1 : 0}
+                                    </span>{" "}
+                                    đến{" "}
+                                    <span className="font-medium">
+                                        {(currentPage * usersPerPage) + currentUsers.length}
+                                    </span>{" "}
+                                    trong tổng số{" "}
+                                    <span className="font-medium">{totalElements}</span> người dùng
                                 </div>
                                 <div className="flex space-x-2 self-center md:self-auto">
                                     <button
@@ -464,16 +450,11 @@ const UserList = () => {
                         </div>
                     </div>
                 </div>
-
-                {/* User Detail Popup sử dụng API getUserById */}
                 {showPopup && selectedUserId && (
                     <UserDetailPopup
                         userId={selectedUserId}
                         onClose={closeUserDetail}
                         onToggleStatus={toggleUserStatus}
-                        onSave={() => {
-                            refetchUsers();
-                        }}
                     />
                 )}
             </div>
