@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import {useMemo, useState} from "react";
 import {
     LineChart,
     Line,
@@ -16,7 +16,17 @@ import { useGetGrowthQuery, useGetSummaryQuery } from "../../../service/adminSer
 
 const Charts = () => {
     const [timePeriod, setTimePeriod] = useState("MONTH");
-    const { data: growthData = [], isLoading } = useGetGrowthQuery({ range: timePeriod });
+    const { data: growthData = {}, isLoading } = useGetGrowthQuery({ range: timePeriod });
+
+    const chartData = useMemo(() => {
+        if (!growthData || !growthData.dates) return [];
+
+        return growthData.dates.map((date, index) => ({
+            date,
+            newMembers: growthData.newMembers?.[index] ?? 0,
+            newChallenges: growthData.newChallenges?.[index] ?? 0,
+        }));
+    }, [growthData]);
 
     // Lấy dữ liệu summary từ API cho pie chart
     const { data: summaryData, isLoading: summaryLoading, isError: summaryError } = useGetSummaryQuery();
@@ -106,10 +116,10 @@ const Charts = () => {
                     </div>
                 ) : (
                     <ResponsiveContainer width="100%" height={400}>
-                        <LineChart data={growthData} margin={{ top: 5, right: 30, left: 20, bottom: 70 }}>
+                        <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 70 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
                             <XAxis
-                                dataKey="period"
+                                dataKey="date"
                                 stroke="#6b7280"
                                 axisLine={{ stroke: "#e5e7eb" }}
                                 tickLine={{ stroke: "#e5e7eb" }}
@@ -141,6 +151,7 @@ const Charts = () => {
                             />
                         </LineChart>
                     </ResponsiveContainer>
+
                 )}
             </div>
 

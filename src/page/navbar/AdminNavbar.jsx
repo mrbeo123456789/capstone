@@ -85,6 +85,28 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
                     <ul className="space-y-2">
                         <li>
                             <NavLink
+                                to="/admin/dashboard"
+                                className={({ isActive }) =>
+                                    `flex items-center ${
+                                        isCollapsed ? "justify-center" : "px-4"
+                                    } py-3 rounded-md transition duration-200 ${
+                                        isActive
+                                            ? "bg-gradient-to-r from-orange-100 to-yellow-100 text-orange-600 font-medium"
+                                            : "hover:bg-gray-100"
+                                    }`
+                                }
+                                title="Dashboard"
+                            >
+                                <FileText
+                                    size={20}
+                                    className={isCollapsed ? "" : "mr-3"}
+                                />
+                                {!isCollapsed && <span>Dashboard</span>}
+                            </NavLink>
+                        </li>
+
+                        <li>
+                            <NavLink
                                 to="/admin/challengelist"
                                 className={({ isActive }) =>
                                     `flex items-center ${
@@ -147,28 +169,6 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
                                     className={isCollapsed ? "" : "mr-3"}
                                 />
                                 {!isCollapsed && <span>Group List</span>}
-                            </NavLink>
-                        </li>
-
-                        <li>
-                            <NavLink
-                                to="/admin/evidencelist"
-                                className={({ isActive }) =>
-                                    `flex items-center ${
-                                        isCollapsed ? "justify-center" : "px-4"
-                                    } py-3 rounded-md transition duration-200 ${
-                                        isActive
-                                            ? "bg-gradient-to-r from-orange-100 to-yellow-100 text-orange-600 font-medium"
-                                            : "hover:bg-gray-100"
-                                    }`
-                                }
-                                title="Evidence List"
-                            >
-                                <FileText
-                                    size={20}
-                                    className={isCollapsed ? "" : "mr-3"}
-                                />
-                                {!isCollapsed && <span>Evidence List</span>}
                             </NavLink>
                         </li>
 
