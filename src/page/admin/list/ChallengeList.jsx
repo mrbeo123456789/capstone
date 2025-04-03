@@ -1,19 +1,32 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { CheckCircle, XCircle, Ban } from "lucide-react";
 import Sidebar from "../../navbar/AdminNavbar.jsx";
 import { useGetChallengesQuery, useReviewChallengeMutation } from "../../../service/adminService.js";
 
 const ChallengeList = () => {
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    // Parse URL query parameters
+    const queryParams = new URLSearchParams(location.search);
+    const statusFromURL = queryParams.get('status');
+
     // State management
     const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState("");
-    const [filterStatus, setFilterStatus] = useState(null);
+    const [filterStatus, setFilterStatus] = useState(statusFromURL);
     const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-    const navigate = useNavigate();
     const itemsPerPage = 10;
+
+    // Effect to handle URL parameter changes
+    useEffect(() => {
+        if (statusFromURL) {
+            setFilterStatus(statusFromURL);
+        }
+    }, [statusFromURL]);
 
     // RTK Query hook: lấy dữ liệu theo phân trang từ backend
     const {
@@ -50,10 +63,31 @@ const ChallengeList = () => {
         return "";
     };
 
+    // Update status filter and update URL
+    const updateStatusFilter = (status) => {
+        // Update state
+        setFilterStatus(status);
+        setIsStatusDropdownOpen(false);
+        setCurrentPage(1);
+
+        // Update URL without navigating away
+        const newParams = new URLSearchParams(location.search);
+        if (status) {
+            newParams.set('status', status);
+        } else {
+            newParams.delete('status');
+        }
+
+        navigate({
+            pathname: location.pathname,
+            search: newParams.toString()
+        }, { replace: true });
+    };
+
     // Lọc theo searchTerm và filterStatus (client-side)
     const filteredChallenges = allChallenges.filter((challenge) => {
         const matchesSearch = challenge.name.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesStatus = filterStatus ? challenge.status === filterStatus : true;
+        const matchesStatus = filterStatus ? challenge.status.toUpperCase() === filterStatus : true;
         return matchesSearch && matchesStatus;
     });
 
@@ -102,9 +136,7 @@ const ChallengeList = () => {
     };
 
     const handleStatusFilter = (status) => {
-        setFilterStatus(status);
-        setIsStatusDropdownOpen(false);
-        setCurrentPage(1);
+        updateStatusFilter(status);
     };
 
     // Search input handler
@@ -123,6 +155,26 @@ const ChallengeList = () => {
     const prevPage = () => {
         if (currentPage > 1) {
             setCurrentPage(currentPage - 1);
+        }
+    };
+
+    // Function to map status values between pie chart and dropdown
+    const getStatusDisplayName = (status) => {
+        if (!status) return "Tất cả trạng thái";
+
+        // Map from pie chart names to dropdown names if needed
+        switch (status.toUpperCase()) {
+            case "COMPLETED": return "Đã kết thúc";
+            case "ONGOING": return "Đang diễn ra";
+            case "PENDING": return "Đang chờ";
+            case "FAILED": return "Đã thất bại";
+            case "APPROVED": return "Đã duyệt";
+            case "REJECTED": return "Đã từ chối";
+            case "BANNED": return "Đã ban";
+            case "CANCELED": return "Bị hủy";
+            case "FINISH": return "Đã kết thúc";
+            case "UPCOMING": return "Sắp diễn ra";
+            default: return status;
         }
     };
 
@@ -160,23 +212,7 @@ const ChallengeList = () => {
                                         className="px-4 py-2 border border-orange-200 rounded-lg bg-white flex items-center justify-between min-w-[180px]"
                                     >
                                         <span>
-                                            {filterStatus === "APPROVED"
-                                                ? "Đã duyệt"
-                                                : filterStatus === "REJECTED"
-                                                    ? "Đã từ chối"
-                                                    : filterStatus === "PENDING"
-                                                        ? "Đang chờ"
-                                                        : filterStatus === "BANNED"
-                                                            ? "Đã ban"
-                                                            : filterStatus === "CANCELED"
-                                                                ? "Bị hủy"
-                                                                : filterStatus === "FINISH"
-                                                                    ? "Đã kết thúc"
-                                                                    : filterStatus === "ONGOING"
-                                                                        ? "Đang diễn ra"
-                                                                        : filterStatus === "UPCOMING"
-                                                                            ? "Sắp diễn ra"
-                                                                            : "Tất cả trạng thái"}
+                                            {getStatusDisplayName(filterStatus)}
                                         </span>
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
@@ -268,28 +304,28 @@ const ChallengeList = () => {
                                                             className="font-medium text-orange-600 hover:text-orange-800 cursor-pointer hover:underline"
                                                             onClick={() => navigateToChallengeDetail(challenge)}
                                                         >
-                                                                {challenge.name}
-                                                            </span>
+                                                            {challenge.name}
+                                                        </span>
                                                     </div>
                                                 </td>
                                                 <td className="p-4">
-                                                        <span className="font-medium">
-                                                            {computeDuration(challenge)}
-                                                        </span>
+                                                    <span className="font-medium">
+                                                        {computeDuration(challenge)}
+                                                    </span>
                                                 </td>
                                                 <td className="p-4">
-                                                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                                                            challenge.status.toUpperCase() === "APPROVED"
-                                                                ? "bg-green-100 text-green-700"
-                                                                : challenge.status.toUpperCase() === "REJECTED"
-                                                                    ? "bg-red-100 text-red-700"
-                                                                    : challenge.status.toUpperCase() === "BANNED" ||
-                                                                    challenge.status.toUpperCase() === "FINISH"
-                                                                        ? "bg-gray-100 text-gray-700"
-                                                                        : "bg-yellow-100 text-yellow-700"
-                                                        }`}>
-                                                            {challenge.status.toUpperCase()}
-                                                        </span>
+                                                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                                                        challenge.status.toUpperCase() === "APPROVED"
+                                                            ? "bg-green-100 text-green-700"
+                                                            : challenge.status.toUpperCase() === "REJECTED"
+                                                                ? "bg-red-100 text-red-700"
+                                                                : challenge.status.toUpperCase() === "BANNED" ||
+                                                                challenge.status.toUpperCase() === "FINISH"
+                                                                    ? "bg-gray-100 text-gray-700"
+                                                                    : "bg-yellow-100 text-yellow-700"
+                                                    }`}>
+                                                        {challenge.status.toUpperCase()}
+                                                    </span>
                                                 </td>
                                                 <td className="p-4">
                                                     <div className="flex space-x-2 justify-center">
@@ -358,45 +394,40 @@ const ChallengeList = () => {
                             )}
                         </div>
 
-                        {/* Pagination Section */}
-                        <div className="bg-gradient-to-r from-orange-50 to-yellow-50 p-4 flex flex-col md:flex-row md:items-center justify-between border-t border-orange-100 gap-4">
-                            <div className="text-gray-600">
-                                Hiển thị{" "}
-                                <span className="font-medium">
-                                    {currentChallenges.length > 0 ? indexOfFirstChallenge + 1 : 0}
-                                </span>{" "}
-                                đến{" "}
-                                <span className="font-medium">
-                                    {indexOfFirstChallenge + currentChallenges.length}
-                                </span>{" "}
-                                trong tổng số{" "}
-                                <span className="font-medium">{sortedChallenges.length}</span> thử thách
+                        {/* Pagination Controls */}
+                        <div className="p-4 border-t border-orange-100 bg-gradient-to-r from-orange-50 to-yellow-50 flex justify-between items-center">
+                            <div className="text-sm text-gray-600">
+                                {currentChallenges.length > 0 ? (
+                                    <>Hiển thị {indexOfFirstChallenge + 1} - {Math.min(indexOfLastChallenge, filteredChallenges.length)} trong tổng số {filteredChallenges.length} thử thách</>
+                                ) : (
+                                    <>Không có thử thách nào</>
+                                )}
                             </div>
-                            <div className="flex space-x-2 self-center md:self-auto">
+                            <div className="flex space-x-2">
                                 <button
-                                    className="p-2 rounded-md bg-white border border-orange-200 text-orange-600 hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed"
                                     onClick={prevPage}
                                     disabled={currentPage === 1}
+                                    className={`px-3 py-1 rounded-md ${
+                                        currentPage === 1
+                                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                            : "bg-white text-orange-600 hover:bg-orange-100"
+                                    }`}
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none"
-                                         viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                                    </svg>
+                                    Trước
                                 </button>
-                                <div className="bg-white border border-orange-200 rounded-md px-4 py-2 flex items-center">
-                                    <span className="text-orange-600 font-medium">{currentPage}</span>
-                                    <span className="mx-1 text-gray-400">/</span>
-                                    <span className="text-gray-600">{totalPages || 1}</span>
+                                <div className="px-3 py-1 bg-orange-100 text-orange-700 rounded-md">
+                                    {currentPage} / {totalPages || 1}
                                 </div>
                                 <button
-                                    className="p-2 rounded-md bg-white border border-orange-200 text-orange-600 hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed"
                                     onClick={nextPage}
-                                    disabled={currentPage === totalPages || totalPages === 0}
+                                    disabled={currentPage >= totalPages}
+                                    className={`px-3 py-1 rounded-md ${
+                                        currentPage >= totalPages
+                                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                            : "bg-white text-orange-600 hover:bg-orange-100"
+                                    }`}
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none"
-                                         viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                    </svg>
+                                    Tiếp
                                 </button>
                             </div>
                         </div>

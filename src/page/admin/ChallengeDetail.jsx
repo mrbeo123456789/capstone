@@ -3,9 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { FaRegClock } from "react-icons/fa";
 import { FaRunning } from "react-icons/fa";
 import { HiUsers } from "react-icons/hi";
-import { CheckCircle, XCircle, UserX, ArrowLeft } from "lucide-react";
+import { CheckCircle, XCircle, UserX, ArrowLeft, Camera, FileText } from "lucide-react";
 import Footer from "../../component/footer.jsx";
 import { useGetChallengeDetailQuery } from "../../service/challengeService.js";
+import EvidenceDetailModal from "./EvidenceDetailModal"; // Import the EvidenceDetailModal component
 
 const ChallengeDetail = () => {
     const { id } = useParams();
@@ -16,6 +17,8 @@ const ChallengeDetail = () => {
     const [reason, setReason] = useState("");
     const [showKickModal, setShowKickModal] = useState(false);
     const [memberToKick, setMemberToKick] = useState(null);
+    // Add state for evidence modal
+    const [selectedEvidence, setSelectedEvidence] = useState(null);
 
     // Sử dụng API thật qua hook RTK Query để lấy chi tiết challenge
     const { data: challenge, error, isLoading } = useGetChallengeDetailQuery(id);
@@ -56,6 +59,43 @@ const ChallengeDetail = () => {
         setShowKickModal(false);
     };
 
+    // Handle opening evidence detail modal
+    const openEvidenceDetail = (evidence, memberName) => {
+        // Format the evidence data for the modal
+        const formattedEvidence = {
+            id: evidence.id,
+            name: evidence.title,
+            challenge: challenge.name,
+            addedBy: memberName,
+            dateAdded: evidence.date,
+            type: evidence.type,
+            status: evidence.status,
+            // Add any other fields required by EvidenceDetailModal
+        };
+        setSelectedEvidence(formattedEvidence);
+    };
+
+    // Handle evidence approval
+    const handleApproveEvidence = (evidenceId) => {
+        // Implement API call to approve evidence
+        console.log(`Evidence approved: ${evidenceId}`);
+        setSelectedEvidence(null);
+        // You might want to refresh the evidence list here
+    };
+
+    // Handle evidence rejection
+    const handleRejectEvidence = (evidenceId) => {
+        // Implement API call to reject evidence
+        console.log(`Evidence rejected: ${evidenceId}`);
+        setSelectedEvidence(null);
+        // You might want to refresh the evidence list here
+    };
+
+    // Close evidence modal
+    const closeEvidenceModal = () => {
+        setSelectedEvidence(null);
+    };
+
     // Mock data cho bảng xếp hạng - thay thế bằng dữ liệu thật từ API
     const mockParticipants = [
         { id: 1, name: "Nguyễn Văn A", score: 1250, rank: 1, avatar: "https://i.pravatar.cc/150?img=1" },
@@ -63,6 +103,39 @@ const ChallengeDetail = () => {
         { id: 3, name: "Lê Văn C", score: 875, rank: 3, avatar: "https://i.pravatar.cc/150?img=3" },
         { id: 4, name: "Phạm Thị D", score: 720, rank: 4, avatar: "https://i.pravatar.cc/150?img=4" },
         { id: 5, name: "Hoàng Văn E", score: 650, rank: 5, avatar: "https://i.pravatar.cc/150?img=5" }
+    ];
+
+    // Mock data cho bằng chứng - thay thế bằng dữ liệu thật từ API
+    const mockEvidence = [
+        {
+            id: 1,
+            memberId: 1,
+            memberName: "Nguyễn Văn A",
+            memberAvatar: "https://i.pravatar.cc/150?img=1",
+            evidences: [
+                { id: 101, type: "image", title: "Đã hoàn thành 5km chạy", date: "2023-08-15", status: "approved", url: "/api/placeholder/400/320" },
+                { id: 102, type: "text", title: "Báo cáo tuần 1", date: "2023-08-16", status: "pending", content: "Tôi đã hoàn thành mục tiêu tuần đầu tiên..." }
+            ]
+        },
+        {
+            id: 2,
+            memberId: 2,
+            memberName: "Trần Thị B",
+            memberAvatar: "https://i.pravatar.cc/150?img=2",
+            evidences: [
+                { id: 103, type: "image", title: "Kết quả chạy 10km", date: "2023-08-14", status: "approved", url: "/api/placeholder/400/320" },
+                { id: 104, type: "image", title: "Hình ảnh tập luyện", date: "2023-08-17", status: "rejected", url: "/api/placeholder/400/320" }
+            ]
+        },
+        {
+            id: 3,
+            memberId: 3,
+            memberName: "Lê Văn C",
+            memberAvatar: "https://i.pravatar.cc/150?img=3",
+            evidences: [
+                { id: 105, type: "text", title: "Báo cáo tuần 2", date: "2023-08-20", status: "approved", content: "Tuần này tôi đã vượt qua mốc 20km..." }
+            ]
+        }
     ];
 
     if (isLoading) {
@@ -198,7 +271,7 @@ const ChallengeDetail = () => {
                 {/* Tabs Section */}
                 <div className="mt-6 w-full max-w-4xl">
                     <div className="flex border-b">
-                        {["info", "rules", "rankings"].map((tab) => (
+                        {["info", "rules", "rankings", "evidence"].map((tab) => (
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
@@ -212,7 +285,9 @@ const ChallengeDetail = () => {
                                     ? "Thông tin"
                                     : tab === "rules"
                                         ? "Quy định"
-                                        : "Bảng xếp hạng"}
+                                        : tab === "rankings"
+                                            ? "Bảng xếp hạng"
+                                            : "Bằng chứng"}
                             </button>
                         ))}
                     </div>
@@ -316,6 +391,89 @@ const ChallengeDetail = () => {
                                 </div>
                             </div>
                         )}
+                        {activeTab === "evidence" && (
+                            <div>
+                                <h3 className="text-lg font-semibold text-gray-800 mb-4">BẰNG CHỨNG</h3>
+
+                                {mockEvidence.map((member) => (
+                                    <div key={member.id} className="mb-6 border-b pb-4">
+                                        <div className="flex items-center mb-3">
+                                            <h4 className="font-semibold text-gray-800">{member.memberName}</h4>
+                                        </div>
+
+                                        <div className="pl-4 border-l-4 border-orange-200">
+                                            {member.evidences.map((evidence) => (
+                                                <div key={evidence.id} className="mb-4 p-4 bg-gray-50 rounded-lg shadow-sm">
+                                                    <div className="flex justify-between items-start mb-2">
+                                                        <div className="flex items-center">
+                                                            {evidence.type === "image" ? (
+                                                                <Camera size={16} className="text-blue-500 mr-2" />
+                                                            ) : (
+                                                                <FileText size={16} className="text-green-500 mr-2" />
+                                                            )}
+                                                            <h5 className="font-medium">{evidence.title}</h5>
+                                                        </div>
+                                                        <div className="flex items-center">
+                                                            <span className="text-xs text-gray-500 mr-2">{evidence.date}</span>
+                                                            <span className={`text-xs px-2 py-1 rounded-full ${
+                                                                evidence.status === "approved"
+                                                                    ? "bg-green-100 text-green-700"
+                                                                    : evidence.status === "rejected"
+                                                                        ? "bg-red-100 text-red-700"
+                                                                        : "bg-yellow-100 text-yellow-700"
+                                                            }`}>
+                                                                {evidence.status === "approved" ? "Đã duyệt" : evidence.status === "rejected" ? "Từ chối" : "Chờ duyệt"}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    {evidence.type === "image" ? (
+                                                        <div className="mt-2">
+                                                            <img src={evidence.url} alt={evidence.title} className="w-full max-h-64 object-contain rounded-lg" />
+                                                        </div>
+                                                    ) : (
+                                                        <div className="mt-2 p-3 bg-white rounded border border-gray-200">
+                                                            <p className="text-gray-700 text-sm">{evidence.content}</p>
+                                                        </div>
+                                                    )}
+
+                                                    <div className="mt-3 flex justify-end space-x-2">
+                                                        {evidence.status === "pending" && (
+                                                            <>
+                                                                <button
+                                                                    onClick={() => handleApproveEvidence(evidence.id)}
+                                                                    className="px-3 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600"
+                                                                >
+                                                                    Phê duyệt
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => handleRejectEvidence(evidence.id)}
+                                                                    className="px-3 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600"
+                                                                >
+                                                                    Từ chối
+                                                                </button>
+                                                            </>
+                                                        )}
+                                                        <button
+                                                            onClick={() => openEvidenceDetail(evidence, member.memberName)}
+                                                            className="px-3 py-1 bg-gray-200 text-gray-700 text-xs rounded hover:bg-gray-300"
+                                                        >
+                                                            Chi tiết
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))}
+
+                                {mockEvidence.length === 0 && (
+                                    <div className="text-center py-8 text-gray-500">
+                                        Chưa có bằng chứng nào được gửi lên cho thử thách này.
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -398,11 +556,21 @@ const ChallengeDetail = () => {
                                 onClick={handleKickMember}
                                 className="px-4 py-2 rounded text-white bg-red-500 hover:bg-red-600"
                             >
-                                Xác nhận
+                                Loại bỏ
                             </button>
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* Evidence Detail Modal */}
+            {selectedEvidence && (
+                <EvidenceDetailModal
+                    evidence={selectedEvidence}
+                    onClose={closeEvidenceModal}
+                    onApprove={handleApproveEvidence}
+                    onReject={handleRejectEvidence}
+                />
             )}
 
             <Footer />
