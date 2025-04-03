@@ -194,15 +194,15 @@ function MemberProfile() {
 
     return (
         <div
-            className="p-6 flex flex-col md:flex-row h-full w-full relative box-border rounded-xl border-4 border-transparent z-[1]">
+            className="p-6 flex flex-col xl:flex-row h-full w-full relative box-border rounded-xl border-4 border-transparent z-[1]">
 
             {/* Left Section: Avatar & Basic Info */}
-            <div className="bg-white rounded-lg shadow-md w-full md:w-1/3">
+            <div className="bg-white rounded-lg shadow-md w-full xl:w-1/3">
                 <div className="p-6 flex flex-col md:m-2">
                     {/* Avatar Upload */}
                     <label htmlFor="dropzone-file"
                            className="relative group cursor-pointer flex items-center justify-center">
-                        <div className="w-[300px] h-[400px] flex items-center justify-center relative md:m-2">
+                        <div className="w-[300px] h-[400px] flex items-center justify-center relative xl:m-2">
                             {/* Close Button */}
                             {preview && (
                                 <FaWindowClose
@@ -253,7 +253,7 @@ function MemberProfile() {
             </div>
 
             {/* Right Section: General Info Form */}
-            <div className="bg-white rounded-lg w-full md:ml-6 p-1">
+            <div className="bg-white rounded-lg w-full xl:ml-6 p-1">
                 <div className="flex flex-col rounded-lg p-6 h-full">
                     <h3 className="mb-4 text-xl font-bold text-red-600">General Information</h3>
                     <form onSubmit={handleSubmit(handleSubmitData)} autoComplete="false">

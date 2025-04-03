@@ -29,9 +29,9 @@ const RankingList = () => {
     const currentUsers = filtered.slice((currentPage - 1) * usersPerPage, currentPage * usersPerPage);
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 w-full mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 w-full mx-auto min-h-[625px]">
             {/* Top Active Podium */}
-            <div className="flex justify-between flex-col bg-white p-6 rounded-lg shadow-md">
+            <div className="flex justify-between flex-col bg-white p-6 rounded-lg shadow-md min-h-80">
                 <h2 className="text-xl font-bold text-center mb-4">Top Active</h2>
                 <div className="flex justify-center space-x-6 h-full">
                     <div className="text-center h-full content-end">

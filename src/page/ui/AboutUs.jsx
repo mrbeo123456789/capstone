@@ -1,6 +1,6 @@
 import React from "react";
 import { ChevronDown, Home } from "lucide-react";
-import {Header} from "./Header.jsx";
+import Header from "./Header.jsx";
 
 const AboutUsPage = () => {
     const scrollToSection = (id) => {

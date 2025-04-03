@@ -29,7 +29,7 @@ export const ChangePassword = () => {
     };
 
     return (
-        <div className="bg-white min-h-screen flex">
+        <div className="flex">
             {/* Main Content */}
             <div className="flex-1 flex items-center justify-center p-6">
                 <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 border border-orange-100">

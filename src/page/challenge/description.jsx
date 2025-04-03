@@ -52,7 +52,7 @@ const Description = ({ content }) => {
 
 
     return (
-        <div className="mt-6 mx-auto p-4 w-full bg-white">
+        <div className="mt-6 mx-auto p-10 w-3/4 bg-white">
             <div className="p-4" dangerouslySetInnerHTML={{__html: content}}/>
         </div>
 

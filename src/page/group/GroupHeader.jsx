@@ -3,8 +3,9 @@ import { FaUsers, FaExchangeAlt, FaExclamationCircle, FaSignOutAlt } from "react
 import {IoCloudUploadOutline} from "react-icons/io5";
 import MemberListPopup from "../ui/MemberListPopup.jsx";
 
-const GroupHeader = () => {
+const GroupHeader = (group) => {
     const [showPopup, setShowPopup] = useState(false);
+    console.log("this is group value", group)
 
     const openMemberList = () => {
         console.log("openUserDetail");
@@ -43,7 +44,14 @@ const GroupHeader = () => {
                         </div>
                     </div>
                     <div className="w-40 h-40 bg-gray-200 flex items-center justify-center rounded-lg">
-                        <IoCloudUploadOutline className="text-gray-500 text-4xl"/>
+                        {group?.picture ? (
+                            <IoCloudUploadOutline className="text-gray-500 text-4xl"/>
+                        ): (
+                            <img
+                                src={group?.picture}
+                                className="w-full h-full object-cover rounded"
+                            />
+                        )}
                     </div>
                 </div>
             </div>

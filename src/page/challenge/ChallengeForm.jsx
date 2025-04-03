@@ -262,11 +262,10 @@ const ChallengeForm = () => {
 
                             {/* Challenge Type ID */}
                             <div>
-                                <label className="text-sm font-medium ">Challenge Type ID</label>
+                                <label className="text-sm font-medium ">Challenge Type</label>
                                 <select
-                                    {...register("challengeTypeId", {required: true})}
+                                    {...register("challengeTypeId")}
                                     className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
-                                    <option value="">Select Type</option>
                                     {/* Optional placeholder */}
                                     {challengeTypes?.map((type) => (
                                         <option key={type.id} value={type.id}>
