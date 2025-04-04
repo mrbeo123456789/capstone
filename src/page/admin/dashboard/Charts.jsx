@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from "react";
+import {useMemo, useState} from "react";
 import {
     LineChart,
     Line,
@@ -13,10 +13,8 @@ import {
     Cell,
 } from "recharts";
 import { useGetGrowthQuery, useGetSummaryQuery } from "../../../service/adminService";
-import { useNavigate } from "react-router-dom";
 
 const Charts = () => {
-    const navigate = useNavigate();
     const [timePeriod, setTimePeriod] = useState("MONTH");
     const { data: growthData = {}, isLoading } = useGetGrowthQuery({ range: timePeriod });
 
@@ -57,14 +55,6 @@ const Charts = () => {
         return { name: key, value: Number(value) || 0, color };
     });
     const totalChallenges = challengesData.reduce((acc, item) => acc + item.value, 0);
-
-    // Handle click on pie chart segment
-    const handlePieClick = (data, index) => {
-        // Get the status name from the clicked segment
-        const status = data.name.toUpperCase();
-        // Navigate to the challenge list with the status filter
-        navigate(`/admin/challengelist?status=${status}`);
-    };
 
     const CustomPieTooltip = ({ active, payload }) => {
         if (active && payload && payload.length) {
@@ -161,6 +151,7 @@ const Charts = () => {
                             />
                         </LineChart>
                     </ResponsiveContainer>
+
                 )}
             </div>
 
@@ -188,8 +179,6 @@ const Charts = () => {
                                         paddingAngle={3}
                                         cornerRadius={4}
                                         stroke="none"
-                                        onClick={handlePieClick}
-                                        cursor="pointer"
                                     >
                                         {challengesData.map((entry, index) => (
                                             <Cell key={`cell-${index}`} fill={entry.color} />
@@ -207,19 +196,13 @@ const Charts = () => {
 
                     <div className="w-full md:w-1/3 flex flex-col justify-center space-y-4 mt-4 md:mt-0 md:ml-6">
                         {challengesData.map((item, index) => (
-                            <div
-                                key={index}
-                                className="flex items-center p-2 rounded-md hover:bg-orange-50 transition-colors cursor-pointer"
-                                onClick={() => handlePieClick(item)}
-                            >
+                            <div key={index} className="flex items-center p-2 rounded-md hover:bg-orange-50 transition-colors">
                                 <div className="w-4 h-4 rounded-full mr-3" style={{ backgroundColor: item.color }}></div>
                                 <div>
                                     <span className="text-gray-800 font-medium block">{item.name}</span>
                                     <div className="flex items-center gap-2">
                                         <span className="text-lg font-bold text-gray-700">{item.value}</span>
                                         <span className="text-xs text-gray-500">
-                                            ({totalChallenges > 0 ? ((item.value / totalChallenges) * 100).toFixed(0) : "0"}%)
-                                        </span>
                       ({totalChallenges > 0 ? ((item.value / totalChallenges) * 100).toFixed(0) : "0"}%)
                     </span>
                                     </div>

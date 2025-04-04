@@ -38,7 +38,7 @@ export default function Login() {
 
             if (response.token) {
                 localStorage.setItem("jwt_token", response.token);
-                navigate("/homepage");
+                navigate("/");
             } else {
                 setError("Unexpected response from server");
             }
