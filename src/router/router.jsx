@@ -28,6 +28,7 @@ import ReportDetail from "../page/admin/detailmodal/ReportDetail.jsx";
 import AdminGroup from "../page/admin/list/GroupList.jsx";
 import ChallengeList from "../page/admin/list/ChallengeList.jsx";
 import AdminChallengeDetail from "../page/admin/detailmodal/ChallengeDetail.jsx";
+import AdminSettings from "../page/admin/list/Settings.jsx";
 // Import các component khác...
 
 
@@ -177,6 +178,10 @@ const router = createBrowserRouter([
             {
                 path: "dashboard",
                 element: <AdminDashboard />
+            },
+            {
+                path: "settings",
+                element: <AdminSettings />
             },
             {
                 path: "userlist",

@@ -196,7 +196,7 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
 
                         <li>
                             <NavLink
-                                to="/challenges/create"
+                                to="admin/settings"
                                 className={({ isActive }) =>
                                     `flex items-center ${
                                         isCollapsed ? "justify-center" : "px-4"
@@ -206,13 +206,13 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
                                             : "hover:bg-gray-100"
                                     }`
                                 }
-                                title="Create Challenge"
+                                title="Settings"
                             >
                                 <PlusCircle
                                     size={20}
                                     className={isCollapsed ? "" : "mr-3"}
                                 />
-                                {!isCollapsed && <span>Create Challenge</span>}
+                                {!isCollapsed && <span>Settings</span>}
                             </NavLink>
                         </li>
                     </ul>
