@@ -210,7 +210,7 @@ const AdminSettings = () => {
                         <div className="bg-orange-500 text-white p-6">
                             <div className="flex items-center">
                                 <Settings className="h-8 w-8 mr-3"/>
-                                <h1 className="text-2xl font-bold">System Settings</h1>
+                                <h1 className="text-2xl font-bold">Admin Configuration</h1>
                             </div>
                             <p className="mt-2">Configure and manage system-wide settings and preferences</p>
                         </div>
@@ -338,11 +338,7 @@ const AdminSettings = () => {
                                                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                                                     >
                                                         <option value="vi-VN">Vietnamese</option>
-                                                        <option value="en-US">English (US)</option>
-                                                        <option value="en-GB">English (UK)</option>
-                                                        <option value="fr-FR">French</option>
-                                                        <option value="de-DE">German</option>
-                                                        <option value="ja-JP">Japanese</option>
+                                                        <option value="en-US">English</option>
                                                     </select>
                                                 </div>
 
@@ -469,8 +465,8 @@ const AdminSettings = () => {
                                                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                                                     >
                                                         <option value="member">Member</option>
-                                                        <option value="contributor">Contributor</option>
-                                                        <option value="moderator">Moderator</option>
+                                                        <option value="contributor">Challenge Host</option>
+                                                        <option value="moderator">Co-Host</option>
                                                     </select>
                                                 </div>
 
@@ -658,6 +654,34 @@ const AdminSettings = () => {
                                                         Notify Admins When New Challenges Are Created
                                                     </label>
                                                 </div>
+                                                <div className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="adminNotifyOnNewChallenge"
+                                                        name="adminNotifyOnNewChallenge"
+                                                        checked={notificationSettings.adminNotifyOnNewReport}
+                                                        onChange={handleNotificationChange}
+                                                        className="h-4 w-4 text-orange-500 focus:ring-orange-400 border-gray-300 rounded"
+                                                    />
+                                                    <label htmlFor="adminNotifyOnNewChallenge"
+                                                           className="ml-2 block text-sm text-gray-700">
+                                                        Notify Admins When New Reports Are Created
+                                                    </label>
+                                                </div>
+                                                <div className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="adminNotifyOnNewChallenge"
+                                                        name="adminNotifyOnNewChallenge"
+                                                        checked={notificationSettings.adminNotifyOnNewGroup}
+                                                        onChange={handleNotificationChange}
+                                                        className="h-4 w-4 text-orange-500 focus:ring-orange-400 border-gray-300 rounded"
+                                                    />
+                                                    <label htmlFor="adminNotifyOnNewChallenge"
+                                                           className="ml-2 block text-sm text-gray-700">
+                                                        Notify Admins When New Groups Are Created
+                                                    </label>
+                                                </div>
 
                                                 <hr className="my-4"/>
                                                 <h3 className="font-medium text-gray-900">User Notifications</h3>
@@ -688,7 +712,7 @@ const AdminSettings = () => {
                                                     />
                                                     <label htmlFor="evidenceSubmissionNotification"
                                                            className="ml-2 block text-sm text-gray-700">
-                                                        Notify Challenge Owners When Evidence Is Submitted
+                                                        Notify Challenge Host When Evidence Is Submitted
                                                     </label>
                                                 </div>
 
@@ -733,31 +757,6 @@ const AdminSettings = () => {
                                             </h2>
 
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                                <div>
-                                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                        SMTP Server
-                                                    </label>
-                                                    <input
-                                                        type="text"
-                                                        name="smtpServer"
-                                                        value={emailSettings.smtpServer}
-                                                        onChange={handleEmailChange}
-                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                                    />
-                                                </div>
-
-                                                <div>
-                                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                        SMTP Port
-                                                    </label>
-                                                    <input
-                                                        type="number"
-                                                        name="smtpPort"
-                                                        value={emailSettings.smtpPort}
-                                                        onChange={handleEmailChange}
-                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                                    />
-                                                </div>
 
                                                 <div>
                                                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -885,29 +884,6 @@ const AdminSettings = () => {
                                                                 />
                                                             </div>
 
-                                                            <div>
-                                                                <label
-                                                                    className="block text-sm font-medium text-gray-700 mb-1">
-                                                                    Color
-                                                                </label>
-                                                                <div className="flex items-center">
-                                                                    <input
-                                                                        type="color"
-                                                                        name="color"
-                                                                        value={newChallengeType.color}
-                                                                        onChange={handleChallengeTypeChange}
-                                                                        className="w-12 h-10 rounded-md border border-gray-300 mr-2"
-                                                                    />
-                                                                    <input
-                                                                        type="text"
-                                                                        name="color"
-                                                                        value={newChallengeType.color}
-                                                                        onChange={handleChallengeTypeChange}
-                                                                        className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                                                    />
-                                                                </div>
-                                                            </div>
-
                                                             <div className="col-span-2">
                                                                 <label
                                                                     className="block text-sm font-medium text-gray-700 mb-1">
@@ -965,9 +941,6 @@ const AdminSettings = () => {
                                                         <thead className="bg-gray-50">
                                                         <tr>
                                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                                Color
-                                                            </th>
-                                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                                 Name
                                                             </th>
                                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -984,10 +957,6 @@ const AdminSettings = () => {
                                                         <tbody className="bg-white divide-y divide-gray-200">
                                                         {challengeTypes.map((type) => (
                                                             <tr key={type.id}>
-                                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                                    <div className="w-6 h-6 rounded"
-                                                                         style={{backgroundColor: type.color}}></div>
-                                                                </td>
                                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                                     <div
                                                                         className="text-sm font-medium text-gray-900">{type.name}</div>

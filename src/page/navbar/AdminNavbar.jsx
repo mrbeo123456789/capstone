@@ -123,7 +123,7 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
                                     size={20}
                                     className={isCollapsed ? "" : "mr-3"}
                                 />
-                                {!isCollapsed && <span>Challenge List</span>}
+                                {!isCollapsed && <span>Challenge Management</span>}
                             </NavLink>
                         </li>
 
@@ -145,7 +145,7 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
                                     size={20}
                                     className={isCollapsed ? "" : "mr-3"}
                                 />
-                                {!isCollapsed && <span>User List</span>}
+                                {!isCollapsed && <span>User Management</span>}
                             </NavLink>
                         </li>
 
@@ -168,7 +168,7 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
                                     size={20}
                                     className={isCollapsed ? "" : "mr-3"}
                                 />
-                                {!isCollapsed && <span>Group List</span>}
+                                {!isCollapsed && <span>Group Management</span>}
                             </NavLink>
                         </li>
 
@@ -190,13 +190,13 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
                                     size={20}
                                     className={isCollapsed ? "" : "mr-3"}
                                 />
-                                {!isCollapsed && <span>Report List</span>}
+                                {!isCollapsed && <span>Report Management</span>}
                             </NavLink>
                         </li>
 
                         <li>
                             <NavLink
-                                to="admin/settings"
+                                to="/admin/settings"
                                 className={({ isActive }) =>
                                     `flex items-center ${
                                         isCollapsed ? "justify-center" : "px-4"
