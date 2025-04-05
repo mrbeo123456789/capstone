@@ -22,13 +22,22 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
     boolean checkIfInSameGroup(@Param("memberId1") Long memberId1, @Param("memberId2") Long memberId2);
     Optional<GroupMember> findByGroupIdAndMemberIdAndStatus(Long groupId, Long memberId, GroupMemberStatus status);
     Optional<GroupMember> findByGroupIdAndMemberId(Long groupId, Long memberId);
+
     @Query("SELECT gm.member.id FROM GroupMember gm WHERE gm.group.id IN " +
-            "(SELECT gm2.group.id FROM GroupMember gm2 WHERE gm2.member.id = :currentMemberId) " +
-            "AND gm.member.id IN :memberIds")
-    List<Long> findCommonGroupMemberIds(Long currentMemberId, List<Long> memberIds);
+            "(SELECT gm2.group.id FROM GroupMember gm2 WHERE gm2.member.id = :currentMemberId AND gm2.status = 'ACTIVE') " +
+            "AND gm.member.id IN :memberIds AND gm.status = 'ACTIVE'")
+    List<Long> findCommonGroupMemberIds(@Param("currentMemberId") Long currentMemberId,
+                                        @Param("memberIds") List<Long> memberIds);
+
     @Query("SELECT gm.member.id FROM GroupMember gm WHERE gm.member.id IN :memberIds " +
-            "AND gm.group.id IN (SELECT gm2.group.id FROM GroupMember gm2 WHERE gm2.member.id = :currentMemberId)")
-    List<Long> findAlreadyJoinedMemberIds(Long currentMemberId, List<Long> memberIds);
+            "AND gm.group.id IN (SELECT gm2.group.id FROM GroupMember gm2 WHERE gm2.member.id = :currentMemberId AND gm2.status = 'ACTIVE') " +
+            "AND gm.status = 'ACTIVE'")
+    List<Long> findAlreadyJoinedActiveMemberIds(@Param("currentMemberId") Long currentMemberId,
+                                                @Param("memberIds") List<Long> memberIds);
+    // Method hiện tại
+
+    // Nếu cần, thêm method lấy groupIds của thành viên:
+    List<Long> findGroupIdsByMemberId(Long memberId);
 
     void deleteByGroupId(Long groupId);
 }

@@ -247,47 +247,41 @@ public class GroupServiceImpl implements GroupService {
     }
 
     // ========================== SEARCH ==========================
-
     @Override
     public List<MemberSearchResponse> searchMembers(MemberSearchRequest request) {
         Pageable pageable = PageRequest.of(0, 20); // Lấy nhiều hơn 5 để đủ sau khi filter
 
         Page<Member> memberPage = memberRepository.searchMembersByKeyword(request.getKeyword(), pageable);
         Long currentMemberId = authService.getMemberIdFromAuthentication();
-
         List<Member> members = memberPage.getContent();
 
-        // Lấy trước danh sách ID (đã loại currentMemberId)
+        // Lấy danh sách ID của các member (loại bỏ currentMemberId)
         List<Long> memberIds = members.stream()
                 .map(Member::getId)
                 .filter(id -> !id.equals(currentMemberId))
                 .toList();
 
-        // Batch query để tránh N+1
+        // Batch query với check trạng thái ACTIVE cho GroupMemberStatus
         List<Long> commonGroupMemberIds = groupMemberRepository.findCommonGroupMemberIds(currentMemberId, memberIds);
-        List<Long> alreadyJoinedMemberIds = groupMemberRepository.findAlreadyJoinedMemberIds(currentMemberId, memberIds);
+        List<Long> alreadyJoinedMemberIds = groupMemberRepository.findAlreadyJoinedActiveMemberIds(currentMemberId, memberIds);
 
-        // Stream xử lý filter + map luôn
+        // Lọc danh sách member theo InvitePermission và loại bỏ những người đã gia nhập nhóm (với trạng thái ACTIVE)
         return members.stream()
-                .filter(m -> !m.getId().equals(currentMemberId)) // (Optional) nếu muốn chắc chắn 100%
+                .filter(m -> !m.getId().equals(currentMemberId))
                 .filter(m -> {
                     InvitePermission permission = m.getInvitePermission();
-
                     if (permission == InvitePermission.NO_ONE) {
                         return false;
                     }
-
                     if (permission == InvitePermission.SAME_GROUP) {
                         return commonGroupMemberIds.contains(m.getId()) && !alreadyJoinedMemberIds.contains(m.getId());
                     }
-
                     if (permission == InvitePermission.EVERYONE) {
                         return !alreadyJoinedMemberIds.contains(m.getId());
                     }
-
                     return false;
                 })
-                .limit(5) // Lấy tối đa 5 thành viên sau khi lọc
+                .limit(5)
                 .map(m -> new MemberSearchResponse(
                         m.getId(),
                         m.getAccount().getEmail(),
@@ -296,6 +290,7 @@ public class GroupServiceImpl implements GroupService {
                 ))
                 .toList();
     }
+
 
 
 

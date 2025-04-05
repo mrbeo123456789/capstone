@@ -105,7 +105,7 @@ public class MemberSuggestionService {
         // Loại bỏ chính currentUser
         allMembers.removeIf(member -> member.getId().equals(currentUser.getId()));
 
-        // Lấy danh sách các memberId đã tham gia thử thách (status JOINED hoặc WAITING tùy nghiệp vụ)
+        // Lấy danh sách các memberId đã tham gia thử thách (status JOINED)
         List<Long> joinedMemberIds = challengeMemberRepository.findMemberIdsByChallengeId(challengeId);
         // Loại bỏ những thành viên đã tham gia thử thách
         allMembers.removeIf(member -> joinedMemberIds.contains(member.getId()));
@@ -132,7 +132,7 @@ public class MemberSuggestionService {
                 .sorted((m1, m2) -> Double.compare(m2.score(), m1.score()))
                 .limit(10)
                 .map(MemberSimilarity::member)
-                .collect(Collectors.toList());
+                .toList();
 
         // Chuyển đổi sang MemberSearchResponse
         return topMembers.stream()
@@ -144,14 +144,22 @@ public class MemberSuggestionService {
                 .collect(Collectors.toList());
     }
 
-    // Kiểm tra xem currentUser có thể mời targetMember không dựa trên quyền mời
+    // Kiểm tra xem currentUser có thể mời targetMember không dựa trên quyền mời.
+    // Trong trường hợp InvitePermission là SAME_GROUP, kiểm tra xem có ít nhất một nhóm chung nào không.
     private boolean canInvite(Member currentUser, Member targetMember) {
         InvitePermission permission = currentUser.getInvitePermission();
         if (permission == InvitePermission.EVERYONE) {
             return true;
         } else if (permission == InvitePermission.SAME_GROUP) {
-            // Kiểm tra xem targetMember có cùng nhóm với currentUser không
-            return groupMember.checkIfInSameGroup(currentUser.getId(), targetMember.getId());
+            // Kiểm tra qua method checkIfInSameGroup
+            boolean sameGroup = groupMember.checkIfInSameGroup(currentUser.getId(), targetMember.getId());
+            // Nếu method checkIfInSameGroup không đủ, ta có thể bổ sung thêm kiểm tra qua danh sách group của từng thành viên.
+            if (!sameGroup) {
+                List<Long> currentUserGroupIds = groupMember.findGroupIdsByMemberId(currentUser.getId());
+                List<Long> targetMemberGroupIds = groupMember.findGroupIdsByMemberId(targetMember.getId());
+                sameGroup = currentUserGroupIds.stream().anyMatch(targetMemberGroupIds::contains);
+            }
+            return sameGroup;
         } else if (permission == InvitePermission.NO_ONE) {
             return false;
         }
