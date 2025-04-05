@@ -55,4 +55,6 @@ public interface ChallengeMemberRepository extends JpaRepository<ChallengeMember
     int countByMemberId(Long memberId);
     int countByMemberIdAndIsCompletedTrue(Long memberId);
     List<ChallengeMember> findByChallengeId(Long challengeId);
+    @Query("SELECT cm.member.id FROM ChallengeMember cm WHERE cm.challenge.id = :challengeId")
+    List<Long> findMemberIdsByChallengeId(@Param("challengeId") Long challengeId);
 }

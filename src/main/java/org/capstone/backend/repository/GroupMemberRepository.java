@@ -22,6 +22,13 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
     boolean checkIfInSameGroup(@Param("memberId1") Long memberId1, @Param("memberId2") Long memberId2);
     Optional<GroupMember> findByGroupIdAndMemberIdAndStatus(Long groupId, Long memberId, GroupMemberStatus status);
     Optional<GroupMember> findByGroupIdAndMemberId(Long groupId, Long memberId);
+    @Query("SELECT gm.member.id FROM GroupMember gm WHERE gm.group.id IN " +
+            "(SELECT gm2.group.id FROM GroupMember gm2 WHERE gm2.member.id = :currentMemberId) " +
+            "AND gm.member.id IN :memberIds")
+    List<Long> findCommonGroupMemberIds(Long currentMemberId, List<Long> memberIds);
+    @Query("SELECT gm.member.id FROM GroupMember gm WHERE gm.member.id IN :memberIds " +
+            "AND gm.group.id IN (SELECT gm2.group.id FROM GroupMember gm2 WHERE gm2.member.id = :currentMemberId)")
+    List<Long> findAlreadyJoinedMemberIds(Long currentMemberId, List<Long> memberIds);
 
     void deleteByGroupId(Long groupId);
 }

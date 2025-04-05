@@ -1,17 +1,27 @@
 package org.capstone.backend.service.challenge;
 
+import org.capstone.backend.dto.challenge.ChallengeSearchRequest;
 import org.capstone.backend.dto.challenge.InvitationResponseDTO;
 import org.capstone.backend.dto.challenge.InviteMemberRequest;
 import org.capstone.backend.dto.group.MemberSearchResponse;
-import org.capstone.backend.entity.*;
-import org.capstone.backend.repository.*;
+import org.capstone.backend.entity.Challenge;
+import org.capstone.backend.entity.ChallengeMember;
+import org.capstone.backend.entity.Member;
+import org.capstone.backend.repository.AccountRepository;
+import org.capstone.backend.repository.ChallengeMemberRepository;
+import org.capstone.backend.repository.ChallengeRepository;
+import org.capstone.backend.repository.GroupMemberRepository;
+import org.capstone.backend.repository.GroupRepository;
+import org.capstone.backend.repository.MemberRepository;
 import org.capstone.backend.service.auth.AuthService;
-import org.capstone.backend.utils.enums.*;
+import org.capstone.backend.utils.enums.ChallengeMemberStatus;
+import org.capstone.backend.utils.enums.ChallengeStatus;
+import org.capstone.backend.utils.enums.InvitePermission;
 import org.capstone.backend.utils.suggestion.MemberSuggestionService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -30,19 +40,29 @@ public class InvitationService implements InvitationServiceInterface {
     private final MemberRepository memberRepository;
     private final AccountRepository accountRepository;
     private final AuthService authService;
- private final MemberSuggestionService memberSuggestionService;
-    public InvitationService(ChallengeRepository challengeRepository, ChallengeMemberRepository challengeMemberRepository,
-                             MemberRepository memberRepository, AccountRepository accountRepository, AuthService authService, MemberSuggestionService memberSuggestionService) {
+    private final GroupRepository groupRepository;
+    private final GroupMemberRepository groupMemberRepository;
+    private final MemberSuggestionService memberSuggestionService;
+
+    public InvitationService(ChallengeRepository challengeRepository,
+                             ChallengeMemberRepository challengeMemberRepository,
+                             MemberRepository memberRepository,
+                             AccountRepository accountRepository,
+                             AuthService authService,
+                             GroupRepository groupRepository,
+                             GroupMemberRepository groupMemberRepository,
+                             MemberSuggestionService memberSuggestionService) {
         this.challengeRepository = challengeRepository;
         this.challengeMemberRepository = challengeMemberRepository;
         this.memberRepository = memberRepository;
         this.accountRepository = accountRepository;
-        this.authService = authService; // Inject AuthService
+        this.authService = authService;
+        this.groupRepository = groupRepository;
+        this.groupMemberRepository = groupMemberRepository;
         this.memberSuggestionService = memberSuggestionService;
     }
 
     private Member getAuthenticatedMember() {
-
         return memberRepository.findById(authService.getMemberIdFromAuthentication())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found."));
     }
@@ -70,12 +90,12 @@ public class InvitationService implements InvitationServiceInterface {
                 .joinBy(invitedBy.getId())
                 .status(status)
                 .createdAt(LocalDateTime.now())
-                .updatedAt(null)
                 .build();
 
         challengeMemberRepository.save(challengeMember);
-
-        return (status == ChallengeMemberStatus.EXPIRED) ? "Challenge is not upcoming. Invitation is expired." : "Invitation sent successfully.";
+        return (status == ChallengeMemberStatus.EXPIRED)
+                ? "Challenge is not upcoming. Invitation is expired."
+                : "Invitation sent successfully.";
     }
 
     @Override
@@ -89,7 +109,6 @@ public class InvitationService implements InvitationServiceInterface {
         }
 
         Challenge challenge = challengeMember.getChallenge();
-
         if (accept) {
             if (challenge.getStatus() != ChallengeStatus.UPCOMING) {
                 challengeMember.setStatus(ChallengeMemberStatus.EXPIRED);
@@ -97,22 +116,19 @@ public class InvitationService implements InvitationServiceInterface {
                 challengeMemberRepository.save(challengeMember);
                 return "Cannot join the challenge. The challenge is not upcoming, invitation is expired.";
             }
-
-            if (challenge.getMaxParticipants() != null && challengeMemberRepository.countByChallengeAndStatus(challenge, ChallengeMemberStatus.JOINED) >= challenge.getMaxParticipants()) {
+            if (challenge.getMaxParticipants() != null &&
+                    challengeMemberRepository.countByChallengeAndStatus(challenge, ChallengeMemberStatus.JOINED) >= challenge.getMaxParticipants()) {
                 challengeMember.setStatus(ChallengeMemberStatus.EXPIRED);
                 challengeMember.setUpdatedAt(LocalDateTime.now());
                 challengeMemberRepository.save(challengeMember);
                 return "Cannot join the challenge. The challenge has reached its maximum number of participants.";
             }
-
             challengeMember.setStatus(ChallengeMemberStatus.JOINED);
         } else {
             challengeMember.setStatus(ChallengeMemberStatus.REJECTED);
         }
-
         challengeMember.setUpdatedAt(LocalDateTime.now());
         challengeMemberRepository.save(challengeMember);
-
         return accept ? "Invitation accepted successfully." : "Invitation rejected successfully.";
     }
 
@@ -124,28 +140,76 @@ public class InvitationService implements InvitationServiceInterface {
         Map<Challenge, List<ChallengeMember>> groupedByChallenge = waitingInvitations.stream()
                 .collect(Collectors.groupingBy(ChallengeMember::getChallenge));
 
-        return groupedByChallenge.entrySet().stream().map(entry -> {
-            Challenge challenge = entry.getKey();
-            List<ChallengeMember> challengeMembers = entry.getValue();
+        return groupedByChallenge.entrySet().stream()
+                .map(entry -> {
+                    Challenge challenge = entry.getKey();
+                    List<ChallengeMember> challengeMembers = entry.getValue();
 
-            if (challengeMembers.stream().anyMatch(cm -> cm.getStatus() != ChallengeMemberStatus.WAITING)) {
-                return null;
-            }
+                    // Nếu có trạng thái nào không phải WAITING thì không hiển thị
+                    if (challengeMembers.stream().anyMatch(cm -> cm.getStatus() != ChallengeMemberStatus.WAITING)) {
+                        return null;
+                    }
 
-            List<String> inviterNames = challengeMembers.stream()
-                    .map(cm -> memberRepository.findById(cm.getJoinBy()).map(Member::getFirstName).orElse("Unknown"))
-                    .toList();
+                    List<String> inviterNames = challengeMembers.stream()
+                            .map(cm -> memberRepository.findById(cm.getJoinBy())
+                                    .map(Member::getFirstName)
+                                    .orElse("Unknown"))
+                            .toList();
 
-            String inviterDisplay = inviterNames.size() == 1 ? inviterNames.get(0) : "Multiple invitations";
+                    String inviterDisplay = (inviterNames.size() == 1) ? inviterNames.get(0) : "Multiple invitations";
+                    Long invitationId = challengeMembers.get(0).getId();
 
-            Long invitationId = challengeMembers.get(0).getId();
-
-            return new InvitationResponseDTO( challenge.getId(),invitationId, challenge.getName(), challenge.getPicture(), inviterDisplay);
-        }).filter(Objects::nonNull).collect(Collectors.toList());
+                    return new InvitationResponseDTO(challenge.getId(), invitationId, challenge.getName(), challenge.getPicture(), inviterDisplay);
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
- public List<MemberSearchResponse> suggestMembers (){
-        return memberSuggestionService.suggestMembers(authService.getMemberIdFromAuthentication());
- }
 
+    @Override
+    public List<MemberSearchResponse> searchMembersForChallengeInvite(ChallengeSearchRequest request) {
+        Pageable pageable = PageRequest.of(0, 20);
+        Long currentMemberId = authService.getMemberIdFromAuthentication();
+
+        // Lấy danh sách member theo keyword (đã có phân trang)
+        Page<Member> memberPage = memberRepository.searchMembersByKeyword(request.getKeyword(), pageable);
+        List<Member> members = memberPage.getContent();
+
+        // Danh sách memberId (loại current member)
+        List<Long> memberIds = members.stream()
+                .map(Member::getId)
+                .filter(id -> !id.equals(currentMemberId))
+                .collect(Collectors.toList());
+
+        // Danh sách các member đã tham gia thử thách
+        List<Long> joinedMemberIds = challengeMemberRepository.findMemberIdsByChallengeId(request.getChallengeid());
+
+        // Batch query: danh sách member cùng nhóm với currentMemberId
+        List<Long> commonGroupMemberIds = groupMemberRepository.findCommonGroupMemberIds(currentMemberId, memberIds);
+
+        return members.stream()
+                .filter(m -> !m.getId().equals(currentMemberId)) // Loại bỏ current member
+                .filter(m -> m.getInvitePermission() != InvitePermission.NO_ONE) // Chỉ mời những member có quyền mời
+                .filter(m -> !joinedMemberIds.contains(m.getId())) // Loại bỏ những người đã tham gia thử thách
+                .filter(m -> {
+                    // Nếu InvitePermission là SAME_GROUP thì chỉ mời nếu cùng nhóm
+                    if (m.getInvitePermission() == InvitePermission.SAME_GROUP) {
+                        return commonGroupMemberIds.contains(m.getId());
+                    }
+                    return true;
+                })
+                .limit(5)
+                .map(m -> new MemberSearchResponse(
+                        m.getId(),
+                        m.getAccount().getEmail(),
+                        m.getAvatar(),
+                        m.getFullName()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<MemberSearchResponse> suggestMembers(Long challengeId) {
+        Long currentMemberId = authService.getMemberIdFromAuthentication();
+        return memberSuggestionService.suggestMembers(currentMemberId, challengeId);
+    }
 
 }

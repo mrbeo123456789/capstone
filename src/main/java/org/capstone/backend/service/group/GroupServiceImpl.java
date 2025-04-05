@@ -250,57 +250,57 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public List<MemberSearchResponse> searchMembers(MemberSearchRequest request) {
-        Pageable pageable = PageRequest.of(0, 5); // Giới hạn kết quả trả về 5 thành viên
+        Pageable pageable = PageRequest.of(0, 20); // Lấy nhiều hơn 5 để đủ sau khi filter
 
-        // Tìm kiếm các member theo keyword (email hoặc full name)
         Page<Member> memberPage = memberRepository.searchMembersByKeyword(request.getKeyword(), pageable);
-
-        // Lấy id của member hiện tại (người dùng đang đăng nhập)
         Long currentMemberId = authService.getMemberIdFromAuthentication();
 
-        // Lọc danh sách thành viên theo invitePermission
-        List<Member> filteredMembers = memberPage.stream()
-                .filter(m -> {
-                    // Không hiển thị chính người dùng hiện tại trong danh sách tìm kiếm
-                    if (m.getId().equals(currentMemberId)) {
-                        return false;
-                    }
+        List<Member> members = memberPage.getContent();
 
-                    // Kiểm tra quyền mời
-                    if (m.getInvitePermission() == InvitePermission.NO_ONE) {
-                        return false;
-                    }
-
-                    // Kiểm tra quyền mời là 'SAME_GROUP' (Nếu có `groupId` hoặc bạn cần kiểm tra nhóm người dùng)
-                    if (m.getInvitePermission() == InvitePermission.SAME_GROUP) {
-                        // Ví dụ: chỉ những người trong cùng nhóm mới có thể mời
-                        // Cần có thêm logic kiểm tra nhóm (group)
-                        return checkIfInSameGroup(currentMemberId, m.getId());
-                    }
-
-                    // Nếu quyền mời là 'EVERYONE' thì tất cả mọi người có thể mời
-                    return true;
-                })
+        // Lấy trước danh sách ID (đã loại currentMemberId)
+        List<Long> memberIds = members.stream()
+                .map(Member::getId)
+                .filter(id -> !id.equals(currentMemberId))
                 .toList();
 
-        // Chuyển đổi từ Member sang MemberSearchResponse
-        return filteredMembers.stream()
+        // Batch query để tránh N+1
+        List<Long> commonGroupMemberIds = groupMemberRepository.findCommonGroupMemberIds(currentMemberId, memberIds);
+        List<Long> alreadyJoinedMemberIds = groupMemberRepository.findAlreadyJoinedMemberIds(currentMemberId, memberIds);
+
+        // Stream xử lý filter + map luôn
+        return members.stream()
+                .filter(m -> !m.getId().equals(currentMemberId)) // (Optional) nếu muốn chắc chắn 100%
+                .filter(m -> {
+                    InvitePermission permission = m.getInvitePermission();
+
+                    if (permission == InvitePermission.NO_ONE) {
+                        return false;
+                    }
+
+                    if (permission == InvitePermission.SAME_GROUP) {
+                        return commonGroupMemberIds.contains(m.getId()) && !alreadyJoinedMemberIds.contains(m.getId());
+                    }
+
+                    if (permission == InvitePermission.EVERYONE) {
+                        return !alreadyJoinedMemberIds.contains(m.getId());
+                    }
+
+                    return false;
+                })
+                .limit(5) // Lấy tối đa 5 thành viên sau khi lọc
                 .map(m -> new MemberSearchResponse(
                         m.getId(),
                         m.getAccount().getEmail(),
                         m.getAvatar(),
                         m.getFullName()
                 ))
-                .collect(Collectors.toList());
+                .toList();
     }
 
-    // Ví dụ method kiểm tra xem người dùng hiện tại có trong cùng nhóm với thành viên khác hay không
-    private boolean checkIfInSameGroup(Long currentMemberId, Long memberId) {
-        // Logic kiểm tra xem 2 thành viên này có trong cùng nhóm hay không
-        // Giả sử bạn có một bảng nhóm và thành viên của nhóm, bạn sẽ cần truy vấn để kiểm tra
-        // Nếu cả 2 thành viên đều thuộc về cùng một nhóm, trả về true
-        return groupMemberRepository.checkIfInSameGroup(currentMemberId, memberId);
-    }
+
+
+
+
 
 
     @Override
