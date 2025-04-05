@@ -29,7 +29,7 @@ public interface GroupService {
     void respondToInvitation(Long groupId, GroupMemberStatus status);
     List<GroupInvitationDTO> getPendingInvitations();
     Page<GroupSummaryDTO> searchGroups(String keyword, int page, int size);
-
+    void disbandGroup(Long groupId);
     // ✅ SEARCH
     List<MemberSearchResponse> searchMembers(MemberSearchRequest request);
 }

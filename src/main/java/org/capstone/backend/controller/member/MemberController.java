@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,24 +26,14 @@ public class MemberController {
 
     @GetMapping("/profile")
     public ResponseEntity<UserProfileResponse> getProfile() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication == null || !authentication.isAuthenticated() ||
-                "anonymousUser".equals(authentication.getPrincipal())) {
-            throw new RuntimeException("User is not authenticated");
-        }
-
-        String username = authentication.getName();
-        System.out.println(username);
-        UserProfileResponse profile = memberService.getMemberProfile(username);
-        System.out.println("Profile data: " + profile.getLastName());
+        UserProfileResponse profile = memberService.getMemberProfile();
         return ResponseEntity.ok(profile);
     }
 
     @PutMapping(value = "/update", consumes = {"multipart/form-data"})
     public ResponseEntity<?> updateProfile(
             @Validated @ModelAttribute("data") UserProfileRequest request,  // 🔥 Automatically binds JSON fields
-            BindingResult bindingResult,
             @RequestParam(value = "avatar", required = false) MultipartFile avatar  // 🔥 Handles file upload
     ) {
         try {
@@ -56,7 +45,7 @@ public class MemberController {
                         .body("User is not authenticated");
             }
             String username = authentication.getName();
-            UserProfileResponse updatedProfile = memberService.updateMember(username, request, avatar);
+            UserProfileResponse updatedProfile = memberService.updateMember( request, avatar);
 
             return ResponseEntity.ok(updatedProfile);
         } catch (JsonProcessingException e) {
@@ -70,14 +59,8 @@ public class MemberController {
 
     @PutMapping("/change-password")
     public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || "anonymousUser".equals(authentication.getPrincipal())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User is not authenticated");
-        }
-
-        String username = authentication.getName();
         try {
-            memberService.changePassword(username, request);
+            memberService.changePassword( request);
             return ResponseEntity.ok("Password changed successfully!");
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

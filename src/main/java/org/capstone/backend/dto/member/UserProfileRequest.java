@@ -2,6 +2,7 @@ package org.capstone.backend.dto.member;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import org.capstone.backend.utils.enums.InvitePermission;
 
 import java.time.LocalDate;
 
@@ -39,6 +40,7 @@ public class UserProfileRequest {
 
         @Past(message = "Date of birth must be in the past")
         private LocalDate dateOfBirth;
+        private InvitePermission invitePermission;
 
         private String avt;
     }

@@ -2,9 +2,13 @@ package org.capstone.backend.service.challenge;
 
 import org.capstone.backend.dto.challenge.InvitationResponseDTO;
 import org.capstone.backend.dto.challenge.InviteMemberRequest;
+import org.capstone.backend.dto.group.MemberSearchResponse;
 import org.capstone.backend.entity.*;
 import org.capstone.backend.repository.*;
+import org.capstone.backend.service.auth.AuthService;
 import org.capstone.backend.utils.enums.*;
+import org.capstone.backend.utils.suggestion.MemberSuggestionService;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,27 +29,21 @@ public class InvitationService implements InvitationServiceInterface {
     private final ChallengeMemberRepository challengeMemberRepository;
     private final MemberRepository memberRepository;
     private final AccountRepository accountRepository;
-
-    public InvitationService(ChallengeRepository challengeRepository, ChallengeMemberRepository challengeMemberRepository, MemberRepository memberRepository, AccountRepository accountRepository) {
+    private final AuthService authService;
+ private final MemberSuggestionService memberSuggestionService;
+    public InvitationService(ChallengeRepository challengeRepository, ChallengeMemberRepository challengeMemberRepository,
+                             MemberRepository memberRepository, AccountRepository accountRepository, AuthService authService, MemberSuggestionService memberSuggestionService) {
         this.challengeRepository = challengeRepository;
         this.challengeMemberRepository = challengeMemberRepository;
         this.memberRepository = memberRepository;
         this.accountRepository = accountRepository;
+        this.authService = authService; // Inject AuthService
+        this.memberSuggestionService = memberSuggestionService;
     }
 
     private Member getAuthenticatedMember() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication == null || !authentication.isAuthenticated() ||
-                "anonymousUser".equals(authentication.getPrincipal())) {
-            throw new RuntimeException("User is not authenticated");
-        }
-
-        String username = authentication.getName();
-        Account account = accountRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found."));
-
-        return memberRepository.findByAccount(account)
+        return memberRepository.findById(authService.getMemberIdFromAuthentication())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found."));
     }
 
@@ -145,4 +143,9 @@ public class InvitationService implements InvitationServiceInterface {
             return new InvitationResponseDTO( challenge.getId(),invitationId, challenge.getName(), challenge.getPicture(), inviterDisplay);
         }).filter(Objects::nonNull).collect(Collectors.toList());
     }
+ public List<MemberSearchResponse> suggestMembers (){
+        return memberSuggestionService.suggestMembers(authService.getMemberIdFromAuthentication());
+ }
+
+
 }

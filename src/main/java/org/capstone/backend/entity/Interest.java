@@ -23,7 +23,6 @@ public class Interest {
 
     @ManyToMany(mappedBy = "interests", fetch = FetchType.LAZY)
     @JsonIgnore // Tránh lỗi vòng lặp khi serialize JSON
-    @ToString.Exclude
     private Set<Member> members = new HashSet<>();
 
     // ✅ Định nghĩa equals() và hashCode() để hỗ trợ Set

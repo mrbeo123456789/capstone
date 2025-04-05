@@ -8,8 +8,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 public interface MemberService {
-    UserProfileResponse getMemberProfile(String username);
-    UserProfileResponse updateMember(String username, UserProfileRequest request, MultipartFile avatar) throws IOException;
+    UserProfileResponse getMemberProfile();
+    UserProfileResponse updateMember (UserProfileRequest request, MultipartFile avatar) throws IOException;
 
-    void changePassword(String username, ChangePasswordRequest request);
+    void changePassword( ChangePasswordRequest request);
 }

@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
@@ -100,4 +101,14 @@ public class GroupController {
     public ResponseEntity<List<GroupInvitationDTO>> getPendingInvitations() {
         return ResponseEntity.ok(groupService.getPendingInvitations());
     }
+    @DeleteMapping("/{groupId}/disband")
+    public ResponseEntity<?> disbandGroup(@PathVariable Long groupId) {
+        try {
+            groupService.disbandGroup(groupId);
+            return ResponseEntity.ok("Nhóm đã được giải tán.");
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+        }
+    }
+
 }

@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -55,35 +56,24 @@ public class DataInitializer implements CommandLineRunner {
     }
    // hoặc từ Controller
 
+
+    // Thêm vào phần đầu của class để dùng lại
+    private final Random random = new Random();
+
     private void seedAccountsAndMembers() {
         if (accountRepository.count() > 0) return;
 
-        // Admin
+        // Tạo tài khoản Admin nhưng không tạo Member
         Account admin = new Account();
         admin.setUsername("admin");
         admin.setPassword(passwordEncoder.encode("admin123"));
         admin.setEmail("admin@example.com");
         admin.setRole(Role.ADMIN);
         admin.setStatus(AccountStatus.ACTIVE);
-        admin.setCreatedAt(LocalDateTime.now());
+        admin.setCreatedAt(randomPastDate(365)); // Random trong 1 năm gần đây
         accountRepository.save(admin);
 
-        Member adminMember = new Member();
-        adminMember.setFullName("Admin User");
-        adminMember.setFirstName("Admin");
-        adminMember.setLastName("User");
-        adminMember.setPhone("0123456789");
-        adminMember.setAddress("123 Admin Street");
-        adminMember.setCity("Admin City");
-        adminMember.setDistrict("Admin District");
-        adminMember.setWard("Admin Ward");
-        adminMember.setDateOfBirth(LocalDate.of(1990, 1, 1));
-        adminMember.setCreatedAt(LocalDateTime.now());
-        adminMember.setUpdatedAt(LocalDateTime.now());
-        adminMember.setAccount(admin);
-        memberRepository.save(adminMember);
-
-        // Users
+        // Tạo các tài khoản User và Member tương ứng
         IntStream.range(1, 11).forEach(i -> {
             Account user = new Account();
             user.setUsername("user" + i);
@@ -91,24 +81,33 @@ public class DataInitializer implements CommandLineRunner {
             user.setEmail("user" + i + "@example.com");
             user.setRole(Role.MEMBER);
             user.setStatus(AccountStatus.ACTIVE);
-            user.setCreatedAt(LocalDateTime.now());
+            user.setCreatedAt(randomPastDate(365));
             accountRepository.save(user);
 
+            // Chỉ tạo Member cho user (KHÔNG tạo cho admin)
             Member member = new Member();
             member.setFullName("User " + i);
             member.setFirstName("User");
             member.setLastName(String.valueOf(i));
             member.setPhone("098765432" + i);
             member.setAddress("123 User Street " + i);
-            member.setCity("User City");
             member.setDistrict("User District");
             member.setWard("User Ward");
             member.setDateOfBirth(LocalDate.of(2000, Math.min(i, 12), Math.min(i, 28)));
-            member.setCreatedAt(LocalDateTime.now());
+            member.setCreatedAt(randomPastDate(365));
             member.setUpdatedAt(LocalDateTime.now());
             member.setAccount(user);
             memberRepository.save(member);
         });
+
+        System.out.println("✅ Seeded accounts and members (Admin has no member record).");
+    }
+
+
+    // Hàm tạo ngày ngẫu nhiên trong quá khứ
+    private LocalDateTime randomPastDate(int maxDays) {
+        int randomDays = random.nextInt(maxDays + 1); // Giá trị từ 0 đến maxDays
+        return LocalDateTime.now().minusDays(randomDays);
     }
 
     private void seedChallengeTypes() {
@@ -159,6 +158,7 @@ public class DataInitializer implements CommandLineRunner {
                     .challengeType(fitnessType)
                     .privacy(PrivacyStatus.PUBLIC)
                     .status(ChallengeStatus.ONGOING)
+                    .verificationType(VerificationType.CROSS_CHECK)
                     .startDate(LocalDate.now())
                     .endDate(LocalDate.now().plusDays(30))
                     .createdAt(LocalDateTime.now())
@@ -178,9 +178,13 @@ public class DataInitializer implements CommandLineRunner {
 
         Member host = members.get(0);
         Member coHost = members.get(1);
-        Member member = members.get(2);
+        List<Member> fullMembers = members.subList(2, members.size());
 
         for (Challenge challenge : challenges) {
+            // Thêm độ trễ ngẫu nhiên để tránh tất cả tham gia vào cùng một thời điểm
+            addRandomDelay();
+
+            // Gán host
             challengeMemberRepository.save(
                     ChallengeMember.builder()
                             .challenge(challenge)
@@ -191,6 +195,7 @@ public class DataInitializer implements CommandLineRunner {
                             .updatedAt(LocalDateTime.now())
                             .build());
 
+            // Gán co-host
             challengeMemberRepository.save(
                     ChallengeMember.builder()
                             .challenge(challenge)
@@ -201,48 +206,62 @@ public class DataInitializer implements CommandLineRunner {
                             .updatedAt(LocalDateTime.now())
                             .build());
 
-            challengeMemberRepository.save(
-                    ChallengeMember.builder()
-                            .challenge(challenge)
-                            .member(member)
-                            .role(ChallengeRole.MEMBER)
-                            .status(ChallengeMemberStatus.JOINED)
-                            .createdAt(LocalDateTime.now())
-                            .updatedAt(LocalDateTime.now())
-                            .build());
+            // Gán full members
+            for (Member member : fullMembers) {
+                addRandomDelay(); // Thêm độ trễ cho từng thành viên
+                challengeMemberRepository.save(
+                        ChallengeMember.builder()
+                                .challenge(challenge)
+                                .member(member)
+                                .role(ChallengeRole.MEMBER)
+                                .status(ChallengeMemberStatus.JOINED)
+                                .createdAt(LocalDateTime.now())
+                                .updatedAt(LocalDateTime.now())
+                                .build());
+            }
+        }
+
+        System.out.println("✅ Seeded challenge members with random delays.");
+    }
+
+    // Hàm thêm độ trễ ngẫu nhiên
+    private void addRandomDelay() {
+        try {
+            // Độ trễ ngẫu nhiên từ 100ms đến 500ms
+            int delay = 100 + new Random().nextInt(400);
+            Thread.sleep(delay);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
+
+
     private void seedTestEvidenceAndReview() {
         List<Challenge> challenges = challengeRepository.findAll();
         List<Member> members = memberRepository.findAll();
 
         if (challenges.isEmpty() || members.size() < 3) return;
 
-        Challenge challenge = challenges.get(0); // lấy thử thách đầu tiên
-        Member submitter = members.get(2);       // member
-        Member reviewer = members.get(1);        // co-host
+        for (Challenge challenge : challenges) {
+            for (int i = 2; i < members.size(); i++) { // Bỏ Host & Co-Host, chỉ lấy Member
+                Member submitter = members.get(i);
+                Member reviewer = members.get(1); // Mặc định Co-Host làm reviewer
 
-        // Tạo evidence mới
-        Evidence evidence = Evidence.builder()
-                .challenge(challenge)
-                .member(submitter)
-                .evidenceUrl("https://example.com/test-video.mp4")
-                .status(EvidenceStatus.PENDING)
-                .submittedAt(LocalDateTime.of(2025, 3, 29, 10, 0)) // ✅ ngày 29/03/2025 lúc 10:00 sáng
-                .updatedAt(LocalDateTime.now())
-                .build();
+                // Tạo evidence cho từng member
+                Evidence evidence = Evidence.builder()
+                        .challenge(challenge)
+                        .member(submitter)
+                        .evidenceUrl("https://example.com/test-video-" + submitter.getId() + ".mp4")
+                        .status(EvidenceStatus.PENDING)
+                        .submittedAt(LocalDateTime.now().minusDays(new Random().nextInt(30)))
+                        .updatedAt(LocalDateTime.now())
+                        .build();
+                evidenceRepository.save(evidence);
+            }
+        }
 
-        evidenceRepository.save(evidence);
-
-
-        // Gán người chấm
-        EvidenceReport report = EvidenceReport.builder()
-                .evidence(evidence)
-                .reviewer(reviewer)
-                .build();
-        evidenceReportRepository.save(report);
-
-        System.out.println("✅ Seeded one evidence and reviewer assignment.");
+        System.out.println("✅ Seeded evidence for each member and assigned Co-Host as reviewer.");
     }
+
 
 }

@@ -1,11 +1,13 @@
 package org.capstone.backend.service.group;
 
+import com.google.monitoring.v3.Group;
 import jakarta.persistence.EntityNotFoundException;
 import org.capstone.backend.dto.group.*;
 import org.capstone.backend.entity.*;
 import org.capstone.backend.repository.*;
 import org.capstone.backend.service.auth.AuthService;
 import org.capstone.backend.utils.enums.GroupMemberStatus;
+import org.capstone.backend.utils.enums.InvitePermission;
 import org.capstone.backend.utils.upload.FirebaseUpload;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -248,27 +250,86 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public List<MemberSearchResponse> searchMembers(MemberSearchRequest request) {
-        Pageable pageable = PageRequest.of(0, 5);
+        Pageable pageable = PageRequest.of(0, 5); // Giới hạn kết quả trả về 5 thành viên
 
+        // Tìm kiếm các member theo keyword (email hoặc full name)
+        Page<Member> memberPage = memberRepository.searchMembersByKeyword(request.getKeyword(), pageable);
 
-        List<Member> members = memberRepository.searchByEmailOrFullName(request.getKeyword(), pageable);
-        members.removeIf(m -> m.getId().equals(authService.getMemberIdFromAuthentication()));
+        // Lấy id của member hiện tại (người dùng đang đăng nhập)
+        Long currentMemberId = authService.getMemberIdFromAuthentication();
 
-        if (request.getGroupId() != null) {
-            Groups group = groupRepository.findById(request.getGroupId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Group not found"));
-            Set<Long> groupMemberIds = new HashSet<>(groupMemberRepository.findMemberIdsByGroup(group));
-            members.removeIf(m -> groupMemberIds.contains(m.getId()));
-        }
+        // Lọc danh sách thành viên theo invitePermission
+        List<Member> filteredMembers = memberPage.stream()
+                .filter(m -> {
+                    // Không hiển thị chính người dùng hiện tại trong danh sách tìm kiếm
+                    if (m.getId().equals(currentMemberId)) {
+                        return false;
+                    }
 
-        return members.stream()
-                .limit(5)
-                .map(m -> new MemberSearchResponse(m.getId(), m.getAccount().getEmail(), m.getAvatar(), m.getFullName()))
+                    // Kiểm tra quyền mời
+                    if (m.getInvitePermission() == InvitePermission.NO_ONE) {
+                        return false;
+                    }
+
+                    // Kiểm tra quyền mời là 'SAME_GROUP' (Nếu có `groupId` hoặc bạn cần kiểm tra nhóm người dùng)
+                    if (m.getInvitePermission() == InvitePermission.SAME_GROUP) {
+                        // Ví dụ: chỉ những người trong cùng nhóm mới có thể mời
+                        // Cần có thêm logic kiểm tra nhóm (group)
+                        return checkIfInSameGroup(currentMemberId, m.getId());
+                    }
+
+                    // Nếu quyền mời là 'EVERYONE' thì tất cả mọi người có thể mời
+                    return true;
+                })
                 .toList();
+
+        // Chuyển đổi từ Member sang MemberSearchResponse
+        return filteredMembers.stream()
+                .map(m -> new MemberSearchResponse(
+                        m.getId(),
+                        m.getAccount().getEmail(),
+                        m.getAvatar(),
+                        m.getFullName()
+                ))
+                .collect(Collectors.toList());
     }
+
+    // Ví dụ method kiểm tra xem người dùng hiện tại có trong cùng nhóm với thành viên khác hay không
+    private boolean checkIfInSameGroup(Long currentMemberId, Long memberId) {
+        // Logic kiểm tra xem 2 thành viên này có trong cùng nhóm hay không
+        // Giả sử bạn có một bảng nhóm và thành viên của nhóm, bạn sẽ cần truy vấn để kiểm tra
+        // Nếu cả 2 thành viên đều thuộc về cùng một nhóm, trả về true
+        return groupMemberRepository.checkIfInSameGroup(currentMemberId, memberId);
+    }
+
 
     @Override
     public Page<GroupSummaryDTO> searchGroups(String keyword, int page, int size) {
         return groupRepository.searchGroupsByName(keyword, PageRequest.of(page, size));
     }
+
+    @Override
+    @Transactional
+    public void disbandGroup(Long groupId) {
+        Long memberId = authService.getMemberIdFromAuthentication(); // null nếu là admin
+
+        Groups group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nhóm không tồn tại."));
+
+        if (memberId != null) {
+            // Member đang đăng nhập → phải là HOST mới được giải tán nhóm
+            GroupMember host = groupMemberRepository.findByGroupIdAndMemberId(groupId, memberId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không tham gia nhóm này."));
+
+            if (!Objects.equals(host.getId(), group.getCreatedBy())) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Chỉ host hoặc admin mới có quyền giải tán nhóm.");
+            }
+        }
+
+        // ✅ Nếu là Admin (memberId == null) hoặc là Host → cho phép xóa
+        groupMemberRepository.deleteByGroupId(groupId); // Xóa tất cả thành viên
+        groupRepository.delete(group); // Xóa nhóm
+    }
+
+
 }

@@ -16,7 +16,12 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
     Optional<GroupMember> findByGroupAndMember(Groups group, Member member);
     List<GroupMember> findByMemberAndStatus(Member member, GroupMemberStatus status);
     boolean existsByGroupAndMember(Groups group, Member member);
-    @Query("SELECT gm.member.id FROM GroupMember gm WHERE gm.group = :group")
-    Set<Long> findMemberIdsByGroup(@Param("group") Groups group);
+    @Query("SELECT COUNT(gm) > 0 FROM GroupMember gm " +
+            "WHERE gm.group.id = (SELECT gm2.group.id FROM GroupMember gm2 WHERE gm2.member.id = :memberId1) " +
+            "AND gm.member.id = :memberId2")
+    boolean checkIfInSameGroup(@Param("memberId1") Long memberId1, @Param("memberId2") Long memberId2);
     Optional<GroupMember> findByGroupIdAndMemberIdAndStatus(Long groupId, Long memberId, GroupMemberStatus status);
+    Optional<GroupMember> findByGroupIdAndMemberId(Long groupId, Long memberId);
+
+    void deleteByGroupId(Long groupId);
 }

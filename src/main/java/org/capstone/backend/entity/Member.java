@@ -3,6 +3,11 @@ package org.capstone.backend.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
+import org.capstone.backend.utils.enums.InvitePermission;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -39,21 +44,24 @@ public class Member {
 
     private String district;
 
-    private String city;
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-    
-    @Column(name = "updated_by")
-    private String updatedBy;
-
-    @Column(name = "created_at")
+    @CreatedDate
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "created_by")
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @CreatedBy
+    @Column(name = "created_by", updatable = false)
     private String createdBy;
+
+    @LastModifiedBy
+    @Column(name = "updated_by")
+    private String updatedBy;
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "member_interest",
@@ -62,6 +70,9 @@ public class Member {
     )
     @JsonIgnore // Tránh lỗi vòng lặp khi serialize JSON
     private Set<Interest> interests = new HashSet<>();
+    @Enumerated(EnumType.STRING)
+    @Column(name = "invite_permission", nullable = false)
+    private InvitePermission invitePermission = InvitePermission.EVERYONE;
 
     @OneToOne
     @JoinColumn(name = "account_id", nullable = false)

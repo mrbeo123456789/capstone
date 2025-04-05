@@ -1,6 +1,7 @@
 package org.capstone.backend.dto.member;
 
 import lombok.Data;
+import org.capstone.backend.utils.enums.InvitePermission;
 
 import java.time.LocalDate;
 
@@ -19,4 +20,6 @@ public class UserProfileResponse {
     private String province;
     private String district;
     private LocalDate dateOfBirth;
+    private InvitePermission invitePermission;
+
 }
