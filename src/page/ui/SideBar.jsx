@@ -48,7 +48,7 @@ const Sidebar = ({ isOpen }) => {
                             <li key={index}>
                                 <Link
                                     to={item.link}
-                                    className="flex md:flex-row flex-col items-center md:items-start space-y-1 md:space-y-0 md:space-x-3 p-2 rounded-md hover:bg-orange-600 hover:text-white transition text-gray-800"
+                                    className="flex md:flex-row flex-col items-center md:items-start space-y-1 md:space-y-0 md:space-x-3 p-2 rounded-md hover:bg-orange-600 hover:text-white transition text-white"
                                 >
                                     <span className="text-lg">{item.icon}</span>
                                     <span className="hidden md:inline">{item.name}</span>

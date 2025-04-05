@@ -15,6 +15,8 @@ const ChallengeForm = () => {
 
     const navigate = useNavigate();
     const [preview, setPreview] = useState("");
+    const [bannerPreview, setBannerPreview] = useState("");
+
 
     const today = new Date();
     const tomorrow = new Date();
@@ -64,7 +66,7 @@ const ChallengeForm = () => {
 
         // Append all fields dynamically
         Object.keys(processedData).forEach((key) => {
-            if (key === "picture") {
+            if (key === "picture" || key === "banner") {
                 if (processedData.picture) {
                     formData.append("picture", processedData.picture); // File
                 }
@@ -150,6 +152,37 @@ const ChallengeForm = () => {
                                 />
                                 <p className="text-red-600">{errors.summary?.message}</p>
                             </div>
+                            {/* Banner Upload */}
+                            <div className="w-full mt-6">
+                                <label className="text-sm font-medium">Banner (Optional)</label>
+                                <label htmlFor="banner-upload" className="relative group cursor-pointer flex items-center justify-center">
+                                    <div className="w-full h-40 flex items-center justify-center relative border-2 border-dashed rounded-lg bg-gray-50">
+                                        {bannerPreview ? (
+                                            <img src={bannerPreview} alt="Banner Preview" className="w-full h-full object-cover rounded-lg" />
+                                        ) : (
+                                            <div className="text-center text-gray-400">
+                                                <IoCloudUploadOutline className="text-3xl mx-auto mb-2" />
+                                                <p className="text-sm">Click to upload Banner Image</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </label>
+                                <input
+                                    id="banner-upload"
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                        const file = e.target.files[0];
+                                        if (file) {
+                                            setBannerPreview(URL.createObjectURL(file));
+                                            setValue("banner", file, { shouldValidate: true });
+                                        }
+                                    }}
+                                />
+                                <input type="hidden" {...register("banner")} />
+                            </div>
+
                         </div>
 
                         {/* Challenge Image */}

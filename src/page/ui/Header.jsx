@@ -48,7 +48,7 @@ const Header = ({ toggleSidebar }) => {
                                 <a
                                     href={item.href}
                                     title={item.title}
-                                    className="text-black hover:text-red-200 transition font-medium"
+                                    className="text-white hover:text-red-200 transition font-medium"
                                 >
                                     {item.text}
                                 </a>

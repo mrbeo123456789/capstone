@@ -3,8 +3,6 @@ import { FaPlayCircle } from "react-icons/fa";
 import VideoModal from "../ui/VideoModal.jsx";
 import {
     useGetEvidencesToReviewQuery,
-    useReviewEvidenceMutation,
-    useUploadEvidenceMutation
 } from "../../service/evidenceService.js";
 import { useParams } from "react-router-dom";
 
@@ -14,8 +12,6 @@ const VoteOther = () => {
 
     const { id } = useParams(); // Get challenge ID from URL
     const { data = [], isLoading } = useGetEvidencesToReviewQuery(id);
-    const [reviewEvidence] = useReviewEvidenceMutation();
-    const [uploadEvidence] = useUploadEvidenceMutation();
 
     const handleOpenVideo = (index) => {
         setActiveIndex(index);
@@ -36,8 +32,8 @@ const VoteOther = () => {
     };
 
     return (
-        <div className="mt-6 w-full mx-auto p-4">
-            <h2 className="text-xl font-bold mb-6 text-center">Vote for Others' Proof</h2>
+        <div className="w-full mx-auto">
+            <h2 className="text-xl font-bold text-center">Vote for Others' Proof</h2>
 
             {isLoading ? (
                 <div className="text-center py-10">Loading videos...</div>
@@ -72,6 +68,7 @@ const VoteOther = () => {
                     onPrevious={handlePrevious}
                     onNext={handleNext}
                     uploader={data[activeIndex]?.uploaderName || "Unknown User"}
+                    evidenceId={data[activeIndex]?.evidenceId}
                 />
             )}
         </div>

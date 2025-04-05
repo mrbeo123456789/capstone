@@ -9,16 +9,18 @@ import {useGetChallengeDetailQuery} from "../../service/challengeService.js";
 import Description from "./description.jsx";
 import ProgressTracking from "./ProgressTracking.jsx";
 import {useGetMyEvidencesByChallengeQuery} from "../../service/evidenceService.js";
-import {FaCheckCircle, FaInfoCircle, FaTrophy, FaVoteYea} from "react-icons/fa";
+import {FaCheckCircle, FaClipboardCheck, FaInfoCircle, FaStar, FaTrophy} from "react-icons/fa";
 
 const JoinedChallengeDetail = () => {
     const [activeTab, setActiveTab] = useState("proof");
     const [showPopup, setShowPopup] = useState(false);
+    const [menuOpen, setMenuOpen] = useState(false);
 
     const tabItems = [
         { key: "proof", label: "Proof", icon: <FaCheckCircle /> },
         { key: "ranking", label: "Ranking", icon: <FaTrophy /> },
-        { key: "voteOther", label: "Vote Other", icon: <FaVoteYea /> },
+        { key: "review", label: "Review", icon: <FaClipboardCheck /> },
+        { key: "vote", label: "Vote Other", icon: <FaStar /> },
         { key: "description", label: "Description", icon: <FaInfoCircle /> },
     ];
 
@@ -52,8 +54,43 @@ const JoinedChallengeDetail = () => {
         <div className="w-full">
             <div className="mx-auto bg-white rounded-lg shadow-lg p-6 m-2">
                 <div className="flex flex-col md:flex-row justify-between items-center">
-                    <div className="w-full md:w-3/5">
-                        <h2 className="text-2xl font-bold text-gray-900">{challenge?.name}</h2>
+                    <div className="w-full md:w-3/5 md:pr-6 pb-6 md:pb-0">
+                        <div className="flex justify-between">
+                            <h2 className="text-2xl font-bold text-gray-900">{challenge?.name}</h2>
+                            <div className="relative inline-block text-left mb-4">
+                                <button
+                                    className="flex flex-col space-y-1 p-2"
+                                    onClick={() => setMenuOpen((prev) => !prev)}
+                                >
+                                    <span className="block w-6 h-1 bg-orange-400"></span>
+                                    <span className="block w-6 h-1 bg-orange-400"></span>
+                                    <span className="block w-6 h-1 bg-orange-400"></span>
+                                </button>
+
+                                {menuOpen && (
+                                    <div
+                                        className="absolute z-10 mt-2 w-44 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
+                                        <div className="py-1">
+                                            <button onClick={() => openMemberList()}
+                                                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">Invite
+                                            </button>
+                                            <button
+                                                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">Leave
+                                            </button>
+                                            <button
+                                                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">Edit
+                                            </button>
+                                            <button
+                                                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">Share
+                                            </button>
+                                            <button
+                                                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">Report
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                         <p className="text-gray-500 mt-2">
                             {formatDate(challenge?.startDate)} - {formatDate(challenge?.endDate)}
                         </p>
@@ -61,6 +98,8 @@ const JoinedChallengeDetail = () => {
                             Thử thách: <span
                             className="text-orange-500 font-semibold">{challenge?.challengeType}</span>
                         </p>
+
+
                         <div className="">
                             <ProgressTracking
                                 challenge={challenge}
@@ -76,10 +115,6 @@ const JoinedChallengeDetail = () => {
                         />
                     </div>
                 </div>
-                <button className="text-white bg-red-600 px-6 py-2 rounded hover:bg-red-900"
-                        onClick={() => openMemberList()}>
-                    Invite
-                </button>
             </div>
 
             <div className="w-full">
@@ -108,7 +143,8 @@ const JoinedChallengeDetail = () => {
                     )
                 )}
                 {activeTab === "ranking" && <RankingList/>}
-                {activeTab === "voteOther" && <VoteOther/>}
+                {activeTab === "review" && <VoteOther />} {/* ← This is now Review tab */}
+                {activeTab === "vote" && <VoteOther/>}
                 {activeTab === "description" && <Description content={challenge?.description}/>}
                 {/* User Detail Popup */}
                 {showPopup && (
