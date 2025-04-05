@@ -34,11 +34,15 @@ const Sidebar = ({ isOpen }) => {
                 {/* Logo */}
                 <div className="items-center space-x-3 mb-6 hidden md:flex">
                     <img
-                        src="https://via.placeholder.com/40"
+                        src="https://firebasestorage.googleapis.com/v0/b/bookstore-f9ac2.appspot.com/o/logo%2Fimage-removebg-preview.png?alt=media&token=f16618d4-686c-4014-a9cc-99b4cf043c86"
                         alt="GoBeyond Logo"
                         className="h-10 rounded-full"
                     />
-                    <span className="text-xl font-bold text-gray-800">GoBeyond</span>
+                    <div className="flex">
+                        <div className="text-xl font-bold text-white">Go</div>
+                        <div className="text-xl font-bold text-yellow-400">Beyond</div>
+                    </div>
+
                 </div>
 
                 {/* Menu */}

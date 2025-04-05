@@ -32,18 +32,21 @@ const Header = ({ toggleSidebar }) => {
                     </button>
                     <a href="/" className="flex items-center">
                         <img
-                            src="https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg"
+                            src="https://firebasestorage.googleapis.com/v0/b/bookstore-f9ac2.appspot.com/o/logo%2Fimage-removebg-preview.png?alt=media&token=f16618d4-686c-4014-a9cc-99b4cf043c86"
                             alt="GoBeyond"
                             className="h-10 rounded-full"
                         />
-                        <span className="ml-2 font-bold text-lg text-white">GoBeyond</span>
+                        <div className="flex">
+                            <div className="text-xl font-bold text-white">Go</div>
+                            <div className="text-xl font-bold text-yellow-400">Beyond</div>
+                        </div>
                     </a>
                 </div>
 
                 {/* Center: Navigation */}
                 <nav className="hidden md:flex space-x-6">
                     <ul className="flex space-x-4">
-                        {menuItems.map((item, index) => (
+                    {menuItems.map((item, index) => (
                             <li key={index}>
                                 <a
                                     href={item.href}

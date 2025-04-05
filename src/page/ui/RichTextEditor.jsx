@@ -4,16 +4,6 @@ import { Editor } from '@tinymce/tinymce-react';
 const RichTextEditor = ({ onChange }) => {
     const editorRef = useRef(null);
 
-    const handleSave = () => {
-        const editor = editorRef.current;
-        if (editor) {
-            editor.uploadImages().then(() => {
-                const content = editor.getContent();
-                onSubmit?.(content);
-            });
-        }
-    };
-
     return (
         <div>
             <Editor
@@ -122,12 +112,6 @@ const RichTextEditor = ({ onChange }) => {
                     // Other advanced settings can be injected here as needed
                 }}
             />
-            <button
-                onClick={handleSave}
-                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded"
-            >
-                Save
-            </button>
         </div>
     );
 }
