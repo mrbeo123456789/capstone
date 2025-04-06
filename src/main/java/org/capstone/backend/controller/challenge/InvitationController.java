@@ -1,7 +1,9 @@
 package org.capstone.backend.controller.challenge;
 
+import jakarta.validation.Valid;
 import org.capstone.backend.dto.challenge.ChallengeSearchRequest;
 import org.capstone.backend.dto.challenge.InvitationResponseDTO;
+import org.capstone.backend.dto.challenge.InviteGroupToChallengeRequest;
 import org.capstone.backend.dto.challenge.InviteMemberRequest;
 import org.capstone.backend.dto.group.MemberSearchRequest;
 import org.capstone.backend.dto.group.MemberSearchResponse;
@@ -24,7 +26,7 @@ public class InvitationController {
         this.invitationService = invitationService;
     }
 
-        @PostMapping("/send")
+        @PostMapping("/send/personal")
         public ResponseEntity<String> sendInvitation(@RequestBody InviteMemberRequest request) {
             String response = invitationService.sendInvitation(request);
             return ResponseEntity.ok(response);
@@ -49,5 +51,9 @@ public class InvitationController {
     public List<MemberSearchResponse> getSuggestion(@PathVariable("challengeId") Long challengeId) {
         return invitationService.suggestMembers(challengeId);
     }
-
+    @PostMapping("/send/group")
+    public ResponseEntity<String> inviteGroupToChallenge(@Valid @RequestBody InviteGroupToChallengeRequest request) {
+        String responseMessage = invitationService.sendGroupInvitationToChallenge(request);
+        return ResponseEntity.ok(responseMessage);
+    }
 }

@@ -2,10 +2,12 @@ package org.capstone.backend.service.challenge;
 
 import org.capstone.backend.dto.challenge.ChallengeSearchRequest;
 import org.capstone.backend.dto.challenge.InvitationResponseDTO;
+import org.capstone.backend.dto.challenge.InviteGroupToChallengeRequest;
 import org.capstone.backend.dto.challenge.InviteMemberRequest;
 import org.capstone.backend.dto.group.MemberSearchResponse;
 import org.capstone.backend.entity.Challenge;
 import org.capstone.backend.entity.ChallengeMember;
+import org.capstone.backend.entity.Groups;
 import org.capstone.backend.entity.Member;
 import org.capstone.backend.repository.AccountRepository;
 import org.capstone.backend.repository.ChallengeMemberRepository;
@@ -16,6 +18,7 @@ import org.capstone.backend.repository.MemberRepository;
 import org.capstone.backend.service.auth.AuthService;
 import org.capstone.backend.utils.enums.ChallengeMemberStatus;
 import org.capstone.backend.utils.enums.ChallengeStatus;
+import org.capstone.backend.utils.enums.GroupMemberStatus;
 import org.capstone.backend.utils.enums.InvitePermission;
 import org.capstone.backend.utils.suggestion.MemberSuggestionService;
 import org.springframework.data.domain.Page;
@@ -26,10 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -66,37 +66,44 @@ public class InvitationService implements InvitationServiceInterface {
         return memberRepository.findById(authService.getMemberIdFromAuthentication())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found."));
     }
-
     @Override
     public String sendInvitation(InviteMemberRequest request) {
         Member invitedBy = getAuthenticatedMember();
         Challenge challenge = challengeRepository.findById(request.getChallengeId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Challenge not found"));
 
-        Member member = memberRepository.findById(request.getMemberId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found"));
+        // Xác định trạng thái lời mời dựa trên trạng thái của thử thách
+        ChallengeMemberStatus status = (challenge.getStatus() != ChallengeStatus.UPCOMING)
+                ? ChallengeMemberStatus.EXPIRED : ChallengeMemberStatus.WAITING;
 
-        Optional<ChallengeMember> existingMember = challengeMemberRepository.findByMemberAndChallenge(member, challenge);
-        if (existingMember.isPresent() && existingMember.get().getStatus() == ChallengeMemberStatus.JOINED) {
-            return "Member has already joined this challenge.";
+        // Batch fetch các thành viên theo danh sách memberIds
+        List<Member> members = memberRepository.findAllById(request.getMemberIds());
+        LocalDateTime now = LocalDateTime.now();
+        List<ChallengeMember> invitations = new ArrayList<>();
+
+        for (Member member : members) {
+            // Kiểm tra nếu member đã tham gia thử thách (với status JOINED) thì bỏ qua
+            Optional<ChallengeMember> existingMember = challengeMemberRepository.findByMemberAndChallenge(member, challenge);
+            if (existingMember.isPresent() && existingMember.get().getStatus() == ChallengeMemberStatus.JOINED) {
+                continue;
+            }
+            // Tạo lời mời cho thành viên mà KHÔNG cần kiểm tra invitePermission
+            ChallengeMember challengeMember = ChallengeMember.builder()
+                    .challenge(challenge)
+                    .member(member)
+                    .joinBy(invitedBy.getId())
+                    .status(status)
+                    .createdAt(now)
+                    .build();
+            invitations.add(challengeMember);
         }
+        challengeMemberRepository.saveAll(invitations);
 
-        ChallengeMemberStatus status = (challenge.getStatus() != ChallengeStatus.UPCOMING) ?
-                ChallengeMemberStatus.EXPIRED : ChallengeMemberStatus.WAITING;
-
-        ChallengeMember challengeMember = ChallengeMember.builder()
-                .challenge(challenge)
-                .member(member)
-                .joinBy(invitedBy.getId())
-                .status(status)
-                .createdAt(LocalDateTime.now())
-                .build();
-
-        challengeMemberRepository.save(challengeMember);
         return (status == ChallengeMemberStatus.EXPIRED)
-                ? "Challenge is not upcoming. Invitation is expired."
-                : "Invitation sent successfully.";
+                ? "Challenge is not upcoming. All invitations are expired."
+                : "Invitations sent successfully to " + invitations.size() + " member(s).";
     }
+
 
     @Override
     public String respondToInvitation(Long invitationId, boolean accept) {
@@ -211,5 +218,76 @@ public class InvitationService implements InvitationServiceInterface {
         Long currentMemberId = authService.getMemberIdFromAuthentication();
         return memberSuggestionService.suggestMembers(currentMemberId, challengeId);
     }
+
+    @Override
+    public String sendGroupInvitationToChallenge(InviteGroupToChallengeRequest request) {
+        Member invitedBy = getAuthenticatedMember();
+        Challenge challenge = challengeRepository.findById(request.getChallengeId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Challenge not found"));
+        Groups group = groupRepository.findById(request.getGroupId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Group not found"));
+
+        ChallengeMemberStatus status = (challenge.getStatus() != ChallengeStatus.UPCOMING)
+                ? ChallengeMemberStatus.EXPIRED : ChallengeMemberStatus.WAITING;
+
+        // Lấy danh sách thành viên của nhóm với trạng thái ACTIVE
+        List<Member> groupMembers = groupMemberRepository.findMembersByGroupIdAndStatus(group.getId(), GroupMemberStatus.ACTIVE);
+        LocalDateTime now = LocalDateTime.now();
+
+        // Bỏ qua người gửi (invitedBy)
+        groupMembers.removeIf(member -> member.getId().equals(invitedBy.getId()));
+
+        // Tạo lời mời cho các thành viên trong nhóm (có kiểm tra invitePermission)
+        List<ChallengeMember> invitations = createInvitationsForChallenge(challenge, groupMembers, invitedBy.getId(), status, now);
+        challengeMemberRepository.saveAll(invitations);
+
+        return (status == ChallengeMemberStatus.EXPIRED)
+                ? "Challenge is not upcoming. All invitations are expired."
+                : "Invitations sent successfully to " + invitations.size() + " member(s) from the group.";
+    }
+
+    private List<ChallengeMember> createInvitationsForChallenge(
+            Challenge challenge,
+            List<Member> members,
+            Long invitedById,
+            ChallengeMemberStatus status,
+            LocalDateTime now) {
+
+        List<ChallengeMember> invitations = new ArrayList<>();
+
+        for (Member member : members) {
+            // Kiểm tra nếu member đã tham gia thử thách (với status JOINED) thì bỏ qua
+            Optional<ChallengeMember> existingMember = challengeMemberRepository.findByMemberAndChallenge(member, challenge);
+            if (existingMember.isPresent() && existingMember.get().getStatus() == ChallengeMemberStatus.JOINED) {
+                continue;
+            }
+
+            // Kiểm tra invitePermission của member (target)
+            // Với SAME_GROUP: chỉ mời nếu có ít nhất 1 nhóm chung giữa người mời và member
+            // Với NO_ONE: bỏ qua; với EVERYONE: luôn cho mời
+            if (member.getInvitePermission() == InvitePermission.NO_ONE) {
+                continue;
+            } else if (member.getInvitePermission() == InvitePermission.SAME_GROUP) {
+                boolean sameGroup = groupMemberRepository.checkIfInSameGroup(invitedById, member.getId());
+                if (!sameGroup) {
+                    continue;
+                }
+            }
+
+            // Tạo lời mời cho member nếu thỏa điều kiện
+            ChallengeMember challengeMember = ChallengeMember.builder()
+                    .challenge(challenge)
+                    .member(member)
+                    .joinBy(invitedById)
+                    .status(status)
+                    .createdAt(now)
+                    .build();
+            invitations.add(challengeMember);
+        }
+
+        return invitations;
+    }
+
+
 
 }

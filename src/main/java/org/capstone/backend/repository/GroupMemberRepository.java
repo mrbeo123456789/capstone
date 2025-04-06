@@ -35,6 +35,9 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
     List<Long> findAlreadyJoinedActiveMemberIds(@Param("currentMemberId") Long currentMemberId,
                                                 @Param("memberIds") List<Long> memberIds);
     // Method hiện tại
+    @Query("SELECT gm.member FROM GroupMember gm WHERE gm.group.id = :groupId AND gm.status = :status")
+    List<Member> findMembersByGroupIdAndStatus(@Param("groupId") Long groupId,
+                                               @Param("status") GroupMemberStatus status);
 
     // Nếu cần, thêm method lấy groupIds của thành viên:
     List<Long> findGroupIdsByMemberId(Long memberId);
