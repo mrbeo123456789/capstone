@@ -53,8 +53,9 @@ public class Challenge {
     private VerificationType verificationType;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "verification_method")
-    private VerificationMethod verificationMethod;
+    @Column(name = "participation_type", nullable = false)
+    private ParticipationType participationType;
+
 
     @Column(name = "start_date")
     private LocalDate startDate;

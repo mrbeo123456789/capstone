@@ -33,5 +33,20 @@ public interface EvidenceRepository extends JpaRepository<Evidence, Long> {
                                          @Param("date") LocalDate date);
 
 
-    Page<Evidence> findByChallengeId(Long challengeId, Pageable pageable);
+    @Query("""
+SELECT e FROM Evidence e
+WHERE e.challenge.id = :challengeId
+AND (
+    (e.submittedAt < :today)
+    OR
+    (e.submittedAt >= :endDateStart AND e.submittedAt <= :endDateEnd)
+)
+""")
+    Page<Evidence> findAllowedEvidenceForHost(
+            @Param("challengeId") Long challengeId,
+            @Param("today") LocalDateTime today,
+            @Param("endDateStart") LocalDateTime endDateStart,
+            @Param("endDateEnd") LocalDateTime endDateEnd,
+            Pageable pageable
+    );
 }

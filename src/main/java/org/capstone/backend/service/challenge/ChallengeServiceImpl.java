@@ -139,11 +139,10 @@ public class ChallengeServiceImpl implements ChallengeService {
         Challenge challenge = Challenge.builder()
                 .name(request.getName())
                 .description(request.getDescription())
-                .rule(request.getRule())
                 .privacy(request.getPrivacy())
                 .status(member == null ? ChallengeStatus.APPROVED : ChallengeStatus.PENDING) // ✅ Duyệt tự động nếu là admin
                 .verificationType(request.getVerificationType())
-                .verificationMethod(request.getVerificationMethod())
+                .participationType(request.getParticipationType())
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
                 .maxParticipants(request.getMaxParticipants())

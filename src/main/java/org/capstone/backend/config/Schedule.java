@@ -2,7 +2,6 @@ package org.capstone.backend.config;
 
 import lombok.RequiredArgsConstructor;
 import org.capstone.backend.entity.Challenge;
-import org.capstone.backend.event.AchievementTriggerEvent;
 import org.capstone.backend.repository.ChallengeRepository;
 import org.capstone.backend.service.evidence.EvidenceService;
 import org.capstone.backend.service.ranking.RankingService;
@@ -65,7 +64,7 @@ public class Schedule {
   //  @Scheduled(cron = "0 * * * * *") // mỗi phút
 
     public void scheduleAssignmentForNormalDays() {
-        List<Long> challengeIds = challengeRepository.findCrossCheckChallengesHappeningToday(ChallengeStatus.ONGOING, VerificationType.CROSS_CHECK);
+        List<Long> challengeIds = challengeRepository.findCrossCheckChallengesHappeningToday(ChallengeStatus.ONGOING, VerificationType.MEMBER_REVIEW);
         challengeIds.forEach(assignmentService::assignPendingReviewersForChallenge);
     }
 

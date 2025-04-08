@@ -1,46 +1,91 @@
 package org.capstone.backend.utils.jwt;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import org.capstone.backend.entity.Account;
-import org.capstone.backend.entity.Member;
-import org.capstone.backend.repository.AccountRepository;
-import org.capstone.backend.repository.MemberRepository;
-import org.capstone.backend.utils.enums.Role;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
+import com.nimbusds.jose.jwk.source.JWKSource;
+import com.nimbusds.jose.proc.SecurityContext;
+import lombok.Data;
+import org.springframework.security.oauth2.jwt.*;
+import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.Map;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.interfaces.RSAPublicKey;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.RSAPublicKeySpec;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Base64;
 
-@Component
+@Service
+@Data
 public class JwtUtil {
 
-    @Value("${jwt.secret}")
-    private String jwtSecret;
+    private final RSAKey rsaKey;
+    private final JwtEncoder jwtEncoder;
+    private final JwtDecoder jwtDecoder;
 
-    @Value("${jwt.expirationMs}")
-    private long jwtExpirationMs;
-
-
-    public String generateToken(String username, String role) {
-        SecretKey key = new SecretKeySpec(jwtSecret.getBytes(StandardCharsets.UTF_8), SignatureAlgorithm.HS256.getJcaName());
-
-        return Jwts.builder()
-                .setSubject(username)
-                .addClaims(Map.of("roles", role)) // Changed "role" to "roles" for consistency
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
-                .signWith(SignatureAlgorithm.HS256, key) // Updated signWith method
-                .compact();
+    public JwtUtil() throws Exception {
+        this.rsaKey = loadRsaKeyFromPrivatePem();
+        this.jwtEncoder = initJwtEncoder();
+        this.jwtDecoder = initJwtDecoder();
     }
 
+    private RSAKey loadRsaKeyFromPrivatePem() throws Exception {
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("private.pem");
+        if (inputStream == null) {
+            throw new IllegalArgumentException("Cannot find private.pem");
+        }
+
+        String privateKeyPem = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8)
+                .replace("-----BEGIN PRIVATE KEY-----", "")
+                .replace("-----END PRIVATE KEY-----", "")
+                .replaceAll("\\s+", "");
+
+        byte[] keyBytes = Base64.getDecoder().decode(privateKeyPem);
+
+        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
+
+        var rsaPrivateKey = (java.security.interfaces.RSAPrivateCrtKey) privateKey;
+
+        RSAPublicKeySpec publicKeySpec = new RSAPublicKeySpec(
+                rsaPrivateKey.getModulus(),
+                rsaPrivateKey.getPublicExponent()
+        );
+        RSAPublicKey publicKey = (RSAPublicKey) keyFactory.generatePublic(publicKeySpec);
+
+        return new RSAKey.Builder(publicKey)
+                .privateKey((RSAPrivateKey) privateKey)
+                .build();
+    }
+
+    private JwtEncoder initJwtEncoder() {
+        JWKSource<SecurityContext> jwkSource = new ImmutableJWKSet<>(new com.nimbusds.jose.jwk.JWKSet(rsaKey));
+        return new NimbusJwtEncoder(jwkSource);
+    }
+
+    private JwtDecoder initJwtDecoder() throws JOSEException {
+        return NimbusJwtDecoder.withPublicKey(rsaKey.toRSAPublicKey()).build();
+    }
+
+    public String generateToken(String username, String role) {
+        Instant now = Instant.now();
+
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuer("capstone-project")
+                .issuedAt(now)
+                .expiresAt(now.plus(10, ChronoUnit.HOURS))
+                .subject(username)
+                .claim("roles", role)
+                .build();
+
+        return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+    }
 
 }

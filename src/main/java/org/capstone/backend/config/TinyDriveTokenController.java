@@ -4,7 +4,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.capstone.backend.entity.Account;
 import org.capstone.backend.repository.AccountRepository;
-import org.capstone.backend.repository.MemberRepository;
+import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
@@ -29,19 +30,36 @@ public class TinyDriveTokenController {
     private final PrivateKey privateKey;
     private final AccountRepository accountRepository;
 
-    public TinyDriveTokenController(AccountRepository accountRepository) throws Exception {
+    public TinyDriveTokenController(AccountRepository accountRepository, Environment env) throws Exception {
         this.accountRepository = accountRepository;
-        // Load your private.pem file (must be in PKCS#8 format)
-        String privateKeyContent = new String(Files.readAllBytes(Paths.get("src/main/resources/private.pem")))
-                .replaceAll("-----BEGIN PRIVATE KEY-----", "")
-                .replaceAll("-----END PRIVATE KEY-----", "")
-                .replaceAll("\\s+", "");
 
-        byte[] keyBytes = Base64.getDecoder().decode(privateKeyContent);
+        String privateKeyPem = null;
+
+        // Ưu tiên đọc file nếu có
+        Path pemPath = Paths.get("src/main/resources/private.pem");
+        if (Files.exists(pemPath)) {
+            privateKeyPem = new String(Files.readAllBytes(pemPath))
+                    .replaceAll("-----BEGIN PRIVATE KEY-----", "")
+                    .replaceAll("-----END PRIVATE KEY-----", "")
+                    .replaceAll("\\s+", "");
+        } else {
+            // Nếu không có file thì fallback sang env
+            privateKeyPem = System.getenv("TINYDRIVE_PRIVATE_KEY");
+            if (privateKeyPem == null || privateKeyPem.isBlank()) {
+                privateKeyPem = env.getProperty("tinydrive.private-key");
+            }
+        }
+
+        if (privateKeyPem == null || privateKeyPem.isBlank()) {
+            throw new IllegalStateException("Missing TinyDrive private key (file, env or config)");
+        }
+
+        byte[] keyBytes = Base64.getDecoder().decode(privateKeyPem);
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         this.privateKey = keyFactory.generatePrivate(keySpec);
     }
+
 
     @GetMapping("/token")
     public ResponseEntity<Map<String, String>> getToken() {

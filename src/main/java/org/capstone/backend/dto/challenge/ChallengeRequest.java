@@ -3,7 +3,7 @@ package org.capstone.backend.dto.challenge;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 import org.capstone.backend.utils.enums.PrivacyStatus;
-import org.capstone.backend.utils.enums.VerificationMethod;
+import org.capstone.backend.utils.enums.ParticipationType;
 import org.capstone.backend.utils.enums.VerificationType;
 
 import java.time.LocalDate;
@@ -20,8 +20,6 @@ public class ChallengeRequest {
     @NotBlank(message = "Description cannot be empty")
     private String description;
 
-//    @NotBlank(message = "Rule cannot be empty")
-    private String rule;
 
     @NotNull(message = "Privacy must be provided")
     private PrivacyStatus privacy;
@@ -29,7 +27,7 @@ public class ChallengeRequest {
     @NotNull(message = "Verification type must be provided")
     private VerificationType verificationType;
 
-    private VerificationMethod verificationMethod;
+    private ParticipationType participationType;
 
     @NotNull(message = "Start date must be provided")
     @Future(message = "Start date must be in the future")

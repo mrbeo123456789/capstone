@@ -93,8 +93,10 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
     List<Challenge> findByStatusAndStartDate(ChallengeStatus status, LocalDate startDate);
     List<Challenge> findByStatusAndEndDate(ChallengeStatus status, LocalDate endDate);
 
-    @Query("SELECT c.id FROM Challenge c WHERE c.endDate = :today")
+    @Query("""
+            SELECT c.id FROM Challenge c WHERE c.endDate = :today AND c.verificationType = org.capstone.backend.utils.enums.VerificationType.MEMBER_REVIEW""")
     List<Long> findChallengesEndingToday(@Param("today") LocalDate today);
+
 
     @Query("SELECT COUNT(*) FROM Challenge WHERE createdAt BETWEEN :start AND :end")
     Long countNewChallengesBetween(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);

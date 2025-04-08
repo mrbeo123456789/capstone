@@ -158,7 +158,8 @@ public class DataInitializer implements CommandLineRunner {
                     .challengeType(fitnessType)
                     .privacy(PrivacyStatus.PUBLIC)
                     .status(ChallengeStatus.ONGOING)
-                    .verificationType(VerificationType.CROSS_CHECK)
+                    .verificationType(VerificationType.MEMBER_REVIEW)
+                    .participationType(ParticipationType.INDIVIDUAL) // <-- THÊM DÒNG NÀY
                     .startDate(LocalDate.now())
                     .endDate(LocalDate.now().plusDays(30))
                     .createdAt(LocalDateTime.now())

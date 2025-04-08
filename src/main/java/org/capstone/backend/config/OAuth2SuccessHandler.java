@@ -18,10 +18,12 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     private final AuthService authService;
     private final ObjectMapper objectMapper;
+    private final String redirectBaseUrl;
 
     public OAuth2SuccessHandler(AuthService authService, ObjectMapper objectMapper) {
         this.authService = authService;
         this.objectMapper = objectMapper;
+        this.redirectBaseUrl = System.getenv().getOrDefault("OAUTH2_REDIRECT_URI", "http://localhost:5173/auth/callback");
     }
 
     @Override
@@ -30,19 +32,13 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         String token = authService.loginWithOAuth2(oAuth2User);
 
-        String redirectUrl = UriComponentsBuilder.fromUriString("http://localhost:5173/auth/callback")
+        String redirectUrl = UriComponentsBuilder.fromUriString(redirectBaseUrl)
                 .queryParam("token", token)
                 .build().toUriString();
 
         response.sendRedirect(redirectUrl);
     }
-
-
 }
-
-
-
-
 
 
 

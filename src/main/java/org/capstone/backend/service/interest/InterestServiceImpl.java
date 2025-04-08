@@ -9,7 +9,11 @@ import org.capstone.backend.entity.Member;
 import org.capstone.backend.repository.AccountRepository;
 import org.capstone.backend.repository.InterestRepository;
 import org.capstone.backend.repository.MemberRepository;
+import org.capstone.backend.service.auth.AuthService;
 import org.capstone.backend.utils.enums.Role;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,14 +30,14 @@ public class InterestServiceImpl implements InterestService {
     private final InterestRepository interestRepository;
     private final AccountRepository accountRepository;
     private final MemberRepository memberRepository;
-
+    private final AuthService authService;
     /**
      * Lấy danh sách Interests của Member đang đăng nhập
      */
     @Override
     @Transactional(readOnly = true)
     public Map<String, List<InterestDTO>> getInterestsForAuthenticatedMember() {
-        Member member = getAuthenticatedMember();
+        Member member = memberRepository.getReferenceById(authService.getMemberIdFromAuthentication());
 
         // Tạo một Set để tránh ConcurrentModificationException
         Set<Interest> memberInterestsSet = new HashSet<>(member.getInterests());
@@ -62,10 +66,7 @@ public class InterestServiceImpl implements InterestService {
     @Override
     @Transactional
     public void updateMemberInterests(List<Long> interestIds) {
-        Member member = getAuthenticatedMember();
-        if (member == null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Admin không thể cập nhật Interests");
-        }
+        Member member = memberRepository.getReferenceById(authService.getMemberIdFromAuthentication());
 
         // Lấy danh sách Interests từ ID gửi lên
         Set<Interest> newInterests = new HashSet<>(interestRepository.findAllById(interestIds));
@@ -76,22 +77,43 @@ public class InterestServiceImpl implements InterestService {
         memberRepository.save(member);
     }
 
-    /**
-     * Lấy thông tin Member từ tài khoản đang đăng nhập
-     */
-    private Member getAuthenticatedMember() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication == null || !authentication.isAuthenticated() ||
-                "anonymousUser".equals(authentication.getPrincipal())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is not authenticated");
+
+    // 🔍 Phân trang + tìm kiếm
+    public Page<Interest> findAllPaged(String keyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        if (keyword == null || keyword.isBlank()) {
+            return interestRepository.findAll(pageable);
+        } else {
+            return interestRepository.findByNameContainingIgnoreCase(keyword, pageable);
         }
-
-        String username = authentication.getName();
-        Account account = accountRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
-
-        return memberRepository.findByAccount(account)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found"));
     }
+
+    // ➕ Tạo mới
+    public Interest create(Interest interest) {
+        return interestRepository.save(interest);
+    }
+
+    // ✏️ Cập nhật
+    public Interest update(Long id, Interest updated) {
+        return interestRepository.findById(id).map(existing -> {
+            existing.setName(updated.getName());
+            return interestRepository.save(existing);
+        }).orElseThrow(() -> new RuntimeException("Interest not found"));
+    }
+
+    // ❌ Xoá
+    public void delete(Long id) {
+        Interest interest = interestRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Interest not found"));
+
+        // Gỡ liên kết với member trước khi xoá
+        interest.getMembers().forEach(member -> {
+            member.getInterests().remove(interest);
+        });
+
+        interestRepository.delete(interest);
+    }
+
+
 }

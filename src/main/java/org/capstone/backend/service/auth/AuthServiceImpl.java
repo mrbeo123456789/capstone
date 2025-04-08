@@ -1,5 +1,6 @@
 package org.capstone.backend.service.auth;
 
+import lombok.RequiredArgsConstructor;
 import org.capstone.backend.entity.Account;
 import org.capstone.backend.entity.Member;
 import org.capstone.backend.repository.AccountRepository;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-
+@RequiredArgsConstructor(onConstructor_ = {@Autowired})
 @Service
 public class AuthServiceImpl implements AuthService {
 
@@ -25,14 +26,7 @@ public class AuthServiceImpl implements AuthService {
     private final JwtUtil jwtUtil;
     private final OtpService otpService;
     private final MemberRepository memberRepository;
-    @Autowired
-    public AuthServiceImpl(AccountRepository accountRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, OtpService otpService, MemberRepository memberRepository) {
-        this.accountRepository = accountRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtUtil = jwtUtil;
-        this.otpService = otpService;
-        this.memberRepository = memberRepository;
-    }
+
 
     @Override
     public String login(String loginIdentifier, String rawPassword) {
@@ -82,6 +76,7 @@ public class AuthServiceImpl implements AuthService {
         account.setRole(Role.MEMBER);
         account.setStatus(AccountStatus.INACTIVE); // 🔴 Khi đăng ký, tài khoản ở trạng thái "INACTIVE"
         account.setCreatedAt(LocalDateTime.now());
+        createMemberIfNotExists(account);
 
         return accountRepository.save(account);
     }
@@ -96,6 +91,7 @@ public class AuthServiceImpl implements AuthService {
             account = accountOpt.get();
         } else {
             account = new Account();
+            assert email != null;
             account.setUsername(email.split("@")[0]);
             account.setEmail(email);
             account.setUsername(oAuth2User.getAttribute("name"));
@@ -103,6 +99,7 @@ public class AuthServiceImpl implements AuthService {
             account.setStatus(AccountStatus.ACTIVE); // 🔵 OAuth2 tài khoản sẽ ACTIVE ngay
             accountRepository.save(account);
         }
+        createMemberIfNotExists(account);
 
         return jwtUtil.generateToken(account.getUsername(), account.getRole().toString());
     }
@@ -152,6 +149,7 @@ public class AuthServiceImpl implements AuthService {
 
         return true;
     }
+
     public Long getMemberIdFromAuthentication() {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -165,4 +163,12 @@ public class AuthServiceImpl implements AuthService {
         return member.getId();
     }
 
+    private void createMemberIfNotExists(Account account) {
+        if (memberRepository.findByAccount(account).isEmpty()) {
+            Member member = new Member();
+            member.setAccount(account);
+            member.setCreatedAt(LocalDateTime.now());
+            memberRepository.save(member);
+        }
+    }
 }

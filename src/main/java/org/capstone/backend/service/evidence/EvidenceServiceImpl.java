@@ -238,7 +238,24 @@ private  final FixedGmailService fixedGmailService;
         }
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<Evidence> evidencePage = evidenceRepository.findByChallengeId(challengeId, pageable);
+
+        Challenge challenge = challengeRepository.findById(challengeId)
+                .orElseThrow(() -> new EntityNotFoundException("Challenge not found"));
+
+        LocalDate today = LocalDate.now();
+        LocalDateTime now = LocalDateTime.now();
+
+        LocalDateTime todayStart = today.atStartOfDay();
+        LocalDateTime endDateStart = challenge.getEndDate().atTime(21, 0);
+        LocalDateTime endDateEnd = challenge.getEndDate().atTime(23, 59, 59);
+
+        Page<Evidence> evidencePage = evidenceRepository.findAllowedEvidenceForHost(
+                challengeId,
+                todayStart,
+                endDateStart,
+                endDateEnd,
+                pageable
+        );
 
         return evidencePage.map(e -> {
             EvidenceReport report = e.getEvidenceReport();
@@ -308,7 +325,6 @@ private  final FixedGmailService fixedGmailService;
         )).collect(Collectors.toList());
     }
 
-    @Async("taskExecutor")
     public void assignPendingReviewersForChallenge(Long challengeId) {
         List<Evidence> evidences = evidenceRepository
                 .findAllUnassignedEvidenceByChallengeOrderBySubmittedAtAsc(challengeId);
