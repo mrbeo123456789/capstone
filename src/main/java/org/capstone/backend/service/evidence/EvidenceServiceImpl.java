@@ -394,4 +394,13 @@ private  final FixedGmailService fixedGmailService;
                 .map(ChallengeMember::getCreatedAt)
                 .orElse(LocalDateTime.MAX);
     }
+
+    public double getApprovedEvidencePercentage(Long memberId, Long challengeId) {
+        long total = evidenceRepository.countTotalEvidence(memberId, challengeId);
+        if (total == 0) {
+            return 0.0;
+        }
+        long approved = evidenceRepository.countApprovedEvidence(memberId, challengeId, EvidenceStatus.APPROVED);
+        return (approved * 100.0) / total;
+    }
 }

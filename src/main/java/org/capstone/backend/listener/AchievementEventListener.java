@@ -1,4 +1,4 @@
-package org.capstone.backend.service.challenge.listener;
+package org.capstone.backend.listener;
 
 
 import lombok.AllArgsConstructor;

@@ -37,8 +37,6 @@ public class Challenge {
     @Column(name = "description", columnDefinition = "LONGTEXT")
     private String description;
 
-    @Column(name = "rule")
-    private String rule;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "privacy", nullable = false)

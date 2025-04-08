@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.capstone.backend.dto.rank.ChallengeProgressRankingResponse;
 import org.capstone.backend.dto.rank.ChallengeStarRatingResponse;
+import org.capstone.backend.dto.rank.GlobalRankingDto;
 import org.capstone.backend.entity.*;
 import org.capstone.backend.repository.*;
 import org.capstone.backend.utils.enums.EvidenceStatus;
@@ -31,6 +32,8 @@ public class RankingServiceImpl implements RankingService {
     private final ChallengeProgressRankingRepository rankingRepository;
  private  final  MemberRepository memberRepository;
  private  final   ChallengeStarRatingRepository challengeStarRatingRepository;
+    private final GlobalMemberRankingRepository globalMemberRankingRepository;
+
     @Override
     public void recalculateAllChallengeProgressRankings() {
         List<Challenge> allChallenges = challengeRepository.findAll();
@@ -149,6 +152,30 @@ public class RankingServiceImpl implements RankingService {
 
         return new PageImpl<>(content, pageable, page.getTotalElements());
     }
+    @Transactional
+    public void updateGlobalRanking() {
+        // Lấy dữ liệu bảng xếp hạng mới
+        List<GlobalRankingDto> rankingDtos = globalMemberRankingRepository.calculateGlobalRanking();
 
+        // Xóa toàn bộ bảng xếp hạng hiện tại
+        globalMemberRankingRepository.deleteAllInBatch();
+
+        // Mapping DTO -> Entity
+        List<GlobalMemberRanking> newRankings = rankingDtos.stream()
+                .map(dto -> GlobalMemberRanking.builder()
+                        .memberId(dto.getMemberId())
+                        .fullName(dto.getFullName())
+                        .totalStars(dto.getTotalStars())
+                        .lastUpdated(java.time.LocalDateTime.now())
+                        .build())
+                .collect(Collectors.toList());
+
+        // Save bảng xếp hạng mới
+        globalMemberRankingRepository.saveAll(newRankings);
+    }
+
+    public Page<GlobalMemberRanking> getGlobalRanking(Pageable pageable) {
+        return globalMemberRankingRepository.findAllByOrderByTotalStarsDesc(pageable);
+    }
 
 }

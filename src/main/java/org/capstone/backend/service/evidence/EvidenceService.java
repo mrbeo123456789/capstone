@@ -18,5 +18,5 @@ public interface EvidenceService {
     List<EvidenceToReviewDTO> getEvidenceAssignedForMemberToReview(Long challengeId);
     List<EvidenceToReviewDTO> getMySubmittedEvidencesByChallenge(Long challengeId);
     void assignPendingReviewersForChallenge(Long challengeId);
-
+    double getApprovedEvidencePercentage(Long memberId, Long challengeId);
 }

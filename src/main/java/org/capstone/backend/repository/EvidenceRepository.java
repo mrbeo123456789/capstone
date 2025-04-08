@@ -20,7 +20,13 @@ public interface EvidenceRepository extends JpaRepository<Evidence, Long> {
             "WHERE e.challenge.id = :challengeId AND e.status = 'PENDING' AND e.evidenceReport IS NULL " +
             "ORDER BY e.submittedAt ASC")
     List<Evidence> findAllUnassignedEvidenceByChallengeOrderBySubmittedAtAsc(@Param("challengeId") Long challengeId);
+    @Query("SELECT COUNT(e) FROM Evidence e WHERE e.member.id = :memberId AND e.challenge.id = :challengeId")
+    long countTotalEvidence(@Param("memberId") Long memberId, @Param("challengeId") Long challengeId);
 
+    @Query("SELECT COUNT(e) FROM Evidence e WHERE e.member.id = :memberId AND e.challenge.id = :challengeId AND e.status = :status")
+    long countApprovedEvidence(@Param("memberId") Long memberId,
+                               @Param("challengeId") Long challengeId,
+                               @Param("status") EvidenceStatus status);
     // EvidenceRepository.java
     List<Evidence> findByMemberIdAndChallengeIdOrderBySubmittedAtAsc(Long memberId, Long challengeId);
     List<Evidence> findByChallengeIdAndStatus(Long challengeId, EvidenceStatus status);
