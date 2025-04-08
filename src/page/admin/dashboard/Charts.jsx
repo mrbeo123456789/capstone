@@ -1,4 +1,5 @@
 import {useMemo, useState} from "react";
+import {useNavigate} from "react-router-dom";
 import {
     LineChart,
     Line,
@@ -15,6 +16,7 @@ import {
 import { useGetGrowthQuery, useGetSummaryQuery } from "../../../service/adminService";
 
 const Charts = () => {
+    const navigate = useNavigate();
     const [timePeriod, setTimePeriod] = useState("MONTH");
     const { data: growthData = {}, isLoading } = useGetGrowthQuery({ range: timePeriod });
 
@@ -37,24 +39,40 @@ const Charts = () => {
     const challengesData = Object.entries(challengeStatusCounts).map(([key, value]) => {
         let color = "#9ca3af";
         switch (key) {
-            case "Completed":
+            case "UPCOMING":
                 color = "#10b981";
                 break;
-            case "Ongoing":
+            case "ONGOING":
                 color = "#f97316";
                 break;
-            case "Pending":
+            case "BANNED":
                 color = "#3b82f6";
                 break;
-            case "Failed":
-                color = "#ef4444";
+            case "CANCELED":
+                color = "#e0dee8";
+                break;
+            case "APPROVED":
+                color = "#8b5cf6";  // Purple
+                break;
+            case "FINISH":
+                color = "#0ea5e9";  // Sky blue
+                break;
+            case "REJECTED":
+                color = "#f43f5e";  // Rose/pink
                 break;
             default:
-                color = "#9ca3af";
+                color = "#9ca3af";  // Default gray
         }
         return { name: key, value: Number(value) || 0, color };
     });
     const totalChallenges = challengesData.reduce((acc, item) => acc + item.value, 0);
+
+    // Hàm xử lý khi người dùng nhấp vào một phần của biểu đồ tròn
+    const handlePieClick = (data, index) => {
+        const status = data.name;
+        // Điều hướng đến trang danh sách challenge với tham số status
+        navigate(`/admin/challengelist?status=${status}`);
+    };
 
     const CustomPieTooltip = ({ active, payload }) => {
         if (active && payload && payload.length) {
@@ -179,6 +197,8 @@ const Charts = () => {
                                         paddingAngle={3}
                                         cornerRadius={4}
                                         stroke="none"
+                                        onClick={handlePieClick}
+                                        cursor="pointer"
                                     >
                                         {challengesData.map((entry, index) => (
                                             <Cell key={`cell-${index}`} fill={entry.color} />
@@ -196,15 +216,19 @@ const Charts = () => {
 
                     <div className="w-full md:w-1/3 flex flex-col justify-center space-y-4 mt-4 md:mt-0 md:ml-6">
                         {challengesData.map((item, index) => (
-                            <div key={index} className="flex items-center p-2 rounded-md hover:bg-orange-50 transition-colors">
+                            <div
+                                key={index}
+                                className="flex items-center p-2 rounded-md hover:bg-orange-50 transition-colors cursor-pointer"
+                                onClick={() => handlePieClick(item, index)}
+                            >
                                 <div className="w-4 h-4 rounded-full mr-3" style={{ backgroundColor: item.color }}></div>
                                 <div>
                                     <span className="text-gray-800 font-medium block">{item.name}</span>
                                     <div className="flex items-center gap-2">
                                         <span className="text-lg font-bold text-gray-700">{item.value}</span>
                                         <span className="text-xs text-gray-500">
-                      ({totalChallenges > 0 ? ((item.value / totalChallenges) * 100).toFixed(0) : "0"}%)
-                    </span>
+                                            ({totalChallenges > 0 ? ((item.value / totalChallenges) * 100).toFixed(0) : "0"}%)
+                                        </span>
                                     </div>
                                 </div>
                             </div>

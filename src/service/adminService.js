@@ -95,10 +95,10 @@ export const adminUserService = createApi({
                 const params = new URLSearchParams();
                 params.append("page", page);
                 params.append("size", size);
-                if (name.trim()) {
+                if (name && name.trim()) {
                     params.append("name", name.trim());
                 }
-                if (status.trim()) {
+                if (status && status.trim()) {
                     params.append("status", status.trim());
                 }
                 const url = `/admin/challenges/all?${params.toString()}`;
@@ -160,15 +160,98 @@ export const adminUserService = createApi({
             }),
             invalidatesTags: ["Admin"],
         }),
+
+        getChallengeTypes: builder.query({
+            query: ({ keyword = "", page = 0, size = 10 } = {}) => {
+                const params = new URLSearchParams();
+                params.append("page", page);
+                params.append("size", size);
+                if (keyword && keyword.trim()) {
+                    params.append("keyword", keyword.trim());
+                }
+                const url = `/admin/setting/challenge-types?${params.toString()}`;
+                console.log("Fetching ChallengeTypes URL:", url);
+                return url;
+            },
+            providesTags: ["Admin"],
+        }),
+
+        createChallengeType: builder.mutation({
+            query: (challengeType) => ({
+                url: `/admin/setting/challenge-types`,
+                method: "POST",
+                body: challengeType,
+            }),
+            invalidatesTags: ["Admin"],
+        }),
+
+        updateChallengeType: builder.mutation({
+            query: ({ id, challengeType }) => ({
+                url: `/admin/setting/challenge-types/${id}`,
+                method: "PUT",
+                body: challengeType,
+            }),
+            invalidatesTags: ["Admin"],
+        }),
+
+        deleteChallengeType: builder.mutation({
+            query: (id) => ({
+                url: `/admin/setting/challenge-types/${id}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: ["Admin"],
+        }),
+
+        // --- INTERESTS ---
+        getInterests: builder.query({
+            query: ({ keyword = "", page = 0, size = 10 } = {}) => {
+                const params = new URLSearchParams();
+                params.append("page", page);
+                params.append("size", size);
+                if (keyword && keyword.trim()) {
+                    params.append("keyword", keyword.trim());
+                }
+                const url = `/admin/setting/interests?${params.toString()}`;
+                console.log("Fetching Interests URL:", url);
+                return url;
+            },
+            providesTags: ["Admin"],
+        }),
+
+        createInterest: builder.mutation({
+            query: (interest) => ({
+                url: `/admin/setting/interests`,
+                method: "POST",
+                body: interest,
+            }),
+            invalidatesTags: ["Admin"],
+        }),
+
+        updateInterest: builder.mutation({
+            query: ({ id, interest }) => ({
+                url: `/admin/setting/interests/${id}`,
+                method: "PUT",
+                body: interest,
+            }),
+            invalidatesTags: ["Admin"],
+        }),
+
+        deleteInterest: builder.mutation({
+            query: (id) => ({
+                url: `/admin/setting/interests/${id}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: ["Admin"],
+        }),
     }),
 });
+
 
 export const {
     useGetUsersQuery,
     useGetUserByIdQuery,
     useBanUserMutation,
     useUnbanUserMutation,
-    useSearchUsersQuery,
     useGetChallengesQuery,
     useReviewChallengeMutation,
     useGetGroupsQuery,
@@ -176,4 +259,12 @@ export const {
     useGetGrowthQuery,
     useGetReportsQuery,
     useUpdateReportStatusMutation,
+    useGetChallengeTypesQuery,
+    useCreateChallengeTypeMutation,
+    useUpdateChallengeTypeMutation,
+    useDeleteChallengeTypeMutation,
+    useGetInterestsQuery,
+    useCreateInterestMutation,
+    useUpdateInterestMutation,
+    useDeleteInterestMutation,
 } = adminUserService;

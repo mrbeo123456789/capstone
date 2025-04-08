@@ -34,7 +34,7 @@ const ChallengeList = () => {
         isLoading,
         isError,
         refetch,
-    } = useGetChallengesQuery({ page: currentPage - 1, size: itemsPerPage });
+    } = useGetChallengesQuery({ page: currentPage - 1, size: itemsPerPage, search: searchTerm, status: filterStatus});
 
     // Sử dụng mutation reviewChallenge
     const [reviewChallenge] = useReviewChallengeMutation();
@@ -97,7 +97,7 @@ const ChallengeList = () => {
     // Client-side pagination
     const indexOfLastChallenge = currentPage * itemsPerPage;
     const indexOfFirstChallenge = indexOfLastChallenge - itemsPerPage;
-    const currentChallenges = sortedChallenges;
+    const currentChallenges = challengesResponse?.content || [];
     const totalPages = challengesResponse?.totalPages || Math.ceil(sortedChallenges.length / itemsPerPage);
 
     // Navigation tới chi tiết thử thách
@@ -143,6 +143,7 @@ const ChallengeList = () => {
     const handleSearchChange = (e) => {
         setSearchTerm(e.target.value);
         setCurrentPage(1);
+        // Có thể thêm debounce ở đây nếu cần
     };
 
     // Pagination handlers

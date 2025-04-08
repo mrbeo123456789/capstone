@@ -197,7 +197,7 @@ const ChallengeDetail = () => {
                 </div>
 
                 {/* Tabs Section */}
-                <div className="mt-6 w-full max-w-4xl">
+                <div className="mt-6 w-full">
                     <div className="flex border-b">
                         {["info", "rules", "rankings", "evidence"].map((tab) => (
                             <button
@@ -219,110 +219,115 @@ const ChallengeDetail = () => {
                             </button>
                         ))}
                     </div>
+
                     {/* Tab Content */}
-                    <div className="p-6 bg-white shadow-md rounded-lg mt-4">
-                        {activeTab === "info" && (
-                            <div>
-                                <h2 className="text-2xl font-bold text-gray-900">
-                                    {challenge.name}
-                                </h2>
-                                <p className="text-gray-500 mt-2">
-                                    {new Date(challenge.startDate).toLocaleDateString('vi-VN')} - {new Date(challenge.endDate).toLocaleDateString('vi-VN')}
-                                </p>
-                                <p className="text-sm text-gray-700 mt-2">
-                                    Người tạo: <span className="text-blue-500 font-semibold">{challenge.created_by}</span>
-                                </p>
-                                <p className="text-sm text-gray-700 mt-2">
-                                    Số người tham gia: <span className="text-blue-500 font-semibold">{challenge.participantCount}</span>
-                                </p>
-
-                                <div className="mt-6 border-t pt-4">
-                                    <h3 className="text-lg font-semibold text-gray-800">
-                                        MÔ TẢ
-                                    </h3>
-                                    <p className="text-gray-700 mt-2">
-                                        {challenge.description}
-                                    </p>
-                                </div>
-
-                                {/* Moved summary section into info tab */}
-                                <div className="mt-6 border-t pt-4">
-                                    <h3 className="text-lg font-semibold text-gray-800">
-                                        TÓM TẮT
-                                    </h3>
-                                    <p className="text-gray-700 mt-2">
-                                        {challenge.summary || "Không có tóm tắt được cung cấp cho thử thách này."}
-                                    </p>
-                                </div>
-                            </div>
-                        )}
-                        {activeTab === "rules" && (
-                            <div>
-                                <h3 className="text-lg font-semibold text-gray-800">QUY ĐỊNH</h3>
-                                <p className="text-gray-700 mt-2">
-                                    {challenge.rule || "Không có quy định được cung cấp cho thử thách này."}
-                                </p>
-                            </div>
-                        )}
-                        {activeTab === "rankings" && (
-                            <div>
-                                <h3 className="text-lg font-semibold text-gray-800">BẢNG XẾP HẠNG</h3>
-                                <div className="mt-4 overflow-x-auto">
-                                    <table className="min-w-full bg-white">
-                                        <thead>
-                                        <tr className="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
-                                            <th className="py-3 px-6 text-left">Xếp hạng</th>
-                                            <th className="py-3 px-6 text-left">Thành viên</th>
-                                            <th className="py-3 px-6 text-right">Điểm số</th>
-                                            <th className="py-3 px-6 text-center">Hành động</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody className="text-gray-600 text-sm">
-                                        {mockParticipants.map((participant) => (
-                                            <tr key={participant.id} className="border-b border-gray-200 hover:bg-gray-50">
-                                                <td className="py-3 px-6 text-left whitespace-nowrap">
-                                                    <div className="flex items-center">
-                                                            <span className={`
-                                                                w-8 h-8 rounded-full flex items-center justify-center
-                                                                ${participant.rank === 1 ? 'bg-yellow-400' :
-                                                                participant.rank === 2 ? 'bg-gray-300' :
-                                                                    participant.rank === 3 ? 'bg-orange-300' : 'bg-gray-200'}
-                                                                text-white font-bold
-                                                            `}>
-                                                                {participant.rank}
-                                                            </span>
-                                                    </div>
-                                                </td>
-                                                <td className="py-3 px-6 text-left">
-                                                    <div className="flex items-center">
-                                                        <div className="mr-2">
-                                                            <img className="w-8 h-8 rounded-full" src={participant.avatar} alt={participant.name} />
-                                                        </div>
-                                                        <span>{participant.name}</span>
-                                                    </div>
-                                                </td>
-                                                <td className="py-3 px-6 text-right">
-                                                    <span className="font-bold">{participant.score}</span>
-                                                </td>
-                                                <td className="py-3 px-6 text-center">
-                                                    <button
-                                                        onClick={() => openKickModal(participant)}
-                                                        className="bg-red-100 text-red-600 py-1 px-3 rounded-full text-xs flex items-center justify-center mx-auto hover:bg-red-200"
-                                                    >
-                                                        <UserX className="h-3 w-3 mr-1" /> Kick
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        )}
-                        {activeTab === "evidence" && (
+                    {activeTab === "evidence" ? (
+                        // Evidence Tab - Full width like Challenge Banner Section
+                        <div className="w-full bg-white shadow-md rounded-lg mt-4">
                             <EvidenceList challengeData={challenge} />
-                        )}
-                    </div>
+                        </div>
+                    ) : (
+                        // Other Tabs - Original layout
+                        <div className="p-6 bg-white shadow-md rounded-lg mt-4 max-w-4xl mx-auto">
+                            {activeTab === "info" && (
+                                <div>
+                                    <h2 className="text-2xl font-bold text-gray-900">
+                                        {challenge.name}
+                                    </h2>
+                                    <p className="text-gray-500 mt-2">
+                                        {new Date(challenge.startDate).toLocaleDateString('vi-VN')} - {new Date(challenge.endDate).toLocaleDateString('vi-VN')}
+                                    </p>
+                                    <p className="text-sm text-gray-700 mt-2">
+                                        Người tạo: <span className="text-blue-500 font-semibold">{challenge.created_by}</span>
+                                    </p>
+                                    <p className="text-sm text-gray-700 mt-2">
+                                        Số người tham gia: <span className="text-blue-500 font-semibold">{challenge.participantCount}</span>
+                                    </p>
+
+                                    <div className="mt-6 border-t pt-4">
+                                        <h3 className="text-lg font-semibold text-gray-800">
+                                            MÔ TẢ
+                                        </h3>
+                                        <p className="text-gray-700 mt-2">
+                                            {challenge.description}
+                                        </p>
+                                    </div>
+
+                                    <div className="mt-6 border-t pt-4">
+                                        <h3 className="text-lg font-semibold text-gray-800">
+                                            TÓM TẮT
+                                        </h3>
+                                        <p className="text-gray-700 mt-2">
+                                            {challenge.summary || "Không có tóm tắt được cung cấp cho thử thách này."}
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+                            {activeTab === "rules" && (
+                                <div>
+                                    <h3 className="text-lg font-semibold text-gray-800">QUY ĐỊNH</h3>
+                                    <p className="text-gray-700 mt-2">
+                                        {challenge.rule || "Không có quy định được cung cấp cho thử thách này."}
+                                    </p>
+                                </div>
+                            )}
+                            {activeTab === "rankings" && (
+                                <div>
+                                    <h3 className="text-lg font-semibold text-gray-800">BẢNG XẾP HẠNG</h3>
+                                    <div className="mt-4 overflow-x-auto">
+                                        <table className="min-w-full bg-white">
+                                            <thead>
+                                            <tr className="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
+                                                <th className="py-3 px-6 text-left">Xếp hạng</th>
+                                                <th className="py-3 px-6 text-left">Thành viên</th>
+                                                <th className="py-3 px-6 text-right">Điểm số</th>
+                                                <th className="py-3 px-6 text-center">Hành động</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody className="text-gray-600 text-sm">
+                                            {mockParticipants.map((participant) => (
+                                                <tr key={participant.id} className="border-b border-gray-200 hover:bg-gray-50">
+                                                    <td className="py-3 px-6 text-left whitespace-nowrap">
+                                                        <div className="flex items-center">
+                                                                <span className={`
+                                                                    w-8 h-8 rounded-full flex items-center justify-center
+                                                                    ${participant.rank === 1 ? 'bg-yellow-400' :
+                                                                    participant.rank === 2 ? 'bg-gray-300' :
+                                                                        participant.rank === 3 ? 'bg-orange-300' : 'bg-gray-200'}
+                                                                    text-white font-bold
+                                                                `}>
+                                                                    {participant.rank}
+                                                                </span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="py-3 px-6 text-left">
+                                                        <div className="flex items-center">
+                                                            <div className="mr-2">
+                                                                <img className="w-8 h-8 rounded-full" src={participant.avatar} alt={participant.name} />
+                                                            </div>
+                                                            <span>{participant.name}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="py-3 px-6 text-right">
+                                                        <span className="font-bold">{participant.score}</span>
+                                                    </td>
+                                                    <td className="py-3 px-6 text-center">
+                                                        <button
+                                                            onClick={() => openKickModal(participant)}
+                                                            className="bg-red-100 text-red-600 py-1 px-3 rounded-full text-xs flex items-center justify-center mx-auto hover:bg-red-200"
+                                                        >
+                                                            <UserX className="h-3 w-3 mr-1" /> Kick
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
 

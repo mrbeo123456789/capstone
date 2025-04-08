@@ -179,13 +179,8 @@ const MemberAndEvidenceManagement = () => {
 
     return (
         <div className="bg-red-50 min-h-screen flex flex-col">
-            <div className="flex flex-1 overflow-hidden relative">
-                <div className={`transition-all duration-300 ${sidebarCollapsed ? 'w-16' : 'w-64'} flex-shrink-0`}>
-                    <Sidebar sidebarCollapsed={sidebarCollapsed} setSidebarCollapsed={setSidebarCollapsed} />
-                </div>
                 <div className="flex-1 flex flex-col overflow-hidden">
                     <div className="container mx-auto p-4 flex-grow">
-                        <h1 className="text-2xl font-bold text-orange-600 mb-6">Member and Evidence Management</h1>
                         {loading ? (
                             <div className="flex justify-center items-center h-64">
                                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
@@ -381,7 +376,6 @@ const MemberAndEvidenceManagement = () => {
                     )}
                 </div>
             </div>
-        </div>
     );
 };
 
