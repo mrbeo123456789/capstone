@@ -554,7 +554,134 @@ const AdminSettings = () => {
                                             <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
                                                 <Shield className="h-5 w-5 mr-2"/> User & Security Settings
                                             </h2>
-                                            {/* Nội dung User Settings giữ nguyên */}
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                        Default User Role
+                                                    </label>
+                                                    <select
+                                                        name="defaultUserRole"
+                                                        value={userSettings.defaultUserRole}
+                                                        onChange={handleUserChange}
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                    >
+                                                        <option value="member">Member</option>
+                                                        <option value="contributor">Challenge Host</option>
+                                                        <option value="moderator">Co-Host</option>
+                                                    </select>
+                                                </div>
+
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                        Minimum Password Length
+                                                    </label>
+                                                    <input
+                                                        type="number"
+                                                        name="minPasswordLength"
+                                                        min="6"
+                                                        max="20"
+                                                        value={userSettings.minPasswordLength}
+                                                        onChange={handleUserChange}
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                    />
+                                                </div>
+
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                        Maximum Login Attempts
+                                                    </label>
+                                                    <input
+                                                        type="number"
+                                                        name="maximumLoginAttempts"
+                                                        min="1"
+                                                        max="10"
+                                                        value={userSettings.maximumLoginAttempts}
+                                                        onChange={handleUserChange}
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                    />
+                                                </div>
+
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                        Account Lockout Duration (minutes)
+                                                    </label>
+                                                    <input
+                                                        type="number"
+                                                        name="lockoutDuration"
+                                                        min="5"
+                                                        max="1440"
+                                                        value={userSettings.lockoutDuration}
+                                                        onChange={handleUserChange}
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                    />
+                                                </div>
+
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                        Session Timeout (minutes)
+                                                    </label>
+                                                    <input
+                                                        type="number"
+                                                        name="sessionTimeout"
+                                                        min="5"
+                                                        max="1440"
+                                                        value={userSettings.sessionTimeout}
+                                                        onChange={handleUserChange}
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                    />
+                                                </div>
+
+                                                <div className="col-span-2">
+                                                    <div className="flex items-center">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="autoApproveUsers"
+                                                            name="autoApproveUsers"
+                                                            checked={userSettings.autoApproveUsers}
+                                                            onChange={handleUserChange}
+                                                            className="h-4 w-4 text-orange-500 focus:ring-orange-400 border-gray-300 rounded"
+                                                        />
+                                                        <label htmlFor="autoApproveUsers"
+                                                               className="ml-2 block text-sm text-gray-700">
+                                                            Automatically Approve New Users
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    <div className="flex items-center">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="passwordRequiresSpecialChar"
+                                                            name="passwordRequiresSpecialChar"
+                                                            checked={userSettings.passwordRequiresSpecialChar}
+                                                            onChange={handleUserChange}
+                                                            className="h-4 w-4 text-orange-500 focus:ring-orange-400 border-gray-300 rounded"
+                                                        />
+                                                        <label htmlFor="passwordRequiresSpecialChar"
+                                                               className="ml-2 block text-sm text-gray-700">
+                                                            Require Special Characters in Password
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    <div className="flex items-center">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="passwordRequiresNumber"
+                                                            name="passwordRequiresNumber"
+                                                            checked={userSettings.passwordRequiresNumber}
+                                                            onChange={handleUserChange}
+                                                            className="h-4 w-4 text-orange-500 focus:ring-orange-400 border-gray-300 rounded"
+                                                        />
+                                                        <label htmlFor="passwordRequiresNumber"
+                                                               className="ml-2 block text-sm text-gray-700">
+                                                            Require Numbers in Password
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     )}
 
@@ -564,7 +691,161 @@ const AdminSettings = () => {
                                             <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
                                                 <Bell className="h-5 w-5 mr-2"/> Notification Settings
                                             </h2>
-                                            {/* Nội dung Notification Settings giữ nguyên */}
+                                            <div className="space-y-4">
+                                                <div className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="enableEmailNotifications"
+                                                        name="enableEmailNotifications"
+                                                        checked={notificationSettings.enableEmailNotifications}
+                                                        onChange={handleNotificationChange}
+                                                        className="h-4 w-4 text-orange-500 focus:ring-orange-400 border-gray-300 rounded"
+                                                    />
+                                                    <label htmlFor="enableEmailNotifications"
+                                                           className="ml-2 block text-sm text-gray-700">
+                                                        Enable Email Notifications
+                                                    </label>
+                                                </div>
+
+                                                <div className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="enablePushNotifications"
+                                                        name="enablePushNotifications"
+                                                        checked={notificationSettings.enablePushNotifications}
+                                                        onChange={handleNotificationChange}
+                                                        className="h-4 w-4 text-orange-500 focus:ring-orange-400 border-gray-300 rounded"
+                                                    />
+                                                    <label htmlFor="enablePushNotifications"
+                                                           className="ml-2 block text-sm text-gray-700">
+                                                        Enable Push Notifications
+                                                    </label>
+                                                </div>
+
+                                                <hr className="my-4"/>
+                                                <h3 className="font-medium text-gray-900">Admin Notifications</h3>
+
+                                                <div className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="adminNotifyOnNewUser"
+                                                        name="adminNotifyOnNewUser"
+                                                        checked={notificationSettings.adminNotifyOnNewUser}
+                                                        onChange={handleNotificationChange}
+                                                        className="h-4 w-4 text-orange-500 focus:ring-orange-400 border-gray-300 rounded"
+                                                    />
+                                                    <label htmlFor="adminNotifyOnNewUser"
+                                                           className="ml-2 block text-sm text-gray-700">
+                                                        Notify Admins When New Users Register
+                                                    </label>
+                                                </div>
+
+                                                <div className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="adminNotifyOnNewChallenge"
+                                                        name="adminNotifyOnNewChallenge"
+                                                        checked={notificationSettings.adminNotifyOnNewChallenge}
+                                                        onChange={handleNotificationChange}
+                                                        className="h-4 w-4 text-orange-500 focus:ring-orange-400 border-gray-300 rounded"
+                                                    />
+                                                    <label htmlFor="adminNotifyOnNewChallenge"
+                                                           className="ml-2 block text-sm text-gray-700">
+                                                        Notify Admins When New Challenges Are Created
+                                                    </label>
+                                                </div>
+                                                <div className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="adminNotifyOnNewChallenge"
+                                                        name="adminNotifyOnNewChallenge"
+                                                        checked={notificationSettings.adminNotifyOnNewReport}
+                                                        onChange={handleNotificationChange}
+                                                        className="h-4 w-4 text-orange-500 focus:ring-orange-400 border-gray-300 rounded"
+                                                    />
+                                                    <label htmlFor="adminNotifyOnNewChallenge"
+                                                           className="ml-2 block text-sm text-gray-700">
+                                                        Notify Admins When New Reports Are Created
+                                                    </label>
+                                                </div>
+                                                <div className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="adminNotifyOnNewChallenge"
+                                                        name="adminNotifyOnNewChallenge"
+                                                        checked={notificationSettings.adminNotifyOnNewGroup}
+                                                        onChange={handleNotificationChange}
+                                                        className="h-4 w-4 text-orange-500 focus:ring-orange-400 border-gray-300 rounded"
+                                                    />
+                                                    <label htmlFor="adminNotifyOnNewChallenge"
+                                                           className="ml-2 block text-sm text-gray-700">
+                                                        Notify Admins When New Groups Are Created
+                                                    </label>
+                                                </div>
+
+                                                <hr className="my-4"/>
+                                                <h3 className="font-medium text-gray-900">User Notifications</h3>
+
+                                                <div className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="challengeCreationNotification"
+                                                        name="challengeCreationNotification"
+                                                        checked={notificationSettings.challengeCreationNotification}
+                                                        onChange={handleNotificationChange}
+                                                        className="h-4 w-4 text-orange-500 focus:ring-orange-400 border-gray-300 rounded"
+                                                    />
+                                                    <label htmlFor="challengeCreationNotification"
+                                                           className="ml-2 block text-sm text-gray-700">
+                                                        Notify Users When New Challenges Are Created
+                                                    </label>
+                                                </div>
+
+                                                <div className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="evidenceSubmissionNotification"
+                                                        name="evidenceSubmissionNotification"
+                                                        checked={notificationSettings.evidenceSubmissionNotification}
+                                                        onChange={handleNotificationChange}
+                                                        className="h-4 w-4 text-orange-500 focus:ring-orange-400 border-gray-300 rounded"
+                                                    />
+                                                    <label htmlFor="evidenceSubmissionNotification"
+                                                           className="ml-2 block text-sm text-gray-700">
+                                                        Notify Challenge Host When Evidence Is Submitted
+                                                    </label>
+                                                </div>
+
+                                                <div className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="challengeCompletionNotification"
+                                                        name="challengeCompletionNotification"
+                                                        checked={notificationSettings.challengeCompletionNotification}
+                                                        onChange={handleNotificationChange}
+                                                        className="h-4 w-4 text-orange-500 focus:ring-orange-400 border-gray-300 rounded"
+                                                    />
+                                                    <label htmlFor="challengeCompletionNotification"
+                                                           className="ml-2 block text-sm text-gray-700">
+                                                        Notify Users When Challenges Are Completed
+                                                    </label>
+                                                </div>
+
+                                                <div className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="systemUpdatesNotification"
+                                                        name="systemUpdatesNotification"
+                                                        checked={notificationSettings.systemUpdatesNotification}
+                                                        onChange={handleNotificationChange}
+                                                        className="h-4 w-4 text-orange-500 focus:ring-orange-400 border-gray-300 rounded"
+                                                    />
+                                                    <label htmlFor="systemUpdatesNotification"
+                                                           className="ml-2 block text-sm text-gray-700">
+                                                        Notify All Users About System Updates
+                                                    </label>
+                                                </div>
+                                            </div>
                                         </div>
                                     )}
 
@@ -574,7 +855,87 @@ const AdminSettings = () => {
                                             <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
                                                 <Mail className="h-5 w-5 mr-2"/> Email Configuration
                                             </h2>
-                                            {/* Nội dung Email Settings giữ nguyên */}
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                        SMTP Username
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        name="smtpUsername"
+                                                        value={emailSettings.smtpUsername}
+                                                        onChange={handleEmailChange}
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                    />
+                                                </div>
+
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                        SMTP Password
+                                                    </label>
+                                                    <input
+                                                        type="password"
+                                                        name="smtpPassword"
+                                                        value={emailSettings.smtpPassword}
+                                                        onChange={handleEmailChange}
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                    />
+                                                </div>
+
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                        Sender Name
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        name="senderName"
+                                                        value={emailSettings.senderName}
+                                                        onChange={handleEmailChange}
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                    />
+                                                </div>
+
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                        Sender Email
+                                                    </label>
+                                                    <input
+                                                        type="email"
+                                                        name="senderEmail"
+                                                        value={emailSettings.senderEmail}
+                                                        onChange={handleEmailChange}
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                    />
+                                                </div>
+
+                                                <div className="col-span-2">
+                                                    <div className="flex items-center">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="enableSsl"
+                                                            name="enableSsl"
+                                                            checked={emailSettings.enableSsl}
+                                                            onChange={handleEmailChange}
+                                                            className="h-4 w-4 text-orange-500 focus:ring-orange-400 border-gray-300 rounded"
+                                                        />
+                                                        <label htmlFor="enableSsl"
+                                                               className="ml-2 block text-sm text-gray-700">
+                                                            Enable SSL/TLS
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                <div className="col-span-2">
+                                                    <button
+                                                        type="button"
+                                                        onClick={handleTestEmail}
+                                                        className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                                    >
+                                                        Send Test Email
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                     )}
 

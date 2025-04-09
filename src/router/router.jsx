@@ -6,7 +6,6 @@ import MemberProfile from "../page/member/MemberProfile.jsx";
 import AuthCallBack from "../page/signin/AuthCallBack.jsx";
 import LoginPage from "../page/signin/LoginPage.jsx";
 import OTPPage from "../page/ui/Otp.jsx";
-import GroupMember from "../page/group/GroupMember.jsx";
 import ChallengeForm from "../page/challenge/ChallengeForm.jsx";
 import ChangePassword from "../page/signin/ChangePassword.jsx";
 import HomePage from "../page/ui/HomePage.jsx";
@@ -31,6 +30,7 @@ import AboutUsPage from "../page/ui/AboutUs.jsx";
 import AdminChallengeDetail from "../page/admin/detailmodal/ChallengeDetail.jsx"
 import NotFoundPage from "../component/NotFoundPage.jsx";
 import ReportDetail from "../page/admin/detailmodal/ReportDetail.jsx";
+import AdminSettings from "../page/admin/list/Settings.jsx";
 const router = createBrowserRouter([
     {
         path: "/", // ✅ Redirect root to homepage
@@ -183,6 +183,11 @@ const router = createBrowserRouter([
                 path:"/admin/challengelist",
                 errorElement:<ErrorPage/>,
                 element: <ChallengeList/>,
+            },
+            {
+                path:"/admin/settings",
+                errorElement:<ErrorPage/>,
+                element: <AdminSettings/>,
             },
             {
                 path:"/admin/challenge/:id/detail",

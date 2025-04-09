@@ -139,7 +139,7 @@ const UserList = () => {
                     <div className="bg-white rounded-lg shadow-xl w-full max-w-xl p-6">
                         <p className="text-center text-red-500">Error loading user details.</p>
                         <button onClick={onClose} className="mt-4 px-4 py-2 bg-gray-300 rounded">
-                            Đóng
+                            Close
                         </button>
                     </div>
                 </div>
@@ -153,12 +153,12 @@ const UserList = () => {
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                 <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl overflow-hidden animate-fadeIn">
                     <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white p-4 flex justify-between items-center">
-                        <h2 className="text-xl font-bold">Chi tiết người dùng</h2>
+                        <h2 className="text-xl font-bold">User detail</h2>
                         <button
                             onClick={onClose}
                             className="px-3 py-1 bg-gray-600 hover:bg-gray-700 rounded-md text-sm font-medium"
                         >
-                            Đóng
+                            Close
                         </button>
                     </div>
 
@@ -184,7 +184,7 @@ const UserList = () => {
                             <div className="bg-orange-50 p-3 rounded-lg">
                                 <div className="flex items-center mb-1 text-orange-700">
                                     <FaIdCard className="mr-2" />
-                                    <span className="text-sm font-medium">Tên đăng nhập</span>
+                                    <span className="text-sm font-medium">Username</span>
                                 </div>
                                 <div className="text-gray-800 pl-6">{userData.username}</div>
                             </div>
@@ -200,7 +200,7 @@ const UserList = () => {
                             <div className="bg-orange-50 p-3 rounded-lg">
                                 <div className="flex items-center mb-1 text-orange-700">
                                     <FaPhone className="mr-2" />
-                                    <span className="text-sm font-medium">Số điện thoại</span>
+                                    <span className="text-sm font-medium">Phone</span>
                                 </div>
                                 <div className="text-gray-800 pl-6">{userData.phone}</div>
                             </div>
@@ -208,7 +208,7 @@ const UserList = () => {
                             <div className="bg-orange-50 p-3 rounded-lg">
                                 <div className="flex items-center mb-1 text-orange-700">
                                     <FaBirthdayCake className="mr-2" />
-                                    <span className="text-sm font-medium">Ngày sinh</span>
+                                    <span className="text-sm font-medium">Date of birth</span>
                                 </div>
                                 <div className="text-gray-800 pl-6">{userData.dateOfBirth || "N/A"}</div>
                             </div>
@@ -216,7 +216,7 @@ const UserList = () => {
                             <div className="bg-orange-50 p-3 rounded-lg md:col-span-2">
                                 <div className="flex items-center mb-1 text-orange-700">
                                     <FaMapMarkerAlt className="mr-2" />
-                                    <span className="text-sm font-medium">Địa chỉ</span>
+                                    <span className="text-sm font-medium">Address</span>
                                 </div>
                                 <div className="text-gray-800 pl-6">{userData.address || "N/A"}</div>
                             </div>
@@ -224,7 +224,7 @@ const UserList = () => {
                             <div className="bg-orange-50 p-3 rounded-lg md:col-span-2">
                                 <div className="flex items-center mb-1 text-orange-700">
                                     <FaUser className="mr-2" />
-                                    <span className="text-sm font-medium">Trạng thái</span>
+                                    <span className="text-sm font-medium">Status</span>
                                 </div>
                                 <div className="flex items-center pl-6">
                                     {userData.status?.toLowerCase() === "active" ? (
@@ -233,7 +233,7 @@ const UserList = () => {
                                         <FaTimesCircle className="text-red-500 mr-2" />
                                     )}
                                     <span className={`font-medium ${userData.status?.toLowerCase() === "active" ? "text-green-600" : "text-red-600"}`}>
-                                        {userData.status?.toLowerCase() === "active" ? "Đang hoạt động" : "Đã bị khóa"}
+                                        {userData.status?.toLowerCase() === "active" ? "active" : "inactive"}
                                     </span>
                                 </div>
                             </div>
@@ -261,7 +261,7 @@ const UserList = () => {
                             onClick={onClose}
                             className="px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
                         >
-                            Đóng
+                            Close
                         </button>
                     </div>
                 </div>
@@ -279,7 +279,7 @@ const UserList = () => {
                     <div className="flex-1 overflow-auto p-4">
                         <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-orange-100 h-full flex flex-col">
                             <div className="p-4 border-b border-orange-100 bg-gradient-to-r from-orange-50 to-yellow-50">
-                                <h1 className="text-2xl font-bold text-orange-600 mb-4">Quản lý người dùng</h1>
+                                <h1 className="text-2xl font-bold text-orange-600 mb-4">User Management</h1>
                                 <div className="flex flex-col md:flex-row gap-3 justify-between">
                                     <div className="relative flex-1">
                                         <input
@@ -307,7 +307,7 @@ const UserList = () => {
                                     </div>
                                 ) : isError ? (
                                     <div className="flex justify-center items-center h-64 text-red-500">
-                                        <p>Đã xảy ra lỗi khi tải dữ liệu. Vui lòng thử lại.</p>
+                                        <p>Error fetching data. Please try again</p>
                                     </div>
                                 ) : (
                                     <table className="w-full">
@@ -315,25 +315,25 @@ const UserList = () => {
                                         <tr>
                                             <th className="p-4 text-left font-bold text-orange-800">
                                                 <button className="flex items-center" onClick={() => handleSort("username")}>
-                                                    Tên
+                                                    Username
                                                     <FaSort className="ml-1 text-orange-500" />
                                                 </button>
                                             </th>
                                             <th className="p-4 text-left font-bold text-orange-800 hidden md:table-cell">Email</th>
                                             <th className="p-4 text-left font-bold text-orange-800">
                                                 <button className="flex items-center" onClick={() => handleSort("status")}>
-                                                    Trạng thái
+                                                    Status
                                                     <FaSort className="ml-1 text-orange-500" />
                                                 </button>
                                             </th>
-                                            <th className="p-4 text-left font-bold text-orange-800">Thao tác</th>
+                                            <th className="p-4 text-left font-bold text-orange-800">Action</th>
                                         </tr>
                                         </thead>
                                         <tbody>
                                         {currentUsers.length === 0 ? (
                                             <tr>
                                                 <td colSpan="5" className="p-4 text-center text-gray-500">
-                                                    Không có người dùng nào phù hợp với tìm kiếm của bạn.
+                                                    Don't have any user match with your looking for
                                                 </td>
                                             </tr>
                                         ) : (
@@ -361,12 +361,12 @@ const UserList = () => {
                                                         {user.status.toLowerCase() === "banned" ? (
                                                             <div className="flex items-center text-red-500">
                                                                 <FaTimesCircle className="mr-2" />
-                                                                <span className="text-sm font-medium">Đã khóa</span>
+                                                                <span className="text-sm font-medium">inactive</span>
                                                             </div>
                                                         ) : (
                                                             <div className="flex items-center text-green-500">
                                                                 <FaCheckCircle className="mr-2" />
-                                                                <span className="text-sm font-medium">Hoạt động</span>
+                                                                <span className="text-sm font-medium">active</span>
                                                             </div>
                                                         )}
                                                     </td>
@@ -410,16 +410,16 @@ const UserList = () => {
                             </div>
                             <div className="bg-gradient-to-r from-orange-50 to-yellow-50 p-4 flex flex-col md:flex-row md:items-center justify-between border-t border-orange-100 gap-4">
                                 <div className="text-gray-600">
-                                    Hiển thị{" "}
+                                    Display{" "}
                                     <span className="font-medium">
                                         {currentUsers.length > 0 ? (currentPage * usersPerPage) + 1 : 0}
                                     </span>{" "}
-                                    đến{" "}
+                                    to{" "}
                                     <span className="font-medium">
                                         {(currentPage * usersPerPage) + currentUsers.length}
                                     </span>{" "}
-                                    trong tổng số{" "}
-                                    <span className="font-medium">{totalElements}</span> người dùng
+                                    in total{" "}
+                                    <span className="font-medium">{totalElements}</span> users
                                 </div>
                                 <div className="flex space-x-2 self-center md:self-auto">
                                     <button
