@@ -161,10 +161,10 @@ public class InvitationService implements InvitationServiceInterface {
                                     .orElse("Unknown"))
                             .toList();
 
-                    String inviterDisplay = (inviterNames.size() == 1) ? inviterNames.get(0) : "Multiple invitations";
+                    String inviterDisplay = (inviterNames.size() == 1) ? inviterNames.get(0) : "Multiple users";
                     Long invitationId = challengeMembers.get(0).getId();
 
-                    return new InvitationResponseDTO(challenge.getId(), invitationId, challenge.getName(), challenge.getPicture(), inviterDisplay);
+                    return new InvitationResponseDTO(challenge.getId(), invitationId, challenge.getName(),  inviterDisplay,challenge.getPicture());
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
