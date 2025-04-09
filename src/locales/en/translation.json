@@ -30,5 +30,23 @@
   "addInterest": "Add Interest",
   "updating": "Updating...",
   "updateProfile": "Update Profile",
-  "selectChallengeType": "Select Challenge Type"
+  "selectChallengeType": "Select Challenge Type",
+
+  "challengeInvite": {
+    "memberList": "Member List",
+    "searchPlaceholder": "Search by name or email...",
+    "search": "Search",
+    "close": "Close",
+    "invite": "Invite",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page",
+    "selectAtLeastOne": "Please select at least one member.",
+    "inviteSuccess": "Invitation sent successfully!",
+    "inviteFailed": "Failed to send invitation.",
+    "searchFailed": "Failed to search members.",
+    "title": "Invite to Challenge",
+    "inviteMembers": "Invite Members",
+    "inviteGroups": "Invite Groups"
+  }
 }

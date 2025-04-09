@@ -6,10 +6,11 @@ import VoteOther from "./VoteOther";
 import MemberListPopup from "../ui/MemberListPopup.jsx";
 import {useParams} from "react-router-dom";
 import {useGetChallengeDetailQuery} from "../../service/challengeService.js";
-import Description from "./description.jsx";
+import Description from "./Description.jsx";
 import ProgressTracking from "./ProgressTracking.jsx";
 import {useGetMyEvidencesByChallengeQuery} from "../../service/evidenceService.js";
 import {FaCheckCircle, FaClipboardCheck, FaInfoCircle, FaStar, FaTrophy} from "react-icons/fa";
+import ChallengeInvitePopup from "./ChallengeInvitePopup.jsx";
 
 const JoinedChallengeDetail = () => {
     const [activeTab, setActiveTab] = useState("proof");
@@ -34,8 +35,7 @@ const JoinedChallengeDetail = () => {
     const challenge = data;
 
     // Invite Section
-    const openMemberList = () => {
-        console.log("openUserDetail");
+    const openInviteMember = () => {
         setShowPopup(true);
     };
 
@@ -71,7 +71,7 @@ const JoinedChallengeDetail = () => {
                                     <div
                                         className="absolute z-10 mt-2 w-44 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
                                         <div className="py-1">
-                                            <button onClick={() => openMemberList()}
+                                            <button onClick={() => openInviteMember()}
                                                     className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">Invite
                                             </button>
                                             <button
@@ -148,7 +148,7 @@ const JoinedChallengeDetail = () => {
                 {activeTab === "description" && <Description content={challenge?.description}/>}
                 {/* User Detail Popup */}
                 {showPopup && (
-                    <MemberListPopup
+                    <ChallengeInvitePopup
                         onClose={closeUserDetail}
                     />
                 )}

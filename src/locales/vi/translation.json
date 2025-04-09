@@ -30,5 +30,21 @@
   "addInterest": "Thêm sở thích",
   "updating": "Đang cập nhật...",
   "updateProfile": "Cập nhật hồ sơ",
-  "selectChallengeType": "Chọn kiểu thử thách"
+  "selectChallengeType": "Chọn kiểu thử thách",
+
+  "challengeInvite": {
+    "memberList": "Danh sách thành viên",
+    "searchPlaceholder": "Tìm kiếm theo tên hoặc email...",
+    "search": "Tìm kiếm",
+    "close": "Đóng",
+    "invite": "Mời",
+    "previous": "Trước",
+    "next": "Sau",
+    "page": "Trang",
+    "selectAtLeastOne": "Vui lòng chọn ít nhất một thành viên.",
+    "inviteSuccess": "Gửi lời mời thành công!",
+    "inviteFailed": "Gửi lời mời thất bại.",
+    "searchFailed": "Tìm kiếm thất bại."
+  }
+
 }

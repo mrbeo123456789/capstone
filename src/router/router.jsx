@@ -20,7 +20,7 @@ import UserList from "../page/admin/list/UserList.jsx";
 import ChallengeDetail from "../page/challenge/ChallengeDetail.jsx";
 import JoinedChallengeDetail from "../page/challenge/JoinedChallengeDetail.jsx";
 import YourChallenge from "../page/challenge/YourChallenge.jsx";
-import GroupUsers from "../page/group/GroupUsers.jsx";
+import GroupUsers from "../page/group/JoinedGroupDetail.jsx";
 import GroupForm from "../page/group/GroupForm.jsx";
 import YourGroup from "../page/group/YourGroup.jsx";
 import Home from "../heroBanner/Home.jsx";
