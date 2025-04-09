@@ -5,22 +5,21 @@ export const evidenceService = createApi({
     reducerPath: "evidence",
     baseQuery: fetchBaseQuery({
         baseUrl: BASE_URL,
-        prepareHeaders: (headers, { getState }) => {
+        prepareHeaders: (headers) => {
             const token = localStorage.getItem("jwt_token");
             if (token) {
                 headers.set("Authorization", `Bearer ${token}`);
             }
-            // ❌ DO NOT manually set Content-Type for FormData
             return headers;
         },
     }),
     endpoints: (builder) => ({
+        // POST: /evidences/upload
         uploadEvidence: builder.mutation({
             query: ({ file, challengeId }) => {
                 const formData = new FormData();
                 formData.append("file", file);
                 formData.append("data", challengeId);
-
                 return {
                     url: "/evidences/upload",
                     method: "POST",
@@ -28,18 +27,50 @@ export const evidenceService = createApi({
                 };
             },
         }),
+
+        // POST: /evidences/review
+        reviewEvidence: builder.mutation({
+            query: (reviewData) => ({
+                url: "/evidences/review",
+                method: "POST",
+                body: reviewData,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }),
+        }),
+
+        // GET: /evidences/get-list-for-host/{challengeId}?page=0&size=10
+        getEvidenceByChallengeForHost: builder.query({
+            query: ({ challengeId, page = 0, size = 10 }) => ({
+                url: `/evidences/get-list-for-host/${challengeId}`,
+                params: { page, size },
+                method: "GET",
+            }),
+        }),
+
+        // GET: /evidences/{challengeId}/to-review
+        getEvidencesToReview: builder.query({
+            query: (challengeId) => ({
+                url: `/evidences/${challengeId}/to-review`,
+                method: "GET",
+            }),
+        }),
+
+        // GET: /evidences/{challengeId}/my-evidences
         getMyEvidencesByChallenge: builder.query({
             query: (challengeId) => ({
                 url: `/evidences/${challengeId}/my-evidences`,
                 method: "GET",
             }),
         }),
-
     }),
 });
 
 export const {
     useUploadEvidenceMutation,
-    useGetMyEvidencesByChallengeQuery, // ✅ Export hook here
-
+    useReviewEvidenceMutation,
+    useGetEvidenceByChallengeForHostQuery,
+    useGetEvidencesToReviewQuery,
+    useGetMyEvidencesByChallengeQuery,
 } = evidenceService;

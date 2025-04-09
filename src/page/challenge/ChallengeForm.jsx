@@ -8,13 +8,17 @@ import {IoCloudUploadOutline} from "react-icons/io5";
 import {challengeValidation} from "../../utils/validation.js";
 import {yupResolver} from "@hookform/resolvers/yup";
 import RichTextEditor from "../ui/RichTextEditor.jsx";
+import {useTranslation} from "react-i18next";
 
 const ChallengeForm = () => {
+    const { t } = useTranslation();
     const [createChallenge, { isLoading }] = useCreateChallengeMutation();
     const { data: challengeTypes, challengeTypeLoading, isError } = useGetChallengeTypesQuery();
 
     const navigate = useNavigate();
     const [preview, setPreview] = useState("");
+    const [bannerPreview, setBannerPreview] = useState("");
+
 
     const today = new Date();
     const tomorrow = new Date();
@@ -64,7 +68,7 @@ const ChallengeForm = () => {
 
         // Append all fields dynamically
         Object.keys(processedData).forEach((key) => {
-            if (key === "picture") {
+            if (key === "picture" || key === "banner") {
                 if (processedData.picture) {
                     formData.append("picture", processedData.picture); // File
                 }
@@ -114,12 +118,13 @@ const ChallengeForm = () => {
             {/* Left Section: Challenge Image & Basic Info */}
             <div className="rounded-lg w-full p-1">
                 <div className="p-6 flex flex-col rounded-lg">
-                    <h3 className="mb-4 text-xl font-bold ">General Information</h3>
+                    <h3 className="mb-4 text-xl font-bold ">Challenge's General Information</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             {/* Challenge Name */}
                             <div className="w-full mt-6">
                                 <label className="text-sm font-medium ">Challenge Name</label>
+                                <span className="text-red-500">*</span>
                                 <input
                                     type="text"
                                     {...register("name")}
@@ -127,16 +132,6 @@ const ChallengeForm = () => {
                                     placeholder="Give it a short distinct name"
                                 />
                                 <p className="text-red-600">{errors.name?.message}</p>
-                            </div>
-
-                            {/* Privacy Status */}
-                            <div>
-                                <label className="text-sm font-medium ">Privacy</label>
-                                <select {...register("privacy")}
-                                        className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
-                                    <option value="PUBLIC">Public</option>
-                                    <option value="PRIVATE">Private</option>
-                                </select>
                             </div>
 
                             {/* Challenge Name */}
@@ -150,12 +145,45 @@ const ChallengeForm = () => {
                                 />
                                 <p className="text-red-600">{errors.summary?.message}</p>
                             </div>
+                            {/* Banner Upload */}
+                            <div className="w-full mt-6">
+                                <label className="text-sm font-medium">Banner (Optional)</label>
+                                <label htmlFor="banner-upload" className="relative group cursor-pointer flex items-center justify-center">
+                                    <div className="w-full h-40 flex items-center justify-center relative border-2 border-dashed rounded-lg bg-gray-50">
+                                        {bannerPreview ? (
+                                            <img src={bannerPreview} alt="Banner Preview" className="w-full h-full object-cover rounded-lg" />
+                                        ) : (
+                                            <div className="text-center text-gray-400">
+                                                <IoCloudUploadOutline className="text-3xl mx-auto mb-2" />
+                                                <p className="text-sm">Click to upload Banner Image</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </label>
+                                <input
+                                    id="banner-upload"
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                        const file = e.target.files[0];
+                                        if (file) {
+                                            setBannerPreview(URL.createObjectURL(file));
+                                            setValue("banner", file, { shouldValidate: true });
+                                        }
+                                    }}
+                                />
+                                <input type="hidden" {...register("banner")} />
+                            </div>
+
                         </div>
 
                         {/* Challenge Image */}
                         <label htmlFor="dropzone-file"
-                               className="relative group cursor-pointer flex items-center justify-center">
-                            <div className="w-full h-[400px] flex items-center justify-center relative md:m-2">
+                               className="relative group cursor-pointer items-center justify-center md:m-2">
+                            <label className="text-sm font-medium ">Add a picture</label>
+                            <span className="text-red-500">*</span>
+                            <div className="w-full h-[400px] flex items-center justify-center relative">
                                 {/* Close Button */}
                                 {preview && (
                                     <FaWindowClose
@@ -186,11 +214,11 @@ const ChallengeForm = () => {
                                     </div>
                                 )}
                             </div>
+                            <p className="text-red-600">{errors.picture?.message}</p>
                         </label>
                         <input {...register("picture")} id="dropzone-file" type="file" accept="image/*"
                                className="hidden"
                                onChange={handleFileChange}/>
-                        <p className="text-red-600">{errors.picture?.message}</p>
                     </div>
                 </div>
             </div>
@@ -210,6 +238,7 @@ const ChallengeForm = () => {
                             {/* Start & End Date */}
                             <div>
                                 <label className="text-sm font-medium ">Start Date</label>
+                                <span className="text-red-500">*</span>
                                 <input
                                     type="date"
                                     {...register("startDate")}
@@ -219,6 +248,7 @@ const ChallengeForm = () => {
                             </div>
                             <div>
                                 <label className="text-sm font-medium ">End Date</label>
+                                <span className="text-red-500">*</span>
                                 <input
                                     type="date"
                                     {...register("endDate")}
@@ -226,7 +256,15 @@ const ChallengeForm = () => {
                                 />
                                 <p className="text-red-600">{errors.endDate?.message}</p>
                             </div>
-
+                            {/* Privacy Status */}
+                            <div>
+                                <label className="text-sm font-medium ">Privacy</label>
+                                <select {...register("privacy")}
+                                        className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+                                    <option value="PUBLIC">Public</option>
+                                    <option value="PRIVATE">Private</option>
+                                </select>
+                            </div>
 
                             {/* Verification Type */}
                             <div>
@@ -239,35 +277,15 @@ const ChallengeForm = () => {
                                 </select>
                             </div>
 
-                            {/* Verification Method */}
+                            {/* Challenge Type */}
                             <div>
-                                <label className="text-sm font-medium ">Verification Method</label>
-                                <select {...register("verificationMethod")}
-                                        className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
-                                    <option value="UPLOAD_MEDIA">Upload Media</option>
-                                    <option value="CHECKMARK">Checkmark</option>
-                                </select>
-                            </div>
-
-                            {/* Max Participants */}
-                            <div>
-                                <label className="text-sm font-medium ">Max Participants</label>
-                                <input
-                                    type="number"
-                                    {...register("maxParticipants")}
-                                    className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                                />
-                                <p className="text-red-600">{errors.maxParticipants?.message}</p>
-                            </div>
-
-                            {/* Challenge Type ID */}
-                            <div>
-                                <label className="text-sm font-medium ">Challenge Type ID</label>
+                                <label className="text-sm font-medium">{t('challengeType')}</label>
                                 <select
                                     {...register("challengeTypeId", {required: true})}
-                                    className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
-                                    <option value="">Select Type</option>
-                                    {/* Optional placeholder */}
+                                    className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                                >
+                                    {/* Option placeholder bắt buộc chọn */}
+                                    <option value="">{t('selectChallengeType')}</option>
                                     {challengeTypes?.map((type) => (
                                         <option key={type.id} value={type.id}>
                                             {type.name}
@@ -276,14 +294,28 @@ const ChallengeForm = () => {
                                 </select>
                                 <p className="text-red-600">{errors.challengeTypeId?.message}</p>
                             </div>
+
+
+                            {/* Max Participants */}
+                            <div>
+                            <label className="text-sm font-medium ">Max Participants</label>
+                                <span className="text-red-500">*</span>
+                                <input
+                                    type="number"
+                                    {...register("maxParticipants")}
+                                    className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                                />
+                                <p className="text-red-600">{errors.maxParticipants?.message}</p>
+                            </div>
                         </div>
 
                         {/* Challenge Type ID */}
                         <div>
                             <label className="text-sm font-medium ">Description</label>
+                            <span className="text-red-500">*</span>
                             <RichTextEditor
                                 onChange={(content) => {
-                                    setValue("description", content, { shouldValidate: true });
+                                    setValue("description", content, {shouldValidate: true});
                                     trigger("description"); // Optional: trigger validation
                                 }}
                             />

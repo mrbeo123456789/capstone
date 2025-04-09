@@ -32,6 +32,12 @@ export const memberService = createApi({
             providesTags: ["Member"],
         }),
 
+        // API lấy profile của thành viên hiện tại
+        getMyProfile: builder.query({
+            query: () => "/member/profile",
+            providesTags: ["Member"],
+        }),
+
         // API cập nhật thông tin thành viên
         updateMember: builder.mutation({
             query: ( formData ) => ({
@@ -59,6 +65,7 @@ export const memberService = createApi({
 export const {
     useGetMembersQuery,
     useGetMemberByIdQuery,
+    useGetMyProfileQuery,
     useUpdateMemberMutation ,
     useChangePasswordMutation,
 } = memberService;

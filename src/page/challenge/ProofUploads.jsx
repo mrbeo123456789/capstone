@@ -1,46 +1,169 @@
+import { useState } from "react";
 import { FaPlus } from "react-icons/fa";
 
-const proofUploads = [
-    { day: 1, time: "19:13", uploaded: true, image: "https://emi.parkview.com/media/Image/Dashboard_952_The-many-health-benefits-of-regular-exercise_11_20.jpg" },
-    { day: 2, time: "19:13", uploaded: true, image: "https://media-cldnry.s-nbcnews.com/image/upload/t_social_share_1024x768_scale,f_auto,q_auto:best/newscms/2015_18/512061/exercise-outside-woman-stock-today-150427-tease.jpg" },
-    { day: 3, time: "19:13", uploaded: true, image: "https://exerciseright.com.au/wp-content/uploads/2020/05/image-from-rawpixel-id-2107431-jpeg-compressed.jpg" },
-    { day: 4, uploaded: false },
-    { day: 5, uploaded: false },
-    { day: 5, uploaded: false },
-    { day: 5, uploaded: false },
-    { day: 5, uploaded: false },
-    { day: 5, uploaded: false },
-    { day: 5, uploaded: false },
-];
+const ITEMS_PER_PAGE = 12;
 
-const ProofUploads = () => {
+const ProofUploads = ({ challenge, evidence }) => {
+    if (!challenge || !evidence) return <p>Đang tải dữ liệu...</p>;
+    const [selectedProof, setSelectedProof] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const startDate = new Date(challenge.startDate[0], challenge.startDate[1] - 1, challenge.startDate[2]);
+    const endDate = new Date(challenge.endDate[0], challenge.endDate[1] - 1, challenge.endDate[2]);
+    const duration = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+
+    const evidenceMap = {};
+    evidence.forEach((e) => {
+        const dateKey = new Date(e.submittedAt[0], e.submittedAt[1] - 1, e.submittedAt[2]).toDateString();
+        if (!evidenceMap[dateKey]) evidenceMap[dateKey] = e;
+    });
+
+    const days = Array.from({ length: duration }, (_, i) => {
+        const date = new Date(startDate);
+        date.setDate(startDate.getDate() + i);
+        return {
+            day: i + 1,
+            date,
+            evidence: evidenceMap[date.toDateString()],
+        };
+    });
+
+    const totalPages = Math.ceil(days.length / ITEMS_PER_PAGE);
+    const currentPageDays = days.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+    );
+
+    const handlePrev = () => {
+        if (currentPage > 1) setCurrentPage(currentPage - 1);
+    };
+
+    const handleNext = () => {
+        if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+    };
+
     return (
-        <div className="mt-6 w-full mx-auto overflow-hidden">
-            <div className="flex space-x-4 overflow-x-auto scrollbar-hide">
-                {proofUploads.map((proof, index) => (
-                    <div key={index} className="flex flex-col items-center">
-                        <div>{`Day ${proof.day}`}</div>
-                        {proof.uploaded ? (
-                            <div className="w-24 h-24 bg-gray-300 flex items-center justify-center rounded-lg shadow-md">
-                                <img
-                                    src={proof.image}
-                                    alt={`Day ${proof.day}`}
-                                    className="w-24 h-24 object-cover rounded-lg shadow-md"
-                                />
+        <div className="mt-6 w-full mx-auto p-4">
+            <h2 className="text-xl font-bold mb-4 text-center">View your proof activity</h2>
+
+            <div className="grid sm:grid-cols-6 gap-4 justify-center grid-cols-3">
+                {currentPageDays.map((dayInfo, index) => {
+                    const { date, evidence } = dayInfo;
+                    const isUploaded = Boolean(evidence);
+                    const isVideo = isUploaded && evidence.evidenceUrl?.includes(".mp4");
+
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0); // remove time portion
+                    const isToday = date.toDateString() === today.toDateString();
+                    const isPast = date < today;
+
+                    const dateLabel = date.toLocaleDateString("en-GB"); // format: dd/mm/yyyy
+
+                    let borderClass = "";
+                    let bgClass = "bg-gray-300";
+                    let symbol = null;
+
+                    if (!isUploaded) {
+                        if (isPast) {
+                            bgClass = "bg-red-200";
+                            symbol = "❌";
+                        } else if (isToday) {
+                            borderClass = "border-2 border-green-500";
+                        }
+                    }
+
+                    return (
+                        <div key={index} className="flex flex-col items-center">
+                            <div className="font-medium">{dateLabel}</div>
+                            <div
+                                className={`w-24 sm:w-4/5 h-24 ${bgClass} flex items-center justify-center rounded-lg shadow-md cursor-pointer ${borderClass}`}
+                                onClick={() => isUploaded && setSelectedProof(evidence)}
+                            >
+                                {isUploaded ? (
+                                    isVideo ? (
+                                        <video
+                                            src={evidence.evidenceUrl}
+                                            muted
+                                            className="w-full h-full object-cover rounded-lg"
+                                        />
+                                    ) : (
+                                        <img
+                                            src={evidence.evidenceUrl}
+                                            alt={`Proof on ${dateLabel}`}
+                                            className="w-full h-full object-cover rounded-lg"
+                                        />
+                                    )
+                                ) : (
+                                    <span className="text-3xl text-gray-600">
+                        {symbol ?? <FaPlus />}
+                    </span>
+                                )}
                             </div>
-                        ) : (
-                            <div className="w-24 h-24 bg-gray-300 flex items-center justify-center rounded-lg shadow-md">
-                                <button className="text-gray-600">
-                                    <FaPlus className="text-3xl" />
-                                </button>
-                            </div>
-                        )}
-                        <p className="mt-2 text-sm text-gray-700">
-                            {proof.uploaded ? proof.time : "Upload your proof"}
-                        </p>
-                    </div>
-                ))}
+                            <p className="mt-2 text-sm text-gray-700">
+                                {isUploaded ? "Uploaded" : "No proof this day"}
+                            </p>
+                        </div>
+                    );
+                })}
+
             </div>
+
+            {/* Pagination controls */}
+            <div className="mt-4 flex justify-center items-center space-x-4">
+                <button
+                    onClick={handlePrev}
+                    disabled={currentPage === 1}
+                    className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50"
+                >
+                    Previous
+                </button>
+                <span className="text-sm font-semibold">
+                    Page {currentPage} of {totalPages}
+                </span>
+                <button
+                    onClick={handleNext}
+                    disabled={currentPage === totalPages}
+                    className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50"
+                >
+                    Next
+                </button>
+            </div>
+
+            {/* Modal */}
+            {selectedProof && (
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+                    onClick={() => setSelectedProof(null)}
+                >
+                    <div
+                        className="bg-white p-4 rounded-lg max-w-3xl w-full max-h-[90vh] overflow-auto"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {selectedProof.evidenceUrl.includes(".mp4") ? (
+                            <video
+                                src={selectedProof.evidenceUrl}
+                                controls
+                                autoPlay
+                                className="w-full h-auto rounded-lg"
+                            />
+                        ) : (
+                            <img
+                                src={selectedProof.evidenceUrl}
+                                alt="Full Evidence"
+                                className="w-full h-auto rounded-lg"
+                            />
+                        )}
+                        <div className="text-right mt-2">
+                            <button
+                                onClick={() => setSelectedProof(null)}
+                                className="text-blue-500 hover:underline"
+                            >
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

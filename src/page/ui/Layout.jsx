@@ -1,32 +1,25 @@
-import { Outlet } from "react-router-dom";
-import { Header } from "./Header.jsx";
-import { Footer } from "./Footer.jsx";
-import { SideBar } from "./SideBar.jsx";
-import {useSidebar} from "../../context/SidebarContext.jsx";
+import React, { useState } from "react";
+import Sidebar from "./SideBar.jsx";
+import Header from "./Header.jsx";
+import {Outlet} from "react-router-dom";
 
-function Layout() {
-    const { isSidebarOpen, toggleSidebar } = useSidebar();
-    console.log("isSidebarOpen in Layout:", isSidebarOpen);
+const Layout = ({ children }) => {
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     return (
-        <>
-            <div className="sticky top-0 z-50">
-            <Header toggleSidebar={toggleSidebar}/>
-            </div>
-            <div
-                className="sm:flex items-start justify-between h-full min-h-screen"
-                style={{
-                    background: "linear-gradient(235deg, rgb(254 225 144), rgb(250 241 221), rgb(252 247 226))",
-                }}
+        <div className="min-h-screen bg-[url('https://firebasestorage.googleapis.com/v0/b/bookstore-f9ac2.appspot.com/o/pexels-bess-hamiti-83687-36487.jpg?alt=media&token=f1fb933e-2fe4-4f6f-a604-7eb7e47314fd')]
+        bg-fixed bg-cover bg-center">
+            <Header toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}/>
+            <Sidebar isOpen={isSidebarOpen}/>
+            <main
+                className={`pt-20 transition-all duration-300 min-h-screen content-center ${
+                    isSidebarOpen ? "ml-14 md:ml-64" : "ml-0"
+                }`}
             >
-                {isSidebarOpen && <SideBar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />}
-                <div className={`w-full transition-all duration-300 pl-0 md:p-4 md:space-y-4`}>
-                    <Outlet />
-                </div>
-            </div>
-            <Footer />
-        </>
+                <div className="mx-4 mt-4"><Outlet/></div>
+            </main>
+        </div>
     );
-}
+};
 
 export default Layout;

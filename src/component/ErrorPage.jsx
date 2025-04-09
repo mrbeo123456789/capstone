@@ -18,11 +18,11 @@ const ErrorPage = ({ errorCode = '500', title, description }) => {
             description: 'Bạn không có quyền truy cập vào trang này.',
             color: '#C70039'
         },
-        '500': {
-            title: 'Lỗi máy chủ',
-            description: 'Rất tiếc, đã xảy ra lỗi trong quá trình xử lý yêu cầu của bạn.',
-            color: '#900C3F'
-        },
+        // '500': {
+        //     title: 'Lỗi máy chủ',
+        //     description: 'Rất tiếc, đã xảy ra lỗi trong quá trình xử lý yêu cầu của bạn.',
+        //     color: '#900C3F'
+        // },
         '502': {
             title: 'Cổng không hợp lệ',
             description: 'Máy chủ nhận được phản hồi không hợp lệ từ máy chủ upstream.',
@@ -58,7 +58,7 @@ const ErrorPage = ({ errorCode = '500', title, description }) => {
                         <path d="M200,275 Q250,240 300,275" fill="none" stroke={themeColor} strokeWidth="5" strokeLinecap="round"/>
                     </svg>
                 );
-            case '500':
+            // case '500':
             case '502':
             case '503':
                 return (
