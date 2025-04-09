@@ -43,7 +43,7 @@ public class InvitationController {
         List<InvitationResponseDTO> invitations = invitationService.getInvitationsForMember();
         return ResponseEntity.ok(invitations);
     }
-    @GetMapping("/search")
+    @PostMapping("/search")
     public List<MemberSearchResponse> searchMembers(@RequestBody ChallengeSearchRequest keyword) {
         return invitationService.searchMembersForChallengeInvite(keyword);
     }

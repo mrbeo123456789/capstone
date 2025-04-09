@@ -72,6 +72,7 @@ public class EvidenceController {
     public ResponseEntity<List<EvidenceToReviewDTO>> getEvidencesAssignedForReviewByChallenge(
             @PathVariable Long challengeId
     ) {
+        evidenceService.assignPendingReviewersForChallenge(challengeId);
         List<EvidenceToReviewDTO> list = evidenceService.getEvidenceAssignedForMemberToReview(challengeId);
         return ResponseEntity.ok(list);
     }

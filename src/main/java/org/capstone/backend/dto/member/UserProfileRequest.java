@@ -21,14 +21,12 @@ public class UserProfileRequest {
         private String lastName;
 
         @NotBlank(message = "Gender cannot be empty")
-        @Pattern(regexp = "Male|Female|Other", message = "Gender must be Male, Female, or Other")
+        @Pattern(regexp = "MALE|FEMALE|OTHER", message = "Gender must be Male, Female, or Other")
         private String gender;
 
         @NotBlank(message = "Phone number cannot be empty")
         @Pattern(regexp = "\\d{9,11}", message = "Phone number must be between 9 and 11 digits")
         private String phone;
-
-        private String avatar;
 
         private String address;
 

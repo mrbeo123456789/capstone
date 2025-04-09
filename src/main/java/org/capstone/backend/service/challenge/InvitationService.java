@@ -16,10 +16,7 @@ import org.capstone.backend.repository.GroupMemberRepository;
 import org.capstone.backend.repository.GroupRepository;
 import org.capstone.backend.repository.MemberRepository;
 import org.capstone.backend.service.auth.AuthService;
-import org.capstone.backend.utils.enums.ChallengeMemberStatus;
-import org.capstone.backend.utils.enums.ChallengeStatus;
-import org.capstone.backend.utils.enums.GroupMemberStatus;
-import org.capstone.backend.utils.enums.InvitePermission;
+import org.capstone.backend.utils.enums.*;
 import org.capstone.backend.utils.suggestion.MemberSuggestionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -91,6 +88,7 @@ public class InvitationService implements InvitationServiceInterface {
             ChallengeMember challengeMember = ChallengeMember.builder()
                     .challenge(challenge)
                     .member(member)
+                    .role(ChallengeRole.MEMBER)
                     .joinBy(invitedBy.getId())
                     .status(status)
                     .createdAt(now)
