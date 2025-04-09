@@ -22,7 +22,7 @@ public class EvidenceReport {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "evidence_id", nullable = false)
     private Evidence evidence;
 

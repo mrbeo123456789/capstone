@@ -1,5 +1,6 @@
 package org.capstone.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
 import org.capstone.backend.utils.enums.EvidenceStatus;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "evidence")
@@ -23,13 +25,14 @@ public class Evidence {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "challenge_id", nullable = false)
     private Challenge challenge;
+
 
     @Column(name = "evidence_url", nullable = false)
     private String evidenceUrl;
@@ -45,9 +48,10 @@ public class Evidence {
 
     @Column(name = "updated_by")
     private Long updatedBy;
+    @OneToMany(mappedBy = "evidence", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<EvidenceReport> evidenceReports;
 
-    @OneToOne(mappedBy = "evidence", cascade = CascadeType.ALL)
-    private EvidenceReport evidenceReport;
 
     @PrePersist
     protected void onCreate() {

@@ -18,7 +18,6 @@ public class NotificationController {
 
     @GetMapping
     public ResponseEntity<List<Map<String, Object>>> getNotifications(
-            @RequestParam String userId,
             @RequestParam(defaultValue = "10") int limit,
             @RequestParam(required = false) String lastCreatedAt
     ) throws Exception {

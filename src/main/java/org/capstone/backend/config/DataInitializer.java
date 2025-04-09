@@ -14,6 +14,8 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+// import giữ nguyên
+
 @Configuration
 public class DataInitializer implements CommandLineRunner {
 
@@ -24,15 +26,22 @@ public class DataInitializer implements CommandLineRunner {
     private final PasswordEncoder passwordEncoder;
     private final ChallengeRepository challengeRepository;
     private final ChallengeMemberRepository challengeMemberRepository;
-  private  final  EvidenceRepository evidenceRepository;
-  private  final  EvidenceReportRepository evidenceReportRepository;
-    public DataInitializer(AccountRepository accountRepository,
-                           ChallengeTypeRepository challengeTypeRepository,
-                           MemberRepository memberRepository,
-                           InterestRepository interestRepository,
-                           PasswordEncoder passwordEncoder,
-                           ChallengeRepository challengeRepository,
-                           ChallengeMemberRepository challengeMemberRepository, EvidenceRepository evidenceRepository, EvidenceReportRepository evidenceReportRepository) {
+    private final EvidenceRepository evidenceRepository;
+    private final EvidenceReportRepository evidenceReportRepository;
+
+    private final Random random = new Random();
+
+    public DataInitializer(
+            AccountRepository accountRepository,
+            ChallengeTypeRepository challengeTypeRepository,
+            MemberRepository memberRepository,
+            InterestRepository interestRepository,
+            PasswordEncoder passwordEncoder,
+            ChallengeRepository challengeRepository,
+            ChallengeMemberRepository challengeMemberRepository,
+            EvidenceRepository evidenceRepository,
+            EvidenceReportRepository evidenceReportRepository
+    ) {
         this.accountRepository = accountRepository;
         this.challengeTypeRepository = challengeTypeRepository;
         this.memberRepository = memberRepository;
@@ -45,7 +54,7 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         seedAccountsAndMembers();
         seedChallengeTypes();
         seedInterests();
@@ -54,119 +63,100 @@ public class DataInitializer implements CommandLineRunner {
         seedTestEvidenceAndReview();
         System.out.println("✅ Data seeding completed successfully.");
     }
-   // hoặc từ Controller
-
-
-    // Thêm vào phần đầu của class để dùng lại
-    private final Random random = new Random();
 
     private void seedAccountsAndMembers() {
         if (accountRepository.count() > 0) return;
 
-        // Tạo tài khoản Admin nhưng không tạo Member
-        Account admin = new Account();
-        admin.setUsername("admin");
-        admin.setPassword(passwordEncoder.encode("admin123"));
-        admin.setEmail("admin@example.com");
-        admin.setRole(Role.ADMIN);
-        admin.setStatus(AccountStatus.ACTIVE);
-        admin.setCreatedAt(randomPastDate(365)); // Random trong 1 năm gần đây
-        accountRepository.save(admin);
+        accountRepository.save(Account.builder()
+                .username("admin")
+                .password(passwordEncoder.encode("admin123"))
+                .email("admin@example.com")
+                .role(Role.ADMIN)
+                .status(AccountStatus.ACTIVE)
+                .createdAt(randomPastDate(365))
+                .build());
 
-        // Tạo các tài khoản User và Member tương ứng
-        IntStream.range(1, 11).forEach(i -> {
-            Account user = new Account();
-            user.setUsername("user" + i);
-            user.setPassword(passwordEncoder.encode("password" + i));
-            user.setEmail("user" + i + "@example.com");
-            user.setRole(Role.MEMBER);
-            user.setStatus(AccountStatus.ACTIVE);
-            user.setCreatedAt(randomPastDate(365));
-            accountRepository.save(user);
+        IntStream.rangeClosed(1, 10).forEach(i -> {
+            Account user = accountRepository.save(Account.builder()
+                    .username("user" + i)
+                    .password(passwordEncoder.encode("password" + i))
+                    .email("user" + i + "@example.com")
+                    .role(Role.MEMBER)
+                    .status(AccountStatus.ACTIVE)
+                    .createdAt(randomPastDate(365))
+                    .build());
 
-            // Chỉ tạo Member cho user (KHÔNG tạo cho admin)
-            Member member = new Member();
-            member.setFullName("User " + i);
-            member.setFirstName("User");
-            member.setLastName(String.valueOf(i));
-            member.setPhone("098765432" + i);
-            member.setAddress("123 User Street " + i);
-            member.setDistrict("User District");
-            member.setWard("User Ward");
-            member.setDateOfBirth(LocalDate.of(2000, Math.min(i, 12), Math.min(i, 28)));
-            member.setCreatedAt(randomPastDate(365));
-            member.setUpdatedAt(LocalDateTime.now());
-            member.setAccount(user);
-            memberRepository.save(member);
+            memberRepository.save(Member.builder()
+                    .fullName("User " + i)
+                    .firstName("User")
+                    .lastName(String.valueOf(i))
+                    .phone("098765432" + i)
+                    .address("123 User Street " + i)
+                    .district("User District")
+                    .ward("User Ward")
+                            .invitePermission(InvitePermission.EVERYONE)
+                    .dateOfBirth(LocalDate.of(2000, Math.min(i, 12), Math.min(i, 28)))
+                    .createdAt(randomPastDate(365))
+                    .updatedAt(LocalDateTime.now())
+                    .account(user)
+                    .build());
         });
 
         System.out.println("✅ Seeded accounts and members (Admin has no member record).");
     }
 
-
-    // Hàm tạo ngày ngẫu nhiên trong quá khứ
-    private LocalDateTime randomPastDate(int maxDays) {
-        int randomDays = random.nextInt(maxDays + 1); // Giá trị từ 0 đến maxDays
-        return LocalDateTime.now().minusDays(randomDays);
-    }
-
     private void seedChallengeTypes() {
         if (challengeTypeRepository.count() > 0) return;
 
-        ChallengeType fitness = ChallengeType.builder()
-                .name("Fitness")
-                .description("Challenge liên quan đến hoạt động thể dục, thể thao.")
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
-
-        ChallengeType learning = ChallengeType.builder()
-                .name("Learning")
-                .description("Challenge liên quan đến học tập và phát triển kỹ năng.")
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
-
-        challengeTypeRepository.saveAll(List.of(fitness, learning));
+        challengeTypeRepository.saveAll(List.of(
+                ChallengeType.builder()
+                        .name("Fitness")
+                        .description("Challenge liên quan đến hoạt động thể dục, thể thao.")
+                        .createdAt(LocalDateTime.now())
+                        .updatedAt(LocalDateTime.now())
+                        .build(),
+                ChallengeType.builder()
+                        .name("Learning")
+                        .description("Challenge liên quan đến học tập và phát triển kỹ năng.")
+                        .createdAt(LocalDateTime.now())
+                        .updatedAt(LocalDateTime.now())
+                        .build()
+        ));
     }
 
     private void seedInterests() {
         if (interestRepository.count() > 0) return;
 
-        List<String> names = List.of("Sports", "Music", "Coding", "Reading", "Gaming", "Traveling", "Cooking");
-        List<Interest> interests = names.stream()
-                .map(name -> {
+        interestRepository.saveAll(List.of("Sports", "Music", "Coding", "Reading", "Gaming", "Traveling", "Cooking")
+                .stream().map(name -> {
                     Interest interest = new Interest();
                     interest.setName(name);
                     return interest;
-                }).collect(Collectors.toList());
-
-        interestRepository.saveAll(interests);
+                }).collect(Collectors.toList()));
     }
 
     private void seedChallenges() {
         if (challengeRepository.count() > 0) return;
 
-        ChallengeType fitnessType = challengeTypeRepository.findAll().stream()
+        challengeTypeRepository.findAll().stream()
                 .filter(ct -> ct.getName().equals("Fitness"))
-                .findFirst().orElse(null);
-
-        if (fitnessType != null) {
-            Challenge sample = Challenge.builder()
-                    .name("30-Day Pushup Challenge")
-                    .description("Thử thách hít đất 30 ngày liên tục")
-                    .challengeType(fitnessType)
-                    .privacy(PrivacyStatus.PUBLIC)
-                    .status(ChallengeStatus.ONGOING)
-                    .verificationType(VerificationType.MEMBER_REVIEW)
-                    .participationType(ParticipationType.INDIVIDUAL) // <-- THÊM DÒNG NÀY
-                    .startDate(LocalDate.now())
-                    .endDate(LocalDate.now().plusDays(30))
-                    .createdAt(LocalDateTime.now())
-                    .updatedAt(LocalDateTime.now())
-                    .build();
-            challengeRepository.save(sample);
-        }
+                .findFirst()
+                .ifPresent(fitnessType -> {
+                    Challenge challenge = Challenge.builder()
+                            .name("30-Day Pushup Challenge")
+                            .description("Thử thách hít đất 30 ngày liên tục")
+                            .challengeType(fitnessType)
+                            .privacy(PrivacyStatus.PUBLIC)
+                            .status(ChallengeStatus.ONGOING)
+                            .verificationType(VerificationType.MEMBER_REVIEW)
+                            .participationType(ParticipationType.INDIVIDUAL)
+                            .startDate(LocalDate.now())
+                            .endDate(LocalDate.now().plusDays(30))
+                            .createdAt(LocalDateTime.now())
+                            .updatedAt(LocalDateTime.now())
+                            .build();
+                    challengeRepository.save(challenge);
+                });
     }
 
     private void seedChallengeMembers() {
@@ -179,14 +169,12 @@ public class DataInitializer implements CommandLineRunner {
 
         Member host = members.get(0);
         Member coHost = members.get(1);
-        List<Member> fullMembers = members.subList(2, members.size());
+        List<Member> participants = members.subList(2, members.size());
 
         for (Challenge challenge : challenges) {
-            // Thêm độ trễ ngẫu nhiên để tránh tất cả tham gia vào cùng một thời điểm
             addRandomDelay();
 
-            // Gán host
-            challengeMemberRepository.save(
+            challengeMemberRepository.saveAll(List.of(
                     ChallengeMember.builder()
                             .challenge(challenge)
                             .member(host)
@@ -194,10 +182,7 @@ public class DataInitializer implements CommandLineRunner {
                             .status(ChallengeMemberStatus.JOINED)
                             .createdAt(LocalDateTime.now())
                             .updatedAt(LocalDateTime.now())
-                            .build());
-
-            // Gán co-host
-            challengeMemberRepository.save(
+                            .build(),
                     ChallengeMember.builder()
                             .challenge(challenge)
                             .member(coHost)
@@ -205,11 +190,11 @@ public class DataInitializer implements CommandLineRunner {
                             .status(ChallengeMemberStatus.JOINED)
                             .createdAt(LocalDateTime.now())
                             .updatedAt(LocalDateTime.now())
-                            .build());
+                            .build()
+            ));
 
-            // Gán full members
-            for (Member member : fullMembers) {
-                addRandomDelay(); // Thêm độ trễ cho từng thành viên
+            participants.forEach(member -> {
+                addRandomDelay();
                 challengeMemberRepository.save(
                         ChallengeMember.builder()
                                 .challenge(challenge)
@@ -219,24 +204,11 @@ public class DataInitializer implements CommandLineRunner {
                                 .createdAt(LocalDateTime.now())
                                 .updatedAt(LocalDateTime.now())
                                 .build());
-            }
+            });
         }
 
         System.out.println("✅ Seeded challenge members with random delays.");
     }
-
-    // Hàm thêm độ trễ ngẫu nhiên
-    private void addRandomDelay() {
-        try {
-            // Độ trễ ngẫu nhiên từ 100ms đến 500ms
-            int delay = 100 + new Random().nextInt(400);
-            Thread.sleep(delay);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-
     private void seedTestEvidenceAndReview() {
         List<Challenge> challenges = challengeRepository.findAll();
         List<Member> members = memberRepository.findAll();
@@ -244,25 +216,43 @@ public class DataInitializer implements CommandLineRunner {
         if (challenges.isEmpty() || members.size() < 3) return;
 
         for (Challenge challenge : challenges) {
-            for (int i = 2; i < members.size(); i++) { // Bỏ Host & Co-Host, chỉ lấy Member
+            for (int i = 2; i < members.size(); i++) { // Skip Host & Co-Host
                 Member submitter = members.get(i);
-                Member reviewer = members.get(1); // Mặc định Co-Host làm reviewer
+                Member reviewer = members.get(1); // Co-Host là reviewer
 
-                // Tạo evidence cho từng member
                 Evidence evidence = Evidence.builder()
                         .challenge(challenge)
                         .member(submitter)
                         .evidenceUrl("https://example.com/test-video-" + submitter.getId() + ".mp4")
                         .status(EvidenceStatus.PENDING)
-                        .submittedAt(LocalDateTime.now().minusDays(new Random().nextInt(30)))
+                        .submittedAt(LocalDateTime.now().minusDays(random.nextInt(30)))
                         .updatedAt(LocalDateTime.now())
                         .build();
                 evidenceRepository.save(evidence);
+
+                EvidenceReport report = EvidenceReport.builder()
+                        .evidence(evidence)
+                        .reviewer(reviewer)
+                        .feedback("Nội dung đạt yêu cầu.")
+                        .isApproved(true)
+                        .updatedBy(reviewer.getId()) // hoặc null nếu chưa hỗ trợ updatedBy logic
+                        .build();
+                evidenceReportRepository.save(report);
             }
         }
 
-        System.out.println("✅ Seeded evidence for each member and assigned Co-Host as reviewer.");
+        System.out.println("✅ Seeded evidence and reviews (Co-Host as reviewer, new structure).");
     }
 
+    private LocalDateTime randomPastDate(int maxDays) {
+        return LocalDateTime.now().minusDays(random.nextInt(maxDays + 1));
+    }
 
+    private void addRandomDelay() {
+        try {
+            Thread.sleep(100 + random.nextInt(400));
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
 }

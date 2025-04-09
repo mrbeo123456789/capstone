@@ -37,14 +37,6 @@ public class MemberController {
             @RequestParam(value = "avatar", required = false) MultipartFile avatar  // 🔥 Handles file upload
     ) {
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.registerModule(new JavaTimeModule());
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication == null || "anonymousUser".equals(authentication.getPrincipal())) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body("User is not authenticated");
-            }
-            String username = authentication.getName();
             UserProfileResponse updatedProfile = memberService.updateMember( request, avatar);
 
             return ResponseEntity.ok(updatedProfile);

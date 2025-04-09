@@ -1,7 +1,10 @@
 package org.capstone.backend.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.capstone.backend.utils.enums.AccountStatus;
 import org.capstone.backend.utils.enums.Role;
 
@@ -9,6 +12,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 @Data
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "account")
 public class Account {
 

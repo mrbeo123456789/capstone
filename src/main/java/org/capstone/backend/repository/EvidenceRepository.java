@@ -4,6 +4,7 @@ import org.capstone.backend.entity.Evidence;
 import org.capstone.backend.utils.enums.EvidenceStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,10 +17,17 @@ import java.util.Optional;
 
 @Repository
 public interface EvidenceRepository extends JpaRepository<Evidence, Long> {
-    @Query("SELECT e FROM Evidence e " +
-            "WHERE e.challenge.id = :challengeId AND e.status = 'PENDING' AND e.evidenceReport IS NULL " +
-            "ORDER BY e.submittedAt ASC")
+    @Query("""
+    SELECT e FROM Evidence e
+    WHERE e.challenge.id = :challengeId
+    AND NOT EXISTS (
+        SELECT r FROM EvidenceReport r
+        WHERE r.evidence = e
+    )
+    ORDER BY e.submittedAt ASC
+""")
     List<Evidence> findAllUnassignedEvidenceByChallengeOrderBySubmittedAtAsc(@Param("challengeId") Long challengeId);
+
     @Query("SELECT COUNT(e) FROM Evidence e WHERE e.member.id = :memberId AND e.challenge.id = :challengeId")
     long countTotalEvidence(@Param("memberId") Long memberId, @Param("challengeId") Long challengeId);
 
@@ -31,12 +39,16 @@ public interface EvidenceRepository extends JpaRepository<Evidence, Long> {
     List<Evidence> findByMemberIdAndChallengeIdOrderBySubmittedAtAsc(Long memberId, Long challengeId);
     List<Evidence> findByChallengeIdAndStatus(Long challengeId, EvidenceStatus status);
 
-    @Query("SELECT e FROM Evidence e WHERE e.member.id = :memberId " +
+    @Query("SELECT e FROM Evidence e " +
+            "WHERE e.member.id = :memberId " +
             "AND e.challenge.id = :challengeId " +
-            "AND DATE(e.submittedAt) = :date")
-    Optional<Evidence> findTodayEvidence(@Param("memberId") Long memberId,
-                                         @Param("challengeId") Long challengeId,
-                                         @Param("date") LocalDate date);
+            "AND e.submittedAt BETWEEN :start AND :end")
+    Optional<Evidence> findTodayEvidence(
+            @Param("memberId") Long memberId,
+            @Param("challengeId") Long challengeId,
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end);
+
 
 
     @Query("""
@@ -55,4 +67,7 @@ AND (
             @Param("endDateEnd") LocalDateTime endDateEnd,
             Pageable pageable
     );
+
+
+
 }

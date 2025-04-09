@@ -64,53 +64,61 @@ private  final FixedGmailService fixedGmailService;
     @Override
     public void uploadAndSubmitEvidence(MultipartFile file, Long challengeId) throws IOException {
         Long memberId = authService.getMemberIdFromAuthentication();
+        System.out.println(">>> memberId: " + memberId);
 
         Challenge challenge = challengeRepository.findById(challengeId)
                 .orElseThrow(() -> new EntityNotFoundException("Challenge not found"));
+        System.out.println(">>> Challenge: " + challenge.getId() + ", Start: " + challenge.getStartDate() + ", End: " + challenge.getEndDate());
 
         LocalDate today = LocalDate.now();
         LocalTime now = LocalTime.now();
+        System.out.println(">>> Today: " + today + ", Time now: " + now);
 
         if (today.isBefore(challenge.getStartDate()) || today.isAfter(challenge.getEndDate())) {
+            System.out.println(">>> OUTSIDE challenge date range");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Hôm nay không nằm trong thời gian thử thách.");
         }
 
         if (today.equals(challenge.getEndDate()) && now.isAfter(LocalTime.of(21, 0))) {
+            System.out.println(">>> Today is the last day and it's past 21:00");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bạn chỉ được nộp bằng chứng trước 21:00 trong ngày cuối.");
         }
 
         boolean isParticipant = challengeMemberRepository.existsByChallengeIdAndMemberIdAndStatus(
                 challengeId, memberId, ChallengeMemberStatus.JOINED);
+        System.out.println(">>> isParticipant: " + isParticipant);
         if (!isParticipant) {
             throw new IllegalStateException("Bạn không tham gia thử thách này.");
         }
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new EntityNotFoundException("Member not found"));
+        System.out.println(">>> Member loaded: " + member.getId());
 
+        // ✅ Tránh dùng DATE() → dùng range từ 00:00 đến < 00:00 ngày mai
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.plusDays(1);
 
-
-        // ✅ Tìm evidence đã nộp hôm nay
         Evidence todayEvidence = evidenceRepository
-                .findTodayEvidence(memberId, challengeId, today)
+                .findTodayEvidence(memberId, challengeId, startOfDay, endOfDay)
                 .orElse(null);
-
-
+        System.out.println(">>> Today evidence: " + (todayEvidence != null ? todayEvidence.getId() : "null"));
 
         String path = String.format("evidences/challenge_%d/member_%d/%s/%s.mp4",
                 challengeId, memberId, today, System.currentTimeMillis());
+        System.out.println(">>> Upload path: " + path);
 
         String fileUrl = firebaseStorageService.uploadFileWithOverwrite(file, path);
+        System.out.println(">>> Uploaded file URL: " + fileUrl);
 
         if (todayEvidence != null) {
-            // ✅ Ghi đè nội dung vào record hôm nay
             todayEvidence.setEvidenceUrl(fileUrl);
             todayEvidence.setUpdatedAt(LocalDateTime.now());
+            System.out.println(">>> Updating existing evidence ID: " + todayEvidence.getId());
             evidenceRepository.save(todayEvidence);
             return;
         }
 
-        // ✅ Chưa có evidence → tạo mới
         Evidence newEvidence = Evidence.builder()
                 .challenge(challenge)
                 .member(member)
@@ -118,8 +126,8 @@ private  final FixedGmailService fixedGmailService;
                 .status(EvidenceStatus.PENDING)
                 .submittedAt(LocalDateTime.now())
                 .build();
-
-        evidenceRepository.save(newEvidence);
+        Evidence savedEvidence = evidenceRepository.save(newEvidence);
+        System.out.println(">>> Created new evidence ID: " + savedEvidence.getId());
     }
 
     @Override
@@ -258,21 +266,17 @@ private  final FixedGmailService fixedGmailService;
         );
 
         return evidencePage.map(e -> {
-            EvidenceReport report = e.getEvidenceReport();
-            boolean canEdit = false;
-
-            if (report == null) {
-                canEdit = true;
-            } else {
-                ChallengeRole originalReviewerRole = challengeMemberRepository
-                        .findByChallengeIdAndMemberId(challengeId, report.getReviewer().getId())
-                        .map(ChallengeMember::getRole)
-                        .orElse(ChallengeRole.MEMBER);
-
-                if (originalReviewerRole == ChallengeRole.MEMBER) {
-                    canEdit = true;
-                }
-            }
+            boolean canEdit = Optional.ofNullable(e.getEvidenceReports())
+                    .orElse(List.of())
+                    .stream()
+                    .map(EvidenceReport::getReviewer)
+                    .map(Member::getId)
+                    .map(reviewerId -> challengeMemberRepository
+                            .findByChallengeIdAndMemberId(challengeId, reviewerId)
+                            .map(ChallengeMember::getRole)
+                            .orElse(ChallengeRole.MEMBER)
+                    )
+                    .anyMatch(role -> role == ChallengeRole.MEMBER);
 
             return new EvidenceToReviewDTO(
                     e.getId(),
@@ -286,7 +290,7 @@ private  final FixedGmailService fixedGmailService;
         });
     }
 
-    @Override
+        @Override
     public List<EvidenceToReviewDTO> getEvidenceAssignedForMemberToReview(Long challengeId) {
         Long reviewerId = authService.getMemberIdFromAuthentication();
 
