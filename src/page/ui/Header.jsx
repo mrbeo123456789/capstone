@@ -1,14 +1,13 @@
-import React from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { IoGlobeOutline } from "react-icons/io5";
 import { FiLogOut } from "react-icons/fi";
+import { useTranslation } from "react-i18next";
 
 const Header = ({ toggleSidebar }) => {
     const navigate = useNavigate();
-
-    const handleLogout = () => {
-        localStorage.removeItem("jwt_token");
-        navigate("/login");
-    };
+    const { i18n } = useTranslation();
+    const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false);
 
     const menuItems = [
         { href: "/aboutus", title: "About", text: "About" },
@@ -18,10 +17,18 @@ const Header = ({ toggleSidebar }) => {
         { href: "/news", title: "News", text: "News" },
     ];
 
-    return (
-        <header
-            className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-white/10 shadow-lg border-b border-white/20 h-20 flex items-center px-4">
+    const changeLanguage = (lng) => {
+        i18n.changeLanguage(lng);
+        setLanguageDropdownOpen(false);
+    };
 
+    const handleLogout = () => {
+        localStorage.removeItem("jwt_token");
+        navigate("/login");
+    };
+
+    return (
+        <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-white/10 shadow-lg border-b border-white/20 h-20 flex items-center px-4">
             <div className="flex justify-between items-center w-full">
                 {/* Left: Sidebar toggle + Logo */}
                 <div className="flex items-center space-x-4">
@@ -30,7 +37,7 @@ const Header = ({ toggleSidebar }) => {
                         <span className="block w-6 h-1 bg-orange-400"></span>
                         <span className="block w-6 h-1 bg-orange-400"></span>
                     </button>
-                    <a href="/" className="flex items-center">
+                    <a href="/" className="flex items-center space-x-2">
                         <img
                             src="https://firebasestorage.googleapis.com/v0/b/bookstore-f9ac2.appspot.com/o/logo%2Fimage-removebg-preview.png?alt=media&token=f16618d4-686c-4014-a9cc-99b4cf043c86"
                             alt="GoBeyond"
@@ -46,12 +53,12 @@ const Header = ({ toggleSidebar }) => {
                 {/* Center: Navigation */}
                 <nav className="hidden md:flex space-x-6">
                     <ul className="flex space-x-4">
-                    {menuItems.map((item, index) => (
+                        {menuItems.map((item, index) => (
                             <li key={index}>
                                 <a
                                     href={item.href}
                                     title={item.title}
-                                    className="text-white hover:text-red-200 transition font-medium"
+                                    className="text-white hover:text-orange-300 transition font-medium"
                                 >
                                     {item.text}
                                 </a>
@@ -60,32 +67,69 @@ const Header = ({ toggleSidebar }) => {
                     </ul>
                 </nav>
 
-                {/* Right: Flag, Search, Avatar, Logout */}
-                <div className="flex items-center space-x-4">
-                    <div className="hidden md:block">
-                        <img
-                            title="Vietnamese"
-                            src="https://upload.wikimedia.org/wikipedia/commons/2/21/Flag_of_Vietnam.svg"
-                            alt="Vietnamese"
-                            className="h-6 w-8 rounded"
-                        />
+                {/* Right: Language Selector + Avatar + Logout */}
+                <div className="flex items-center space-x-4 relative">
+                    {/* Language */}
+                    <div className="relative">
+                        <button
+                            onClick={() => setLanguageDropdownOpen(!languageDropdownOpen)}
+                            className="flex items-center space-x-2 px-4 py-2 rounded-md bg-white/20 backdrop-blur-sm hover:bg-orange-400 hover:text-white transition"
+                        >
+                            <IoGlobeOutline className="text-xl" />
+                        </button>
+
+                        {languageDropdownOpen && (
+                            <div className="absolute right-0 mt-2 w-44 bg-white rounded-lg shadow-lg overflow-hidden">
+                                <button
+                                    onClick={() => changeLanguage('en')}
+                                    className="flex items-center gap-3 w-full px-4 py-2 hover:bg-orange-100"
+                                >
+                                    <img
+                                        src="https://upload.wikimedia.org/wikipedia/en/a/ae/Flag_of_the_United_Kingdom.svg"
+                                        alt="English"
+                                        className="w-5 h-5 rounded-sm object-cover"
+                                    />
+                                    <span className="text-sm font-medium">English</span>
+                                </button>
+                                <button
+                                    onClick={() => changeLanguage('vi')}
+                                    className="flex items-center gap-3 w-full px-4 py-2 hover:bg-orange-100"
+                                >
+                                    <img
+                                        src="https://upload.wikimedia.org/wikipedia/commons/2/21/Flag_of_Vietnam.svg"
+                                        alt="Vietnamese"
+                                        className="w-5 h-5 rounded-sm object-cover"
+                                    />
+                                    <span className="text-sm font-medium">Tiếng Việt</span>
+                                </button>
+                                <button
+                                    onClick={() => changeLanguage('jp')}
+                                    className="flex items-center gap-3 w-full px-4 py-2 hover:bg-orange-100"
+                                >
+                                    <img
+                                        src="https://upload.wikimedia.org/wikipedia/en/9/9e/Flag_of_Japan.svg"
+                                        alt="Japanese"
+                                        className="w-5 h-5 rounded-sm object-cover"
+                                    />
+                                    <span className="text-sm font-medium">日本語</span>
+                                </button>
+                            </div>
+                        )}
                     </div>
 
-                    <button type="button">
-                        <i className="fa fa-search text-black hover:text-red-200 text-lg"></i>
-                    </button>
-
+                    {/* Avatar */}
                     <img
                         src="https://randomuser.me/api/portraits/men/32.jpg"
                         alt="User Avatar"
                         className="w-10 h-10 rounded-full border-2 border-white cursor-pointer"
                     />
 
+                    {/* Logout Button */}
                     <button
                         onClick={handleLogout}
                         className="flex items-center space-x-2 text-white hover:text-red-200 transition font-medium"
                     >
-                        <FiLogOut className="text-xl"/>
+                        <FiLogOut className="text-xl" />
                         <span className="hidden sm:block">Logout</span>
                     </button>
                 </div>

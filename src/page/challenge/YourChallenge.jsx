@@ -1,18 +1,31 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {useGetMyChallengesMutation} from "../../service/challengeService.js";
+import { useGetMyChallengesMutation } from "../../service/challengeService.js";
+import { useGetMyInvitationsQuery, useRespondInvitationMutation } from "../../service/invitationService.js";
 
 const YourChallenge = () => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState("All");
 
     const [getMyChallenges, { data: joinedChallenges = [], isLoading }] = useGetMyChallengesMutation();
+    const { data: invitations = [], isLoading: isInvitationsLoading } = useGetMyInvitationsQuery();
+    const [respondInvitation] = useRespondInvitationMutation();
+
+    const themeColor = "#FF5733";
 
     useEffect(() => {
         getMyChallenges(activeTab.toUpperCase());
     }, [activeTab]);
 
-    const invitations = []; // Make this dynamic later if needed
+    const handleRespond = async (invitationId, accept) => {
+        try {
+            await respondInvitation({ invitationId, accept }).unwrap();
+            alert(accept ? "Invitation accepted!" : "Invitation declined!");
+        } catch (error) {
+            console.error("Failed to respond to invitation:", error);
+            alert("Failed to respond. Try again.");
+        }
+    };
 
     const getStatusStyle = (status) => {
         switch (status) {
@@ -28,7 +41,6 @@ const YourChallenge = () => {
                 return { text: status, bg: "bg-gray-100", textColor: "text-gray-700" };
         }
     };
-    const themeColor = `#FF5733`;
 
     return (
         <div className="p-6 space-y-6 bg-white rounded-lg shadow-lg overflow-hidden">
@@ -52,29 +64,25 @@ const YourChallenge = () => {
 
             {/* Invitations */}
             <div className="border rounded-lg p-4 space-y-4">
-                <h2 className="text-lg font-semibold">Invitation ({invitations.length})</h2>
-                {invitations.length === 0 ? (
+                <h2 className="text-lg font-semibold">Invitations ({invitations.length})</h2>
+                {isInvitationsLoading ? (
+                    <p>Loading invitations...</p>
+                ) : invitations.length === 0 ? (
                     <div className="h-52 w-full flex items-center justify-center border border-dashed border-gray-300 rounded-lg bg-gray-50 text-gray-500 text-center">
                         <div>
+                            {/* Keep your SVG exactly here */}
                             <svg viewBox="0 0 500 400">
-                                <path d="M150,50 L350,50 L350,350 L150,350 Z" fill="#fff" stroke="#ddd"
-                                      strokeWidth="3"/>
+                                <path d="M150,50 L350,50 L350,350 L150,350 Z" fill="#fff" stroke="#ddd" strokeWidth="3" />
                                 <path d="M175,80 L325,80 M175,120 L325,120 M175,160 L275,160 M175,200 L250,200"
-                                      stroke="#eee" strokeWidth="5" strokeLinecap="round"/>
-                                <circle cx="320" cy="230" r="70" fill="#fff" stroke={themeColor} strokeWidth="8"/>
-                                <circle cx="320" cy="230" r="60" fill="none" stroke={themeColor} strokeWidth="3"
-                                        strokeOpacity="0.5"/>
-                                <line x1="375" y1="280" x2="420" y2="330" stroke={themeColor} strokeWidth="12"
-                                      strokeLinecap="round"/>
-                                <text x="320" y="260" fontSize="80" textAnchor="middle" fill={themeColor}
-                                      fontWeight="bold">?
-                                </text>
-                                <circle cx="220" cy="260" r="40" fill="#FFF0E6" stroke={themeColor} strokeWidth="2"
-                                        strokeOpacity="0.5"/>
-                                <circle cx="205" cy="250" r="4" fill="#666"/>
-                                <circle cx="235" cy="250" r="4" fill="#666"/>
-                                <path d="M200,275 Q220,265 240,275" fill="none" stroke="#666" strokeWidth="3"
-                                      strokeLinecap="round"/>
+                                      stroke="#eee" strokeWidth="5" strokeLinecap="round" />
+                                <circle cx="320" cy="230" r="70" fill="#fff" stroke={themeColor} strokeWidth="8" />
+                                <circle cx="320" cy="230" r="60" fill="none" stroke={themeColor} strokeWidth="3" strokeOpacity="0.5" />
+                                <line x1="375" y1="280" x2="420" y2="330" stroke={themeColor} strokeWidth="12" strokeLinecap="round" />
+                                <text x="320" y="260" fontSize="80" textAnchor="middle" fill={themeColor} fontWeight="bold">?</text>
+                                <circle cx="220" cy="260" r="40" fill="#FFF0E6" stroke={themeColor} strokeWidth="2" strokeOpacity="0.5" />
+                                <circle cx="205" cy="250" r="4" fill="#666" />
+                                <circle cx="235" cy="250" r="4" fill="#666" />
+                                <path d="M200,275 Q220,265 240,275" fill="none" stroke="#666" strokeWidth="3" strokeLinecap="round" />
                             </svg>
                             <p className="font-semibold">You have no challenge invites</p>
                         </div>
@@ -84,17 +92,23 @@ const YourChallenge = () => {
                         {invitations.map((invite) => (
                             <div
                                 key={invite.id}
-                                onClick={() => navigate(`/challenges/detail/${invite.id}`)}
                                 className="cursor-pointer min-w-[200px] p-4 border rounded-lg space-y-2 flex-shrink-0 hover:shadow-lg transition"
                             >
-                                <p className="text-sm">{invite.inviter} invite you to a challenge</p>
-                                <div className="h-24 bg-gray-200 rounded"/>
-                                <p className="font-medium">{invite.challenge}</p>
+                                <p className="text-sm">{invite.inviterName} invites you to:</p>
+                                <div className="h-24 bg-gray-200 rounded overflow-hidden">
+                                    <img
+                                        src={invite.challengePicture || "https://via.placeholder.com/300x200"}
+                                        alt={invite.challengeName}
+                                        className="w-full h-full object-cover rounded"
+                                    />
+                                </div>
+                                <p className="font-medium">{invite.challengeName}</p>
                                 <div className="flex gap-2">
                                     <button
                                         className="bg-green-600 text-white px-3 py-1 rounded"
                                         onClick={(e) => {
                                             e.stopPropagation();
+                                            handleRespond(invite.id, true);
                                         }}
                                     >
                                         Accept
@@ -103,6 +117,7 @@ const YourChallenge = () => {
                                         className="border px-3 py-1 rounded"
                                         onClick={(e) => {
                                             e.stopPropagation();
+                                            handleRespond(invite.id, false);
                                         }}
                                     >
                                         Decline
@@ -120,9 +135,7 @@ const YourChallenge = () => {
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
-                        className={`px-4 py-2 rounded-lg ${
-                            activeTab === tab ? "bg-blue-600 text-white" : "border"
-                        }`}
+                        className={`px-4 py-2 rounded-lg ${activeTab === tab ? "bg-blue-600 text-white" : "border"}`}
                     >
                         {tab.charAt(0).toUpperCase() + tab.slice(1)}
                     </button>
@@ -131,8 +144,10 @@ const YourChallenge = () => {
 
             {/* Joined Challenges */}
             <div>
-                <h2 className="text-lg font-semibold mb-4">Joined challenges</h2>
-                {joinedChallenges.length === 0 ? (
+                <h2 className="text-lg font-semibold mb-4">Joined Challenges</h2>
+                {isLoading ? (
+                    <p>Loading challenges...</p>
+                ) : joinedChallenges.length === 0 ? (
                     <div className="h-52 w-full flex items-center justify-center border border-dashed border-gray-300 rounded-lg bg-gray-50 text-gray-500 text-center">
                         <div>
                             <p className="font-semibold">You haven't joined any challenge</p>
@@ -148,7 +163,7 @@ const YourChallenge = () => {
                             >
                                 <div className="relative w-full h-24 mb-2">
                                     <img
-                                        src={challenge?.picture}
+                                        src={challenge.picture || "https://via.placeholder.com/300x200"}
                                         alt={challenge.name}
                                         className="w-full h-full object-cover rounded"
                                     />

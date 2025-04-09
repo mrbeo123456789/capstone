@@ -62,6 +62,7 @@ function MemberProfile() {
             setValue("province", userData.province || "");
             setValue("district", userData.district || "");
             setValue("ward", userData.ward || "");
+            setValue("invitePermission", userData.invitePermission || "");
             setValue("dateOfBirth", formatDate(userData.dateOfBirth));
             setPreview(userData.avatar || "");
             setSelectedProvince(userData.province || "");
@@ -177,22 +178,25 @@ function MemberProfile() {
                 <div className="bg-white rounded-lg shadow-md w-full xl:w-1/3">
                     <div className="p-6 flex flex-col md:m-2">
                         {/* Avatar Upload */}
-                        <label htmlFor="dropzone-file" className="relative group cursor-pointer flex items-center justify-center">
+                        <label htmlFor="dropzone-file"
+                               className="relative group cursor-pointer flex items-center justify-center">
                             <div className="w-[300px] h-[400px] flex items-center justify-center relative xl:m-2">
                                 {/* Close Button */}
                                 {preview && (
                                     <FaWindowClose
                                         className="text-2xl text-red-500 absolute right-2 top-2 z-10"
                                         onClick={handleClosePreview}
-                                        style={{ cursor: "pointer", backgroundColor: "white" }}
+                                        style={{cursor: "pointer", backgroundColor: "white"}}
                                     />
                                 )}
                                 {/* Avatar Image OR Placeholder */}
                                 {preview ? (
-                                    <img className="w-full h-full object-cover rounded-lg" src={preview} alt="Uploaded Avatar" />
+                                    <img className="w-full h-full object-cover rounded-lg" src={preview}
+                                         alt="Uploaded Avatar"/>
                                 ) : (
-                                    <div className="w-full h-full flex flex-col items-center justify-center border-2 border-gray-300 border-dashed rounded-lg bg-gray-50">
-                                        <IoCloudUploadOutline className="text-2xl" />
+                                    <div
+                                        className="w-full h-full flex flex-col items-center justify-center border-2 border-gray-300 border-dashed rounded-lg bg-gray-50">
+                                        <IoCloudUploadOutline className="text-2xl"/>
                                         <p className="mb-2 text-sm text-gray-500">
                                             <span className="font-semibold">{t('uploadHint')}</span>
                                         </p>
@@ -201,7 +205,8 @@ function MemberProfile() {
                                 )}
                                 {/* Hover Overlay */}
                                 {preview && (
-                                    <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
+                                    <div
+                                        className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
                                         <span className="text-white font-semibold">{t('changePicture')}</span>
                                     </div>
                                 )}
@@ -215,6 +220,7 @@ function MemberProfile() {
                             className="hidden"
                             onChange={handleFileChange}
                         />
+                        <p className="text-red-500">{errors.avatar?.message}</p>
 
                         {/* Email & Username */}
                         <div className="w-full mt-6 flex justify-between grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -229,7 +235,8 @@ function MemberProfile() {
                                 />
                             </div>
                             <div className="px-2 w-full">
-                                <label className="text-sm font-medium text-black" htmlFor="username">{t('username')}</label>
+                                <label className="text-sm font-medium text-black"
+                                       htmlFor="username">{t('username')}</label>
                                 <input
                                     disabled
                                     type="text"
@@ -255,7 +262,7 @@ function MemberProfile() {
                                 <input type="text" {...register("fullName")} defaultValue={user?.fullName || ""}
                                        className="w-full sm:w-1/2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                                        placeholder="John"/>
-                                <p className="text-red-500">{errors.name?.message}</p>
+                                <p className="text-red-500">{errors.fullName?.message}</p>
                             </div>
                             {/* Date of Birth */}
                             <div>
@@ -267,12 +274,14 @@ function MemberProfile() {
                                     {...register("dateOfBirth")} // ✅ Thống nhất camelCase
                                     className="w-full sm:w-1/2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                                 />
-                                <p className="text-red-500">{errors.name?.message}</p>
+                                <p className="text-red-500">{errors.dateOfBirth?.message}</p>
                             </div>
 
                             {/* Gender */}
                             <div>
-                                <label className="text-sm font-medium text-black block">{t('gender')}</label>
+                                <label className="text-sm font-medium text-black block">{t('gender')}
+                                    <span className="text-red-500">*</span>
+                                </label>
                                 <select {...register("gender")} defaultValue={user?.gender || ""}
                                         className="w-full sm:w-1/2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
                                     <option value="">{t('chooseGender')}</option>
@@ -280,6 +289,7 @@ function MemberProfile() {
                                     <option value="FEMALE">{t('female')}</option>
                                     <option value="OTHER">{t('other')}</option>
                                 </select>
+                                <p className="text-red-500">{errors.gender?.message}</p>
                             </div>
                             {/* Phone */}
                             <div>
@@ -287,6 +297,7 @@ function MemberProfile() {
                                 <input type="text" {...register("phone")}
                                        className="w-full sm:w-1/2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                                        placeholder={t('phone')}/>
+                                <p className="text-red-500">{errors.phone?.message}</p>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 {/* Province */}
@@ -366,6 +377,26 @@ function MemberProfile() {
                                     />
                                 </div>
                             </div>
+
+                            {/* Invite Permission */}
+                            <div className="mt-4">
+                                <label className="text-sm font-medium text-black block" htmlFor="invitePermission">
+                                    {t('invitePermission.select')}
+                                </label>
+                                <select
+                                    {...register("invitePermission")}
+                                    defaultValue={user?.invitePermission || ""}
+                                    className="w-full sm:w-1/2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                                >
+                                    <option value="">{t('invitePermission.select')}</option>
+                                    <option value="EVERYONE">{t('invitePermission.everyone')}</option>
+                                    <option value="NO_ONE">{t('invitePermission.noOne')}</option>
+                                    <option value="SAME_GROUP">{t('invitePermission.sameGroup')}</option>
+                                </select>
+                                <p className="text-red-500">{errors.invitePermission?.message}</p>
+                            </div>
+
+
                             {/* Interests */}
                             <div className="flex items-center justify-between">
                                 <label className="text-sm font-medium text-black block">{t('yourInterest')}</label>

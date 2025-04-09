@@ -48,5 +48,22 @@
     "title": "Invite to Challenge",
     "inviteMembers": "Invite Members",
     "inviteGroups": "Invite Groups"
+  },
+
+  "sidebar": {
+    "myChallenge": "My Challenge",
+    "myGroup": "My Group",
+    "profile": "Profile",
+    "password": "Password",
+    "achievement": "Achievement",
+    "statistics": "Statistics"
+  },
+
+  "invitePermission": {
+    "select": "Select Invite Permission",
+    "everyone": "Everyone can invite",
+    "noOne": "No one can invite",
+    "sameGroup": "Only same group members can invite"
   }
+
 }

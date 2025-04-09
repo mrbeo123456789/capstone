@@ -45,6 +45,22 @@
     "inviteSuccess": "Gửi lời mời thành công!",
     "inviteFailed": "Gửi lời mời thất bại.",
     "searchFailed": "Tìm kiếm thất bại."
+  },
+
+  "sidebar": {
+    "myChallenge": "Thử thách của tôi",
+    "myGroup": "Nhóm của tôi",
+    "profile": "Hồ sơ",
+    "password": "Mật khẩu",
+    "achievement": "Thành tựu",
+    "statistics": "Thống kê"
+  },
+
+  "invitePermission": {
+    "select": "Chọn quyền mời",
+    "everyone": "Mọi người đều có thể mời",
+    "noOne": "Không ai có thể mời",
+    "sameGroup": "Chỉ thành viên cùng nhóm mới được mời"
   }
 
 }

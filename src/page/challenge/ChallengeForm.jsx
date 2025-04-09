@@ -271,11 +271,21 @@ const ChallengeForm = () => {
                                 <label className="text-sm font-medium ">Verification Type</label>
                                 <select {...register("verificationType")}
                                         className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
-                                    <option value="PEER_TO_PEER">Peer to Peer</option>
-                                    <option value="CROSS_CHECK">Cross Check</option>
-                                    <option value="AI_REVIEW">AI Review</option>
+                                    <option value="MEMBER_REVIEW">Peer to Peer</option>
+                                    <option value="HOST_REVIEW">Host review</option>
                                 </select>
                             </div>
+
+                            {/* Verification Type */}
+                            <div>
+                                <label className="text-sm font-medium ">Participation Type</label>
+                                <select {...register("participationType")}
+                                        className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+                                    <option value="INDIVIDUAL">Individual</option>
+                                    <option value="GROUP">Group</option>
+                                </select>
+                            </div>
+
 
                             {/* Challenge Type */}
                             <div>

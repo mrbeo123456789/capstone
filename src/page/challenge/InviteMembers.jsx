@@ -1,27 +1,27 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
-import {useParams} from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
-    useSearchMembersForChallengeInviteQuery,
+    useSearchMembersForChallengeInviteMutation,
     useSendInvitationMutation,
     useSuggestMembersQuery
 } from "../../service/invitationService.js";
 
-const InviteMembers = ({onClose }) => {
+const InviteMembers = ({ onClose }) => {
     const PAGE_SIZE = 4;
+    const { id: challengeId } = useParams(); // Challenge ID from URL
+    const { t } = useTranslation();
+
     const [selected, setSelected] = useState([]);
     const [searchKeyword, setSearchKeyword] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const [triggerSearch, setTriggerSearch] = useState("");
 
-    const { id: challengeId } = useParams();
-    const { t } = useTranslation();
-    const { data: members = [], isFetching } = useSearchMembersForChallengeInviteQuery(triggerSearch, { skip: !triggerSearch });
+    const [searchMembers, { data: members = [], isLoading: isFetching }] = useSearchMembersForChallengeInviteMutation();
+    const { data: suggestedMembers = [], isLoading } = useSuggestMembersQuery(challengeId);
     const [sendInvitation] = useSendInvitationMutation();
-    const { data: suggestedMembers = [], isLoading, error } = useSuggestMembersQuery(challengeId);
 
-    const paginatedMembers = members.slice(
+    const paginatedMembers = (members || []).slice(
         (currentPage - 1) * PAGE_SIZE,
         currentPage * PAGE_SIZE
     );
@@ -38,7 +38,7 @@ const InviteMembers = ({onClose }) => {
             return;
         }
         try {
-            await sendInvitation({ challengeId, memberIds: selected }).unwrap();
+            await sendInvitation({ challengeId, memberIds: selected });
             toast.success(t("challengeInvite.inviteSuccess"));
             onClose();
         } catch (error) {
@@ -47,6 +47,14 @@ const InviteMembers = ({onClose }) => {
         }
     };
 
+    const handleSearch = () => {
+        if (!searchKeyword.trim()) {
+            toast.warn(t("challengeInvite.searchPlaceholder"));
+            return;
+        }
+        searchMembers({ challengeid: challengeId, keyword: searchKeyword });
+        setCurrentPage(1);
+    };
 
     return (
         <div className="p-4">
@@ -61,7 +69,7 @@ const InviteMembers = ({onClose }) => {
                 />
                 <div className="flex justify-end mt-2">
                     <button
-                        onClick={() => setTriggerSearch(searchKeyword)}
+                        onClick={handleSearch}
                         className="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600"
                     >
                         {t('challengeInvite.search')}
@@ -137,7 +145,6 @@ const InviteMembers = ({onClose }) => {
             </div>
         </div>
     );
-
 };
 
 export default InviteMembers;

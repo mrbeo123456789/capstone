@@ -14,10 +14,22 @@ export const invitationService = createApi({
         },
     }),
     endpoints: (builder) => ({
-        // POST: /api/member/invitations/send
+        // POST: /api/member/invitations/send/personal
         sendInvitation: builder.mutation({
             query: (payload) => ({
-                url: "/member/invitations/send",
+                url: "/member/invitations/send/personal",
+                method: "POST",
+                body: payload,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }),
+        }),
+
+        // POST: /api/member/invitations/send/group
+        sendGroupInvitation: builder.mutation({
+            query: (payload) => ({
+                url: "/member/invitations/send/group",
                 method: "POST",
                 body: payload,
                 headers: {
@@ -42,12 +54,15 @@ export const invitationService = createApi({
             }),
         }),
 
-        // GET: /api/member/invitations/search?keyword=abc
-        searchMembersForChallengeInvite: builder.query({
-            query: (keyword) => ({
+        // POST: /api/member/invitations/search
+        searchMembersForChallengeInvite: builder.mutation({
+            query: (payload) => ({
                 url: `/member/invitations/search`,
-                params: { keyword },
-                method: "GET",
+                method: "POST",
+                body: payload, // { challengeid: ..., keyword: ... }
+                headers: {
+                    "Content-Type": "application/json",
+                },
             }),
         }),
 
@@ -63,8 +78,9 @@ export const invitationService = createApi({
 
 export const {
     useSendInvitationMutation,
+    useSendGroupInvitationMutation,
     useRespondInvitationMutation,
     useGetMyInvitationsQuery,
-    useSearchMembersForChallengeInviteQuery,
+    useSearchMembersForChallengeInviteMutation,
     useSuggestMembersQuery,
 } = invitationService;
