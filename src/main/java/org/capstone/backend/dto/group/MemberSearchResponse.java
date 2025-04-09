@@ -10,4 +10,5 @@ public class MemberSearchResponse {
     private String email;   // Email thành viên
     private String avatar;  // Ảnh đại diện
     private String name;
+    private String reason;
 }

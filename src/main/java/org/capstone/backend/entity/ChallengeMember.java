@@ -47,7 +47,9 @@ public class ChallengeMember {
 
     @Column(name = "is_completed")
     private Boolean isCompleted = false;
-    
+    @Column(name = "group_id")
+    private Long groupId; // nullable: null nếu tham gia cá nhân
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();

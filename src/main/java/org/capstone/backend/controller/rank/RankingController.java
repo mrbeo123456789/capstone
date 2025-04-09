@@ -3,6 +3,7 @@ package org.capstone.backend.controller.rank;
 import lombok.RequiredArgsConstructor;
 import org.capstone.backend.dto.rank.ChallengeProgressRankingResponse;
 import org.capstone.backend.dto.rank.ChallengeStarRatingResponse;
+import org.capstone.backend.dto.rank.GlobalMemberRankingResponse;
 import org.capstone.backend.entity.GlobalMemberRanking;
 import org.capstone.backend.service.ranking.RankingService;
 import org.springframework.data.domain.Page;
@@ -43,7 +44,7 @@ public class RankingController {
     }
 
     @GetMapping("/global")
-    public Page<GlobalMemberRanking> getGlobalRanking(
+    public Page<GlobalMemberRankingResponse> getGlobalRanking(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {

@@ -18,7 +18,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
+@Transactional
 @Component
 @RequiredArgsConstructor
 public class Schedule {
@@ -87,7 +87,9 @@ public class Schedule {
     /**
      * Tính lại bảng xếp hạng tiến trình của Challenge vào 00:05 mỗi ngày.
      */
-    @Scheduled(cron = "0 5 0 * * *")
+    @Scheduled(cron = "0 * * * * *")
+
+  //  @Scheduled(cron = "0 5 0 * * *")
     public void updateAllChallengeProgressRankings() {
         rankingService.recalculateAllChallengeProgressRankings();
     }
@@ -114,7 +116,9 @@ public class Schedule {
     /**
      * Cập nhật điểm đánh giá sao cho Challenge vào 00:35 mỗi ngày.
      */
-    @Scheduled(cron = "0 35 0 * * *")
+    @Scheduled(cron = "0 * * * * *")
+
+    // @Scheduled(cron = "0 35 0 * * *")
     public void scheduledStarRatingUpdate() {
         rankingService.updateChallengeStarRatings();
     }
@@ -122,7 +126,9 @@ public class Schedule {
     /**
      * Cập nhật bảng xếp hạng toàn cục vào 00:00 Chủ nhật hàng tuần.
      */
-    @Scheduled(cron = "0 0 0 * * SUN")
+    @Scheduled(cron = "0 * * * * *")
+
+    //  @Scheduled(cron = "0 0 0 * * SUN")
     public void refreshGlobalRanking() {
         rankingService.updateGlobalRanking();
     }

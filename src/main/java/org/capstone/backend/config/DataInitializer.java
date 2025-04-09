@@ -6,6 +6,7 @@ import org.capstone.backend.utils.enums.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,9 +14,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-// import giữ nguyên
-
+import java.util.stream.Stream;
+@Transactional
 @Configuration
 public class DataInitializer implements CommandLineRunner {
 
@@ -29,6 +29,10 @@ public class DataInitializer implements CommandLineRunner {
     private final EvidenceRepository evidenceRepository;
     private final EvidenceReportRepository evidenceReportRepository;
 
+    // Repository dành cho Group và GroupChallenge
+    private final GroupRepository groupRepository;
+    private final GroupChallengeRepository groupChallengeRepository;
+
     private final Random random = new Random();
 
     public DataInitializer(
@@ -40,7 +44,9 @@ public class DataInitializer implements CommandLineRunner {
             ChallengeRepository challengeRepository,
             ChallengeMemberRepository challengeMemberRepository,
             EvidenceRepository evidenceRepository,
-            EvidenceReportRepository evidenceReportRepository
+            EvidenceReportRepository evidenceReportRepository,
+            GroupRepository groupRepository,
+            GroupChallengeRepository groupChallengeRepository
     ) {
         this.accountRepository = accountRepository;
         this.challengeTypeRepository = challengeTypeRepository;
@@ -51,6 +57,8 @@ public class DataInitializer implements CommandLineRunner {
         this.challengeMemberRepository = challengeMemberRepository;
         this.evidenceRepository = evidenceRepository;
         this.evidenceReportRepository = evidenceReportRepository;
+        this.groupRepository = groupRepository;
+        this.groupChallengeRepository = groupChallengeRepository;
     }
 
     @Override
@@ -60,6 +68,8 @@ public class DataInitializer implements CommandLineRunner {
         seedInterests();
         seedChallenges();
         seedChallengeMembers();
+        seedGroups();              // Seed cho Groups nếu chưa có dữ liệu
+        seedGroupChallenges();     // Seed cho GroupChallenge
         seedTestEvidenceAndReview();
         System.out.println("✅ Data seeding completed successfully.");
     }
@@ -94,7 +104,7 @@ public class DataInitializer implements CommandLineRunner {
                     .address("123 User Street " + i)
                     .district("User District")
                     .ward("User Ward")
-                            .invitePermission(InvitePermission.EVERYONE)
+                    .invitePermission(InvitePermission.EVERYONE)
                     .dateOfBirth(LocalDate.of(2000, Math.min(i, 12), Math.min(i, 28)))
                     .createdAt(randomPastDate(365))
                     .updatedAt(LocalDateTime.now())
@@ -127,17 +137,19 @@ public class DataInitializer implements CommandLineRunner {
     private void seedInterests() {
         if (interestRepository.count() > 0) return;
 
-        interestRepository.saveAll(List.of("Sports", "Music", "Coding", "Reading", "Gaming", "Traveling", "Cooking")
-                .stream().map(name -> {
-                    Interest interest = new Interest();
-                    interest.setName(name);
-                    return interest;
-                }).collect(Collectors.toList()));
+        interestRepository.saveAll(
+                Stream.of("Sports", "Music", "Coding", "Reading", "Gaming", "Traveling", "Cooking").map(name -> {
+                            Interest interest = new Interest();
+                            interest.setName(name);
+                            return interest;
+                        }).collect(Collectors.toList())
+        );
     }
 
     private void seedChallenges() {
         if (challengeRepository.count() > 0) return;
 
+        // Giả sử chỉ seed thử thách cho loại Fitness
         challengeTypeRepository.findAll().stream()
                 .filter(ct -> ct.getName().equals("Fitness"))
                 .findFirst()
@@ -164,7 +176,6 @@ public class DataInitializer implements CommandLineRunner {
 
         List<Member> members = memberRepository.findAll();
         List<Challenge> challenges = challengeRepository.findAll();
-
         if (members.size() < 3 || challenges.isEmpty()) return;
 
         Member host = members.get(0);
@@ -172,8 +183,6 @@ public class DataInitializer implements CommandLineRunner {
         List<Member> participants = members.subList(2, members.size());
 
         for (Challenge challenge : challenges) {
-            addRandomDelay();
-
             challengeMemberRepository.saveAll(List.of(
                     ChallengeMember.builder()
                             .challenge(challenge)
@@ -194,7 +203,6 @@ public class DataInitializer implements CommandLineRunner {
             ));
 
             participants.forEach(member -> {
-                addRandomDelay();
                 challengeMemberRepository.save(
                         ChallengeMember.builder()
                                 .challenge(challenge)
@@ -207,18 +215,82 @@ public class DataInitializer implements CommandLineRunner {
             });
         }
 
-        System.out.println("✅ Seeded challenge members with random delays.");
+        System.out.println("✅ Seeded challenge members.");
     }
+
+    // Seed Groups nếu chưa có dữ liệu (giả định groups được tạo từ các member)
+    private void seedGroups() {
+        if (groupRepository.count() > 0) return;
+
+        // Ví dụ: tạo 3 nhóm, mỗi nhóm gồm 3 thành viên ngẫu nhiên
+        List<Member> allMembers = memberRepository.findAll();
+        if (allMembers.size() < 9) return;
+
+        for (int i = 1; i <= 3; i++) {
+            // Chọn ngẫu nhiên 3 thành viên
+            List<Member> groupMembers = allMembers.subList((i - 1) * 3, i * 3);
+            Groups group = Groups.builder()
+                    .name("Group " + i)
+                    .createdAt(LocalDateTime.now())
+                    .build();
+            Groups savedGroup = groupRepository.save(group);
+
+            // Giả sử entity Groups có quan hệ one-to-many với GroupMember
+            // Và bạn đã có repository GroupMemberRepository để lưu mối quan hệ
+            // Nếu Groups entity tự quản lý danh sách thành viên, bạn có thể set:
+            List<GroupMember> groupMemberList = groupMembers.stream()
+                    .map(member -> GroupMember.builder()
+                            .group(savedGroup)
+                            .member(member)
+                            .role("MEMBER")
+                            .createdAt(LocalDateTime.now())
+                            .build())
+                    .collect(Collectors.toList());
+            savedGroup.setMembers(groupMemberList);
+            groupRepository.save(savedGroup);
+        }
+        System.out.println("✅ Seeded groups and group members.");
+    }
+
+    // Seed GroupChallenge: liên kết Group tham gia thử thách
+    private void seedGroupChallenges() {
+        if (groupChallengeRepository.count() > 0) return;
+
+        // Lấy tất cả các group đã có
+        List<Groups> groups = groupRepository.findAll();
+        List<Challenge> challenges = challengeRepository.findAll();
+
+        // Ví dụ: mỗi group sẽ tham gia thử thách đầu tiên có trạng thái UPCOMING (nếu có)
+        for (Groups group : groups) {
+            List<GroupMember> groupMemberList = group.getMembers();
+            if (groupMemberList == null || groupMemberList.isEmpty()) continue;
+            Challenge upcomingChallenge = challenges.stream()
+                    .filter(c -> c.getStatus() == ChallengeStatus.UPCOMING)
+                    .findFirst()
+                    .orElse(null);
+            if (upcomingChallenge != null) {
+                GroupChallenge groupChallenge = GroupChallenge.builder()
+                        .group(group)
+                        .challenge(upcomingChallenge)
+                        .joinDate(LocalDateTime.now())
+                        .status(GroupChallengeStatus.ONGOING)
+                        .createdAt(LocalDateTime.now())
+                        .build();
+                groupChallengeRepository.save(groupChallenge);
+            }
+        }
+        System.out.println("✅ Seeded group challenges.");
+    }
+
     private void seedTestEvidenceAndReview() {
         List<Challenge> challenges = challengeRepository.findAll();
         List<Member> members = memberRepository.findAll();
-
         if (challenges.isEmpty() || members.size() < 3) return;
 
         for (Challenge challenge : challenges) {
-            for (int i = 2; i < members.size(); i++) { // Skip Host & Co-Host
+            for (int i = 2; i < members.size(); i++) { // Bỏ qua Host & Co-Host
                 Member submitter = members.get(i);
-                Member reviewer = members.get(1); // Co-Host là reviewer
+                Member reviewer = members.get(1); // Co-Host làm reviewer
 
                 Evidence evidence = Evidence.builder()
                         .challenge(challenge)
@@ -235,24 +307,15 @@ public class DataInitializer implements CommandLineRunner {
                         .reviewer(reviewer)
                         .feedback("Nội dung đạt yêu cầu.")
                         .isApproved(true)
-                        .updatedBy(reviewer.getId()) // hoặc null nếu chưa hỗ trợ updatedBy logic
+                        .updatedBy(reviewer.getId())
                         .build();
                 evidenceReportRepository.save(report);
             }
         }
-
-        System.out.println("✅ Seeded evidence and reviews (Co-Host as reviewer, new structure).");
+        System.out.println("✅ Seeded evidence and reviews.");
     }
 
     private LocalDateTime randomPastDate(int maxDays) {
         return LocalDateTime.now().minusDays(random.nextInt(maxDays + 1));
-    }
-
-    private void addRandomDelay() {
-        try {
-            Thread.sleep(100 + random.nextInt(400));
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
     }
 }

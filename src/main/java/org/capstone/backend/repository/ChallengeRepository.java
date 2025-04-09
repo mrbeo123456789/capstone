@@ -42,7 +42,7 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
            c.id, c.name, c.summary, c.picture
        )
        FROM Challenge c
-       WHERE c.status = 'APPROVED'\s
+       WHERE c.status = 'UPCOMING'\s
        AND c.id NOT IN (
            SELECT cm.challenge.id FROM ChallengeMember cm WHERE cm.member.id = :memberId
        )
@@ -66,14 +66,22 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
 
     @Query("""
     SELECT new org.capstone.backend.dto.challenge.ChallengeDetailResponse(
-        c.id, c.name, c.description, c.summary, c.startDate, c.endDate, 
-        c.picture, c.challengeType.name, 
+        c.id, 
+        c.name, 
+        c.description, 
+        c.summary, 
+        c.startDate, 
+        c.endDate, 
+        c.picture, 
+        c.challengeType.name, 
         CASE WHEN EXISTS (
             SELECT 1 FROM ChallengeMember cm 
             WHERE cm.challenge.id = c.id AND cm.member.id = :memberId
         ) THEN true ELSE false END, 
         (SELECT COUNT(cm) FROM ChallengeMember cm WHERE cm.challenge.id = c.id),
-        DATEDIFF(c.endDate, c.startDate)
+        DATEDIFF(c.endDate, c.startDate),
+        c.verificationType,
+        c.participationType
     )
     FROM Challenge c
     WHERE c.id = :challengeId
@@ -81,6 +89,7 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
     ChallengeDetailResponse findChallengeDetailByIdAndMemberId(
             @Param("challengeId") Long challengeId,
             @Param("memberId") Long memberId);
+
 
 
     @Query("SELECT c.id FROM Challenge c " +

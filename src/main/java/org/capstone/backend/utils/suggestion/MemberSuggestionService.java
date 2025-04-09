@@ -44,12 +44,16 @@ public class MemberSuggestionService {
 
         int[] vector1 = new int[interestMap.size()];
         for (Interest interest : interests1) {
-            vector1[interestMap.get(interest.getId())] = 1;
+            if(interestMap.containsKey(interest.getId())) {
+                vector1[interestMap.get(interest.getId())] = 1;
+            }
         }
 
         int[] vector2 = new int[interestMap.size()];
         for (Interest interest : interests2) {
-            vector2[interestMap.get(interest.getId())] = 1;
+            if(interestMap.containsKey(interest.getId())) {
+                vector2[interestMap.get(interest.getId())] = 1;
+            }
         }
 
         int dotProduct = 0;
@@ -68,34 +72,34 @@ public class MemberSuggestionService {
     }
 
     // Hàm tính điểm tương đồng địa lý
-    public static double calculateLocationSimilarity(Member member1, Member member2) {
+    // Số điểm tối đa là 3 (province, district, ward)
+    public static int calculateLocationScore(Member member1, Member member2) {
         int score = 0;
         if (member1.getProvince() != null && member2.getProvince() != null &&
                 member1.getProvince().equalsIgnoreCase(member2.getProvince())) {
-            score += 1;
+            score++;
         }
         if (member1.getDistrict() != null && member2.getDistrict() != null &&
                 member1.getDistrict().equalsIgnoreCase(member2.getDistrict())) {
-            score += 1;
+            score++;
         }
         if (member1.getWard() != null && member2.getWard() != null &&
                 member1.getWard().equalsIgnoreCase(member2.getWard())) {
-            score += 1;
+            score++;
         }
         return score;
     }
 
-    // Lớp phụ trợ để chứa thành viên và điểm tương đồng của họ
-    private record MemberSimilarity(Member member, double score) {}
+    // Lớp phụ trợ để chứa thành viên cùng với điểm số và lý do gợi ý
+    private record MemberSuggestion(Member member, double interestScore, int locationScore, String reason, double totalScore) {}
 
     /**
-     * Hàm suggestMembers tối ưu: lọc ra những thành viên phù hợp dựa trên
-     * điểm tương đồng sở thích, địa lý và quyền mời (canInvite),
-     * đồng thời loại bỏ những thành viên đã tham gia thử thách.
+     * Hàm suggestMembers cải tiến: tách riêng ra thành viên gần và thành viên cùng sở thích,
+     * đồng thời thêm lý do gợi ý.
      *
      * @param id          ID của người dùng hiện tại
      * @param challengeId ID của thử thách cần lọc (loại bỏ thành viên đã tham gia)
-     * @return danh sách gợi ý dưới dạng MemberSearchResponse
+     * @return danh sách gợi ý dưới dạng MemberSearchResponse với lý do gợi ý
      */
     public List<MemberSearchResponse> suggestMembers(Long id, Long challengeId) {
         // Lấy người dùng hiện tại
@@ -105,15 +109,14 @@ public class MemberSuggestionService {
         // Loại bỏ chính currentUser
         allMembers.removeIf(member -> member.getId().equals(currentUser.getId()));
 
-        // Lấy danh sách các memberId đã tham gia thử thách (status JOINED)
-        List<Long> joinedMemberIds = challengeMemberRepository.findMemberIdsByChallengeId(challengeId);
         // Loại bỏ những thành viên đã tham gia thử thách
+        List<Long> joinedMemberIds = challengeMemberRepository.findMemberIdsByChallengeId(challengeId);
         allMembers.removeIf(member -> joinedMemberIds.contains(member.getId()));
 
-        // Tạo danh sách chứa điểm tương đồng
-        List<MemberSimilarity> memberSimilarities = new ArrayList<>();
         // Lấy tất cả các sở thích
         List<Interest> allInterests = interestRepository.findAll();
+
+        List<MemberSuggestion> suggestions = new ArrayList<>();
 
         for (Member member : allMembers) {
             // Kiểm tra quyền mời của currentUser với target member
@@ -121,26 +124,51 @@ public class MemberSuggestionService {
                 continue;
             }
 
-            double similarity = cosineSimilarity(currentUser.getInterests(), member.getInterests(), allInterests);
-            double locationSimilarity = calculateLocationSimilarity(currentUser, member);
-            double finalScore = 0.7 * similarity + 0.3 * locationSimilarity;
-            memberSimilarities.add(new MemberSimilarity(member, finalScore));
+            double interestScore = cosineSimilarity(currentUser.getInterests(), member.getInterests(), allInterests);
+            int locationScore = calculateLocationScore(currentUser, member);
+
+            // Chỉ đưa thành viên có điểm nào đó (có cùng sở thích hoặc gần địa chỉ)
+            if (interestScore <= 0 && locationScore <= 0) {
+                continue;
+            }
+
+            // Xác định lý do gợi ý
+            String reason;
+            if (interestScore > 0 && locationScore > 0) {
+                reason = "Cùng sở thích và gần địa chỉ";
+            } else if (interestScore > 0) {
+                reason = "Cùng sở thích";
+            } else {
+                reason = "Gần địa chỉ";
+            }
+
+            // Tổng điểm sắp xếp: có thể điều chỉnh theo trọng số nếu cần (ví dụ: 0.7 * interestScore + 0.3 * (locationScore / 3.0))
+            double totalScore = 0.7 * interestScore + 0.3 * (locationScore / 3.0);
+
+            suggestions.add(new MemberSuggestion(member, interestScore, locationScore, reason, totalScore));
         }
 
-        // Sắp xếp theo điểm tương đồng và lấy top 10
-        List<Member> topMembers = memberSimilarities.stream()
-                .sorted((m1, m2) -> Double.compare(m2.score(), m1.score()))
+        // Sắp xếp theo tổng điểm giảm dần và lấy top 10
+        List<Member> topMembers = suggestions.stream()
+                .sorted((s1, s2) -> Double.compare(s2.totalScore(), s1.totalScore()))
                 .limit(10)
-                .map(MemberSimilarity::member)
+                .map(MemberSuggestion::member)
                 .toList();
 
-        // Chuyển đổi sang MemberSearchResponse
+        // Nếu DTO MemberSearchResponse chưa có field reason, bạn cần bổ sung nó.
+        // Ở đây ta giả sử MemberSearchResponse đã có constructor:
+        // MemberSearchResponse(Long id, String email, String avatar, String fullName, String reason)
+        Map<Long, String> memberIdToReason = suggestions.stream()
+                .collect(Collectors.toMap(s -> s.member().getId(), s -> s.reason(), (oldVal, newVal) -> oldVal));
+
         return topMembers.stream()
                 .map(m -> new MemberSearchResponse(
                         m.getId(),
                         m.getAccount().getEmail(),
                         m.getAvatar(),
-                        m.getFullName()))
+                        m.getFullName(),
+                        memberIdToReason.get(m.getId()) // thêm lý do gợi ý
+                ))
                 .collect(Collectors.toList());
     }
 
@@ -151,9 +179,7 @@ public class MemberSuggestionService {
         if (permission == InvitePermission.EVERYONE) {
             return true;
         } else if (permission == InvitePermission.SAME_GROUP) {
-            // Kiểm tra qua method checkIfInSameGroup
             boolean sameGroup = groupMember.checkIfInSameGroup(currentUser.getId(), targetMember.getId());
-            // Nếu method checkIfInSameGroup không đủ, ta có thể bổ sung thêm kiểm tra qua danh sách group của từng thành viên.
             if (!sameGroup) {
                 List<Long> currentUserGroupIds = groupMember.findGroupIdsByMemberId(currentUser.getId());
                 List<Long> targetMemberGroupIds = groupMember.findGroupIdsByMemberId(targetMember.getId());

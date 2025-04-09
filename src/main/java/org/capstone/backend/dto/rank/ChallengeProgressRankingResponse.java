@@ -9,5 +9,6 @@ public class ChallengeProgressRankingResponse {
     private Long memberId;
     private String memberName;
     private Integer rank;
+    private String avatar; // 👈 thêm dòng này
 
 }

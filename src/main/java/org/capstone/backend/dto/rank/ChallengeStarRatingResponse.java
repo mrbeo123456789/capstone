@@ -9,5 +9,6 @@ import lombok.*;
 public class ChallengeStarRatingResponse {
     private Long memberId;
     private String memberName;
+    private String avatar; // 👈 Thêm dòng này
     private Double averageStar;
 }

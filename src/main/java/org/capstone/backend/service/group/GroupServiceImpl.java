@@ -286,17 +286,11 @@ public class GroupServiceImpl implements GroupService {
                         m.getId(),
                         m.getAccount().getEmail(),
                         m.getAvatar(),
-                        m.getFullName()
+                        m.getFullName(),
+                        "" // lý do có thể để trống
                 ))
-                .toList();
+                .collect(Collectors.toList());
     }
-
-
-
-
-
-
-
 
     @Override
     public Page<GroupSummaryDTO> searchGroups(String keyword, int page, int size) {

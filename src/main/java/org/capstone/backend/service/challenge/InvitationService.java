@@ -207,7 +207,9 @@ public class InvitationService implements InvitationServiceInterface {
                         m.getId(),
                         m.getAccount().getEmail(),
                         m.getAvatar(),
-                        m.getFullName()))
+                        m.getFullName(),
+                        "" // lý do có thể để trống
+                ))
                 .collect(Collectors.toList());
     }
 

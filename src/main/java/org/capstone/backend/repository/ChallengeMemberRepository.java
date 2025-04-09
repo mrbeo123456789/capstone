@@ -40,6 +40,7 @@ public interface ChallengeMemberRepository extends JpaRepository<ChallengeMember
            """)
     Optional<ChallengeMember> findByChallengeIdAndMemberId(@Param("challengeId") Long challengeId,
                                                            @Param("memberId") Long memberId);
+    boolean existsByChallengeAndMember(Challenge challenge, Member member);
 
     // Cập nhật Role của một thành viên trong Challenge
     @Modifying

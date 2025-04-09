@@ -2,27 +2,20 @@ package org.capstone.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.capstone.backend.utils.key.ChallengeProgressRankingId;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "challenge_progress_ranking",
-       uniqueConstraints = @UniqueConstraint(columnNames = {"challenge_id", "member_id"}))
+@Table(name = "challenge_progress_ranking")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class ChallengeProgressRanking {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "challenge_id", nullable = false)
-    private Long challengeId;
-
-    @Column(name = "member_id", nullable = false)
-    private Long memberId;
+    @EmbeddedId
+    private ChallengeProgressRankingId id;
 
     @Column(name = "completed_days")
     private Integer completedDays;

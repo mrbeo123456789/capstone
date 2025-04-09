@@ -100,5 +100,11 @@ public class ChallengeController {
         challengeReportService.reportChallenge(dto);
         return ResponseEntity.ok("Report submitted successfully.");
     }
-
+    @PostMapping("/{groupId}/join-challenge/{challengeId}")
+    public ResponseEntity<String> joinGroupToChallenge(
+            @PathVariable Long groupId,
+            @PathVariable Long challengeId) {
+        String result = challengeService.joinGroupToChallenge(groupId, challengeId);
+        return ResponseEntity.ok(result);
+    }
 }

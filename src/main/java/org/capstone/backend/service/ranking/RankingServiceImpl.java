@@ -4,10 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.capstone.backend.dto.rank.ChallengeProgressRankingResponse;
 import org.capstone.backend.dto.rank.ChallengeStarRatingResponse;
+import org.capstone.backend.dto.rank.GlobalMemberRankingResponse;
 import org.capstone.backend.dto.rank.GlobalRankingDto;
 import org.capstone.backend.entity.*;
 import org.capstone.backend.repository.*;
 import org.capstone.backend.utils.enums.EvidenceStatus;
+import org.capstone.backend.utils.key.ChallengeProgressRankingId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +37,7 @@ public class RankingServiceImpl implements RankingService {
     private final GlobalMemberRankingRepository globalMemberRankingRepository;
 
     @Override
+    @Transactional // Đảm bảo tất cả hành động xóa và insert nằm trong 1 transaction
     public void recalculateAllChallengeProgressRankings() {
         List<Challenge> allChallenges = challengeRepository.findAll();
 
@@ -43,65 +46,69 @@ public class RankingServiceImpl implements RankingService {
             LocalDate startDate = challenge.getStartDate();
             LocalDate endDate = challenge.getEndDate();
 
-            List<ChallengeMember> members = challengeMemberRepository.findByChallengeId(challengeId);
-            List<ChallengeProgressRanking> rankingList = new ArrayList<>();
+            List<ChallengeProgressRanking> rankingList = challengeMemberRepository.findByChallengeId(challengeId)
+                    .stream()
+                    .map(cm -> {
+                        Long memberId = cm.getMember().getId();
 
-            for (ChallengeMember cm : members) {
-                Long memberId = cm.getMember().getId();
+                        List<Evidence> evidences = evidenceRepository
+                                .findByMemberIdAndChallengeIdOrderBySubmittedAtAsc(challengeId, memberId);
 
-                // Lấy tất cả evidence người dùng đã nộp trong thử thách
-                List<Evidence> evidences = evidenceRepository.findByMemberIdAndChallengeIdOrderBySubmittedAtAsc(challengeId, memberId);
+                        Set<LocalDate> completedDays = evidences.stream()
+                                .map(e -> e.getSubmittedAt().toLocalDate())
+                                .filter(d -> !d.isBefore(startDate) && !d.isAfter(endDate))
+                                .collect(Collectors.toSet());
 
-                // Đếm số ngày khác nhau user đã nộp evidence
-                Set<LocalDate> completedDays = evidences.stream()
-                        .map(e -> e.getSubmittedAt().toLocalDate())
-                        .filter(d -> !d.isBefore(startDate) && !d.isAfter(endDate))
-                        .collect(Collectors.toSet());
+                        int approvedCount = (int) evidences.stream()
+                                .filter(e -> e.getStatus() == EvidenceStatus.APPROVED)
+                                .count();
 
-                // Đếm số evidence được duyệt
-                int approvedCount = (int) evidences.stream()
-                        .filter(e -> e.getStatus() == EvidenceStatus.APPROVED)
-                        .count();
+                        int voteGivenCount = evidenceVoteRepository.countByVoterId(memberId);
 
-                // Đếm số vote user đã đi vote cho người khác
-                int voteGivenCount = evidenceVoteRepository.countByVoterId(memberId);
+                        int score = completedDays.size() * 10 + voteGivenCount * 3 + approvedCount * 5;
 
-                // Tính tổng điểm
-                int score = completedDays.size() * 10 + voteGivenCount * 3 + approvedCount * 5;
+                        return ChallengeProgressRanking.builder()
+                                .id(new ChallengeProgressRankingId(challengeId, memberId))
+                                .completedDays(completedDays.size())
+                                .voteGivenCount(voteGivenCount)
+                                .approvedEvidenceCount(approvedCount)
+                                .score(score)
+                                .createdAt(LocalDateTime.now())
+                                .build();
 
-                rankingList.add(ChallengeProgressRanking.builder()
-                        .challengeId(challengeId)
-                        .memberId(memberId)
-                        .completedDays(completedDays.size())
-                        .voteGivenCount(voteGivenCount)
-                        .approvedEvidenceCount(approvedCount)
-                        .score(score)
-                        .build());
-            }
 
-            // Cập nhật bảng xếp hạng
+                    })
+                    .collect(Collectors.toList());
+
             rankingRepository.deleteByChallengeId(challengeId);
             rankingRepository.saveAll(rankingList);
         }
-
-
     }
+
+
+
     @Override
     public List<ChallengeProgressRankingResponse> getTop3RankingByChallengeId(Long challengeId) {
         List<ChallengeProgressRanking> rankings = rankingRepository
-                .findTop3ByChallengeIdOrderByScoreDesc(challengeId);
+                .findTop3ById_ChallengeIdOrderByScoreDesc(challengeId);
 
         return IntStream.range(0, rankings.size())
                 .mapToObj(i -> {
                     ChallengeProgressRanking r = rankings.get(i);
+                    Long memberId = r.getId().getMemberId();
+                    var member = memberRepository.getReferenceById(memberId); // lấy full member object
+
                     return ChallengeProgressRankingResponse.builder()
-                            .memberId(r.getMemberId())
-                            .memberName(memberRepository.getReferenceById(r.getMemberId()).getFirstName())
+                            .memberId(memberId)
+                            .memberName(member.getFirstName())
+                            .avatar(member.getAvatar()) // 👈 thêm dòng này
                             .rank(i + 1)
                             .build();
                 })
                 .toList();
     }
+
+
 
 
     @Transactional
@@ -143,15 +150,25 @@ public class RankingServiceImpl implements RankingService {
                 .findByChallengeIdOrderByAverageStarDescTotalRatingCountDescGivenRatingCountDesc(challengeId, pageable);
 
         List<ChallengeStarRatingResponse> content = page.getContent().stream()
-                .map(rating -> ChallengeStarRatingResponse.builder()
-                        .memberId(rating.getMemberId())
-                        .memberName(memberRepository.getReferenceById(rating.getMemberId()).getFirstName())
-                        .averageStar(rating.getAverageStar())
-                        .build())
+                .map(rating -> {
+                    var member = memberRepository.getReferenceById(rating.getMemberId());
+
+                    return ChallengeStarRatingResponse.builder()
+                            .memberId(rating.getMemberId())
+                            .memberName(member.getFirstName())
+                            .avatar(member.getAvatar())
+                            .averageStar(roundTo1Decimal(rating.getAverageStar())) // 👈 làm tròn ở đây
+                            .build();
+                })
                 .toList();
+
 
         return new PageImpl<>(content, pageable, page.getTotalElements());
     }
+    private double roundTo1Decimal(double value) {
+        return Math.round(value * 10.0) / 10.0;
+    }
+
     @Transactional
     public void updateGlobalRanking() {
         // Lấy dữ liệu bảng xếp hạng mới
@@ -174,8 +191,25 @@ public class RankingServiceImpl implements RankingService {
         globalMemberRankingRepository.saveAll(newRankings);
     }
 
-    public Page<GlobalMemberRanking> getGlobalRanking(Pageable pageable) {
-        return globalMemberRankingRepository.findAllByOrderByTotalStarsDesc(pageable);
+    @Override
+    public Page<GlobalMemberRankingResponse> getGlobalRanking(Pageable pageable) {
+        Page<GlobalMemberRanking> page = globalMemberRankingRepository.findAllByOrderByTotalStarsDesc(pageable);
+
+        List<GlobalMemberRankingResponse> content = page.getContent().stream()
+                .map(ranking -> {
+                    var member = memberRepository.getReferenceById(ranking.getMemberId());
+
+                    return GlobalMemberRankingResponse.builder()
+                            .memberId(ranking.getMemberId())
+                            .fullName(ranking.getFullName())
+                            .totalStars(ranking.getTotalStars())
+                            .avatar(member.getAvatar()) // 👈 lấy avt từ bảng Member
+                            .build();
+                })
+                .toList();
+
+        return new PageImpl<>(content, pageable, page.getTotalElements());
     }
+
 
 }
