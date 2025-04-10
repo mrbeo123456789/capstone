@@ -3,9 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { FaRegClock } from "react-icons/fa";
 import { FaRunning } from "react-icons/fa";
 import { HiUsers } from "react-icons/hi";
-import { CheckCircle, XCircle, UserX, ArrowLeft } from "lucide-react";
+import {CheckCircle, XCircle, UserX, ArrowLeft, Ban} from "lucide-react";
 import Footer from "../../../component/footer.jsx";
 import { useGetChallengeDetailQuery } from "../../../service/challengeService.js";
+import { useReviewChallengeMutation } from "../../../service/adminService.js";
 import EvidenceList from "../list/EvidenceList.jsx"; // Import the EvidenceList component
 
 const ChallengeDetail = () => {
@@ -19,8 +20,9 @@ const ChallengeDetail = () => {
     const [memberToKick, setMemberToKick] = useState(null);
 
     // Sử dụng API thật qua hook RTK Query để lấy chi tiết challenge
-    const { data: challenge, error, isLoading } = useGetChallengeDetailQuery(id);
-
+    const { data: challenge, error, isLoading ,refetch} = useGetChallengeDetailQuery(id);
+    const [reviewChallenge] = useReviewChallengeMutation();
+    console.log(challenge);
     const handleGoBack = () => {
         navigate(-1);
     };
@@ -30,17 +32,26 @@ const ChallengeDetail = () => {
     };
 
     // Mở modal xác nhận với challenge_id và hành động (approve/reject)
-    const openConfirmModal = (challengeId, action) => {
-        setConfirmAction(action);
-        setReason("");
-        setShowConfirmModal(true);
+    const handleAction = async (challengeId, action) => {
+        const newStatus = action === "confirmed" ? "APPROVED" : "REJECTED";
+        try {
+            const reviewRequest = { challengeId, status: newStatus };
+            const response = await reviewChallenge(reviewRequest).unwrap();
+            console.log("Review challenge response:", response);
+            refetch();
+        } catch (error) {
+            console.error(`Error ${action} challenge:`, error);
+        }
     };
-
-    // Xử lý khi nhấn OK trên modal xác nhận
-    const handleConfirmAction = () => {
-        // Ở đây bạn có thể gọi API cập nhật trạng thái challenge nếu cần.
-        alert(`Challenge #${challenge.challenge_id} ${confirmAction === 'confirmed' ? 'approved' : 'rejected'} with reason: "${reason}"`);
-        setShowConfirmModal(false);
+    const banChallenge = async (challengeId) => {
+        try {
+            const reviewRequest = { challengeId, status: "BANNED" };
+            const response = await reviewChallenge(reviewRequest).unwrap();
+            console.log("Ban challenge response:", response);
+            refetch();
+        } catch (error) {
+            console.error("Error banning challenge:", error);
+        }
     };
 
     // Mở modal kick thành viên
@@ -143,41 +154,47 @@ const ChallengeDetail = () => {
                     <div className="bg-gray-100 p-6 md:w-1/3 flex flex-col justify-between">
                         <h2 className="text-xl font-bold text-gray-900">ĐÁNH GIÁ</h2>
                         <div className="mt-2">
-                            {challenge.status === "PENDING" ? (
-                                <div className="flex space-x-2">
-                                    <button
-                                        onClick={() => openConfirmModal(challenge.challenge_id, 'confirmed')}
-                                        className="flex-1 bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 flex items-center justify-center"
-                                    >
-                                        <CheckCircle className="h-5 w-5 mr-1" /> Approve
-                                    </button>
-                                    <button
-                                        onClick={() => openConfirmModal(challenge.challenge_id, 'rejected')}
-                                        className="flex-1 bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 flex items-center justify-center"
-                                    >
-                                        <XCircle className="h-5 w-5 mr-1" /> Reject
-                                    </button>
-                                </div>
-                            ) : (
-                                <button
-                                    className={`w-full py-2 rounded-lg text-white flex items-center justify-center ${
-                                        challenge.status === "APPROVED"
-                                            ? "bg-red-500 hover:bg-red-600"
-                                            : "bg-green-500 hover:bg-green-600"
-                                    }`}
-                                    onClick={() =>
-                                        challenge.status === "APPROVED"
-                                            ? openConfirmModal(challenge.challenge_id, 'rejected')
-                                            : openConfirmModal(challenge.challenge_id, 'confirmed')
-                                    }
-                                >
-                                    {challenge.status === "APPROVED" ? (
-                                        <><XCircle className="h-5 w-5 mr-1" /> Reject</>
-                                    ) : (
-                                        <><CheckCircle className="h-5 w-5 mr-1" /> Approve</>
-                                    )}
-                                </button>
-                            )}
+                            {(() => {
+                                const status = challenge.status.toUpperCase();
+                                if (status === "PENDING") {
+                                    return (
+                                        <>
+                                            <button
+                                                className="p-2 bg-green-100 text-green-600 rounded-md hover:bg-green-200 transition-colors"
+                                                onClick={() => handleAction(challenge.id, "confirmed")}
+                                            >
+                                                <CheckCircle className="h-5 w-5" />
+                                            </button>
+                                            <button
+                                                className="p-2 bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition-colors"
+                                                onClick={() => handleAction(challenge.id, "rejected")}
+                                            >
+                                                <XCircle className="h-5 w-5" />
+                                            </button>
+                                        </>
+                                    );
+                                } else if (status === "REJECTED") {
+                                    return (
+                                        <button
+                                            className="p-2 bg-green-100 text-green-600 rounded-md hover:bg-green-200 transition-colors"
+                                            onClick={() => handleAction(challenge.id, "confirmed")}
+                                        >
+                                            <CheckCircle className="h-5 w-5" />
+                                        </button>
+                                    );
+                                } else if (status === "BANNED" || status === "FINISH" || status === "CANCELED") {
+                                    return null;
+                                } else {
+                                    return (
+                                        <button
+                                            className="p-2 bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition-colors"
+                                            onClick={() => banChallenge(challenge.id)}
+                                        >
+                                            <Ban className="h-5 w-5" />
+                                        </button>
+                                    );
+                                }
+                            })()}
                         </div>
                         <div className="mt-4 flex items-center">
                             <FaRegClock className="text-gray-500 mr-2"/>
@@ -336,10 +353,10 @@ const ChallengeDetail = () => {
                 <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
                         <h2 className="text-xl font-bold mb-4 text-gray-700">
-                            Xác nhận {confirmAction === 'confirmed' ? 'Approve' : 'Reject'}?
+                            Confirm {confirmAction === 'confirmed' ? 'Approve' : 'Reject'}?
                         </h2>
                         <p className="text-gray-600 mb-4">
-                            Bạn có chắc chắn muốn {confirmAction === 'confirmed' ? 'approve' : 'reject'} challenge này không?
+                            Are you sure {confirmAction === 'confirmed' ? 'approve' : 'reject'} this challenge?
                         </p>
                         <div className="mb-4">
                             <label className="block text-sm font-medium text-gray-700 mb-1">Lý do (tuỳ chọn):</label>
@@ -356,7 +373,7 @@ const ChallengeDetail = () => {
                                 onClick={() => setShowConfirmModal(false)}
                                 className="px-4 py-2 rounded border border-gray-300 text-gray-600 hover:bg-gray-50"
                             >
-                                Hủy
+                                Cancel
                             </button>
                             <button
                                 onClick={handleConfirmAction}
@@ -378,21 +395,21 @@ const ChallengeDetail = () => {
                 <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
                         <h2 className="text-xl font-bold mb-4 text-gray-700">
-                            Xác nhận loại bỏ thành viên
+                            Confirm kick member
                         </h2>
                         <div className="flex items-center mb-4">
                             <img className="w-10 h-10 rounded-full mr-3" src={memberToKick.avatar} alt={memberToKick.name} />
                             <span className="font-medium">{memberToKick.name}</span>
                         </div>
                         <p className="text-gray-600 mb-4">
-                            Bạn có chắc chắn muốn loại bỏ thành viên này khỏi challenge không?
+                            Do you sure to kick this member from the challenge?
                         </p>
                         <div className="mb-4">
                             <label className="block text-sm font-medium text-gray-700 mb-1">Lý do loại bỏ:</label>
                             <textarea
                                 className="w-full border border-gray-300 rounded p-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                                 rows="3"
-                                placeholder="Nhập lý do loại bỏ thành viên..."
+                                placeholder="Reason why you delete ..."
                                 value={reason}
                                 onChange={(e) => setReason(e.target.value)}
                                 required

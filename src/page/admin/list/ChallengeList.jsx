@@ -9,11 +9,13 @@ const ChallengeList = () => {
     const navigate = useNavigate();
 
     // Parse URL query parameters
+    // Parse URL query parameters
     const queryParams = new URLSearchParams(location.search);
     const statusFromURL = queryParams.get('status');
 
-    // State management
-    const [currentPage, setCurrentPage] = useState(1);
+// State management
+// Chuyển currentPage sang 0-indexed giống UserList
+    const [currentPage, setCurrentPage] = useState(0);
     const [searchTerm, setSearchTerm] = useState("");
     const [filterStatus, setFilterStatus] = useState(statusFromURL);
     const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
@@ -21,40 +23,38 @@ const ChallengeList = () => {
 
     const itemsPerPage = 10;
 
-    // Effect to handle URL parameter changes
+// Effect để đồng bộ status filter theo URL
     useEffect(() => {
         if (statusFromURL) {
             setFilterStatus(statusFromURL);
         }
     }, [statusFromURL]);
 
-    // RTK Query hook: lấy dữ liệu theo phân trang từ backend
+// Gọi API phân trang (API đang nhận page ở dạng 0-indexed)
     const {
         data: challengesResponse = {},
         isLoading,
         isError,
         refetch,
-    } = useGetChallengesQuery({ page: currentPage - 1, size: itemsPerPage, search: searchTerm, status: filterStatus});
+    } = useGetChallengesQuery({ page: currentPage, size: itemsPerPage, search: searchTerm, status: filterStatus });
 
-    // Sử dụng mutation reviewChallenge
+// Sử dụng mutation reviewChallenge
     const [reviewChallenge] = useReviewChallengeMutation();
 
-    // Giả định API trả về dữ liệu có property "content"
+// Giả định API trả về dữ liệu có property "content"
     const allChallenges = challengesResponse?.content || [];
 
-    // Hàm tính duration = endDate - startDate (tính theo ngày)
+// Hàm tính duration giữa startDate và endDate (tính theo ngày)
     const computeDuration = (challenge) => {
         if (challenge.startDate && challenge.endDate) {
             let s = challenge.startDate;
             let e = challenge.endDate;
-            // Nếu dữ liệu trả về là array [year, month, day]
             if (Array.isArray(s) && Array.isArray(e)) {
                 const start = new Date(s[0], s[1] - 1, s[2]);
                 const end = new Date(e[0], e[1] - 1, e[2]);
                 const diff = Math.round((end - start) / (1000 * 60 * 60 * 24));
                 return diff + " days";
             }
-            // Nếu là chuỗi, parse trực tiếp
             const start = new Date(s);
             const end = new Date(e);
             const diff = Math.round((end - start) / (1000 * 60 * 60 * 24));
@@ -63,49 +63,32 @@ const ChallengeList = () => {
         return "";
     };
 
-    // Update status filter and update URL
+// Cập nhật filter status và đồng bộ URL
     const updateStatusFilter = (status) => {
-        // Update state
         setFilterStatus(status);
         setIsStatusDropdownOpen(false);
-        setCurrentPage(1);
-
-        // Update URL without navigating away
+        setCurrentPage(0);
         const newParams = new URLSearchParams(location.search);
         if (status) {
             newParams.set('status', status);
         } else {
             newParams.delete('status');
         }
-
-        navigate({
-            pathname: location.pathname,
-            search: newParams.toString()
-        }, { replace: true });
+        navigate({ pathname: location.pathname, search: newParams.toString() }, { replace: true });
     };
 
-    // Lọc theo searchTerm và filterStatus (client-side)
-    const filteredChallenges = allChallenges.filter((challenge) => {
-        const matchesSearch = challenge.name.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesStatus = filterStatus ? challenge.status.toUpperCase() === filterStatus : true;
-        return matchesSearch && matchesStatus;
-    });
-
-    // Sắp xếp theo id tăng dần
-    const sortedChallenges = [...filteredChallenges].sort((a, b) => a.id - b.id);
-
-    // Client-side pagination
-    const indexOfLastChallenge = currentPage * itemsPerPage;
-    const indexOfFirstChallenge = indexOfLastChallenge - itemsPerPage;
+// Phân trang theo dữ liệu trả về từ API
+// currentChallenges chính là kết quả phân trang từ API
     const currentChallenges = challengesResponse?.content || [];
-    const totalPages = challengesResponse?.totalPages || Math.ceil(sortedChallenges.length / itemsPerPage);
+    const totalElements = challengesResponse?.totalElements || 0;
+    const totalPages = challengesResponse?.totalPages || Math.ceil(totalElements / itemsPerPage);
 
-    // Navigation tới chi tiết thử thách
+// Navigation tới trang chi tiết của challenge
     const navigateToChallengeDetail = (challenge) => {
         navigate(`/admin/challenge/${challenge.id}/detail`);
     };
 
-    // Hàm xử lý review: Approve hoặc Reject
+// Hàm xử lý review (Approve/Reject)
     const handleAction = async (challengeId, action) => {
         const newStatus = action === "confirmed" ? "APPROVED" : "REJECTED";
         try {
@@ -118,7 +101,7 @@ const ChallengeList = () => {
         }
     };
 
-    // Hàm xử lý ban: cập nhật status thành BANNED
+// Hàm xử lý ban challenge (chuyển sang status BANNED)
     const banChallenge = async (challengeId) => {
         try {
             const reviewRequest = { challengeId, status: "BANNED" };
@@ -130,7 +113,7 @@ const ChallengeList = () => {
         }
     };
 
-    // Dropdown handlers
+// Xử lý dropdown status
     const toggleStatusDropdown = () => {
         setIsStatusDropdownOpen(!isStatusDropdownOpen);
     };
@@ -139,42 +122,39 @@ const ChallengeList = () => {
         updateStatusFilter(status);
     };
 
-    // Search input handler
+// Xử lý thay đổi của ô search
     const handleSearchChange = (e) => {
         setSearchTerm(e.target.value);
-        setCurrentPage(1);
-        // Có thể thêm debounce ở đây nếu cần
+        setCurrentPage(0);
     };
 
-    // Pagination handlers
+// Pagination handlers (giống như UserList)
     const nextPage = () => {
-        if (currentPage < totalPages) {
+        if (currentPage < totalPages - 1) {
             setCurrentPage(currentPage + 1);
         }
     };
 
     const prevPage = () => {
-        if (currentPage > 1) {
+        if (currentPage > 0) {
             setCurrentPage(currentPage - 1);
         }
     };
 
-    // Function to map status values between pie chart and dropdown
+// Hàm chuyển đổi tên hiển thị status
     const getStatusDisplayName = (status) => {
-        if (!status) return "Tất cả trạng thái";
+        if (!status) return "All Status";
 
         // Map from pie chart names to dropdown names if needed
         switch (status.toUpperCase()) {
-            case "COMPLETED": return "Đã kết thúc";
-            case "ONGOING": return "Đang diễn ra";
-            case "PENDING": return "Đang chờ";
-            case "FAILED": return "Đã thất bại";
-            case "APPROVED": return "Đã duyệt";
-            case "REJECTED": return "Đã từ chối";
-            case "BANNED": return "Đã ban";
-            case "CANCELED": return "Bị hủy";
-            case "FINISH": return "Đã kết thúc";
-            case "UPCOMING": return "Sắp diễn ra";
+            case "ONGOING": return "ONGOING";
+            case "PENDING": return "PENDING";
+            case "FAILED": return "FAILED";
+            case "REJECTED": return "REJECTED";
+            case "BANNED": return "BANNED";
+            case "CANCELED": return "CANCELED";
+            case "FINISH": return "FINISH";
+            case "UPCOMING": return "UPCOMING";
             default: return status;
         }
     };
@@ -183,10 +163,7 @@ const ChallengeList = () => {
         <div className="bg-red-50 min-h-screen flex flex-col">
             <div className="flex flex-1 overflow-hidden relative">
                 <div className={`transition-all duration-300 ${sidebarCollapsed ? 'w-16' : 'w-64'} flex-shrink-0`}>
-                    <Sidebar
-                        sidebarCollapsed={sidebarCollapsed}
-                        setSidebarCollapsed={setSidebarCollapsed}
-                    />
+                    <Sidebar sidebarCollapsed={sidebarCollapsed} setSidebarCollapsed={setSidebarCollapsed} />
                 </div>
                 <div className="flex-1 overflow-auto p-4">
                     <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-orange-100 h-full flex flex-col">
@@ -196,7 +173,7 @@ const ChallengeList = () => {
                                 <div className="flex-1 relative">
                                     <input
                                         type="text"
-                                        placeholder="Tìm kiếm thử thách..."
+                                        placeholder="Searching challenge ..."
                                         value={searchTerm}
                                         onChange={handleSearchChange}
                                         className="w-full pl-10 pr-4 py-2 border border-orange-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-300"
@@ -212,9 +189,7 @@ const ChallengeList = () => {
                                         onClick={toggleStatusDropdown}
                                         className="px-4 py-2 border border-orange-200 rounded-lg bg-white flex items-center justify-between min-w-[180px]"
                                     >
-                                        <span>
-                                            {getStatusDisplayName(filterStatus)}
-                                        </span>
+                                        <span>{getStatusDisplayName(filterStatus)}</span>
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
                                             className={`h-5 w-5 transition-transform ${isStatusDropdownOpen ? "rotate-180" : ""}`}
@@ -229,31 +204,28 @@ const ChallengeList = () => {
                                         <div className="absolute right-0 mt-2 w-56 bg-white border border-orange-200 rounded-lg shadow-lg z-10">
                                             <div className="py-1">
                                                 <button onClick={() => handleStatusFilter(null)} className="block w-full text-left px-4 py-2 hover:bg-orange-50">
-                                                    Tất cả trạng thái
-                                                </button>
-                                                <button onClick={() => handleStatusFilter("APPROVED")} className="block w-full text-left px-4 py-2 hover:bg-orange-50">
-                                                    Đã duyệt
+                                                    All status
                                                 </button>
                                                 <button onClick={() => handleStatusFilter("REJECTED")} className="block w-full text-left px-4 py-2 hover:bg-orange-50">
-                                                    Đã từ chối
+                                                    Rejected
                                                 </button>
                                                 <button onClick={() => handleStatusFilter("PENDING")} className="block w-full text-left px-4 py-2 hover:bg-orange-50">
-                                                    Đang chờ
+                                                    Pending
                                                 </button>
                                                 <button onClick={() => handleStatusFilter("BANNED")} className="block w-full text-left px-4 py-2 hover:bg-orange-50">
-                                                    Đã ban
+                                                    Banned
                                                 </button>
                                                 <button onClick={() => handleStatusFilter("CANCELED")} className="block w-full text-left px-4 py-2 hover:bg-orange-50">
-                                                    Bị hủy
+                                                    Canceled
                                                 </button>
                                                 <button onClick={() => handleStatusFilter("FINISH")} className="block w-full text-left px-4 py-2 hover:bg-orange-50">
-                                                    Đã kết thúc
+                                                    Finished
                                                 </button>
                                                 <button onClick={() => handleStatusFilter("ONGOING")} className="block w-full text-left px-4 py-2 hover:bg-orange-50">
-                                                    Đang diễn ra
+                                                    On going
                                                 </button>
                                                 <button onClick={() => handleStatusFilter("UPCOMING")} className="block w-full text-left px-4 py-2 hover:bg-orange-50">
-                                                    Sắp diễn ra
+                                                    Upcoming
                                                 </button>
                                             </div>
                                         </div>
@@ -270,23 +242,23 @@ const ChallengeList = () => {
                                 </div>
                             ) : isError ? (
                                 <div className="flex justify-center items-center h-64 text-red-500">
-                                    <p>Đã xảy ra lỗi khi tải dữ liệu. Vui lòng thử lại.</p>
+                                    <p>Error to get data. Please try again</p>
                                 </div>
                             ) : (
                                 <table className="w-full">
                                     <thead className="bg-gradient-to-r from-orange-50 to-yellow-50 text-orange-700">
                                     <tr>
-                                        <th className="p-4 text-left">Thử thách</th>
+                                        <th className="p-4 text-left">Challenge</th>
                                         <th className="p-4 text-left">Duration</th>
-                                        <th className="p-4 text-left">Trạng thái</th>
-                                        <th className="p-4 text-center">Hành động</th>
+                                        <th className="p-4 text-left">Status</th>
+                                        <th className="p-4 text-center">Action</th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     {currentChallenges.length === 0 ? (
                                         <tr>
                                             <td colSpan="4" className="p-4 text-center text-gray-500">
-                                                Không có thử thách nào phù hợp với tìm kiếm của bạn.
+                                                Không có challenge nào
                                             </td>
                                         </tr>
                                     ) : (
@@ -310,9 +282,7 @@ const ChallengeList = () => {
                                                     </div>
                                                 </td>
                                                 <td className="p-4">
-                                                    <span className="font-medium">
-                                                        {computeDuration(challenge)}
-                                                    </span>
+                                                    <span className="font-medium">{computeDuration(challenge)}</span>
                                                 </td>
                                                 <td className="p-4">
                                                     <span className={`px-3 py-1 rounded-full text-sm font-medium ${
@@ -333,7 +303,6 @@ const ChallengeList = () => {
                                                         {(() => {
                                                             const status = challenge.status.toUpperCase();
                                                             if (status === "PENDING") {
-                                                                // Hiển thị nút Approve và Reject cho trạng thái PENDING
                                                                 return (
                                                                     <>
                                                                         <button
@@ -350,18 +319,7 @@ const ChallengeList = () => {
                                                                         </button>
                                                                     </>
                                                                 );
-                                                            } else if (status === "APPROVED") {
-                                                                // Nếu đã approve, cho phép chuyển sang rejected
-                                                                return (
-                                                                    <button
-                                                                        className="p-2 bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition-colors"
-                                                                        onClick={() => handleAction(challenge.id, "rejected")}
-                                                                    >
-                                                                        <XCircle className="h-5 w-5" />
-                                                                    </button>
-                                                                );
                                                             } else if (status === "REJECTED") {
-                                                                // Nếu đã reject, cho phép chuyển sang approved
                                                                 return (
                                                                     <button
                                                                         className="p-2 bg-green-100 text-green-600 rounded-md hover:bg-green-200 transition-colors"
@@ -371,10 +329,8 @@ const ChallengeList = () => {
                                                                     </button>
                                                                 );
                                                             } else if (status === "BANNED" || status === "FINISH" || status === "CANCELED") {
-                                                                // Không hiển thị hành động nếu status là BANNED, FINISH hoặc CANCELED
                                                                 return null;
                                                             } else {
-                                                                // Các trạng thái khác sẽ hiển thị nút ban
                                                                 return (
                                                                     <button
                                                                         className="p-2 bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition-colors"
@@ -395,40 +351,43 @@ const ChallengeList = () => {
                             )}
                         </div>
 
-                        {/* Pagination Controls */}
-                        <div className="p-4 border-t border-orange-100 bg-gradient-to-r from-orange-50 to-yellow-50 flex justify-between items-center">
-                            <div className="text-sm text-gray-600">
-                                {currentChallenges.length > 0 ? (
-                                    <>Hiển thị {indexOfFirstChallenge + 1} - {Math.min(indexOfLastChallenge, filteredChallenges.length)} trong tổng số {filteredChallenges.length} thử thách</>
-                                ) : (
-                                    <>Không có thử thách nào</>
-                                )}
+                        {/* Pagination Controls (giống UserList) */}
+                        <div className="bg-gradient-to-r from-orange-50 to-yellow-50 p-4 flex flex-col md:flex-row md:items-center justify-between border-t border-orange-100 gap-4">
+                            <div className="text-gray-600">
+                                Display{" "}
+                                <span className="font-medium">
+                                {currentChallenges.length > 0 ? (currentPage * itemsPerPage) + 1 : 0}
+                            </span>{" "}
+                                to{" "}
+                                <span className="font-medium">
+                                {(currentPage * itemsPerPage) + currentChallenges.length}
+                            </span>{" "}
+                                in total{" "}
+                                <span className="font-medium">{totalElements}</span> challenges
                             </div>
-                            <div className="flex space-x-2">
+                            <div className="flex space-x-2 self-center md:self-auto">
                                 <button
-                                    onClick={prevPage}
-                                    disabled={currentPage === 1}
-                                    className={`px-3 py-1 rounded-md ${
-                                        currentPage === 1
-                                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                            : "bg-white text-orange-600 hover:bg-orange-100"
-                                    }`}
+                                    className="p-2 rounded-md bg-white border border-orange-200 text-orange-600 hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 0))}
+                                    disabled={currentPage === 0}
                                 >
-                                    Trước
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                    </svg>
                                 </button>
-                                <div className="px-3 py-1 bg-orange-100 text-orange-700 rounded-md">
-                                    {currentPage} / {totalPages || 1}
+                                <div className="bg-white border border-orange-200 rounded-md px-4 py-2 flex items-center">
+                                    <span className="text-orange-600 font-medium">{currentPage + 1}</span>
+                                    <span className="mx-1 text-gray-400">/</span>
+                                    <span className="text-gray-600">{totalPages}</span>
                                 </div>
                                 <button
-                                    onClick={nextPage}
-                                    disabled={currentPage >= totalPages}
-                                    className={`px-3 py-1 rounded-md ${
-                                        currentPage >= totalPages
-                                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                            : "bg-white text-orange-600 hover:bg-orange-100"
-                                    }`}
+                                    className="p-2 rounded-md bg-white border border-orange-200 text-orange-600 hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages - 1))}
+                                    disabled={currentPage === totalPages - 1}
                                 >
-                                    Tiếp
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                    </svg>
                                 </button>
                             </div>
                         </div>
@@ -438,5 +397,4 @@ const ChallengeList = () => {
         </div>
     );
 };
-
 export default ChallengeList;
