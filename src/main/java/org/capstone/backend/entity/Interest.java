@@ -24,6 +24,8 @@ public class Interest {
     @ManyToMany(mappedBy = "interests", fetch = FetchType.LAZY)
     @JsonIgnore // Tránh lỗi vòng lặp khi serialize JSON
     private Set<Member> members = new HashSet<>();
+    @Column(nullable = false)
+    private boolean active = true; // mặc định là bật
 
     // ✅ Định nghĩa equals() và hashCode() để hỗ trợ Set
     @Override

@@ -1,12 +1,14 @@
 package org.capstone.backend.controller.admin;
 
 import lombok.RequiredArgsConstructor;
+import org.capstone.backend.dto.interest.InterestDTO;
 import org.capstone.backend.entity.ChallengeType;
 import org.capstone.backend.entity.Interest;
 import org.capstone.backend.service.challenge.ChallengeTypeService;
 import org.capstone.backend.service.interest.InterestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RestController
@@ -63,6 +65,13 @@ public class SettingController {
     public Interest updateInterest(@PathVariable Long id, @RequestBody Interest updated) {
         return interestService.update(id, updated);
     }
+    @PutMapping("/{id}/status")
+    public ResponseEntity<String> updateStatus(@PathVariable Long id, @RequestParam boolean active) {
+        interestService.toggleActive(id, active);
+        String status = active ? "activated" : "deactivated";
+        return ResponseEntity.ok("Interest " + status + " successfully.");
+    }
+
 
     @DeleteMapping("/interests/{id}")
     public void deleteInterest(@PathVariable Long id) {

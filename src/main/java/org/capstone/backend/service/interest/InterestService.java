@@ -14,5 +14,6 @@ public interface InterestService {
     Interest create(Interest interest);
     Interest update(Long id, Interest updated);
     void delete(Long id);
+    Interest toggleActive(Long id, boolean isActive);
 
 }

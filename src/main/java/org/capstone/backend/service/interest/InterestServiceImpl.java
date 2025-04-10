@@ -37,19 +37,15 @@ public class InterestServiceImpl implements InterestService {
     @Override
     @Transactional(readOnly = true)
     public Map<String, List<InterestDTO>> getInterestsForAuthenticatedMember() {
-        Member member = memberRepository.getReferenceById(authService.getMemberIdFromAuthentication());
+        Long memberId = authService.getMemberIdFromAuthentication();
 
-        // Tạo một Set để tránh ConcurrentModificationException
-        Set<Interest> memberInterestsSet = new HashSet<>(member.getInterests());
-
-        // Chuyển đổi sang DTO
-        List<InterestDTO> memberInterests = memberInterestsSet.stream()
+        List<InterestDTO> memberInterests = interestRepository.findActiveByMemberId(memberId)
+                .stream()
                 .map(interest -> new InterestDTO(interest.getId(), interest.getName()))
                 .collect(Collectors.toList());
 
-        // Lấy danh sách Interests chưa sở hữu
-        List<InterestDTO> otherInterests = interestRepository.findAll().stream()
-                .filter(interest -> !memberInterestsSet.contains(interest))
+        List<InterestDTO> otherInterests = interestRepository.findActiveNotOwnedByMemberId(memberId)
+                .stream()
                 .map(interest -> new InterestDTO(interest.getId(), interest.getName()))
                 .collect(Collectors.toList());
 
@@ -68,15 +64,11 @@ public class InterestServiceImpl implements InterestService {
     public void updateMemberInterests(List<Long> interestIds) {
         Member member = memberRepository.getReferenceById(authService.getMemberIdFromAuthentication());
 
-        // Lấy danh sách Interests từ ID gửi lên
-        Set<Interest> newInterests = new HashSet<>(interestRepository.findAllById(interestIds));
+        Set<Interest> newInterests = new HashSet<>(interestRepository.findAllActiveByIdIn(interestIds));
 
-        // Cập nhật Interests đúng cách để tránh ConcurrentModificationException
         member.setInterests(newInterests);
-
         memberRepository.save(member);
     }
-
 
 
     // 🔍 Phân trang + tìm kiếm
@@ -113,6 +105,13 @@ public class InterestServiceImpl implements InterestService {
         });
 
         interestRepository.delete(interest);
+    }
+    @Override
+    public Interest toggleActive(Long id, boolean isActive) {
+        Interest interest = interestRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Interest not found"));
+        interest.setActive(isActive);
+        return interestRepository.save(interest);
     }
 
 
