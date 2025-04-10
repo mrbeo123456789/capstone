@@ -14,7 +14,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "evidence")
+@Table(name = "evidence",
+        uniqueConstraints = @UniqueConstraint(
+                columnNames = {"member_id", "challenge_id", "submitted_at"}
+        ))
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
