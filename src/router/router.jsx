@@ -34,7 +34,7 @@ import AdminSettings from "../page/admin/list/Settings.jsx";
 const router = createBrowserRouter([
     {
         path: "/", // ✅ Redirect root to homepage
-        element: <Navigate to="/homepage" replace />
+        element: <Navigate to="/homepage" />
     },
     {
         path: "*", // ✅ Redirect root to homepage
@@ -176,7 +176,6 @@ const router = createBrowserRouter([
             },
             {
                 path:"/admin/grouplist",
-                errorElement:<ErrorPage/>,
                 element: <GroupList/>,
             },
             {
