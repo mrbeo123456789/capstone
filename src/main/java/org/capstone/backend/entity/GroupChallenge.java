@@ -22,7 +22,7 @@ public class GroupChallenge {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "group_id", nullable = false)
+    @JoinColumn(name = "group_id") // ❗ group_id có thể null
     private Groups group;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -36,17 +36,14 @@ public class GroupChallenge {
     @Column(name = "status", nullable = false)
     private GroupChallengeStatus status;
 
-    // Automatically sets the createdAt field to the time of creation.
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    // Automatically updates the updatedAt field when the entity is updated.
     @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    // Biến boolean để xác định thử thách đã hoàn thành (success) hay thất bại (failure)
     @Column(name = "is_success", nullable = false)
     private boolean isSuccess;
 }

@@ -320,5 +320,19 @@ public class GroupServiceImpl implements GroupService {
         groupRepository.delete(group); // Xóa nhóm
     }
 
+    @Override
+    public List<AvailableGroupResponse> getAvailableGroupsToJoinChallenge() {
+        Long memberId = authService.getMemberIdFromAuthentication();
+
+        List<Groups> groups = groupMemberRepository.findAvailableGroupsForMember(memberId);
+
+        return groups.stream()
+                .map(group -> new AvailableGroupResponse(
+                        group.getId(),
+                        group.getName(),
+                        group.getPicture()
+                ))
+                .toList();
+    }
 
 }

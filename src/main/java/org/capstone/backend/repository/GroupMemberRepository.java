@@ -80,6 +80,20 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
             @Param("currentMemberId") Long currentMemberId,
             Pageable pageable
     );
+    @Query("""
+    SELECT gm.group
+    FROM GroupMember gm
+    WHERE gm.member.id = :memberId
+    AND gm.role = 'OWNER'
+    AND gm.status = 'ACTIVE'
+    AND gm.group.id NOT IN (
+        SELECT gc.group.id
+        FROM GroupChallenge gc
+        WHERE gc.status = 'ONGOING'
+    )
+    ORDER BY gm.group.name ASC
+""")
+    List<Groups> findAvailableGroupsForMember(@Param("memberId") Long memberId);
 
     List<GroupMember> findByMemberAndRoleAndStatus(Member member, String owner, GroupMemberStatus groupMemberStatus);
 }

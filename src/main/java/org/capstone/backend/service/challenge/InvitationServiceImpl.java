@@ -54,41 +54,79 @@ public class InvitationServiceImpl implements InvitationService {
      * @throws ResponseStatusException nếu không tìm thấy thử thách
      */
     @Override
+    @Transactional
     public String sendInvitation(InviteMemberRequest request) {
+        // Lấy thông tin người gửi lời mời (Leader A)
         Member invitedBy = getAuthenticatedMember();
+
+        // Lấy thông tin challenge
         Challenge challenge = challengeRepository.findById(request.getChallengeId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Challenge not found"));
 
-        // Xác định trạng thái lời mời dựa trên trạng thái của thử thách (nếu không UPCOMING thì mark là EXPIRED)
-        ChallengeMemberStatus status = (challenge.getStatus() != ChallengeStatus.UPCOMING)
-                ? ChallengeMemberStatus.EXPIRED : ChallengeMemberStatus.WAITING;
         LocalDateTime now = LocalDateTime.now();
+        String type = request.getType();
 
-        // Lấy danh sách các member từ DB, loại bỏ những member đã JOINED rồi,
-        // và tạo đối tượng ChallengeMember thông qua stream.
-        List<ChallengeMember> invitations = memberRepository.findAllById(request.getMemberIds())
-                .stream()
-                .filter(member -> {
-                    Optional<ChallengeMember> existing = challengeMemberRepository.findByMemberAndChallenge(member, challenge);
-                    // Nếu chưa có dữ liệu hoặc nếu đã có nhưng chưa JOINED thì cho phép tạo lời mời
-                    return existing.map(cm -> cm.getStatus() != ChallengeMemberStatus.JOINED).orElse(true);
-                })
-                .map(member -> ChallengeMember.builder()
-                        .challenge(challenge)
-                        .member(member)
-                        .role(ChallengeRole.MEMBER)
-                        .joinBy(invitedBy.getId())
-                        .status(status)
-                        .createdAt(now)
-                        .build())
-                .collect(Collectors.toList());
+        // Xử lý mời thành viên cá nhân (MEMBER)
+        if ("MEMBER".equalsIgnoreCase(type)) {
+            ChallengeMemberStatus status = (challenge.getStatus() != ChallengeStatus.UPCOMING)
+                    ? ChallengeMemberStatus.EXPIRED
+                    : ChallengeMemberStatus.WAITING;
 
-        challengeMemberRepository.saveAll(invitations);
+            List<ChallengeMember> invitations = memberRepository.findAllById(request.getMemberIds())
+                    .stream()
+                    .filter(member -> {
+                        Optional<ChallengeMember> existing =
+                                challengeMemberRepository.findByMemberAndChallenge(member, challenge);
+                        return existing.map(cm -> cm.getStatus() != ChallengeMemberStatus.JOINED).orElse(true);
+                    })
+                    .map(member -> ChallengeMember.builder()
+                            .challenge(challenge)
+                            .member(member)
+                            .role(ChallengeRole.MEMBER)
+                            .status(status)
+                            .joinBy(invitedBy.getId())
+                            .createdAt(now)
+                            .build())
+                    .toList();
 
-        return (status == ChallengeMemberStatus.EXPIRED)
-                ? "Challenge is not upcoming. All invitations are expired."
-                : "Invitations sent successfully to " + invitations.size() + " member(s).";
+            challengeMemberRepository.saveAll(invitations);
+
+            return (status == ChallengeMemberStatus.EXPIRED)
+                    ? "Challenge is not upcoming. Member invitations are expired."
+                    : "Member invitations sent successfully to " + invitations.size() + " member(s).";
+        }
+        // Xử lý mời Leader (LEADER): TẠO BẢN GHI TRONG GROUP_CHALLENGE VỚI group_id = null
+        else if ("LEADER".equalsIgnoreCase(type)) {
+            // Nếu challenge đang UPCOMING thì trạng thái lời mời là PENDING,
+            // còn nếu không thì tự động đánh dấu là REJECTED.
+            GroupChallengeStatus groupStatus = (challenge.getStatus() == ChallengeStatus.UPCOMING)
+                    ? GroupChallengeStatus.PENDING
+                    : GroupChallengeStatus.REJECTED;
+
+            // Với kiểu LEADER, request.getIds() chứa danh sách các leaderId (ID của Leader B).
+            // Ở giai đoạn mời, không cần lấy group id; do đó, group sẽ được để null.
+            List<GroupChallenge> groupInvitations = request.getMemberIds().stream()
+                    .map(leaderId -> GroupChallenge.builder()
+                            .group(null) // Chưa xác định group tại bước mời, sẽ được cập nhật sau khi Leader B quyết định
+                            .challenge(challenge)
+                            .joinDate(now)
+                            .status(groupStatus)
+                            .isSuccess(false)
+                            .createdAt(now)
+                            .build())
+                    .toList();
+
+            groupChallengeRepository.saveAll(groupInvitations);
+
+            return (groupStatus == GroupChallengeStatus.REJECTED)
+                    ? "Challenge is not upcoming. Group invitations are rejected."
+                    : "Group invitations sent successfully to " + groupInvitations.size() + " leader(s).";
+        }
+
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                "Invalid invitation type: must be MEMBER or LEADER.");
     }
+
 
     /**
      * Xử lý phản hồi lời mời tham gia thử thách.
@@ -103,84 +141,100 @@ public class InvitationServiceImpl implements InvitationService {
     @Override
     @Transactional
     public String respondToInvitation(InvitationRespondRequestDTO request) {
-        Member member = getAuthenticatedMember();
+        Member currentMember = getAuthenticatedMember();
+        boolean accept = Boolean.TRUE.equals(request.getAccept());
         String invitationType = request.getInvitationType();
-        boolean accept = request.getAccept();
 
         if ("PERSONAL".equalsIgnoreCase(invitationType)) {
-            // Xử lý lời mời cá nhân
-            ChallengeMember challengeMember = challengeMemberRepository.findById(request.getInvitationId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invitation not found."));
-
-            if (!challengeMember.getMember().equals(member)) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not allowed to respond to this invitation.");
-            }
-
-            Challenge challenge = challengeMember.getChallenge();
-            // Nếu accept nhưng challenge không ở trạng thái UPCOMING hoặc đã đạt giới hạn số người tham gia thì từ chối (mark EXPIRED)
-            if (accept) {
-                if (challenge.getStatus() != ChallengeStatus.UPCOMING ||
-                        (challenge.getMaxParticipants() != null &&
-                                challengeMemberRepository.countByChallengeAndStatus(challenge, ChallengeMemberStatus.JOINED)
-                                        >= challenge.getMaxParticipants())) {
-                    challengeMember.setStatus(ChallengeMemberStatus.EXPIRED);
-                    challengeMember.setUpdatedAt(LocalDateTime.now());
-                    challengeMemberRepository.save(challengeMember);
-                    return "Cannot join the challenge. Invitation expired or challenge is full.";
-                }
-                challengeMember.setStatus(ChallengeMemberStatus.JOINED);
-            } else {
-                challengeMember.setStatus(ChallengeMemberStatus.REJECTED);
-            }
-            challengeMember.setUpdatedAt(LocalDateTime.now());
-            challengeMemberRepository.save(challengeMember);
-
+            return handlePersonalInvitation(request.getInvitationId(), currentMember, accept);
         } else if ("GROUP".equalsIgnoreCase(invitationType)) {
-            // Xử lý lời mời nhóm
-            GroupChallenge groupChallenge = groupChallengeRepository.findById(request.getInvitationId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Group invitation not found."));
-
-            Groups group = groupChallenge.getGroup();
-            Challenge challenge = groupChallenge.getChallenge();
-
-            if (accept) {
-                if (challenge.getStatus() != ChallengeStatus.UPCOMING) {
-                    groupChallenge.setStatus(GroupChallengeStatus.REJECTED);
-                    groupChallenge.setUpdatedAt(LocalDateTime.now());
-                    groupChallengeRepository.save(groupChallenge);
-                    return "Cannot join. The challenge is not available.";
-                }
-                groupChallenge.setStatus(GroupChallengeStatus.ONGOING);
-                groupChallenge.setUpdatedAt(LocalDateTime.now());
-                groupChallengeRepository.save(groupChallenge);
-
-                // Batch thêm toàn bộ thành viên trong group vào challenge
-                List<ChallengeMember> newChallengeMembers = group.getMembers()
-                        .stream()
-                        .map(GroupMember::getMember)
-                        // Loại bỏ những member đã từng tham gia challenge
-                        .filter(groupMember -> !challengeMemberRepository.existsByChallengeAndMember(challenge, groupMember))
-                        .map(groupMember -> ChallengeMember.builder()
-                                .challenge(challenge)
-                                .member(groupMember)
-                                .role(ChallengeRole.MEMBER)
-                                .status(ChallengeMemberStatus.JOINED)
-                                .groupId(group.getId())
-                                .joinBy(member.getId()) // Leader gửi lời mời
-                                .createdAt(LocalDateTime.now())
-                                .build())
-                        .collect(Collectors.toList());
-                if (!newChallengeMembers.isEmpty()) {
-                    challengeMemberRepository.saveAll(newChallengeMembers);
-                }
-            } else {
-                groupChallenge.setStatus(GroupChallengeStatus.REJECTED);
-                groupChallenge.setUpdatedAt(LocalDateTime.now());
-                groupChallengeRepository.save(groupChallenge);
+            if (accept && request.getGroupId() == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Group ID must be provided when accepting a group invitation.");
             }
+            return handleGroupInvitation(request.getInvitationId(), currentMember, accept, request.getGroupId());
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid invitation type. Must be PERSONAL or GROUP.");
         }
-        return accept ? "Invitation accepted successfully." : "Invitation rejected successfully.";
     }
+
+    private String handlePersonalInvitation(Long invitationId, Member member, boolean accept) {
+        ChallengeMember invitation = challengeMemberRepository.findById(invitationId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invitation not found."));
+
+        if (!invitation.getMember().equals(member)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to respond to this invitation.");
+        }
+
+        Challenge challenge = invitation.getChallenge();
+        if (accept) {
+            if (challenge.getStatus() != ChallengeStatus.UPCOMING ||
+                    (challenge.getMaxParticipants() != null &&
+                            challengeMemberRepository.countByChallengeAndStatus(challenge, ChallengeMemberStatus.JOINED)
+                                    >= challenge.getMaxParticipants())) {
+                invitation.setStatus(ChallengeMemberStatus.EXPIRED);
+            } else {
+                invitation.setStatus(ChallengeMemberStatus.JOINED);
+            }
+        } else {
+            invitation.setStatus(ChallengeMemberStatus.REJECTED);
+        }
+
+        invitation.setUpdatedAt(LocalDateTime.now());
+        challengeMemberRepository.save(invitation);
+
+        return accept ? "Personal invitation accepted successfully." : "Personal invitation rejected successfully.";
+    }
+
+    private String handleGroupInvitation(Long invitationId, Member member, boolean accept, Long selectedGroupId) {
+        GroupChallenge groupChallenge = groupChallengeRepository.findById(invitationId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Group invitation not found."));
+
+        Challenge challenge = groupChallenge.getChallenge();
+
+        if (!accept) {
+            groupChallenge.setStatus(GroupChallengeStatus.REJECTED);
+            groupChallenge.setUpdatedAt(LocalDateTime.now());
+            groupChallengeRepository.save(groupChallenge);
+            return "Group invitation rejected successfully.";
+        }
+
+        if (challenge.getStatus() != ChallengeStatus.UPCOMING) {
+            groupChallenge.setStatus(GroupChallengeStatus.REJECTED);
+            groupChallenge.setUpdatedAt(LocalDateTime.now());
+            groupChallengeRepository.save(groupChallenge);
+            return "Cannot join. The challenge is not available.";
+        }
+
+        Groups selectedGroup = groupRepository.findById(selectedGroupId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Selected group not found."));
+
+        // Accept: cập nhật trạng thái GroupChallenge và thêm tất cả thành viên nhóm vào ChallengeMember
+        groupChallenge.setGroup(selectedGroup);
+        groupChallenge.setStatus(GroupChallengeStatus.ONGOING);
+        groupChallenge.setUpdatedAt(LocalDateTime.now());
+        groupChallengeRepository.save(groupChallenge);
+
+        List<ChallengeMember> newChallengeMembers = selectedGroup.getMembers().stream()
+                .map(GroupMember::getMember)
+                .filter(groupMember -> !challengeMemberRepository.existsByChallengeAndMember(challenge, groupMember))
+                .map(groupMember -> ChallengeMember.builder()
+                        .challenge(challenge)
+                        .member(groupMember)
+                        .role(ChallengeRole.MEMBER)
+                        .status(ChallengeMemberStatus.JOINED)
+                        .groupId(selectedGroup.getId())
+                        .joinBy(member.getId())
+                        .createdAt(LocalDateTime.now())
+                        .build())
+                .toList();
+
+        if (!newChallengeMembers.isEmpty()) {
+            challengeMemberRepository.saveAll(newChallengeMembers);
+        }
+
+        return "Group invitation accepted successfully.";
+    }
+
 
     /**
      * Lấy danh sách tất cả lời mời tham gia thử thách của thành viên hiện tại.

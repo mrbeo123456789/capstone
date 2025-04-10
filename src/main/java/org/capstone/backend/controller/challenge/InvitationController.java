@@ -19,12 +19,12 @@ public class InvitationController {
 
 
     @PostMapping("/send/personal")
-    public ResponseEntity<String> sendInvitation(@RequestBody InviteMemberRequest request) {
+    public ResponseEntity<String> sendInvitation(@RequestBody @Valid InviteMemberRequest request) {
         String response = invitationService.sendInvitation(request);
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/invitation/respond")
+    @PostMapping("/respond")
     public ResponseEntity<String> respondToInvitation(
             @RequestBody @Valid InvitationRespondRequestDTO request) {
         String response = invitationService.respondToInvitation(request);

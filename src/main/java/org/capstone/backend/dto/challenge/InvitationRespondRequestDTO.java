@@ -16,6 +16,8 @@ public class InvitationRespondRequestDTO {
     @NotNull(message = "Invitation type cannot be null.")
     private String invitationType; // "PERSONAL" hoặc "GROUP"
 
+    private Long groupId;  // Có thể null nếu type là PERSONAL
+
     @NotNull(message = "Accept status must be provided.")
     private Boolean accept;
 }

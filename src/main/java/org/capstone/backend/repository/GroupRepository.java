@@ -27,4 +27,5 @@ public interface GroupRepository extends JpaRepository<Groups, Long> {
         ORDER BY g.createdAt DESC
     """)
     Page<GroupSummaryDTO> searchGroupsByName(@Param("keyword") String keyword, Pageable pageable);
+
 }

@@ -12,4 +12,7 @@ public class InviteMemberRequest {
 
     @NotNull(message = "Member IDs cannot be null")
     private List<Long> memberIds;
+
+    @NotNull(message = "Invitation type cannot be null.")
+    private String type; // "MEMBER" hoặc "LEADER"
 }

@@ -110,5 +110,10 @@ public class GroupController {
             return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         }
     }
+    @GetMapping("/available-to-join")
+    public ResponseEntity<List<AvailableGroupResponse>> getAvailableGroups() {
+        List<AvailableGroupResponse> availableGroups = groupService.getAvailableGroupsToJoinChallenge();
+        return ResponseEntity.ok(availableGroups);
+    }
 
 }

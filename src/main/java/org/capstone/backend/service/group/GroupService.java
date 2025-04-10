@@ -15,7 +15,7 @@ import java.util.Optional;
 public interface GroupService {
     List<GroupResponse> getGroupsByMemberId();
     GroupResponse getGroupsDetail(Long groupId);
-
+    List<AvailableGroupResponse> getAvailableGroupsToJoinChallenge();
     // ✅ CREATE & UPDATE group
     Groups createGroup(GroupRequest request, MultipartFile picture);
     Groups updateGroup(Long groupId, GroupRequest request);
@@ -32,4 +32,5 @@ public interface GroupService {
     void disbandGroup(Long groupId);
     // ✅ SEARCH
     List<MemberSearchResponse> searchMembers(MemberSearchRequest request);
+
 }
