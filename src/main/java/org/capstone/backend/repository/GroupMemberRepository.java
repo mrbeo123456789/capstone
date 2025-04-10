@@ -57,7 +57,7 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
     )
     FROM GroupMember gm
     JOIN gm.group g
-    WHERE gm.role = ''
+    WHERE gm.role = 'OWNER'
     AND gm.status = :groupMemberStatus
     AND gm.member.invitePermission = :invitePermission
     AND gm.member.id <> :currentMemberId

@@ -17,7 +17,4 @@ public interface GroupChallengeRepository extends JpaRepository<GroupChallenge, 
     // Kiểm tra xem một group đã có tham gia thử thách nào với trạng thái đang diễn ra (ONGOING) hay chưa
     boolean existsByGroupAndStatus(Groups group, GroupChallengeStatus status);
     List<GroupChallenge> findByGroupAndStatus(Groups group, GroupChallengeStatus status);
-
-    // Tìm một bản ghi GroupChallenge dựa trên Group và Challenge
-    Optional<GroupChallenge> findByGroupAndChallenge(Groups group, Challenge challenge);
 }

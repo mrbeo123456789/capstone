@@ -11,11 +11,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
 public interface ChallengeReportRepository extends JpaRepository<ChallengeReport, Long> {
-    List<ChallengeReport> findByChallengeId(Long challengeId);
     @Query("""
     SELECT new org.capstone.backend.dto.report.ChallengeReportResponseDTO(
         r.id,
