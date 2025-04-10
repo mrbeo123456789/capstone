@@ -21,4 +21,8 @@ public interface ChallengeService {
     List<MyChallengeResponse> getChallengesByMember(ChallengeRole role);
     ChallengeDetailResponse getChallengeDetail(Long challengeId);
     String joinGroupToChallenge(Long groupId, Long challengeId);
+    String cancelChallenge(Long challengeId);
+    String leaveChallenge(Long challengeId);
+    String kickMemberFromChallenge(Long challengeId, Long targetMemberId);
+
 }

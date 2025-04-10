@@ -116,7 +116,7 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
 
     @Query("SELECT c.status, COUNT(c) FROM Challenge c GROUP BY c.status")
     List<Object[]> countChallengesByStatus();
-    int countByCreatedBy(Long memberId); // hoặc createdBy = username nếu dùng String
+    int countByCreatedBy(String createdBy);
     @Query("SELECT c.id FROM Challenge c WHERE c.status = 'ONGOING'")
     List<Long> findAllOngoingChallengeIds();
 

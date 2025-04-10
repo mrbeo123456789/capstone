@@ -3,6 +3,10 @@ package org.capstone.backend.entity;
 import lombok.*;
 import jakarta.persistence.*;
 import org.capstone.backend.utils.enums.*;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -64,17 +68,23 @@ public class Challenge {
     @Column(name = "max_participants")
     private Integer maxParticipants;
 
-    @Column(name = "created_by")
-    private Long createdBy;
+    @CreatedBy
+    @Column(name = "created_by", nullable = false, updatable = false)
+    private String createdBy;
 
+    @LastModifiedBy
+    @Column(name = "updated_by")
+    private String updatedBy;
+
+    @CreatedDate
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
+    @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name = "updated_by")
-    private Long updatedBy;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "challenge_type_id", nullable = false)

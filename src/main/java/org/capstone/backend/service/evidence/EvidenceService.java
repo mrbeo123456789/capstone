@@ -5,6 +5,7 @@ import org.capstone.backend.dto.evidence.EvidenceToReviewDTO;
 import org.capstone.backend.entity.Evidence;
 import org.capstone.backend.entity.EvidenceReport;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,4 +20,6 @@ public interface EvidenceService {
     List<EvidenceToReviewDTO> getMySubmittedEvidencesByChallenge(Long challengeId);
     void assignPendingReviewersForChallenge(Long challengeId);
     double getApprovedEvidencePercentage(Long memberId, Long challengeId);
+    Page<EvidenceToReviewDTO> getEvidenceByMemberAndChallenge(Long memberId, Long challengeId, Pageable pageable);
+
 }

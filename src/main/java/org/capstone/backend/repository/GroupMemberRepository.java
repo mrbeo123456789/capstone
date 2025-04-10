@@ -1,16 +1,19 @@
 package org.capstone.backend.repository;
 
+import org.capstone.backend.dto.group.MemberSearchResponse;
 import org.capstone.backend.entity.GroupMember;
 import org.capstone.backend.entity.Groups;
 import org.capstone.backend.entity.Member;
+import org.capstone.backend.utils.enums.GroupChallengeStatus;
 import org.capstone.backend.utils.enums.GroupMemberStatus;
+import org.capstone.backend.utils.enums.InvitePermission;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> {
     Optional<GroupMember> findByGroupAndMember(Groups group, Member member);
@@ -43,4 +46,41 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
     List<Long> findGroupIdsByMemberId(Long memberId);
 
     void deleteByGroupId(Long groupId);
+
+    @Query(value = """
+    SELECT new org.capstone.backend.dto.group.MemberSearchResponse(
+        gm.member.id,
+        gm.member.account.email,
+        gm.member.avatar,
+        gm.member.fullName,
+        NULL
+    )
+    FROM GroupMember gm
+    JOIN gm.group g
+    WHERE gm.role = ''
+    AND gm.status = :groupMemberStatus
+    AND gm.member.invitePermission = :invitePermission
+    AND gm.member.id <> :currentMemberId
+    AND g.id NOT IN (
+        SELECT gc.group.id
+        FROM GroupChallenge gc
+        WHERE gc.challenge.id = :challengeId
+        AND gc.status IN (:pendingStatus, :ongoingStatus)
+    )
+    AND (gm.member.account.email LIKE %:keyword% OR gm.member.fullName LIKE %:keyword%)
+    ORDER BY gm.member.fullName ASC
+""")
+    List<MemberSearchResponse> searchAvailableGroupLeaders(
+            @Param("challengeId") Long challengeId,
+            @Param("keyword") String keyword,
+            @Param("groupMemberStatus") GroupMemberStatus groupMemberStatus,
+            @Param("pendingStatus") GroupChallengeStatus pendingStatus,
+            @Param("ongoingStatus") GroupChallengeStatus ongoingStatus,
+            @Param("invitePermission") InvitePermission invitePermission,
+            @Param("currentMemberId") Long currentMemberId,
+            Pageable pageable
+    );
+
+    List<GroupMember> findByMemberAndRoleAndStatus(Member member, String owner, GroupMemberStatus groupMemberStatus);
 }
+

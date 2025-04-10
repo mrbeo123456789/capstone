@@ -11,4 +11,6 @@ public class InvitationResponseDTO {
     private String challengeName;
     private String inviterInfo;
     private String challengeImage;
+    private String invitationType; // "PERSONAL" hoặc "GROUP"
+
 }

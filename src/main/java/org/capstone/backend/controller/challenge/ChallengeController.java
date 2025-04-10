@@ -1,23 +1,16 @@
 package org.capstone.backend.controller.challenge;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.capstone.backend.dto.challenge.*;
 import org.capstone.backend.dto.report.ChallengeReportRequestDTO;
-import org.capstone.backend.entity.Challenge;
 
 import org.capstone.backend.entity.ChallengeType;
 import org.capstone.backend.service.challenge.ChallengeService;
-import org.capstone.backend.service.challenge.InvitationService;
 import org.capstone.backend.service.report.ChallengeReportService;
 import org.capstone.backend.utils.enums.ChallengeRole;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -106,5 +99,26 @@ public class ChallengeController {
             @PathVariable Long challengeId) {
         String result = challengeService.joinGroupToChallenge(groupId, challengeId);
         return ResponseEntity.ok(result);
+    }
+    // Endpoint cho việc rời thử thách
+    @PostMapping("/{challengeId}/leave")
+    public ResponseEntity<String> leaveChallenge(@PathVariable Long challengeId) {
+        String response = challengeService.leaveChallenge(challengeId);
+        return ResponseEntity.ok(response);
+    }
+
+    // Endpoint cho việc huỷ thử thách
+    @PostMapping("/{challengeId}/cancel")
+    public ResponseEntity<String> cancelChallenge(@PathVariable Long challengeId) {
+        String response = challengeService.cancelChallenge(challengeId);
+        return ResponseEntity.ok(response);
+    }
+
+    // Endpoint cho việc kick (loại) thành viên khỏi thử thách
+    @DeleteMapping("/{challengeId}/kick/{targetMemberId}")
+    public ResponseEntity<String> kickMemberFromChallenge(@PathVariable Long challengeId,
+                                                          @PathVariable Long targetMemberId) {
+        String response = challengeService.kickMemberFromChallenge(challengeId, targetMemberId);
+        return ResponseEntity.ok(response);
     }
 }

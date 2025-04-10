@@ -41,10 +41,13 @@ public class AchievementEventListener {
     }
 
     private void checkCreateChallenge(Member member) {
-        if (challengeRepository.countByCreatedBy(member.getId()) == 1) {
+        String username = member.getAccount().getUsername();
+        // Giả sử bạn đã định nghĩa trong ChallengeRepository: int countByCreatedBy(String createdBy)
+        if (challengeRepository.countByCreatedBy(username) == 1) {
             achievementService.grantAchievement(member, "A1"); // Người tiên phong
         }
     }
+
 
     private void checkJoinChallenge(Member member) {
         if (challengeMemberRepository.countByMemberId(member.getId()) == 1) {

@@ -51,7 +51,10 @@ public interface EvidenceRepository extends JpaRepository<Evidence, Long> {
             @Param("end") LocalDateTime end);
 
 
-
+    @Query("SELECT e FROM Evidence e WHERE e.member.id = :memberId AND e.challenge.id = :challengeId ORDER BY e.submittedAt DESC")
+    Page<Evidence> findByMemberIdAndChallengeId(@Param("memberId") Long memberId,
+                                                @Param("challengeId") Long challengeId,
+                                                Pageable pageable);
 
     @Query("""
 SELECT e FROM Evidence e

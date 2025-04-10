@@ -1,21 +1,23 @@
 package org.capstone.backend.controller.admin;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.capstone.backend.dto.challenge.AdminChallengesResponse;
 import org.capstone.backend.dto.challenge.ReviewChallengeRequest;
+import org.capstone.backend.dto.evidence.EvidenceToReviewDTO;
 import org.capstone.backend.service.challenge.ChallengeService;
+import org.capstone.backend.service.evidence.EvidenceService;
 import org.capstone.backend.utils.enums.ChallengeStatus;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/admin/challenges")
 public class ManageChallengeController {
     private final ChallengeService challengeService;
-    public ManageChallengeController(final ChallengeService challengeService) {
-        this.challengeService = challengeService;
-    }
+    private final EvidenceService evidenceService;
     @PostMapping("/review")
     public ResponseEntity<String> reviewChallenge(@Valid @RequestBody ReviewChallengeRequest request) {
         String result = challengeService.reviewChallenge(request);
@@ -41,7 +43,16 @@ public class ManageChallengeController {
         return ResponseEntity.ok(challenges);
     }
 
-
+    @GetMapping("/getEvidence")
+    public Page<EvidenceToReviewDTO> getEvidencesByMemberAndChallenge(
+            @RequestParam Long memberId,
+            @RequestParam Long challengeId,
+            @RequestParam(defaultValue = "0") int page
+    ) {
+        // Page size = 10 như bạn yêu cầu
+        PageRequest pageable = PageRequest.of(page, 10);
+        return evidenceService.getEvidenceByMemberAndChallenge(memberId, challengeId, pageable);
+    }
 
 
 }

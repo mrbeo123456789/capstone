@@ -60,4 +60,5 @@ public interface ChallengeMemberRepository extends JpaRepository<ChallengeMember
     List<Long> findMemberIdsByChallengeId(@Param("challengeId") Long challengeId);
     List<ChallengeMember> findByChallenge(Challenge challenge);
 
+
 }

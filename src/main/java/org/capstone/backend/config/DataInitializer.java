@@ -6,6 +6,7 @@ import org.capstone.backend.utils.enums.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 @Transactional
-@Configuration
+@Component
 public class DataInitializer implements CommandLineRunner {
 
     private final AccountRepository accountRepository;
@@ -165,6 +166,7 @@ public class DataInitializer implements CommandLineRunner {
                             .participationType(ParticipationType.INDIVIDUAL)
                             .startDate(LocalDate.now())
                             .endDate(LocalDate.now().plusDays(30))
+                            .createdBy("SYSTEM") // 👈 THÊM DÒNG NÀY
                             .createdAt(LocalDateTime.now())
                             .updatedAt(LocalDateTime.now())
                             .build();

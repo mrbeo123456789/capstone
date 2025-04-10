@@ -6,4 +6,5 @@ public enum ChallengeMemberStatus {
     EXPIRED,
     LEFT,
     JOINED,
+    KICKED,
 }
