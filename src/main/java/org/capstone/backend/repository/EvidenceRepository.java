@@ -42,12 +42,14 @@ public interface EvidenceRepository extends JpaRepository<Evidence, Long> {
     @Query("SELECT e FROM Evidence e " +
             "WHERE e.member.id = :memberId " +
             "AND e.challenge.id = :challengeId " +
-            "AND e.submittedAt BETWEEN :start AND :end")
-    Optional<Evidence> findTodayEvidence(
+            "AND e.submittedAt BETWEEN :start AND :end " +
+            "ORDER BY e.submittedAt ASC")
+    List<Evidence> findTodayEvidence(
             @Param("memberId") Long memberId,
             @Param("challengeId") Long challengeId,
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end);
+
 
 
 

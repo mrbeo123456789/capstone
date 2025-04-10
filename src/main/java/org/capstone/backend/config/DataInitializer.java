@@ -141,6 +141,7 @@ public class DataInitializer implements CommandLineRunner {
                 Stream.of("Sports", "Music", "Coding", "Reading", "Gaming", "Traveling", "Cooking").map(name -> {
                             Interest interest = new Interest();
                             interest.setName(name);
+                            interest.isActive();
                             return interest;
                         }).collect(Collectors.toList())
         );
@@ -243,6 +244,7 @@ public class DataInitializer implements CommandLineRunner {
                             .group(savedGroup)
                             .member(member)
                             .role("MEMBER")
+                            .status(GroupMemberStatus.ACTIVE)
                             .createdAt(LocalDateTime.now())
                             .build())
                     .collect(Collectors.toList());

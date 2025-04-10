@@ -34,12 +34,20 @@ public class EvidenceController {
             evidenceService.uploadAndSubmitEvidence(file, challengeId);
             return ResponseEntity.ok(Map.of("message", "Nộp bằng chứng thành công!", "status", "PENDING"));
         } catch (ResponseStatusException e) {
-            return ResponseEntity.status(e.getStatusCode()).body(Map.of("error", Objects.requireNonNull(e.getReason())));
+            // Trả lại đúng status và lý do từ service
+            return ResponseEntity.status(e.getStatusCode())
+                    .body(Map.of("error", e.getReason()));
         } catch (Exception e) {
+            // In rõ lỗi cho dev log, không che giấu lỗi
+            e.printStackTrace(); // hoặc dùng logger.error(...)
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Đã xảy ra lỗi khi xử lý bằng chứng."));
+                    .body(Map.of(
+                            "error", "Lỗi nội bộ trong khi xử lý.",
+                            "details", e.getMessage()
+                    ));
         }
     }
+
 
     @PostMapping("/review")
     public ResponseEntity<?> reviewEvidence(@RequestBody EvidenceReviewRequest request) {

@@ -99,10 +99,19 @@ private  final FixedGmailService fixedGmailService;
         LocalDateTime startOfDay = today.atStartOfDay();
         LocalDateTime endOfDay = startOfDay.plusDays(1);
 
-        Evidence todayEvidence = evidenceRepository
-                .findTodayEvidence(memberId, challengeId, startOfDay, endOfDay)
-                .orElse(null);
-        System.out.println(">>> Today evidence: " + (todayEvidence != null ? todayEvidence.getId() : "null"));
+        List<Evidence> todayEvidences = evidenceRepository
+                .findTodayEvidence(memberId, challengeId, startOfDay, endOfDay);
+
+        Evidence todayEvidence = null;
+
+        if (!todayEvidences.isEmpty()) {
+            // Nếu nhiều bản ghi → dùng bản đầu tiên hoặc throw error
+            if (todayEvidences.size() > 1) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Có nhiều bằng chứng đã nộp trong hôm nay. Vui lòng liên hệ admin.");
+            }
+            todayEvidence = todayEvidences.get(0);
+        }
+
 
         String path = String.format("evidences/challenge_%d/member_%d/%s/%s.mp4",
                 challengeId, memberId, today, System.currentTimeMillis());
