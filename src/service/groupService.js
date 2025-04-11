@@ -41,7 +41,7 @@ export const groupService = createApi({
         }),
         deleteGroup: builder.mutation({
             query: (id) => ({
-                url: `/groups/${id}`,
+                url: `/groups/${id}/disband`,
                 method: "DELETE",
             }),
             invalidatesTags: ["Group"],
