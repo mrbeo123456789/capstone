@@ -1,8 +1,10 @@
 import * as yup from "yup";
+
 // Helper function để parse date & so sánh cho dễ
 const today = new Date();
 today.setHours(0, 0, 0, 0); // Reset time về 00:00 để tránh lỗi so sánh
 
+// Validate thông tin người dùng
 export const validateCandidate = yup.object({
     fullName: yup.string().required("Full name is required!"),
     dateOfBirth: yup
@@ -15,7 +17,6 @@ export const validateCandidate = yup.object({
                 if (!value) return false;
                 const birthDate = new Date(value);
                 const today = new Date();
-
                 const age = today.getFullYear() - birthDate.getFullYear();
                 const m = today.getMonth() - birthDate.getMonth();
                 const d = today.getDate() - birthDate.getDate();
@@ -27,17 +28,9 @@ export const validateCandidate = yup.object({
             }
         ),
     gender: yup.string().required("Gender is required!"),
-    // phone: yup.string()
-    //     .matches(/^[0-9]{10}$/, "Phone number must be exactly 10 digits"),
-    // avatar: yup.mixed()
-    //     .test("fileType", "File must be an image!", (value)=>{
-    //     // console.log(value[0])
-    //     return value && value?.type?.startsWith("image/")
-    // }).test("fileSize","File size must be less than 10MB", (value) => {
-    //     return value && value?.size <= 50 * 1024 * 1024;
-    // }),
-})
+});
 
+// Validate challenge
 export const challengeValidation = yup.object({
     name: yup.string()
         .required("Challenge name is required!")
@@ -81,8 +74,8 @@ export const challengeValidation = yup.object({
             "fileSize",
             "Picture size must be less than 50MB",
             (value) => {
-                if (!value) return false; // required
-                return value.size <= 50 * 1024 * 1024; // 50MB in bytes
+                if (!value) return false;
+                return value.size <= 50 * 1024 * 1024;
             }
         )
         .test(
@@ -95,13 +88,18 @@ export const challengeValidation = yup.object({
         ),
 
     challengeTypeId: yup.string()
-        .required("Challenge type is required")
+        .required("Challenge type is required"),
+});
 
-})
-
+// Validate login
 export const loginValidation = yup.object({
     username: yup.string().required("Username is required!"),
-    password: yup.string().required("Password is required!")
-        .min(8, "Password must be at least 8 characters!")
+    password: yup.string().required("Password is required!").min(8, "Password must be at least 8 characters!"),
+});
 
-})
+// ✅ Validate group (NEW!! từ yêu cầu của bạn)
+export const groupValidation = yup.object({
+    name: yup.string().required("Group name is required!"),
+    privacy: yup.string().oneOf(["PUBLIC", "PRIVATE"]).required("Privacy setting is required!"),
+    description: yup.string().nullable(),
+});

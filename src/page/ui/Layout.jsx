@@ -16,7 +16,7 @@ const Layout = ({ children }) => {
                     isSidebarOpen ? "ml-14 md:ml-64" : "ml-0"
                 }`}
             >
-                <div className="mx-4 mt-4"><Outlet/></div>
+                <div className="mx-4 my-4"><Outlet/></div>
             </main>
         </div>
     );

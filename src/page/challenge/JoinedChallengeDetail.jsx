@@ -98,8 +98,6 @@ const JoinedChallengeDetail = () => {
                             Thử thách: <span
                             className="text-orange-500 font-semibold">{challenge?.challengeType}</span>
                         </p>
-
-
                         <div className="">
                             <ProgressTracking
                                 challenge={challenge}
@@ -111,7 +109,7 @@ const JoinedChallengeDetail = () => {
                         <img
                             src={challenge?.picture}
                             alt={challenge?.name}
-                            className="w-full h-full object-cover rounded"
+                            className="w-full h-[450px] object-cover rounded"
                         />
                     </div>
                 </div>

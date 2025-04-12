@@ -73,6 +73,25 @@
     "everyone": "Everyone can invite",
     "noOne": "No one can invite",
     "sameGroup": "Only same group members can invite"
+  },
+
+  "groupForm": {
+    "title": "Group Information",
+    "groupName": "Group Name",
+    "groupNamePlaceholder": "Enter group name",
+    "privacy": "Privacy",
+    "public": "Public",
+    "private": "Private",
+    "description": "Description",
+    "descriptionPlaceholder": "Describe the group",
+    "uploadHint": "Click to upload or drag and drop",
+    "uploadSubHint": "SVG, PNG, JPG, or GIF (MAX. 800x400px)",
+    "changePicture": "Change Picture",
+    "creating": "Creating...",
+    "createButton": "Create Group",
+    "cancelButton": "Cancel",
+    "createSuccess": "Group created successfully!",
+    "createFailed": "Failed to create group!"
   }
 
 }

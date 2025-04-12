@@ -73,6 +73,25 @@
     "everyone": "全員が招待できる",
     "noOne": "誰も招待できない",
     "sameGroup": "同じグループのメンバーのみ招待できる"
+  },
+
+  "groupForm": {
+    "title": "グループ情報",
+    "groupName": "グループ名",
+    "groupNamePlaceholder": "グループ名を入力してください",
+    "privacy": "プライバシー",
+    "public": "公開",
+    "private": "非公開",
+    "description": "説明",
+    "descriptionPlaceholder": "グループの説明を入力してください",
+    "uploadHint": "クリックしてアップロードまたはドラッグ＆ドロップ",
+    "uploadSubHint": "SVG、PNG、JPG、またはGIF（最大800x400px）",
+    "changePicture": "画像を変更",
+    "creating": "作成中...",
+    "createButton": "グループを作成",
+    "cancelButton": "キャンセル",
+    "createSuccess": "グループが正常に作成されました！",
+    "createFailed": "グループの作成に失敗しました！"
   }
 
 }

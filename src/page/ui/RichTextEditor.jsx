@@ -17,9 +17,9 @@ const RichTextEditor = ({ onChange }) => {
                     height: 600,
                     menubar: 'file edit view insert format tools table tc help',
                     plugins:
-                        'importword exportword exportpdf preview powerpaste casechange importcss tinydrive searchreplace autolink autosave save directionality advcode visualblocks visualchars fullscreen image link math media mediaembed codesample table charmap pagebreak nonbreaking anchor tableofcontents insertdatetime advlist lists checklist wordcount tinymcespellchecker a11ychecker editimage help formatpainter permanentpen pageembed charmap mentions quickbars linkchecker emoticons advtable footnotes autocorrect typography advtemplate markdown revisionhistory',
+                        'preview importcss tinydrive searchreplace autolink autosave save directionality visualblocks visualchars fullscreen image link media codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars linkchecker emoticons',
                     toolbar:
-                        'undo redo | importword exportword exportpdf | revisionhistory | aidialog aishortcuts | blocks fontsizeinput | bold italic | align numlist bullist | link image | table math media pageembed | lineheight outdent indent | strikethrough forecolor backcolor formatpainter removeformat | charmap emoticons checklist | code fullscreen preview | save print | pagebreak anchor codesample footnotes mergetags | addtemplate inserttemplate | addcomment showcomments | ltr rtl casechange | spellcheckdialog a11ycheck',
+                        'undo redo | aidialog aishortcuts | blocks fontsizeinput | bold italic | align numlist bullist | link image | table media pageembed | lineheight outdent indent | strikethrough forecolor backcolor formatpainter removeformat | charmap emoticons | code fullscreen preview | save print | pagebreak anchor codesample mergetags | inserttemplate | addcomment showcomments | ltr rtl casechange | spellcheckdialog',
                     autosave_ask_before_unload: true,
                     autosave_interval: '30s',
                     autosave_prefix: '{path}{query}-{id}-',
