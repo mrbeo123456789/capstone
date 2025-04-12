@@ -2,6 +2,7 @@ package org.capstone.backend.service.evidence;
 
 import org.capstone.backend.dto.evidence.EvidenceReviewRequest;
 import org.capstone.backend.dto.evidence.EvidenceToReviewDTO;
+import org.capstone.backend.dto.evidence.TaskChecklistDTO;
 import org.capstone.backend.entity.Evidence;
 import org.capstone.backend.entity.EvidenceReport;
 import org.springframework.data.domain.Page;
@@ -21,5 +22,5 @@ public interface EvidenceService {
     void assignPendingReviewersForChallenge(Long challengeId);
     double getApprovedEvidencePercentage(Long memberId, Long challengeId);
     Page<EvidenceToReviewDTO> getEvidenceByMemberAndChallenge(Long memberId, Long challengeId, Pageable pageable);
-
+    List<TaskChecklistDTO> getTasksForCurrentMonth();
 }

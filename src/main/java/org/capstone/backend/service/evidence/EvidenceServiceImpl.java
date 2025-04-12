@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.capstone.backend.dto.evidence.EvidenceReviewRequest;
 import org.capstone.backend.dto.evidence.EvidenceToReviewDTO;
+import org.capstone.backend.dto.evidence.TaskChecklistDTO;
 import org.capstone.backend.entity.Challenge;
 import org.capstone.backend.entity.ChallengeMember;
 import org.capstone.backend.entity.Evidence;
@@ -468,4 +469,56 @@ public class EvidenceServiceImpl implements EvidenceService {
                         e.getSubmittedAt()
                 ));
     }
+
+    public List<TaskChecklistDTO> getTasksForCurrentMonth()
+    {
+
+        Long memberId = authService.getMemberIdFromAuthentication();
+        // Lấy ngày đầu và ngày cuối của tháng hiện tại
+        LocalDate firstDayOfMonth = LocalDate.now().withDayOfMonth(1); // Ngày đầu tháng
+        LocalDate lastDayOfMonth = LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth()); // Ngày cuối tháng
+
+        // Lấy tất cả thử thách của member trong tháng hiện tại có trạng thái ONGOING
+        List<ChallengeMember> challengeMembers = challengeMemberRepository.findOngoingChallengesForMemberInCurrentMonth(memberId, firstDayOfMonth, lastDayOfMonth);
+
+        // Dùng Stream để xử lý và chuyển thành TaskChecklistDTO
+        List<TaskChecklistDTO> taskList = challengeMembers.stream()
+                .map(cm -> {
+                    Challenge challenge = cm.getChallenge();
+                    Evidence evidence = evidenceRepository.findEvidenceByMemberAndChallenge(memberId, challenge.getId()).orElse(null);
+
+                    // Tạo đối tượng TaskChecklistDTO
+                    TaskChecklistDTO taskDTO = new TaskChecklistDTO();
+                    taskDTO.setChallengeId(challenge.getId());
+                    taskDTO.setChallengeName(challenge.getName());
+
+                    if (evidence == null) {
+                        taskDTO.setEvidenceSubmitted(false);
+                        taskDTO.setMessage("Chưa nộp chứng cứ");
+                    } else {
+                        taskDTO.setEvidenceSubmitted(true);
+                        taskDTO.setEvidenceStatus(evidence.getStatus().toString());
+                        taskDTO.setEvidenceSubmitted(evidence.getStatus() == EvidenceStatus.APPROVED);
+
+                        if (evidence.getStatus() == EvidenceStatus.APPROVED) {
+                            taskDTO.setMessage("Đã phê duyệt");
+                        } else {
+                            taskDTO.setMessage("Chưa phê duyệt");
+                        }
+                    }
+
+                    return taskDTO;
+                })
+                .collect(Collectors.toList());
+
+        // Nếu không có nhiệm vụ trong tháng này
+        if (taskList.isEmpty()) {
+            TaskChecklistDTO noTaskDTO = new TaskChecklistDTO();
+            noTaskDTO.setMessage("Không có nhiệm vụ trong tháng này.");
+            taskList.add(noTaskDTO);
+        }
+
+        return taskList;
+    }
+
 }

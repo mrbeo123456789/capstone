@@ -1,9 +1,11 @@
 package org.capstone.backend.service.group;
 
+import org.capstone.backend.dto.challenge.GroupChallengeHistoryDTO;
 import org.capstone.backend.dto.group.*;
 import org.capstone.backend.entity.Groups;
 import org.capstone.backend.dto.group.GroupRequest;
 import org.capstone.backend.entity.Member;
+import org.capstone.backend.utils.enums.GroupChallengeStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,5 +34,5 @@ public interface GroupService {
     void disbandGroup(Long groupId);
     // ✅ SEARCH
     List<MemberSearchResponse> searchMembers(MemberSearchRequest request);
-
+    Page<GroupChallengeHistoryDTO> getGroupChallengeHistories(Long groupId, GroupChallengeStatus status, int page);
 }

@@ -2,16 +2,20 @@ package org.capstone.backend.service.group;
 
 import com.google.monitoring.v3.Group;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
+import org.capstone.backend.dto.challenge.GroupChallengeHistoryDTO;
 import org.capstone.backend.dto.group.*;
 import org.capstone.backend.entity.*;
 import org.capstone.backend.repository.*;
 import org.capstone.backend.service.auth.AuthService;
+import org.capstone.backend.utils.enums.GroupChallengeStatus;
 import org.capstone.backend.utils.enums.GroupMemberStatus;
 import org.capstone.backend.utils.enums.InvitePermission;
 import org.capstone.backend.utils.upload.FirebaseUpload;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
-
+@RequiredArgsConstructor
 @Service
 public class GroupServiceImpl implements GroupService {
 
@@ -31,20 +35,8 @@ public class GroupServiceImpl implements GroupService {
     private final AccountRepository accountRepository;
     private final FirebaseUpload firebaseUpload;
     private final AuthService authService;
+private final GroupChallengeRepository groupChallengeRepository;
 
-    public GroupServiceImpl(GroupRepository groupRepository,
-                            MemberRepository memberRepository,
-                            GroupMemberRepository groupMemberRepository,
-                            AccountRepository accountRepository,
-                            FirebaseUpload firebaseUpload,
-                            AuthService authService) {
-        this.groupRepository = groupRepository;
-        this.memberRepository = memberRepository;
-        this.groupMemberRepository = groupMemberRepository;
-        this.accountRepository = accountRepository;
-        this.firebaseUpload = firebaseUpload;
-        this.authService = authService;
-    }
 
     // ========================== GET ==========================
 
@@ -334,5 +326,10 @@ public class GroupServiceImpl implements GroupService {
                 ))
                 .toList();
     }
+    public Page<GroupChallengeHistoryDTO> getGroupChallengeHistories(Long groupId, GroupChallengeStatus status, int page) {
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("joinDate").descending());
+        return groupChallengeRepository.findGroupChallengeHistories(groupId, status, pageable);
+    }
+
 
 }

@@ -1,6 +1,8 @@
 package org.capstone.backend.repository;
 
+import org.capstone.backend.entity.Challenge;
 import org.capstone.backend.entity.Evidence;
+import org.capstone.backend.entity.Member;
 import org.capstone.backend.utils.enums.EvidenceStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -73,6 +75,8 @@ AND (
             Pageable pageable
     );
 
-
-
+    @Query("SELECT e FROM Evidence e WHERE e.member.id = :memberId AND e.challenge.id = :challengeId")
+    Optional<Evidence> findEvidenceByMemberAndChallenge(Long memberId, Long challengeId);
 }
+
+
