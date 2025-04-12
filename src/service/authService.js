@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { BASE_URL } from "../contant/contant.js";
+import {toast} from "react-toastify";
 
 export const authService = createApi({
     reducerPath: "auth",
@@ -7,13 +8,39 @@ export const authService = createApi({
         baseUrl: BASE_URL,
         prepareHeaders: (headers) => {
             const token = localStorage.getItem("jwt_token");
-            if (token) {
-                console.log("JWT Token:", token);
-                headers.set("Authorization", `Bearer ${token}`);
+            const exp = localStorage.getItem("exp");
+
+            if (token && exp) {
+                const now = Date.now();
+                const expTime = parseInt(exp, 10) * 1000;
+
+                if (now > expTime) {
+                    console.log("🔴 Token expired detected!");
+
+                    // 👉 Toastify notify user
+                    toast.error("Your session has expired. Please log in again.", {
+                        position: "top-center",
+                        autoClose: 3000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                    });
+
+                    // 👉 Then clear and redirect after small delay
+                    setTimeout(() => {
+                        localStorage.clear();
+                        window.location.href = "/login"; // Force logout after toast
+                    }, 3200); // Wait a bit so user sees the toast
+                } else {
+                    headers.set("Authorization", `Bearer ${token}`);
+                }
             }
+
             headers.set("Content-Type", "application/json");
             return headers;
-        },
+        }
     }),
     tagTypes: ["Auth"],
     endpoints: (builder) => ({
@@ -36,9 +63,18 @@ export const authService = createApi({
                 if (typeof response === "string") {
                     return { error: response };
                 }
-                localStorage.setItem("jwt_token", response.token);
+
+                const token = response.token;
+                if (token) {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    localStorage.setItem("jwt_token", token);
+                    localStorage.setItem("username", payload.sub);
+                    localStorage.setItem("role", payload.roles);
+                    localStorage.setItem("exp", payload.exp);
+                }
+
                 return response;
-            },
+            }
         }),
 
         forgotPassword: builder.mutation({

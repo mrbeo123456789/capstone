@@ -94,10 +94,10 @@ const YourChallenge = () => {
                                 key={invite.id}
                                 className="cursor-pointer min-w-[200px] p-4 border rounded-lg space-y-2 flex-shrink-0 hover:shadow-lg transition"
                             >
-                                <p className="text-sm">{invite.inviterName} invites you to:</p>
+                                <p className="text-sm">{invite.inviterInfo} invites you to:</p>
                                 <div className="h-24 bg-gray-200 rounded overflow-hidden">
                                     <img
-                                        src={invite.challengePicture || "https://via.placeholder.com/300x200"}
+                                        src={invite.challengeImage || "https://via.placeholder.com/300x200"}
                                         alt={invite.challengeName}
                                         className="w-full h-full object-cover rounded"
                                     />

@@ -8,7 +8,7 @@ import { FaWindowClose } from "react-icons/fa";
 import { toast, Slide } from "react-toastify";
 import { useGetMyProfileQuery, useUpdateMemberMutation } from "../../service/memberService.js";
 import locationService from "../../service/locationService.js";
-import { useGetMyInterestsQuery, useUpdateMyInterestsMutation } from "../../service/interestService.js";
+import {useGetMyInterestsQuery, useUpdateMyInterestsMutation} from "../../service/interestService.js";
 import { useTranslation } from "react-i18next";
 
 function MemberProfile() {
@@ -22,6 +22,7 @@ function MemberProfile() {
     const [selectedProvince, setSelectedProvince] = useState("");
     const [selectedDistrict, setSelectedDistrict] = useState("");
     const { data: interestsData = [] } = useGetMyInterestsQuery();
+    console.log("this is my interests", interestsData);
     const [yourInterests, setYourInterests] = useState([]);
     const [availableInterests, setAvailableInterests] = useState([]);
     const [showAll, setShowAll] = useState(false);
@@ -423,7 +424,8 @@ function MemberProfile() {
                                     </div>
                                 ))}
 
-                                <button type="button" onClick={() => setShowAll(!showAll)} className="text-red-500">
+                                <button type="button" onClick={() => setShowAll(!showAll)
+                                } className="text-red-500">
                                     ➕
                                 </button>
 
