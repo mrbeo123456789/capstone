@@ -1,4 +1,13 @@
 {
+  "menu": {
+    "about": "About",
+    "guide": "Guide",
+    "challenges": "Challenges",
+    "leaderboard": "Leaderboard",
+    "news": "News",
+    "logout": "Logout"
+  },
+
   "profileUpdated": "Profile updated successfully!",
   "updateFailed": "Failed to update profile.",
   "removed": "Removed",

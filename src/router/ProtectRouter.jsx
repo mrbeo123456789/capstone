@@ -1,71 +1,59 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { decode } from "jsonwebtoken-esm";
+import { toast } from "react-toastify"; // ✅ Import toast
 
 export function ProtectRouter({ children, requiredRoles = [] }) {
+    const token = localStorage.getItem("jwt_token");
+    const location = useLocation();
+    const pathname = location.pathname;
+
+    if (!token) {
+        console.warn("🔒 No token found, redirecting to login...");
+        return <Navigate to="/login" replace />;
+    }
+
     try {
-        const token = localStorage.getItem("jwt_token");
-        console.log("Token from storage:", token);
-        if (!token) {
-            console.error("Token not found in localStorage.");
-            throw new Error("Unauthorized: No token provided.");
+        const decoded = decode(token);
+
+        if (!decoded || !decoded.roles || !decoded.exp) {
+            console.error("🔒 Invalid token structure.");
+            return <Navigate to="/login" replace />;
         }
 
-        let decodedToken;
-        try {
-            decodedToken = decode(token);
-            console.log("Decoded token:", decodedToken);
-        } catch (err) {
-            console.error("Decoding token failed:", err);
-            throw new Error("Unauthorized: Invalid token.");
+        const nowInSeconds = Date.now() / 1000;
+        if (decoded.exp < nowInSeconds) {
+            console.warn("⏰ Token expired, redirecting to homepage...");
+            toast.error("Session expired. Please log in again.");
+            localStorage.clear();
+            return <Navigate to="/homepage" replace />;
         }
 
-        if (!decodedToken || !decodedToken.roles) {
-            console.error("Token missing roles.");
-            throw new Error("Unauthorized: Invalid token.");
-        }
+        const userRoles = Array.isArray(decoded.roles)
+            ? decoded.roles.map(r => r.toUpperCase())
+            : [decoded.roles.toUpperCase()];
 
-        let userRoles = [];
-        if (typeof decodedToken.roles === "string") {
-            userRoles = [decodedToken.roles.toUpperCase()];
-        } else if (Array.isArray(decodedToken.roles)) {
-            userRoles = decodedToken.roles.map((role) => role.toUpperCase());
-        } else {
-            console.error("Token roles format is not supported.");
-            throw new Error("Unauthorized: Invalid token.");
-        }
-
-        console.log("User roles:", userRoles);
-
-        // Kiểm tra nếu route yêu cầu quyền cụ thể mà token không chứa
         if (requiredRoles.length > 0) {
-            const normalizedRequiredRoles = requiredRoles.map((role) => role.toUpperCase());
-            const hasRequiredRole = normalizedRequiredRoles.some((role) =>
-                userRoles.includes(role)
-            );
+            const normalizedRequiredRoles = requiredRoles.map(role => role.toUpperCase());
+            const hasRequiredRole = normalizedRequiredRoles.some(role => userRoles.includes(role));
+
             if (!hasRequiredRole) {
-                console.error("User does not have required role(s).");
-                throw new Error("Unauthorized: Insufficient permissions.");
+                console.warn("⛔ User does not have required role(s).");
+                return <Navigate to="/homepage" replace />;
             }
         }
 
-        // Xác định role để chuyển hướng
-        const userRoleForRedirect = userRoles.includes("ADMIN") ? "admin" : "member";
-        console.log("User role for redirect:", userRoleForRedirect);
-        console.log("Current pathname:", window.location.pathname);
-
-        // Nếu đang ở trang login hoặc root, chuyển hướng theo role
-        if (window.location.pathname === "/login" || window.location.pathname === "/") {
-            return userRoleForRedirect === "admin" ? (
-                <Navigate to="/admin/dashboard" />
-            ) : (
-                <Navigate to="/homepage" />
-            );
+        if (pathname === "/" || pathname === "/login") {
+            if (userRoles.includes("ADMIN")) {
+                return <Navigate to="/admin/dashboard" replace />;
+            } else {
+                return <Navigate to="/homepage" replace />;
+            }
         }
 
         return children;
     } catch (error) {
-        console.error("Access denied:", error.message);
-        return <Navigate to="/login" />;
+        console.error("🔒 Token decode error:", error);
+        return <Navigate to="/login" replace />;
     }
 }
 

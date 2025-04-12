@@ -69,7 +69,6 @@ export const authService = createApi({
                     const payload = JSON.parse(atob(token.split('.')[1]));
                     localStorage.setItem("jwt_token", token);
                     localStorage.setItem("username", payload.sub);
-                    localStorage.setItem("role", payload.roles);
                     localStorage.setItem("exp", payload.exp);
                 }
 

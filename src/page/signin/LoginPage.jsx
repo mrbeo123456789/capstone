@@ -1,18 +1,35 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLoginMutation } from "../../service/authService.js";
+import { useGetMyProfileQuery } from "../../service/memberService.js";
 import google_icon from "../../assets/google-icon.png";
 import background from "../../assets/login1.png";
 import { toast } from "react-toastify";
+import {decode} from "jsonwebtoken-esm";
 
 export default function Login() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [tokenReady, setTokenReady] = useState(false); // ✅
 
     const [login] = useLoginMutation();
+    const { data: userData } = useGetMyProfileQuery(undefined, { skip: !tokenReady }); // ✅
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (userData) {
+            console.log("✅ Got user profile:", userData);
+
+            if (userData.avatar) {
+                localStorage.setItem("avatar", userData.avatar);
+            }
+            if (userData.fullName) {
+                localStorage.setItem("fullName", userData.fullName);
+            }
+        }
+    }, [userData, navigate]);
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -33,15 +50,30 @@ export default function Login() {
             console.log("Login Response:", response);
 
             if (response.token) {
-                // ✅ You already saved jwt_token, username, role, exp inside `authService`
-                // No need to decode and save again here!
+                const token = response.token;
+                const decoded = decode(token);
 
-                toast.success("Đăng nhập thành công!", { autoClose: 1500 });
+                if (decoded && decoded.roles) {
+                    const role = Array.isArray(decoded.roles)
+                        ? decoded.roles[0]
+                        : decoded.roles;
 
-                // Delay small time to make sure everything saved
-                setTimeout(() => {
-                    navigate("/");
-                }, 800);
+                    console.log("Decoded role:", role);
+
+                    setTokenReady(true); // ✅ Trigger profile fetching
+
+                    toast.success("Đăng nhập thành công!", { autoClose: 1500 });
+
+                    setTimeout(() => {
+                        if (role.toUpperCase() === "ADMIN") {
+                            navigate("/admin/dashboard");
+                        } else {
+                            navigate("/homepage");
+                        }
+                    }, 100);
+                } else {
+                    setError("Invalid token received.");
+                }
             } else {
                 setError("Unexpected response from server");
             }

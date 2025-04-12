@@ -1,4 +1,13 @@
 {
+  "menu": {
+    "about": "Về chúng tôi",
+    "guide": "Hướng dẫn",
+    "challenges": "Thử thách",
+    "leaderboard": "Bảng xếp hạng",
+    "news": "Tin tức",
+    "logout": "Đăng xuất"
+  },
+
   "profileUpdated": "Cập nhật hồ sơ thành công!",
   "updateFailed": "Cập nhật hồ sơ thất bại.",
   "removed": "Đã loại bỏ",
