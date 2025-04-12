@@ -11,5 +11,6 @@ public class GroupRequest {
     private String name;
 
     private String privacy;
-    private Integer maxParticipants;
+
+    private String description;
 }

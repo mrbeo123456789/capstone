@@ -23,8 +23,7 @@ public class Groups {
     @Column(name = "group_name", nullable = false)
     private String name;
 
-    @Column(name = "max_participants")
-    private Integer maxParticipants;
+    private String description;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

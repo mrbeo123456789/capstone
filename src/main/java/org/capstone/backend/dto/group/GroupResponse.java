@@ -8,7 +8,7 @@ import java.util.List;
 public class GroupResponse {
     private Long id;
     private String name;
-    private Integer maxParticipants;
+    private String description;
     private LocalDateTime createdAt;
     private Long createdBy;
     private LocalDateTime updatedAt;

@@ -68,8 +68,8 @@ public class GroupServiceImpl implements GroupService {
         GroupResponse dto = new GroupResponse();
         dto.setId(group.getId());
         dto.setName(group.getName());
-        dto.setMaxParticipants(group.getMaxParticipants());
         dto.setPicture(group.getPicture());
+        dto.setDescription(group.getDescription());
         dto.setCreatedAt(group.getCreatedAt());
         dto.setCreatedBy(group.getCreatedBy());
         dto.setUpdatedAt(group.getUpdatedAt());
@@ -133,8 +133,8 @@ public class GroupServiceImpl implements GroupService {
 
         Groups group = groupRepository.save(Groups.builder()
                 .name(request.getName())
-                .maxParticipants(request.getMaxParticipants())
                 .picture(pictureUrl)
+                .description(request.getDescription())
                 .createdBy(memberId)
                 .build());
 
@@ -168,7 +168,6 @@ public class GroupServiceImpl implements GroupService {
                 .orElseThrow(() -> new RuntimeException("Group not found"));
 
         group.setName(request.getName());
-        group.setMaxParticipants(request.getMaxParticipants());
         group.setUpdatedBy(authService.getMemberIdFromAuthentication());
         return groupRepository.save(group);
     }
