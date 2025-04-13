@@ -12,6 +12,7 @@ import org.capstone.backend.entity.EvidenceReport;
 import org.capstone.backend.entity.Member;
 import org.capstone.backend.entity.Groups;
 import org.capstone.backend.entity.GroupMember;
+import org.capstone.backend.event.EvidenceReviewedEvent;
 import org.capstone.backend.repository.ChallengeMemberRepository;
 import org.capstone.backend.repository.ChallengeRepository;
 import org.capstone.backend.repository.EvidenceReportRepository;
@@ -23,6 +24,7 @@ import org.capstone.backend.utils.enums.ChallengeRole;
 import org.capstone.backend.utils.enums.EvidenceStatus;
 import org.capstone.backend.utils.sendmail.FixedGmailService;
 import org.capstone.backend.utils.upload.FirebaseUpload;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -50,7 +52,7 @@ public class EvidenceServiceImpl implements EvidenceService {
     private final EvidenceReportRepository evidenceReportRepository;
     private final FirebaseUpload firebaseStorageService;
     private final AuthService authService;
-    private final FixedGmailService fixedGmailService;
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * Upload và nộp bằng chứng cho thử thách.
@@ -191,33 +193,11 @@ public class EvidenceServiceImpl implements EvidenceService {
         evidenceRepository.save(evidence);
         evidenceReportRepository.save(report);
 
-        // Gửi email thông báo kết quả chấm bằng chứng cho người nộp
-        try {
-            String toEmail = evidence.getMember().getAccount().getEmail();
-            String subject = "Bằng chứng của bạn đã được chấm";
-            String body = String.format("""
-                    Xin chào %s,
+        eventPublisher.publishEvent(new EvidenceReviewedEvent(
+                evidence,
+                request.getIsApproved()
+        ));
 
-                    Bằng chứng bạn đã nộp cho thử thách "%s" đã được %s.
-
-                    Trạng thái: %s
-                    Góp ý: %s
-
-                    Vui lòng truy cập GoBeyond để xem chi tiết.
-
-                    Trân trọng,
-                    Đội ngũ GoBeyond
-                    """,
-                    evidence.getMember().getFullName(),
-                    evidence.getChallenge().getName(),
-                    request.getIsApproved() ? "chấm xong" : "chấm và từ chối",
-                    evidence.getStatus(),
-                    request.getFeedback() != null ? request.getFeedback() : "Không có"
-            );
-            fixedGmailService.sendEmail(toEmail, subject, body);
-        } catch (Exception ex) {
-            // Lỗi gửi mail có thể được ghi log trong môi trường production
-        }
     }
 
     /**
@@ -470,8 +450,7 @@ public class EvidenceServiceImpl implements EvidenceService {
                 ));
     }
 
-    public List<TaskChecklistDTO> getTasksForCurrentMonth()
-    {
+    public List<TaskChecklistDTO> getTasksForCurrentMonth() {
 
         Long memberId = authService.getMemberIdFromAuthentication();
         // Lấy ngày đầu và ngày cuối của tháng hiện tại
@@ -521,4 +500,22 @@ public class EvidenceServiceImpl implements EvidenceService {
         return taskList;
     }
 
+    /**
+     * Đếm số lượng chứng cứ được nộp bởi thành viên (memberId) cho thử thách (challengeId)
+     * từ ngày startDate đến today.
+     *
+     * @param memberId    ID của thành viên
+     * @param challengeId ID của thử thách
+     * @param startDate   Ngày bắt đầu tính (LocalDate)
+     * @param today       Ngày hiện tại (LocalDate)
+     * @return số lượng chứng cứ đã nộp trong khoảng thời gian trên
+     */
+    @Override
+    public long getSubmittedEvidenceCount(Long memberId, Long challengeId, LocalDate startDate, LocalDate today) {
+        // Chuyển đổi LocalDate sang LocalDateTime với thời gian đầu ngày và cuối ngày.
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = today.atTime(LocalTime.MAX);
+        return evidenceRepository.countByMemberIdAndChallengeIdAndSubmittedAtBetween(
+                memberId, challengeId, startDateTime, endDateTime);
+    }
 }

@@ -60,6 +60,9 @@ public interface ChallengeMemberRepository extends JpaRepository<ChallengeMember
     @Query("SELECT cm.member.id FROM ChallengeMember cm WHERE cm.challenge.id = :challengeId AND cm.status = 'JOINED'")
     List<Long> findMemberIdsByChallengeId(@Param("challengeId") Long challengeId);
     List<ChallengeMember> findByChallenge(Challenge challenge);
+    // New method to find members of a specific group in a challenge
+    @Query("SELECT cm FROM ChallengeMember cm WHERE cm.challenge = :challenge AND cm.groupId = :groupId")
+    List<ChallengeMember> findByChallengeAndGroupId(@Param("challenge") Challenge challenge, @Param("groupId") Long groupId);
 
     @Query("SELECT cm FROM ChallengeMember cm " +
             "JOIN cm.challenge c " +

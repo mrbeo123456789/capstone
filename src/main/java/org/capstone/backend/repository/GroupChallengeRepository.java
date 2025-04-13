@@ -13,6 +13,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,5 +40,12 @@ public interface GroupChallengeRepository extends JpaRepository<GroupChallenge, 
             @Param("status") GroupChallengeStatus status,
             Pageable pageable
     );
-
+    @Query("SELECT gc FROM GroupChallenge gc " +
+            "JOIN gc.challenge c " +
+            "WHERE gc.status = :status " +
+            "AND c.endDate = :date")
+    List<GroupChallenge> findGroupChallengesByStatusAndEndDate(@Param("status") GroupChallengeStatus status,
+                                                               @Param("date") LocalDate date);
+    @Query("SELECT gc FROM GroupChallenge gc WHERE gc.challenge.id = :challengeId")
+    List<GroupChallenge> findByChallengeId(@Param("challengeId") Long challengeId);
 }

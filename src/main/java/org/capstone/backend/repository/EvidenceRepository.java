@@ -75,6 +75,22 @@ AND (
             Pageable pageable
     );
 
+    /**
+     * Đếm số lượng chứng cứ được nộp của một thành viên (memberId) cho thử thách (challengeId)
+     * trong khoảng thời gian từ 'start' đến 'end'.
+     *
+     * @param memberId    ID của thành viên
+     * @param challengeId ID của thử thách
+     * @param start       Thời điểm bắt đầu (LocalDateTime)
+     * @param end         Thời điểm kết thúc (LocalDateTime)
+     * @return Số lượng chứng cứ đã nộp
+     */
+    long countByMemberIdAndChallengeIdAndSubmittedAtBetween(
+            Long memberId,
+            Long challengeId,
+            LocalDateTime start,
+            LocalDateTime end
+    );
     @Query("SELECT e FROM Evidence e WHERE e.member.id = :memberId AND e.challenge.id = :challengeId")
     Optional<Evidence> findEvidenceByMemberAndChallenge(Long memberId, Long challengeId);
 }

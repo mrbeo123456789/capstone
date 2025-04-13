@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 public interface EvidenceService {
@@ -23,4 +24,5 @@ public interface EvidenceService {
     double getApprovedEvidencePercentage(Long memberId, Long challengeId);
     Page<EvidenceToReviewDTO> getEvidenceByMemberAndChallenge(Long memberId, Long challengeId, Pageable pageable);
     List<TaskChecklistDTO> getTasksForCurrentMonth();
+    long getSubmittedEvidenceCount(Long memberId, Long challengeId, LocalDate startDate, LocalDate today);
 }

@@ -96,5 +96,7 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
     List<Groups> findAvailableGroupsForMember(@Param("memberId") Long memberId);
 
     List<GroupMember> findByMemberAndRoleAndStatus(Member member, String owner, GroupMemberStatus groupMemberStatus);
+
+    List<GroupMember> findByGroupId(Long groupId);
 }
 

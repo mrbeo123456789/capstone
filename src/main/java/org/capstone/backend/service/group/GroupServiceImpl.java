@@ -1,17 +1,19 @@
 package org.capstone.backend.service.group;
 
-import com.google.monitoring.v3.Group;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.capstone.backend.dto.challenge.GroupChallengeHistoryDTO;
 import org.capstone.backend.dto.group.*;
 import org.capstone.backend.entity.*;
+import org.capstone.backend.event.InvitationSentEvent;
 import org.capstone.backend.repository.*;
 import org.capstone.backend.service.auth.AuthService;
 import org.capstone.backend.utils.enums.GroupChallengeStatus;
 import org.capstone.backend.utils.enums.GroupMemberStatus;
 import org.capstone.backend.utils.enums.InvitePermission;
+import org.capstone.backend.utils.enums.NotificationType;
 import org.capstone.backend.utils.upload.FirebaseUpload;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -32,12 +34,10 @@ public class GroupServiceImpl implements GroupService {
     private final GroupRepository groupRepository;
     private final MemberRepository memberRepository;
     private final GroupMemberRepository groupMemberRepository;
-    private final AccountRepository accountRepository;
     private final FirebaseUpload firebaseUpload;
     private final AuthService authService;
-private final GroupChallengeRepository groupChallengeRepository;
-
-
+    private final GroupChallengeRepository groupChallengeRepository;
+    private final ApplicationEventPublisher eventPublisher;
     // ========================== GET ==========================
 
     @Override
@@ -180,6 +180,12 @@ private final GroupChallengeRepository groupChallengeRepository;
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found in this group"));
 
         memberToKick.setStatus(GroupMemberStatus.BANNED);
+        eventPublisher.publishEvent(new InvitationSentEvent(
+                memberId.toString(),
+                "Bạn đã bị kick khỏi nhóm",
+                "Bạn đã bị quản trị viên xóa khỏi nhóm '" + group.getName() + "'.",
+                NotificationType. SYSTEM_NOTIFICATION
+        ));
         groupMemberRepository.save(memberToKick);
     }
 
@@ -221,6 +227,12 @@ private final GroupChallengeRepository groupChallengeRepository;
         if (!invitations.isEmpty()) {
             groupMemberRepository.saveAll(invitations);
         }
+        eventPublisher.publishEvent(new InvitationSentEvent(
+                request.getMemberIds().toString(),
+                "Bạn có lời mời mới",
+                "Bạn đã nhận được lời mời tham gia nhóm ",
+                NotificationType.INVITATION));
+
     }
 
     @Override
@@ -306,7 +318,16 @@ private final GroupChallengeRepository groupChallengeRepository;
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Chỉ host hoặc admin mới có quyền giải tán nhóm.");
             }
         }
-
+        // ✅ Trước khi xóa, gửi Notification cho tất cả thành viên
+        List<GroupMember> members = groupMemberRepository.findByGroupId(groupId);
+        members.forEach(m -> {
+            eventPublisher.publishEvent(new InvitationSentEvent(
+                    m.getMember().getId().toString(),
+                    "Nhóm đã bị giải tán",
+                    "Nhóm '" + group.getName() + "' đã bị giải tán .",
+                    NotificationType. SYSTEM_NOTIFICATION
+            ));
+        });
         // ✅ Nếu là Admin (memberId == null) hoặc là Host → cho phép xóa
         groupMemberRepository.deleteByGroupId(groupId); // Xóa tất cả thành viên
         groupRepository.delete(group); // Xóa nhóm
