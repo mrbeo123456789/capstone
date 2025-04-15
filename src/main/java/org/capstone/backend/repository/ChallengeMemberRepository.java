@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,6 +60,17 @@ public interface ChallengeMemberRepository extends JpaRepository<ChallengeMember
     @Query("SELECT cm.member.id FROM ChallengeMember cm WHERE cm.challenge.id = :challengeId AND cm.status = 'JOINED'")
     List<Long> findMemberIdsByChallengeId(@Param("challengeId") Long challengeId);
     List<ChallengeMember> findByChallenge(Challenge challenge);
+    // New method to find members of a specific group in a challenge
+    @Query("SELECT cm FROM ChallengeMember cm WHERE cm.challenge = :challenge AND cm.groupId = :groupId")
+    List<ChallengeMember> findByChallengeAndGroupId(@Param("challenge") Challenge challenge, @Param("groupId") Long groupId);
 
-
+    @Query("SELECT cm FROM ChallengeMember cm " +
+            "JOIN cm.challenge c " +
+            "WHERE cm.member.id = :memberId " +
+            "AND c.status = 'ONGOING' " +
+            "AND c.startDate <= :lastDayOfMonth " +
+            "AND c.endDate >= :firstDayOfMonth")
+    List<ChallengeMember> findOngoingChallengesForMemberInCurrentMonth(@Param("memberId") Long memberId,
+                                                                       @Param("firstDayOfMonth") LocalDate firstDayOfMonth,
+                                                                       @Param("lastDayOfMonth") LocalDate lastDayOfMonth);
 }

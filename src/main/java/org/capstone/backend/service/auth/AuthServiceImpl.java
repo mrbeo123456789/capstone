@@ -74,12 +74,16 @@ public class AuthServiceImpl implements AuthService {
         account.setEmail(email);
         account.setPassword(passwordEncoder.encode(rawPassword));
         account.setRole(Role.MEMBER);
-        account.setStatus(AccountStatus.INACTIVE); // 🔴 Khi đăng ký, tài khoản ở trạng thái "INACTIVE"
+        account.setStatus(AccountStatus.INACTIVE);
         account.setCreatedAt(LocalDateTime.now());
-        createMemberIfNotExists(account);
 
-        return accountRepository.save(account);
+        Account savedAccount = accountRepository.save(account); // ✅ lưu trước
+
+        createMemberIfNotExists(savedAccount); // ✅ tạo member sau khi đã có id
+
+        return savedAccount; // ✅ cuối cùng mới return
     }
+
 
     @Override
     public String loginWithOAuth2(OAuth2User oAuth2User) {

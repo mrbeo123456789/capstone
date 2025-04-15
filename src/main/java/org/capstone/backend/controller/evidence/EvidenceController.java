@@ -3,6 +3,7 @@ package org.capstone.backend.controller.evidence;
 import lombok.RequiredArgsConstructor;
 import org.capstone.backend.dto.evidence.EvidenceReviewRequest;
 import org.capstone.backend.dto.evidence.EvidenceToReviewDTO;
+import org.capstone.backend.dto.evidence.TaskChecklistDTO;
 import org.capstone.backend.dto.member.UserProfileRequest;
 import org.capstone.backend.entity.Evidence;
 import org.capstone.backend.service.evidence.EvidenceService;
@@ -16,8 +17,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-
 @RestController
 @RequestMapping("/api/evidences")
 @RequiredArgsConstructor
@@ -92,6 +91,12 @@ public class EvidenceController {
         List<EvidenceToReviewDTO> result = evidenceService.getMySubmittedEvidencesByChallenge(challengeId);
         return ResponseEntity.ok(result);
     }
+    @GetMapping("/tasks")
+    public ResponseEntity<List<TaskChecklistDTO>> getTasksForCurrentMonth(
+           ) {
 
+        List<TaskChecklistDTO> tasks = evidenceService.getTasksForCurrentMonth();
+        return ResponseEntity.ok(tasks);
+    }
 
 }

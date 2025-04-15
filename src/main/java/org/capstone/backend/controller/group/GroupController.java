@@ -1,9 +1,13 @@
 package org.capstone.backend.controller.group;
 
+import org.capstone.backend.dto.challenge.GroupChallengeHistoryDTO;
 import org.capstone.backend.dto.group.*;
 import org.capstone.backend.entity.Groups;
 import org.capstone.backend.service.group.GroupService;
+import org.capstone.backend.utils.enums.GroupChallengeStatus;
 import org.capstone.backend.utils.enums.GroupMemberStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -19,7 +23,6 @@ import java.util.Map;
 public class GroupController {
 
     private final GroupService groupService;
-
     public GroupController(GroupService groupService) {
         this.groupService = groupService;
     }
@@ -115,5 +118,15 @@ public class GroupController {
         List<AvailableGroupResponse> availableGroups = groupService.getAvailableGroupsToJoinChallenge();
         return ResponseEntity.ok(availableGroups);
     }
+    @GetMapping("/{groupId}/challenge-history")
+    public ResponseEntity<Page<GroupChallengeHistoryDTO>> getGroupChallengeHistory(
+            @PathVariable Long groupId,
+            @RequestParam(required = false) GroupChallengeStatus status,
+            @RequestParam(defaultValue = "0") int page
+    ) {
+        Page<GroupChallengeHistoryDTO> history = groupService.getGroupChallengeHistories(groupId, status, page);
+        return ResponseEntity.ok(history);
+    }
+
 
 }

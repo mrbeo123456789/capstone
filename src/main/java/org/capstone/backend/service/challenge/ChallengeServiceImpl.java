@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.capstone.backend.dto.challenge.*;
 import org.capstone.backend.entity.*;
 import org.capstone.backend.event.AchievementTriggerEvent;
+import org.capstone.backend.event.ChallengeRoleUpdatedEvent;
+import org.capstone.backend.event.ChallengeStatusUpdatedEvent;
+import org.capstone.backend.event.InvitationSentEvent;
 import org.capstone.backend.repository.*;
 import org.capstone.backend.service.auth.AuthService;
 import org.capstone.backend.utils.enums.*;
@@ -221,8 +224,13 @@ public class ChallengeServiceImpl implements ChallengeService {
         challenge.setStatus(status);
         challenge.setAdminNote(request.getAdminNote());
         challengeRepository.save(challenge);
+
+        // 🔥 Bắn event thông báo thử thách được cập nhật trạng thái
+        eventPublisher.publishEvent(new ChallengeStatusUpdatedEvent(challenge, status.name()));
+
         return "Challenge status updated successfully.";
     }
+
 
     /**
      * Toggle role Co-Host cho một thành viên trong thử thách.
@@ -236,7 +244,6 @@ public class ChallengeServiceImpl implements ChallengeService {
         Long currentMemberId = authService.getMemberIdFromAuthentication();
         boolean isAdmin = (currentMemberId == null);
 
-        // Nếu không phải Admin thì phải xác định người thực hiện có phải Host hay không
         if (!isAdmin) {
             ChallengeMember hostMember = challengeMemberRepository.findHostByChallengeId(challengeId)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Thử thách không có Host."));
@@ -247,10 +254,15 @@ public class ChallengeServiceImpl implements ChallengeService {
 
         ChallengeMember targetMember = challengeMemberRepository.findByChallengeIdAndMemberId(challengeId, targetMemberId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Thành viên không tham gia thử thách."));
+
         ChallengeRole newRole = (targetMember.getRole() == ChallengeRole.CO_HOST)
                 ? ChallengeRole.MEMBER
                 : ChallengeRole.CO_HOST;
+
         challengeMemberRepository.updateRole(challengeId, targetMemberId, newRole);
+
+        // 🔥 Bắn event thông báo thay đổi role
+        eventPublisher.publishEvent(new ChallengeRoleUpdatedEvent(targetMember, newRole));
     }
 
     /**
@@ -410,10 +422,24 @@ public class ChallengeServiceImpl implements ChallengeService {
             }
         }
 
+        // ✅ Cập nhật trạng thái CANCELED
         challenge.setStatus(ChallengeStatus.CANCELED);
         challengeRepository.save(challenge);
+
+        // ✅ Gửi Notification cho tất cả thành viên đã tham gia
+        List<ChallengeMember> challengeMembers = challengeMemberRepository.findByChallenge(challenge);
+        for (ChallengeMember cm : challengeMembers) {
+            eventPublisher.publishEvent(new InvitationSentEvent(
+                    cm.getMember().getId().toString(),
+                    "Thử thách đã bị huỷ",
+                    "Thử thách '" + challenge.getName() + "' đã bị huỷ bởi quản trị viên hoặc Host.",
+                    NotificationType.SYSTEM_NOTIFICATION
+            ));
+        }
+
         return "Thử thách đã được huỷ thành công.";
     }
+
 
     /**
      * Cho phép một member rời thử thách nếu thử thách chưa bắt đầu (UPCOMING).
@@ -465,6 +491,12 @@ public class ChallengeServiceImpl implements ChallengeService {
         // Cập nhật trạng thái thành LEFT để lưu lại lịch sử.
         targetRecord.setStatus(ChallengeMemberStatus.KICKED);
         challengeMemberRepository.save(targetRecord);
+        eventPublisher.publishEvent(new InvitationSentEvent(
+                targetMemberId.toString(),
+                "Bạn đã bị kick khỏi thử thách",
+                "Bạn đã bị quản trị viên xóa khỏi thử thách '" + targetRecord.getChallenge().getName() + "'.",
+                NotificationType. SYSTEM_NOTIFICATION
+        ));
         return "Thành viên đã bị kick khỏi thử thách thành công.";
     }
 

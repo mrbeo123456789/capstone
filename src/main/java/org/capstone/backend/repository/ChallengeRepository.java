@@ -3,8 +3,10 @@ package org.capstone.backend.repository;
 import org.capstone.backend.dto.challenge.*;
 import org.capstone.backend.entity.Challenge;
 import org.capstone.backend.entity.ChallengeStarRating;
+import org.capstone.backend.entity.GroupChallenge;
 import org.capstone.backend.utils.enums.ChallengeRole;
 import org.capstone.backend.utils.enums.ChallengeStatus;
+import org.capstone.backend.utils.enums.GroupChallengeStatus;
 import org.capstone.backend.utils.enums.VerificationType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 @Repository
@@ -120,4 +123,4 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
     @Query("SELECT c.id FROM Challenge c WHERE c.status = 'ONGOING'")
     List<Long> findAllOngoingChallengeIds();
 
-}
+    }

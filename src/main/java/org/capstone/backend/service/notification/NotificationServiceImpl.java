@@ -35,6 +35,7 @@ public class NotificationServiceImpl implements NotificationService {
         docData.put("title", title);
         docData.put("content", content);
         docData.put("type", type.toString());
+        docData.put("isRead",false);
         docData.put("createdAt", Timestamp.now());
 
         db.collection("notifications").add(docData);
