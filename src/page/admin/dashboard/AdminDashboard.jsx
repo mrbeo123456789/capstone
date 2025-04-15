@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import Charts from "./Charts.jsx";
 import { FaPlus } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
@@ -73,20 +73,6 @@ const AdminDashboard = () => {
                             </div>
                         </div>
                     </>
-                );
-            case "reports":
-                return (
-                    <div className="bg-white p-6 rounded-lg shadow-md">
-                        <h2 className="text-xl font-bold mb-4 text-gray-800">User Reports</h2>
-                        {ReportsAndMembers && <ReportsAndMembers />}
-                    </div>
-                );
-            case "challenges":
-                return (
-                    <div className="bg-white p-6 rounded-lg shadow-md">
-                        <h2 className="text-xl font-bold mb-4 text-gray-800">Challenges & Evidence</h2>
-                        {ChallengeAndEvidence && <ChallengeAndEvidence />}
-                    </div>
                 );
             default:
                 return <div className="text-gray-600">Select a tab to view content</div>;

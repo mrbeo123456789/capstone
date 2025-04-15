@@ -174,8 +174,8 @@ const UserList = () => {
                             <div className="md:ml-6 text-center md:text-left">
                                 <h3 className="text-2xl font-bold text-gray-800">{userData.username}</h3>
                                 <span className="inline-block px-3 py-1 rounded-full text-sm font-medium mt-2 bg-green-100 text-green-800">
-                                    Member
-                                </span>
+                        Member
+                    </span>
                             </div>
                         </div>
 
@@ -220,43 +220,49 @@ const UserList = () => {
                                 </div>
                                 <div className="text-gray-800 pl-6">{userData.address || "N/A"}</div>
                             </div>
-                            {/* STATUS */}
+                            {/* STATUS with Toggle Button */}
                             <div className="bg-orange-50 p-3 rounded-lg md:col-span-2">
                                 <div className="flex items-center mb-1 text-orange-700">
                                     <FaUser className="mr-2" />
                                     <span className="text-sm font-medium">Status</span>
                                 </div>
-                                <div className="flex items-center pl-6">
-                                    {userData.status?.toLowerCase() === "active" ? (
-                                        <FaCheckCircle className="text-green-500 mr-2" />
-                                    ) : (
-                                        <FaTimesCircle className="text-red-500 mr-2" />
-                                    )}
-                                    <span className={`font-medium ${userData.status?.toLowerCase() === "active" ? "text-green-600" : "text-red-600"}`}>
-                                        {userData.status?.toLowerCase() === "active" ? "active" : "inactive"}
-                                    </span>
+                                <div className="flex items-center justify-between pl-6">
+                                    <div className="flex items-center">
+                                        {userData.status?.toLowerCase() === "active" ? (
+                                            <FaCheckCircle className="text-green-500 mr-2" />
+                                        ) : (
+                                            <FaTimesCircle className="text-red-500 mr-2" />
+                                        )}
+                                        <span className={`font-medium ${userData.status?.toLowerCase() === "active" ? "text-green-600" : "text-red-600"}`}>
+                                {userData.status?.toLowerCase() === "active" ? "active" : "inactive"}
+                            </span>
+                                    </div>
+
+                                    {/* Toggle button moved up from footer */}
+                                    <div className="flex items-center">
+                                        <label htmlFor="toggleSwitch" className="relative inline-block w-12 h-6">
+                                            <input
+                                                id="toggleSwitch"
+                                                type="checkbox"
+                                                className="opacity-0 w-0 h-0"
+                                                checked={userData.status?.toLowerCase() === "active"}
+                                                onChange={() => onToggleStatus(userId, userData.status)}
+                                            />
+                                            <span
+                                                className={`absolute cursor-pointer top-0 left-0 right-0 bottom-0 rounded-full transition-all duration-300 ${userData.status?.toLowerCase() === "active" ? "bg-red-500" : "bg-green-500"}`}
+                                            ></span>
+                                            <span
+                                                className={`absolute left-1 top-1 w-4 h-4 rounded-full bg-white transition-transform duration-300 ${userData.status?.toLowerCase() === "active" ? "translate-x-6" : "translate-x-0"}`}
+                                            ></span>
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    {/* Footer với toggle trạng thái và nút Đóng */}
-                    <div className="bg-gray-50 px-6 py-4 flex justify-end items-center border-t border-gray-200 space-x-3">
-                        <label htmlFor="toggleSwitch" className="relative inline-block w-12 h-6">
-                            <input
-                                id="toggleSwitch"
-                                type="checkbox"
-                                className="opacity-0 w-0 h-0"
-                                checked={userData.status?.toLowerCase() === "active"}
-                                onChange={() => onToggleStatus(userId, userData.status)}
-                            />
-                            <span
-                                className={`absolute cursor-pointer top-0 left-0 right-0 bottom-0 rounded-full transition-all duration-300 ${userData.status?.toLowerCase() === "active" ? "bg-red-500" : "bg-green-500"}`}
-                            ></span>
-                            <span
-                                className={`absolute left-1 top-1 w-4 h-4 rounded-full bg-white transition-transform duration-300 ${userData.status?.toLowerCase() === "active" ? "translate-x-6" : "translate-x-0"}`}
-                            ></span>
-                        </label>
+                    {/* Footer with just Close button */}
+                    <div className="bg-gray-50 px-6 py-4 flex justify-end items-center border-t border-gray-200">
                         <button
                             onClick={onClose}
                             className="px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"

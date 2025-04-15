@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Sidebar from "../../navbar/AdminNavbar.jsx";
-import { ChevronLeft, ChevronRight, Eye, Check, X } from "lucide-react";
-import { useGetReportsQuery, useUpdateReportStatusMutation } from "../../../service/adminService.js";
-import ReportDetail from "../detailmodal/ReportDetail.jsx";
+import { ChevronLeft, ChevronRight, Check, X } from "lucide-react";
+import { useFilterReportsQuery, useUpdateReportStatusMutation } from "../../../service/adminService.js";
 
 const ReportList = () => {
     // State management
@@ -10,12 +9,10 @@ const ReportList = () => {
     const [reportTypeFilter, setReportTypeFilter] = useState("");
     const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-    const [selectedReportId, setSelectedReportId] = useState(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const itemsPerPage = 10;
 
     // API hooks
-    const { data: reportsData, isLoading, isError } = useGetReportsQuery({
+    const { data: reportsData, isLoading, isError } = useFilterReportsQuery({
         reportType: reportTypeFilter.trim(),
         page: currentPage - 1,
         size: itemsPerPage,
@@ -54,17 +51,6 @@ const ReportList = () => {
         }
     };
 
-    // Modal handlers
-    const openReportModal = (reportId) => {
-        setSelectedReportId(reportId);
-        setIsModalOpen(true);
-    };
-
-    const closeReportModal = () => {
-        setIsModalOpen(false);
-        setSelectedReportId(null);
-    };
-
     // Report action handlers with API integration
     const handleAgree = async (reportId) => {
         try {
@@ -93,6 +79,15 @@ const ReportList = () => {
             // You could add error handling/notification here
         }
     };
+    const formatBackendDateArray = (dateArray) => {
+        if (!Array.isArray(dateArray) || dateArray.length < 3) return "Invalid date";
+        const [year, month, day] = dateArray;
+        // Nếu số ngày hoặc tháng chỉ có 1 chữ số, thêm số 0 phía trước
+        const dd = day < 10 ? `0${day}` : day;
+        const mm = month < 10 ? `0${month}` : month;
+        return `${dd}/${mm}/${year}`;
+    };
+
 
     // Calculate pagination info
     const indexOfFirstReport = (currentPage - 1) * itemsPerPage + 1;
@@ -189,13 +184,14 @@ const ReportList = () => {
                                         <th className="p-4 text-left">Loại báo cáo</th>
                                         <th className="p-4 text-left">Mô tả</th>
                                         <th className="p-4 text-left">Ngày tạo</th>
+                                        <th className="p-4 text-left">Trạng thái</th>
                                         <th className="p-4 text-center">Hành động</th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     {reports.length === 0 ? (
                                         <tr>
-                                            <td colSpan="5" className="p-4 text-center text-gray-500">
+                                            <td colSpan="6" className="p-4 text-center text-gray-500">
                                                 Không có báo cáo nào phù hợp với tìm kiếm của bạn.
                                             </td>
                                         </tr>
@@ -218,36 +214,50 @@ const ReportList = () => {
                                                             {report.reportType}
                                                         </span>
                                                 </td>
-                                                <td className="p-4">{report.description || "-"}</td>
+                                                <td className="p-4">{report.content || "-"}</td>
                                                 <td className="p-4">
-                                                    {report.createdAt ? new Date(report.createdAt).toLocaleDateString() : "-"}
+                                                    {formatBackendDateArray(report.createdAt)}
                                                 </td>
                                                 <td className="p-4">
-                                                    <div className="flex justify-center space-x-2">
-                                                        <button
-                                                            onClick={() => handleAgree(report.id)}
-                                                            className="p-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors disabled:opacity-50"
-                                                            title="Đồng ý"
-                                                            disabled={isUpdating}
-                                                        >
-                                                            <Check size={16} />
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleDisagree(report.id)}
-                                                            className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors disabled:opacity-50"
-                                                            title="Không đồng ý"
-                                                            disabled={isUpdating}
-                                                        >
-                                                            <X size={16} />
-                                                        </button>
-                                                        <button
-                                                            onClick={() => openReportModal(report.id)}
-                                                            className="p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
-                                                            title="Xem chi tiết"
-                                                        >
-                                                            <Eye size={16} />
-                                                        </button>
-                                                    </div>
+                                                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                                                        report.status === "PENDING"
+                                                            ? "bg-blue-100 text-blue-700"
+                                                            : report.status === "APPROVED"
+                                                                ? "bg-green-100 text-green-700"
+                                                                : report.status === "REJECTED"
+                                                                    ? "bg-red-100 text-red-700"
+                                                                    : "bg-gray-100 text-gray-700"
+                                                    }`}>
+                                                        {report.status === "PENDING"
+                                                            ? "Chờ xử lý"
+                                                            : report.status === "APPROVED"
+                                                                ? "Đã duyệt"
+                                                                : report.status === "REJECTED"
+                                                                    ? "Đã từ chối"
+                                                                    : report.status}
+                                                    </span>
+                                                </td>
+                                                <td className="p-4">
+                                                    {report.status === "PENDING" && (
+                                                        <div className="flex justify-center space-x-2">
+                                                            <button
+                                                                onClick={() => handleAgree(report.id)}
+                                                                className="p-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors disabled:opacity-50"
+                                                                title="Đồng ý"
+                                                                disabled={isUpdating}
+                                                            >
+                                                                <Check size={16} />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleDisagree(report.id)}
+                                                                className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors disabled:opacity-50"
+                                                                title="Không đồng ý"
+                                                                disabled={isUpdating}
+                                                            >
+                                                                <X size={16} />
+                                                            </button>
+                                                        </div>
+                                                    )}
                                                 </td>
                                             </tr>
                                         ))
@@ -296,40 +306,6 @@ const ReportList = () => {
                     </div>
                 </div>
             </div>
-
-            {/* Report Detail Modal */}
-            {isModalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-auto">
-                        <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-                            <h2 className="text-xl font-bold text-gray-800">Chi tiết báo cáo</h2>
-                            <button
-                                onClick={closeReportModal}
-                                className="text-gray-500 hover:text-gray-700"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-                        </div>
-                        <div className="p-4">
-                            <ReportDetail
-                                reportId={selectedReportId}
-                                onApprove={handleAgree}
-                                onReject={handleDisagree}
-                            />
-                        </div>
-                        <div className="p-4 border-t border-gray-200 flex justify-end">
-                            <button
-                                onClick={closeReportModal}
-                                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
-                            >
-                                Đóng
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 };
