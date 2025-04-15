@@ -76,7 +76,8 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
         c.startDate, 
         c.endDate, 
         c.picture, 
-        c.challengeType.name, 
+        c.challengeType.name,
+        c.status,
         CASE WHEN EXISTS (
             SELECT 1 FROM ChallengeMember cm 
             WHERE cm.challenge.id = c.id AND cm.member.id = :memberId

@@ -3,6 +3,7 @@ package org.capstone.backend.dto.challenge;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.capstone.backend.utils.enums.ChallengeStatus;
 import org.capstone.backend.utils.enums.ParticipationType;
 import org.capstone.backend.utils.enums.VerificationType;
 
@@ -22,7 +23,8 @@ public class ChallengeDetailResponse {
     private String challengeType;
     private boolean joined;
     private long participantCount;
-    private long duration; // Thời gian của thử thách, tính theo số ngày
+    private long duration;
+    private ChallengeStatus challengeStatus;// Thời gian của thử thách, tính theo số ngày
     private VerificationType verificationType;    // Cập nhật kiểu enum
     private ParticipationType participationType;   // Cập nhật kiểu enum
 }
