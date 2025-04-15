@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.capstone.backend.dto.evidence.EvidenceReviewRequest;
 import org.capstone.backend.dto.evidence.EvidenceToReviewDTO;
 import org.capstone.backend.dto.evidence.TaskChecklistDTO;
+import org.capstone.backend.dto.member.MemberSubmissionProjection;
 import org.capstone.backend.entity.Challenge;
 import org.capstone.backend.entity.ChallengeMember;
 import org.capstone.backend.entity.Evidence;
@@ -59,39 +60,36 @@ public class EvidenceServiceImpl implements EvidenceService {
      *
      * @param file        file bằng chứng được upload
      * @param challengeId ID của thử thách
-     * @throws IOException nếu lỗi upload file
+     * @throws ResponseStatusException nếu xảy ra lỗi (không tìm thấy thử thách, không trong thời gian thử thách, không tham gia,…)
      */
     @Override
-    public void uploadAndSubmitEvidence(MultipartFile file, Long challengeId) throws IOException {
+    @Transactional
+    public void uploadAndSubmitEvidence(MultipartFile file, Long challengeId) {
         Long memberId = authService.getMemberIdFromAuthentication();
 
         Challenge challenge = challengeRepository.findById(challengeId)
-                .orElseThrow(() -> new EntityNotFoundException("Challenge not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy thử thách."));
 
         LocalDate today = LocalDate.now();
         LocalTime now = LocalTime.now();
 
-        // Kiểm tra ngày nộp có nằm trong khoảng thời gian của thử thách không
         if (today.isBefore(challenge.getStartDate()) || today.isAfter(challenge.getEndDate())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Hôm nay không nằm trong thời gian thử thách.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Hôm nay không nằm trong thời gian của thử thách.");
         }
 
-        // Nếu ngày cuối của thử thách thì chỉ nộp trước 21:00
         if (today.equals(challenge.getEndDate()) && now.isAfter(LocalTime.of(21, 0))) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bạn chỉ được nộp bằng chứng trước 21:00 trong ngày cuối.");
         }
 
-        // Kiểm tra user có tham gia thử thách không
         boolean isParticipant = challengeMemberRepository.existsByChallengeIdAndMemberIdAndStatus(
                 challengeId, memberId, ChallengeMemberStatus.JOINED);
         if (!isParticipant) {
-            throw new IllegalStateException("Bạn không tham gia thử thách này.");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không tham gia thử thách này.");
         }
 
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new EntityNotFoundException("Member not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy thành viên."));
 
-        // Xác định khoảng thời gian của ngày hôm nay
         LocalDateTime startOfDay = today.atStartOfDay();
         LocalDateTime endOfDay = startOfDay.plusDays(1);
 
@@ -99,87 +97,59 @@ public class EvidenceServiceImpl implements EvidenceService {
         Evidence todayEvidence = null;
         if (!todayEvidences.isEmpty()) {
             if (todayEvidences.size() > 1) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "Có nhiều bằng chứng đã nộp trong hôm nay. Vui lòng liên hệ admin.");
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Có nhiều bằng chứng đã nộp hôm nay. Vui lòng liên hệ quản trị viên.");
             }
             todayEvidence = todayEvidences.get(0);
         }
 
-        // Tạo đường dẫn upload và upload file
-        String path = String.format("evidences/challenge_%d/member_%d/%s/%s.mp4",
-                challengeId, memberId, today, System.currentTimeMillis());
-        String fileUrl = firebaseStorageService.uploadFileWithOverwrite(file, path);
+        try {
+            String path = String.format("evidences/challenge_%d/member_%d/%s/%s.mp4",
+                    challengeId, memberId, today, System.currentTimeMillis());
+            String fileUrl = firebaseStorageService.uploadFileWithOverwrite(file, path);
 
-        if (todayEvidence != null) {
-            todayEvidence.setEvidenceUrl(fileUrl);
-            todayEvidence.setUpdatedAt(LocalDateTime.now());
-            evidenceRepository.save(todayEvidence);
-        } else {
-            Evidence newEvidence = Evidence.builder()
-                    .challenge(challenge)
-                    .member(member)
-                    .evidenceUrl(fileUrl)
-                    .status(EvidenceStatus.PENDING)
-                    .submittedAt(LocalDateTime.now())
-                    .build();
-            evidenceRepository.save(newEvidence);
+            if (todayEvidence != null) {
+                todayEvidence.setEvidenceUrl(fileUrl);
+                todayEvidence.setUpdatedAt(LocalDateTime.now());
+                evidenceRepository.save(todayEvidence);
+            } else {
+                Evidence newEvidence = Evidence.builder()
+                        .challenge(challenge)
+                        .member(member)
+                        .evidenceUrl(fileUrl)
+                        .status(EvidenceStatus.PENDING)
+                        .submittedAt(LocalDateTime.now())
+                        .build();
+                evidenceRepository.save(newEvidence);
+            }
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Không thể upload bằng chứng: " + e.getMessage());
         }
     }
 
-    /**
-     * Xử lý chấm (review) bằng chứng.
-     *
-     * @param request dữ liệu chấm bằng chứng bao gồm ID, phản hồi và trạng thái phê duyệt
-     */
     @Override
     @Transactional
     public void reviewEvidence(EvidenceReviewRequest request) {
         Long reviewerId = authService.getMemberIdFromAuthentication();
 
         Evidence evidence = evidenceRepository.findById(request.getEvidenceId())
-                .orElseThrow(() -> new EntityNotFoundException("Evidence not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy bằng chứng."));
 
         EvidenceReport report = evidenceReportRepository.findByEvidenceId(evidence.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Không có người chấm cho bằng chứng này."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Không có người chấm cho bằng chứng này."));
 
-        boolean isReviewer = report.getReviewer().getId().equals(reviewerId);
-
-        // Kiểm tra quyền của người gọi (có phải Host/Co-host không)
-        ChallengeRole callerRole = challengeMemberRepository
-                .findByChallengeIdAndMemberId(evidence.getChallenge().getId(), reviewerId)
-                .map(ChallengeMember::getRole)
-                .orElse(null);
-        boolean isHostOrCoHost = callerRole == ChallengeRole.HOST || callerRole == ChallengeRole.CO_HOST;
-        boolean isAlreadyReviewed = report.getIsApproved() != null;
-
-        if (isAlreadyReviewed) {
-            if (!isHostOrCoHost) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền sửa bằng chứng đã chấm.");
-            }
-            ChallengeRole originalReviewerRole = challengeMemberRepository
-                    .findByChallengeIdAndMemberId(evidence.getChallenge().getId(), report.getReviewer().getId())
-                    .map(ChallengeMember::getRole)
-                    .orElse(ChallengeRole.MEMBER);
-            if (originalReviewerRole != ChallengeRole.MEMBER) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Không thể sửa nếu người chấm đầu là Host/Co-host.");
-            }
-        } else {
-            if (!isReviewer && !isHostOrCoHost) {
+        // Kiểm tra quyền chấm/chỉnh sửa theo nghiệp vụ đã được trích xuất
+        if (!isUserAllowedToReview(evidence, report, reviewerId)) {
+            if (report.getIsApproved() != null) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền sửa bằng chứng đã được chấm.");
+            } else {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không được phép chấm bằng chứng này.");
             }
         }
 
-        // Kiểm tra thời gian được phép chấm bằng chứng
-        LocalDate submittedDate = evidence.getSubmittedAt().toLocalDate();
-        LocalTime currentTime = LocalTime.now();
-        LocalDate today = LocalDate.now();
-        boolean isEndDate = submittedDate.equals(evidence.getChallenge().getEndDate());
-        boolean isTooEarlyToReview = (!isEndDate && today.isBefore(submittedDate.plusDays(1)))
-                || (isEndDate && today.equals(submittedDate) && currentTime.isBefore(LocalTime.of(21, 0)));
-        if (isTooEarlyToReview) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Chưa đến thời gian được chấm bằng chứng.");
-        }
+        // Kiểm tra thời gian cho phép chấm
+        checkReviewTime(evidence);
 
-        // Cập nhật trạng thái của evidence và report
+        // Cập nhật trạng thái bằng chứng và báo cáo
         evidence.setStatus(request.getIsApproved() ? EvidenceStatus.APPROVED : EvidenceStatus.REJECTED);
         evidence.setUpdatedAt(LocalDateTime.now());
         evidence.setUpdatedBy(reviewerId);
@@ -193,11 +163,56 @@ public class EvidenceServiceImpl implements EvidenceService {
         evidenceRepository.save(evidence);
         evidenceReportRepository.save(report);
 
-        eventPublisher.publishEvent(new EvidenceReviewedEvent(
-                evidence,
-                request.getIsApproved()
-        ));
+        eventPublisher.publishEvent(new EvidenceReviewedEvent(evidence, request.getIsApproved()));
+    }
 
+    // Kiểm tra xem thời gian hiện tại đã đủ cho phép chấm/chỉnh sửa hay chưa
+    private boolean isTimeEligibleForReview(Evidence evidence) {
+        LocalDate submittedDate = evidence.getSubmittedAt().toLocalDate();
+        LocalDate today = LocalDate.now();
+        LocalTime currentTime = LocalTime.now();
+        boolean isEndDate = submittedDate.equals(evidence.getChallenge().getEndDate());
+        // Nếu chưa đủ 1 ngày sau khi nộp (hoặc đối với ngày kết thúc, chỉ cho phép sau 21:00)
+        return !((!isEndDate && today.isBefore(submittedDate.plusDays(1)))
+                || (isEndDate && today.equals(submittedDate) && currentTime.isBefore(LocalTime.of(21, 0))));
+    }
+
+    // Nâng cao: Nếu không đủ thời gian thì ném exception
+    private void checkReviewTime(Evidence evidence) {
+        if (!isTimeEligibleForReview(evidence)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Chưa đến thời gian được chấm bằng chứng.");
+        }
+    }
+
+    // Kiểm tra xem một member có phải Host/Co-host hay không của một thử thách
+    private boolean isUserHostOrCoHost(Long challengeId, Long memberId) {
+        ChallengeRole role = challengeMemberRepository
+                .findByChallengeIdAndMemberId(challengeId, memberId)
+                .map(ChallengeMember::getRole)
+                .orElse(null);
+        return role == ChallengeRole.HOST || role == ChallengeRole.CO_HOST;
+    }
+
+    // Kiểm tra quyền chấm/chỉnh sửa bằng chứng dựa trên logic nghiệp vụ
+    private boolean isUserAllowedToReview(Evidence evidence, EvidenceReport report, Long reviewerId) {
+        boolean isReviewer = report.getReviewer().getId().equals(reviewerId);
+        boolean isHostOrCoHost = isUserHostOrCoHost(evidence.getChallenge().getId(), reviewerId);
+        boolean isAlreadyReviewed = report.getIsApproved() != null;
+
+        if (isAlreadyReviewed) {
+            // Nếu đã chấm: chỉ cho Host/Co-host được phép sửa, với điều kiện người chấm ban đầu là Member
+            if (!isHostOrCoHost) {
+                return false;
+            }
+            ChallengeRole originalReviewerRole = challengeMemberRepository
+                    .findByChallengeIdAndMemberId(evidence.getChallenge().getId(), report.getReviewer().getId())
+                    .map(ChallengeMember::getRole)
+                    .orElse(ChallengeRole.MEMBER);
+            return originalReviewerRole == ChallengeRole.MEMBER;
+        } else {
+            // Nếu chưa chấm: cho phép nếu là người được giao chấm hoặc Host/Co-host
+            return isReviewer || isHostOrCoHost;
+        }
     }
 
     /**
@@ -209,50 +224,58 @@ public class EvidenceServiceImpl implements EvidenceService {
      * @return một trang chứa các EvidenceToReviewDTO
      */
     @Override
-    public Page<EvidenceToReviewDTO> getEvidenceByChallengeForHost(Long challengeId, int page, int size) {
+    public Page<EvidenceToReviewDTO> getEvidenceByChallengeForHost(
+            Long challengeId,
+            Long memberId,
+            EvidenceStatus status,
+            int page,
+            int size) {
+
         Long currentReviewerId = authService.getMemberIdFromAuthentication();
-        ChallengeRole currentRole = challengeMemberRepository.findByChallengeIdAndMemberId(challengeId, currentReviewerId)
-                .map(ChallengeMember::getRole)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không thuộc thử thách này"));
-        if (currentRole != ChallengeRole.HOST && currentRole != ChallengeRole.CO_HOST) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Chỉ Host/Co-host mới có quyền xem");
-        }
-        Pageable pageable = PageRequest.of(page, size);
+        boolean isAdmin = currentReviewerId == null;
+
+        // Lấy thông tin Challenge
         Challenge challenge = challengeRepository.findById(challengeId)
-                .orElseThrow(() -> new EntityNotFoundException("Challenge not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy thử thách."));
 
-        LocalDate today = LocalDate.now();
-        LocalDateTime todayStart = today.atStartOfDay();
-        LocalDateTime endDateStart = challenge.getEndDate().atTime(21, 0);
-        LocalDateTime endDateEnd = challenge.getEndDate().atTime(23, 59, 59);
+        // Nếu không phải admin, kiểm tra quyền của thành viên (chỉ Host/Co-host được phép xem)
+        if (!isAdmin) {
+            ChallengeRole currentRole = challengeMemberRepository
+                    .findByChallengeIdAndMemberId(challengeId, currentReviewerId)
+                    .map(ChallengeMember::getRole)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không thuộc thử thách này."));
+            if (currentRole != ChallengeRole.HOST && currentRole != ChallengeRole.CO_HOST) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Chỉ có Host/Co-host mới được quyền xem.");
+            }
+        }
 
-        Page<Evidence> evidencePage = evidenceRepository.findAllowedEvidenceForHost(
+        Pageable pageable = PageRequest.of(page, size);
+
+        // Lấy danh sách bằng chứng theo trạng thái và giới hạn thời gian chấm (theo logic riêng repository)
+        Page<Evidence> evidencePage = evidenceRepository.findAllowedEvidenceForHostByMemberIdAndStatus(
                 challengeId,
-                todayStart,
-                endDateStart,
-                endDateEnd,
+                memberId, // Admin vẫn lọc theo memberId từ API
+                LocalDate.now().atStartOfDay(), // todayStart
+                challenge.getEndDate().atTime(21, 0), // endDateStart
+                challenge.getEndDate().atTime(23, 59, 59), // endDateEnd
+                status,
                 pageable
         );
 
-        return evidencePage.map(e -> {
-            boolean canEdit = Optional.ofNullable(e.getEvidenceReports())
-                    .orElse(Collections.emptyList())
-                    .stream()
-                    .map(EvidenceReport::getReviewer)
-                    .map(Member::getId)
-                    .map(reviewerId -> challengeMemberRepository
-                            .findByChallengeIdAndMemberId(challengeId, reviewerId)
-                            .map(ChallengeMember::getRole)
-                            .orElse(ChallengeRole.MEMBER))
-                    .anyMatch(role -> role == ChallengeRole.MEMBER);
+        return evidencePage.map(evidence -> {
+            // Trả về canEdit dựa trên thời gian và quyền chấm
+            EvidenceReport report = evidenceReportRepository.findByEvidenceId(evidence.getId()).orElse(null);
+            boolean canEdit = report != null && isTimeEligibleForReview(evidence)
+                    && isUserAllowedToReview(evidence, report, currentReviewerId);
+
             return new EvidenceToReviewDTO(
-                    e.getId(),
-                    e.getMember().getId(),
-                    e.getMember().getFullName(),
-                    e.getEvidenceUrl(),
-                    e.getStatus(),
+                    evidence.getId(),
+                    evidence.getMember().getId(),
+                    evidence.getMember().getFullName(),
+                    evidence.getEvidenceUrl(),
+                    evidence.getStatus(),
                     canEdit,
-                    e.getSubmittedAt()
+                    evidence.getSubmittedAt()
             );
         });
     }
@@ -434,7 +457,7 @@ public class EvidenceServiceImpl implements EvidenceService {
      * @param memberId    ID của member
      * @param challengeId ID của thử thách
      * @param pageable    thông tin phân trang
-     * @return trang EvidenceToReviewDTO
+     * @return trang chứa các EvidenceToReviewDTO
      */
     @Override
     public Page<EvidenceToReviewDTO> getEvidenceByMemberAndChallenge(Long memberId, Long challengeId, Pageable pageable) {
@@ -454,19 +477,17 @@ public class EvidenceServiceImpl implements EvidenceService {
 
         Long memberId = authService.getMemberIdFromAuthentication();
         // Lấy ngày đầu và ngày cuối của tháng hiện tại
-        LocalDate firstDayOfMonth = LocalDate.now().withDayOfMonth(1); // Ngày đầu tháng
-        LocalDate lastDayOfMonth = LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth()); // Ngày cuối tháng
+        LocalDate firstDayOfMonth = LocalDate.now().withDayOfMonth(1);
+        LocalDate lastDayOfMonth = LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth());
 
         // Lấy tất cả thử thách của member trong tháng hiện tại có trạng thái ONGOING
         List<ChallengeMember> challengeMembers = challengeMemberRepository.findOngoingChallengesForMemberInCurrentMonth(memberId, firstDayOfMonth, lastDayOfMonth);
 
-        // Dùng Stream để xử lý và chuyển thành TaskChecklistDTO
         List<TaskChecklistDTO> taskList = challengeMembers.stream()
                 .map(cm -> {
                     Challenge challenge = cm.getChallenge();
                     Evidence evidence = evidenceRepository.findEvidenceByMemberAndChallenge(memberId, challenge.getId()).orElse(null);
 
-                    // Tạo đối tượng TaskChecklistDTO
                     TaskChecklistDTO taskDTO = new TaskChecklistDTO();
                     taskDTO.setChallengeId(challenge.getId());
                     taskDTO.setChallengeName(challenge.getName());
@@ -490,7 +511,6 @@ public class EvidenceServiceImpl implements EvidenceService {
                 })
                 .collect(Collectors.toList());
 
-        // Nếu không có nhiệm vụ trong tháng này
         if (taskList.isEmpty()) {
             TaskChecklistDTO noTaskDTO = new TaskChecklistDTO();
             noTaskDTO.setMessage("Không có nhiệm vụ trong tháng này.");
@@ -501,21 +521,22 @@ public class EvidenceServiceImpl implements EvidenceService {
     }
 
     /**
-     * Đếm số lượng chứng cứ được nộp bởi thành viên (memberId) cho thử thách (challengeId)
-     * từ ngày startDate đến today.
+     * Đếm số lượng chứng cứ được nộp bởi thành viên cho thử thách từ ngày startDate đến today.
      *
      * @param memberId    ID của thành viên
      * @param challengeId ID của thử thách
-     * @param startDate   Ngày bắt đầu tính (LocalDate)
-     * @param today       Ngày hiện tại (LocalDate)
-     * @return số lượng chứng cứ đã nộp trong khoảng thời gian trên
+     * @param startDate   Ngày bắt đầu tính
+     * @param today       Ngày hiện tại
+     * @return số lượng chứng cứ đã nộp
      */
     @Override
     public long getSubmittedEvidenceCount(Long memberId, Long challengeId, LocalDate startDate, LocalDate today) {
-        // Chuyển đổi LocalDate sang LocalDateTime với thời gian đầu ngày và cuối ngày.
         LocalDateTime startDateTime = startDate.atStartOfDay();
         LocalDateTime endDateTime = today.atTime(LocalTime.MAX);
         return evidenceRepository.countByMemberIdAndChallengeIdAndSubmittedAtBetween(
                 memberId, challengeId, startDateTime, endDateTime);
     }
+
+
+
 }

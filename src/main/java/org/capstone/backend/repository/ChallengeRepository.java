@@ -41,17 +41,17 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
 
 
     @Query("""
-       SELECT new org.capstone.backend.dto.challenge.ChallengeResponse(
-           c.id, c.name, c.summary, c.picture
-       )
-       FROM Challenge c
-       WHERE c.status = 'UPCOMING'\s
-       AND c.id NOT IN (
-           SELECT cm.challenge.id FROM ChallengeMember cm WHERE cm.member.id = :memberId
-       )
-       ORDER BY c.updatedAt DESC
-      \s""")
+    SELECT new org.capstone.backend.dto.challenge.ChallengeResponse(
+        c.id, c.name, c.summary, c.picture, c.participationType
+    )
+    FROM Challenge c
+    LEFT JOIN ChallengeMember cm ON cm.challenge.id = c.id AND cm.member.id = :memberId
+    WHERE c.status = 'UPCOMING'
+    AND (cm.id IS NULL OR (cm.status != 'JOINED' AND cm.status != 'KICKED'))
+    ORDER BY c.updatedAt DESC
+""")
     Page<ChallengeResponse> findApprovedChallengesNotJoined(@Param("memberId") Long memberId, Pageable pageable);
+
 
     @Query("""
    SELECT new org.capstone.backend.dto.challenge.MyChallengeBaseResponse(

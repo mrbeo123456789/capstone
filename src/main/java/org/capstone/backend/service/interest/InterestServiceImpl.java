@@ -2,21 +2,16 @@ package org.capstone.backend.service.interest;
 
 import lombok.RequiredArgsConstructor;
 import org.capstone.backend.dto.interest.InterestDTO;
-import org.capstone.backend.entity.Account;
-import org.capstone.backend.entity.ChallengeMember;
 import org.capstone.backend.entity.Interest;
 import org.capstone.backend.entity.Member;
 import org.capstone.backend.repository.AccountRepository;
 import org.capstone.backend.repository.InterestRepository;
 import org.capstone.backend.repository.MemberRepository;
 import org.capstone.backend.service.auth.AuthService;
-import org.capstone.backend.utils.enums.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -31,8 +26,9 @@ public class InterestServiceImpl implements InterestService {
     private final AccountRepository accountRepository;
     private final MemberRepository memberRepository;
     private final AuthService authService;
+
     /**
-     * Lấy danh sách Interests của Member đang đăng nhập
+     * Lấy danh sách sở thích của thành viên đang đăng nhập.
      */
     @Override
     @Transactional(readOnly = true)
@@ -57,21 +53,18 @@ public class InterestServiceImpl implements InterestService {
     }
 
     /**
-     * Cập nhật Interests cho Member (thêm mới & xóa những cái không còn nữa)
+     * Cập nhật sở thích của thành viên (thêm mới và xoá các sở thích không còn).
      */
     @Override
     @Transactional
     public void updateMemberInterests(List<Long> interestIds) {
         Member member = memberRepository.getReferenceById(authService.getMemberIdFromAuthentication());
-
         Set<Interest> newInterests = new HashSet<>(interestRepository.findAllActiveByIdIn(interestIds));
-
         member.setInterests(newInterests);
         memberRepository.save(member);
     }
 
-
-    // 🔍 Phân trang + tìm kiếm
+    // 🔍 Phân trang và tìm kiếm sở thích
     public Page<Interest> findAllPaged(String keyword, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         if (keyword == null || keyword.isBlank()) {
@@ -81,38 +74,35 @@ public class InterestServiceImpl implements InterestService {
         }
     }
 
-    // ➕ Tạo mới
+    // ➕ Tạo mới sở thích
     public Interest create(Interest interest) {
         return interestRepository.save(interest);
     }
 
-    // ✏️ Cập nhật
+    // ✏️ Cập nhật sở thích
     public Interest update(Long id, Interest updated) {
         return interestRepository.findById(id).map(existing -> {
             existing.setName(updated.getName());
             return interestRepository.save(existing);
-        }).orElseThrow(() -> new RuntimeException("Interest not found"));
+        }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy sở thích."));
     }
 
-    // ❌ Xoá
+    // ❌ Xoá sở thích
     public void delete(Long id) {
         Interest interest = interestRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Interest not found"));
-
-        // Gỡ liên kết với member trước khi xoá
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy sở thích."));
+        // Gỡ liên kết với các member trước khi xoá
         interest.getMembers().forEach(member -> {
             member.getInterests().remove(interest);
         });
-
         interestRepository.delete(interest);
     }
+
     @Override
-    public Interest toggleActive(Long id, boolean isActive) {
+    public void toggleActive(Long id, boolean isActive) {
         Interest interest = interestRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Interest not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy sở thích."));
         interest.setActive(isActive);
-        return interestRepository.save(interest);
+        interestRepository.save(interest);
     }
-
-
 }

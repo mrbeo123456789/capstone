@@ -1,6 +1,7 @@
 package org.capstone.backend.service.challenge;
 
 import org.capstone.backend.dto.challenge.*;
+import org.capstone.backend.dto.member.MemberSubmissionProjection;
 import org.capstone.backend.entity.Challenge;
 import org.capstone.backend.entity.ChallengeType;
 import org.capstone.backend.utils.enums.ChallengeRole;
@@ -15,7 +16,7 @@ public interface ChallengeService {
     List<ChallengeType> getAllTypes();
     String reviewChallenge(ReviewChallengeRequest request);
     String joinChallenge(Long challengeId);
-    Page<AdminChallengesResponse> getChallenges(String name, ChallengeStatus status, int page, int size);
+    Page<AdminChallengesResponse> getChallenges(String name, String status, int page, int size);
     Page<ChallengeResponse> getApprovedChallenges(int page, int size);
     void toggleCoHost(Long challengeId, Long memberId);
     List<MyChallengeResponse> getChallengesByMember(ChallengeRole role);
@@ -24,5 +25,6 @@ public interface ChallengeService {
     String cancelChallenge(Long challengeId);
     String leaveChallenge(Long challengeId);
     String kickMemberFromChallenge(Long challengeId, Long targetMemberId);
-
+    Page<MemberSubmissionProjection> getJoinedMembersWithPendingEvidence(
+            Long challengeId, String keyword, int page, int size);
 }

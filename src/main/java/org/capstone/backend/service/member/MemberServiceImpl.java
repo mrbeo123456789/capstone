@@ -10,18 +10,21 @@ import org.capstone.backend.repository.MemberRepository;
 import org.capstone.backend.service.auth.AuthService;
 import org.capstone.backend.utils.enums.InvitePermission;
 import org.capstone.backend.utils.upload.FirebaseUpload;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 
 @Service
 public class MemberServiceImpl implements MemberService {
+
     private final MemberRepository memberRepository;
     private final AccountRepository accountRepository;
     private final FirebaseUpload firebaseUpload;
@@ -49,16 +52,18 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public UserProfileResponse updateMember(UserProfileRequest request, MultipartFile avatar) throws IOException {
+    public UserProfileResponse updateMember(UserProfileRequest request, MultipartFile avatar) {
         Member member = findOrCreateMember();
 
-        // Upload avatar lên Firebase nếu có file mới
         if (avatar != null && !avatar.isEmpty()) {
-            String avatarUrl = firebaseUpload.uploadFile(avatar, "avatar");
-            member.setAvatar(avatarUrl);
+            try {
+                String avatarUrl = firebaseUpload.uploadFile(avatar, "avatar");
+                member.setAvatar(avatarUrl);
+            } catch (IOException e) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Không thể tải lên avatar: " + e.getMessage());
+            }
         }
 
-        // Cập nhật thông tin profile từ DTO
         member.setFirstName(request.getFirstName());
         member.setFullName(request.getFullName());
         member.setLastName(request.getLastName());
@@ -71,8 +76,6 @@ public class MemberServiceImpl implements MemberService {
         member.setDateOfBirth(request.getDateOfBirth());
         member.setInvitePermission(request.getInvitePermission());
 
-
-        // Lưu lại thông tin member đã cập nhật
         Member updatedMember = memberRepository.save(member);
         return mapToDto(updatedMember);
     }
@@ -81,13 +84,13 @@ public class MemberServiceImpl implements MemberService {
         Long memberId = authService.getMemberIdFromAuthentication();
         if (memberId != null) {
             return memberRepository.findById(memberId)
-                    .orElseThrow(() -> new RuntimeException("Member not found with ID: " + memberId));
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy thành viên với ID: " + memberId));
         }
-
+        // Nếu chưa tồn tại member, lấy thông tin từ authentication
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         Account account = accountRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Account not found with username: " + username));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy tài khoản với username: " + username));
 
         Member newMember = new Member();
         newMember.setAccount(account);
@@ -123,10 +126,10 @@ public class MemberServiceImpl implements MemberService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         Account user = accountRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy người dùng với username: " + username));
 
         if (!BCrypt.checkpw(request.getOldPassword(), user.getPassword())) {
-            throw new RuntimeException("Old password is incorrect");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Mật khẩu cũ không chính xác.");
         }
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));

@@ -1,8 +1,8 @@
-// NotificationController.java
 package org.capstone.backend.controller.notification;
 
+import lombok.RequiredArgsConstructor;
+import org.capstone.backend.dto.notification.NotificationResponse;
 import org.capstone.backend.service.notification.NotificationService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,17 +11,17 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/member/notifications")
+@RequiredArgsConstructor
 public class NotificationController {
 
-    @Autowired
-    private NotificationService notificationService;
+    private final NotificationService notificationService;
 
     @GetMapping
-    public ResponseEntity<List<Map<String, Object>>> getNotifications(
+    public ResponseEntity<NotificationResponse> getNotifications(
             @RequestParam(defaultValue = "10") int limit,
             @RequestParam(required = false) String lastCreatedAt
-    ) throws Exception {
-        List<Map<String, Object>> notifications = notificationService.getNotifications( limit, lastCreatedAt);
+    ) {
+        NotificationResponse notifications = notificationService.getNotifications(limit, lastCreatedAt);
         return ResponseEntity.ok(notifications);
     }
 }

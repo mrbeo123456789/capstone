@@ -15,8 +15,10 @@ import org.capstone.backend.utils.enums.ReportType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -26,14 +28,18 @@ public class ChallengeReportServiceImpl implements ChallengeReportService {
     private final ChallengeRepository challengeRepository;
     private final MemberRepository memberRepository;
     private final AuthService authService;
+
     @Override
     @Transactional
-    public void reportChallenge( ChallengeReportRequestDTO dto) {
+    public void reportChallenge(ChallengeReportRequestDTO dto) {
         Challenge challenge = challengeRepository.findById(dto.getChallengeId())
-                .orElseThrow(() -> new RuntimeException("Challenge not found"));
-
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy thử thách.")
+                );
         Member member = memberRepository.findById(authService.getMemberIdFromAuthentication())
-                .orElseThrow(() -> new RuntimeException("Member not found"));
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy thành viên.")
+                );
 
         ChallengeReport report = ChallengeReport.builder()
                 .challenge(challenge)
@@ -43,19 +49,20 @@ public class ChallengeReportServiceImpl implements ChallengeReportService {
 
         challengeReportRepository.save(report);
     }
+
     @Override
     public Page<ChallengeReportResponseDTO> filterReports(ReportType type, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return challengeReportRepository.filterReportsForAdmin(type, pageable);
     }
 
-
     @Override
     @Transactional
     public void updateReportStatus(Long reportId, ReportStatus newStatus) {
         ChallengeReport report = challengeReportRepository.findById(reportId)
-                .orElseThrow(() -> new RuntimeException("Report not found"));
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy báo cáo.")
+                );
         report.setStatus(newStatus);
     }
-
 }

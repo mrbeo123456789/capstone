@@ -59,19 +59,30 @@ public interface EvidenceRepository extends JpaRepository<Evidence, Long> {
                                                 Pageable pageable);
 
     @Query("""
-SELECT e FROM Evidence e
-WHERE e.challenge.id = :challengeId
-AND (
-    (e.submittedAt < :today)
-    OR
-    (e.submittedAt >= :endDateStart AND e.submittedAt <= :endDateEnd)
-)
+    SELECT e FROM Evidence e
+    WHERE e.challenge.id = :challengeId
+    AND e.member.id = :memberId
+    AND (
+        e.submittedAt < :today
+        OR (e.submittedAt >= :endDateStart AND e.submittedAt <= :endDateEnd)
+    )
+    AND (:status IS NULL OR e.status = :status)
+    ORDER BY\s
+        CASE\s
+            WHEN e.status = 'PENDING' THEN 0
+            WHEN e.status = 'REJECTED' THEN 1
+            WHEN e.status = 'APPROVED' THEN 2
+            ELSE 3
+        END,
+        e.submittedAt DESC
 """)
-    Page<Evidence> findAllowedEvidenceForHost(
+    Page<Evidence> findAllowedEvidenceForHostByMemberIdAndStatus(
             @Param("challengeId") Long challengeId,
+            @Param("memberId") Long memberId,
             @Param("today") LocalDateTime today,
             @Param("endDateStart") LocalDateTime endDateStart,
             @Param("endDateEnd") LocalDateTime endDateEnd,
+            @Param("status") EvidenceStatus status,
             Pageable pageable
     );
 

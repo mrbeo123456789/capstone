@@ -67,11 +67,11 @@ public class DataInitializer implements CommandLineRunner {
         seedAccountsAndMembers();
         seedChallengeTypes();
         seedInterests();
-        seedChallenges();
-        seedChallengeMembers();
-        seedGroups();              // Seed cho Groups nếu chưa có dữ liệu
-        seedGroupChallenges();     // Seed cho GroupChallenge
-        seedTestEvidenceAndReview();
+      //  seedChallenges();
+        //seedChallengeMembers();
+       // seedGroups();              // Seed cho Groups nếu chưa có dữ liệu
+       // seedGroupChallenges();     // Seed cho GroupChallenge
+        //seedTestEvidenceAndReview();
         System.out.println("✅ Data seeding completed successfully.");
     }
 
@@ -291,33 +291,35 @@ public class DataInitializer implements CommandLineRunner {
         List<Member> members = memberRepository.findAll();
         if (challenges.isEmpty() || members.size() < 3) return;
 
-        for (Challenge challenge : challenges) {
-            for (int i = 2; i < members.size(); i++) { // Bỏ qua Host & Co-Host
-                Member submitter = members.get(i);
-                Member reviewer = members.get(1); // Co-Host làm reviewer
+        Challenge challenge = challenges.get(0); // chỉ dùng challenge đầu tiên
+        Member reviewer = members.get(1); // Co-Host làm reviewer
 
-                Evidence evidence = Evidence.builder()
-                        .challenge(challenge)
-                        .member(submitter)
-                        .evidenceUrl("https://example.com/test-video-" + submitter.getId() + ".mp4")
-                        .status(EvidenceStatus.PENDING)
-                        .submittedAt(LocalDateTime.now().minusDays(random.nextInt(30)))
-                        .updatedAt(LocalDateTime.now())
-                        .build();
-                evidenceRepository.save(evidence);
+        for (int i = 2; i < members.size(); i++) { // bỏ qua Host & Co-Host
+            Member submitter = members.get(i);
 
-                EvidenceReport report = EvidenceReport.builder()
-                        .evidence(evidence)
-                        .reviewer(reviewer)
-                        .feedback("Nội dung đạt yêu cầu.")
-                        .isApproved(true)
-                        .updatedBy(reviewer.getId())
-                        .build();
-                evidenceReportRepository.save(report);
-            }
+            Evidence evidence = Evidence.builder()
+                    .challenge(challenge)
+                    .member(submitter)
+                    .evidenceUrl("https://example.com/test-video-" + submitter.getId() + ".mp4")
+                    .status(EvidenceStatus.PENDING)
+                    .submittedAt(LocalDateTime.now().minusDays(random.nextInt(30)))
+                    .updatedAt(LocalDateTime.now())
+                    .build();
+            evidenceRepository.save(evidence);
+
+            EvidenceReport report = EvidenceReport.builder()
+                    .evidence(evidence)
+                    .reviewer(reviewer)
+                    .feedback("Nội dung đạt yêu cầu.")
+                    .isApproved(true)
+                    .updatedBy(reviewer.getId())
+                    .build();
+            evidenceReportRepository.save(report);
         }
-        System.out.println("✅ Seeded evidence and reviews.");
+
+        System.out.println("✅ Seeded 1 evidence per user.");
     }
+
 
     private LocalDateTime randomPastDate(int maxDays) {
         return LocalDateTime.now().minusDays(random.nextInt(maxDays + 1));
