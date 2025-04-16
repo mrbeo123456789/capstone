@@ -12,8 +12,14 @@ import java.util.List;
 
 public interface GroupRepository extends JpaRepository<Groups, Long> {
 
-    @Query("SELECT g FROM Groups g JOIN GroupMember gm ON g.id = gm.group.id WHERE gm.member.id = :memberId and gm.status= 'active'")
+    @Query("""
+    SELECT g FROM Groups g
+    JOIN GroupMember gm ON g.id = gm.group.id
+    WHERE gm.member.id = :memberId
+      AND gm.status = org.capstone.backend.utils.enums.GroupMemberStatus.ACTIVE
+""")
     List<Groups> findByMemberId(@Param("memberId") Long memberId);
+
     @Query("""
         SELECT new org.capstone.backend.dto.group.GroupSummaryDTO(
             g.id,

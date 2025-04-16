@@ -76,7 +76,12 @@ public class GroupServiceImpl implements GroupService {
             dto.setMembers(memberDTOs);
         }
 
-        dto.setCurrentParticipants(group.getMembers().size());
+        // ✅ Only count ACTIVE members
+        dto.setCurrentParticipants(
+                (int) group.getMembers().stream()
+                        .filter(m -> m.getStatus() == GroupMemberStatus.ACTIVE)
+                        .count()
+        );
 
         group.getMembers().stream()
                 .filter(m -> m.getMember().getId().equals(memberId))
