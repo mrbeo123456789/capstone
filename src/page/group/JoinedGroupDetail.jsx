@@ -1,12 +1,9 @@
 import { useState } from "react";
-import GroupHeader from "./GroupHeader";
 import MemberTable from "./MemberTable";
-import { IoCloudUploadOutline } from "react-icons/io5";
-import { FaUsers, FaTrophy, FaFire } from "react-icons/fa";
+import { FaUsers, FaFire } from "react-icons/fa";
 import { useGetGroupDetailQuery } from "../../service/groupService.js";
 import { useParams } from "react-router-dom";
 import MemberListPopup from "../ui/MemberListPopup.jsx";
-import GroupDetailRanking from "./GroupMemberDetail.jsx"; // (You can create it similar to ChallengeInvitePopup)
 
 const JoinedGroupDetail = () => {
     const [activeTab, setActiveTab] = useState("members");
@@ -27,14 +24,15 @@ const JoinedGroupDetail = () => {
     if (isLoading) return <p className="text-center">Loading group data...</p>;
     if (error) return <p className="text-center text-red-500">Failed to load group.</p>;
 
+    // ✅ Map đúng kiểu cũ: name, email, avatar
     const users = group?.members?.map((member) => ({
-        id: member.memberId,
-        name: member.memberName,
-        email: `user${member.memberId}@example.com`,
-        avatar: member.imageUrl,
+        id: member.id,
+        name: member.name || "",    // dùng field name
+        email: member.email || "",  // dùng field email
+        avatar: member.avatar || "", // dùng field avatar
         role: member.role,
         status: member.status,
-        joinDate: member.joinDate
+        joinDate: member.joinDate,
     })) || [];
 
     return (
@@ -44,7 +42,7 @@ const JoinedGroupDetail = () => {
                 <div className="flex flex-col md:flex-row justify-between items-center">
                     <div className="w-full md:pr-6 pb-6 md:pb-0">
                         <div className="flex justify-between">
-                            <h2 className="text-2xl font-bold text-gray-900">{group?.name}</h2>
+                            <h2 className="text-2xl font-bold text-orange-600">{group?.name}</h2>
                             <div className="relative inline-block text-left mb-4">
                                 <button
                                     className="flex flex-col space-y-1 p-2"
@@ -74,8 +72,14 @@ const JoinedGroupDetail = () => {
                             </div>
                         </div>
 
-                        <p className="text-gray-500 mt-2">Group Code: <span className="text-orange-600 font-semibold">{group?.code}</span></p>
-                        <p className="text-gray-500 mt-1">Created At: {new Date(group?.createdAt).toLocaleDateString()}</p>
+                        <p className="text-gray-500 mt-2">
+                            Description: <span className="font-semibold">{group?.description}</span>
+                        </p>
+                        <p className="text-gray-500 mt-1">
+                            Created At: {group?.createdAt ? new Date(
+                            group.createdAt[0], group.createdAt[1] - 1, group.createdAt[2]
+                        ).toLocaleDateString() : ""}
+                        </p>
                     </div>
                     <div className="bg-gray-200 flex items-center justify-center rounded-lg">
                         <img
@@ -104,10 +108,11 @@ const JoinedGroupDetail = () => {
                     ))}
                 </div>
 
-                <div className="shadow-lg rounded-lg w-full mx-auto">
-                    {activeTab === "membersz" && <MemberTable users={users} />}
-                    {activeTab === "members" && <GroupDetailRanking/>}
-                    {activeTab === "challenge" && <div className="text-center text-gray-600">🔥 Challenge Tab Coming Soon!</div>}
+                <div className="shadow-lg rounded-lg w-full mx-auto p-4">
+                    {activeTab === "members" && <MemberTable users={users} />}
+                    {activeTab === "challenge" && (
+                        <div className="text-center text-gray-600">🔥 Challenge Tab Coming Soon!</div>
+                    )}
                 </div>
             </div>
 

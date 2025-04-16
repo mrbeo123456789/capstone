@@ -39,7 +39,10 @@ const MediaUpload = ({ date, onClose, challengeId }) => {
             onClose();
         } catch (err) {
             console.error(err);
-            const errorMessage = err?.data?.error || "❌ Đã xảy ra lỗi khi nộp bằng chứng.";
+            const errorMessage =
+                err?.data?.message ||
+                err?.data?.error ||
+                "❌ Đã xảy ra lỗi khi nộp bằng chứng.";
             toast.error(errorMessage);
         }
     };

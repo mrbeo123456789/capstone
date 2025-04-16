@@ -156,7 +156,7 @@ const YourGroup = () => {
                                 className="cursor-pointer min-w-[150px] border rounded-lg flex flex-col items-center relative flex-shrink-0 hover:shadow-lg transition">
                                 <div className="relative w-full h-24 mb-2">
                                     <img
-                                        src={group.picture || "https://via.placeholder.com/300x200"}
+                                        src={group.picture || "https://firebasestorage.googleapis.com/v0/b/bookstore-f9ac2.appspot.com/o/group%2Fuser-icon-vector.jpg?alt=media&token=7671a36b-07cd-409c-aaa3-4d99853bcaae"}
                                         alt={group.name}
                                         className="w-full h-full object-cover rounded"
                                     />

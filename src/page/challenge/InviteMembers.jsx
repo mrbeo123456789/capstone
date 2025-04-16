@@ -38,7 +38,7 @@ const InviteMembers = ({ onClose }) => {
             return;
         }
         try {
-            await sendInvitation({ challengeId, memberIds: selected });
+            await sendInvitation({ challengeId, memberIds: selected ,type : "MEMBER"});
             toast.success(t("challengeInvite.inviteSuccess"));
             onClose();
         } catch (error) {

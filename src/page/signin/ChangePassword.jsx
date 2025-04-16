@@ -93,7 +93,7 @@ export const ChangePassword = () => {
                                 Save Changes
                             </button>
                             <Link
-                                to="/forgot-password"
+                                to="/forgotPassword"
                                 className="text-orange-600 hover:underline text-sm"
                             >
                                 Forgot Password?

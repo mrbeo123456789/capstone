@@ -1,117 +1,95 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import { IoCloseCircle } from "react-icons/io5";
 import { useSearchMembersMutation, useInviteMembersMutation } from "../../service/groupService.js";
 import { useParams } from "react-router-dom";
-
-const dummyMembers = [
-    { id: 1, name: "John Doe", email: "john@example.com", avatar: "https://randomuser.me/api/portraits/men/1.jpg" },
-    { id: 2, name: "Jane Smith", email: "jane@example.com", avatar: "https://randomuser.me/api/portraits/women/2.jpg" },
-    { id: 3, name: "Michael Brown", email: "michael@example.com", avatar: "https://randomuser.me/api/portraits/men/3.jpg" },
-    { id: 4, name: "Emily Johnson", email: "emily@example.com", avatar: "https://randomuser.me/api/portraits/women/4.jpg" },
-    { id: 5, name: "Alex Lee", email: "alex@example.com", avatar: "https://randomuser.me/api/portraits/men/4.jpg" },
-    { id: 6, name: "Sara Kim", email: "sara@example.com", avatar: "https://randomuser.me/api/portraits/women/5.jpg" },
-];
+import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 const PAGE_SIZE = 4;
 
-const MemberListPopup = ({ onClose}) => {
+const MemberListPopup = ({ onClose }) => {
+    const { t } = useTranslation();
     const [inviteMembers] = useInviteMembersMutation();
-    const [searchMembers, { data, isLoading }] = useSearchMembersMutation();
-    const { id: groupId } = useParams(); // assuming your route is defined like /groups/joins/:id
+    const [searchMembers] = useSearchMembersMutation();
+    const { id: groupId } = useParams();
+
     const [searchTerm, setSearchTerm] = useState("");
     const [selected, setSelected] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [filtered, setFiltered] = useState(null);
-    const displayMembers = filtered || dummyMembers;
+    const [filtered, setFiltered] = useState([]);
 
-    const paginatedMembers = displayMembers.slice(
+    const paginatedMembers = filtered.slice(
         (currentPage - 1) * PAGE_SIZE,
         currentPage * PAGE_SIZE
     );
 
     const handleSearch = async () => {
-        const payload = {
-            keyword: searchTerm,
-        };
+        if (!searchTerm.trim()) {
+            toast.info(t("groupInvite.enterKeyword"));
+            return;
+        }
 
         try {
-            const result = await searchMembers(payload).unwrap();
-            setFiltered(result); // New state to display the result
-            setCurrentPage(1);   // Reset pagination to first page
-        } catch (error) {
-            console.error("Search failed:", error);
+            const result = await searchMembers({ keyword: searchTerm }).unwrap();
+            setFiltered(result);
+            setCurrentPage(1);
+        } catch (err) {
+            toast.error(t("groupInvite.searchFailed"));
         }
     };
 
     useEffect(() => {
-        if (searchTerm.trim() === '') setFiltered(null);
+        if (!searchTerm.trim()) setFiltered([]);
     }, [searchTerm]);
 
-    const filteredMembers = dummyMembers.filter(
-        (member) =>
-            member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            member.email.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    // const paginatedMembers = filteredMembers.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
-
     const handleCheckboxChange = (id) => {
-        if (selected.includes(id)) {
-            setSelected(selected.filter((s) => s !== id));
-        } else {
-            setSelected([...selected, id]);
-        }
+        setSelected((prev) =>
+            prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+        );
     };
 
     const handleInvite = async () => {
-        const memberIds = selected;
-        if (memberIds.length === 0) {
-            alert("Please select at least one member.");
+        if (selected.length === 0) {
+            toast.warn(t("groupInvite.selectAtLeastOne"));
             return;
         }
 
-        const payload = {
-            groupId: groupId,
-            memberIds: memberIds
-        };
-
         try {
-            const res = await inviteMembers(payload).unwrap();
-            alert(res); // e.g., "Lời mời đã được gửi đến các thành viên!"
+            await inviteMembers({ groupId, memberIds: selected });
+            toast.success(t("groupInvite.inviteSuccess"));
             setSelected([]);
-            onClose(); // close popup
-        } catch (error) {
-            console.error("Invite failed:", error);
-            alert("Gửi lời mời thất bại.");
+            onClose();
+        } catch (err) {
+            toast.error(t("groupInvite.inviteFailed"));
         }
     };
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl overflow-hidden animate-fadeIn">
+            <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl overflow-hidden">
                 {/* Header */}
                 <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white p-4 flex justify-between items-center">
-                    <h2 className="text-xl font-bold">Danh sách thành viên</h2>
-                    <button onClick={onClose} className="text-white hover:text-gray-200 transition-colors">
+                    <h2 className="text-xl font-bold">{t("groupInvite.title")}</h2>
+                    <button onClick={onClose} className="text-white hover:text-gray-200">
                         <IoCloseCircle className="text-2xl" />
                     </button>
                 </div>
 
-                {/* Search Bar */}
+                {/* Search */}
                 <div className="p-4">
                     <input
                         type="text"
-                        placeholder="Search by name or email..."
+                        placeholder={t("groupInvite.searchPlaceholder")}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full p-2 border rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                        className="w-full p-2 border rounded-md mb-4 focus:ring-orange-400"
                     />
                     <div className="flex justify-end px-4">
                         <button
                             onClick={handleSearch}
                             className="px-4 py-1 bg-orange-500 text-white rounded hover:bg-orange-600"
                         >
-                            Search
+                            {t("groupInvite.search")}
                         </button>
                     </div>
                 </div>
@@ -124,12 +102,10 @@ const MemberListPopup = ({ onClose}) => {
                             className="flex items-center justify-between bg-orange-50 p-3 mb-3 rounded-lg shadow-sm"
                         >
                             <div className="flex items-center space-x-4">
-                                <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-orange-300">
-                                    <img src={member.avatar} alt={member.name} className="w-full h-full object-cover" />
-                                </div>
+                                <img src={member.avatar} alt={member.name} className="w-14 h-14 rounded-full border-2 border-orange-300" />
                                 <div>
-                                    <p className="font-semibold text-gray-800">{member.name}</p>
-                                    <p className="text-gray-600 text-sm">{member.email}</p>
+                                    <p className="font-semibold">{member.name}</p>
+                                    <p className="text-sm text-gray-600">{member.email}</p>
                                 </div>
                             </div>
                             <input
@@ -145,39 +121,40 @@ const MemberListPopup = ({ onClose}) => {
                     <div className="flex justify-center gap-4 my-4">
                         <button
                             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                            className="px-4 py-1 bg-gray-300 rounded hover:bg-gray-400"
                             disabled={currentPage === 1}
-                        >
-                            Previous
-                        </button>
-                        <span className="text-gray-700">Page {currentPage}</span>
-                        <button
-                            onClick={() =>
-                                setCurrentPage((prev) =>
-                                    prev * PAGE_SIZE < filteredMembers.length ? prev + 1 : prev
-                                )
-                            }
                             className="px-4 py-1 bg-gray-300 rounded hover:bg-gray-400"
-                            disabled={currentPage * PAGE_SIZE >= filteredMembers.length}
                         >
-                            Next
+                            {t("groupInvite.previous")}
+                        </button>
+                        <span className="text-gray-700">
+                            {t("groupInvite.page")} {currentPage}
+                        </span>
+                        <button
+                            onClick={() => {
+                                const total = Math.ceil(filtered.length / PAGE_SIZE);
+                                if (currentPage < total) setCurrentPage(currentPage + 1);
+                            }}
+                            disabled={currentPage * PAGE_SIZE >= filtered.length}
+                            className="px-4 py-1 bg-gray-300 rounded hover:bg-gray-400"
+                        >
+                            {t("groupInvite.next")}
                         </button>
                     </div>
                 </div>
 
                 {/* Footer */}
-                <div className="bg-gray-50 px-6 py-4 flex justify-between border-t border-gray-200">
+                <div className="bg-gray-50 px-6 py-4 flex justify-between border-t">
                     <button
                         onClick={onClose}
-                        className="px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+                        className="px-4 py-2 border border-gray-300 bg-white text-gray-700 rounded hover:bg-gray-100"
                     >
-                        Đóng
+                        {t("groupInvite.close")}
                     </button>
                     <button
                         onClick={handleInvite}
-                        className="px-4 py-2 rounded-md bg-orange-500 text-white hover:bg-orange-600"
+                        className="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600"
                     >
-                        Invite ({selected.length})
+                        {t("groupInvite.invite")} ({selected.length})
                     </button>
                 </div>
             </div>

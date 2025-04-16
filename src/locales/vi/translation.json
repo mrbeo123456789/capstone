@@ -89,6 +89,22 @@
     "cancelButton": "Hủy",
     "createSuccess": "Tạo nhóm thành công!",
     "createFailed": "Tạo nhóm thất bại!"
+  },
+
+  "groupInvite": {
+    "title": "Mời vào nhóm",
+    "searchPlaceholder": "Tìm theo tên hoặc email...",
+    "search": "Tìm kiếm",
+    "close": "Đóng",
+    "invite": "Mời",
+    "previous": "Trước",
+    "next": "Tiếp",
+    "page": "Trang",
+    "selectAtLeastOne": "Vui lòng chọn ít nhất một thành viên.",
+    "inviteSuccess": "Gửi lời mời thành công!",
+    "inviteFailed": "Gửi lời mời thất bại.",
+    "searchFailed": "Tìm kiếm thất bại.",
+    "enterKeyword": "Vui lòng nhập từ khóa."
   }
 
 }

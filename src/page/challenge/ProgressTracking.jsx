@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import MediaUpload from "../ui/MediaUpload.jsx";
-import toast from "react-hot-toast";
+import {toast} from "react-toastify";
 
 const LOCAL_STORAGE_KEY = "markedDays";
 
@@ -119,8 +119,21 @@ export default function ProgressTracking({ challenge, evidence }) {
                                         `}
                             onClick={() => {
                                 if (isCurrentMonth) {
-                                    setSelectedDate(date);
-                                    setShowModal(true);
+                                    const clickedDate = new Date(date);
+                                    const todayDate = new Date();
+                                    if (
+                                        clickedDate.getFullYear() === todayDate.getFullYear() &&
+                                        clickedDate.getMonth() === todayDate.getMonth() &&
+                                        clickedDate.getDate() === todayDate.getDate()
+                                    ) {
+                                        setSelectedDate(date);
+                                        setShowModal(true);
+                                    } else {
+                                        toast.error("Today is not the day to upload evidence.", {
+                                            position: "top-right",
+                                            autoClose: 2500,
+                                        });
+                                    }
                                 }
                             }}
                         >

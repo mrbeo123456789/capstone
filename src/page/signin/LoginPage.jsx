@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLoginMutation } from "../../service/authService.js";
 import { useGetMyProfileQuery } from "../../service/memberService.js";
@@ -95,17 +95,27 @@ export default function Login() {
         window.location.href = "http://localhost:8080/oauth2/authorization/google";
     };
 
-    const handleForgotPassword = () => navigate("/forgot-password");
+    const handleForgotPassword = () => navigate("/forgotPassword");
     const handleRegister = () => navigate("/register");
 
     return (
         <div className="relative min-h-screen bg-black">
             {/* Background */}
-            <div style={{ backgroundImage: `url(${background})` }} className="absolute inset-0 w-full h-screen bg-cover bg-center opacity-50"></div>
+            <div style={{ backgroundImage: `url(https://firebasestorage.googleapis.com/v0/b/bookstore-f9ac2.appspot.com/o/pexels-bess-hamiti-83687-36487.jpg?alt=media&token=f1fb933e-2fe4-4f6f-a604-7eb7e47314fd)` }} className="absolute inset-0 w-full h-screen bg-cover bg-center opacity-50">
+
+            </div>
 
             {/* Logo */}
-            <div className="absolute top-5 left-5">
-                <h1 className="text-red-600 text-4xl font-bold">GoBeyond</h1>
+            <div className="absolute top-5 left-5 flex items-end">
+                <img
+                    src="https://firebasestorage.googleapis.com/v0/b/bookstore-f9ac2.appspot.com/o/logo%2Fimage-removebg-preview.png?alt=media&token=f16618d4-686c-4014-a9cc-99b4cf043c86"
+                    alt="GoBeyond Logo"
+                    className="h-10 rounded-full"
+                />
+                <div className="flex mt-2">
+                    <div className="text-4xl font-bold text-white">Go</div>
+                    <div className="text-4xl font-bold text-yellow-400">Beyond</div>
+                </div>
             </div>
 
             {/* Login Form */}

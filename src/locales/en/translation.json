@@ -92,6 +92,22 @@
     "cancelButton": "Cancel",
     "createSuccess": "Group created successfully!",
     "createFailed": "Failed to create group!"
+  },
+
+  "groupInvite": {
+    "title": "Invite to Group",
+    "searchPlaceholder": "Search by name or email...",
+    "search": "Search",
+    "close": "Close",
+    "invite": "Invite",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page",
+    "selectAtLeastOne": "Please select at least one member.",
+    "inviteSuccess": "Invitation sent successfully!",
+    "inviteFailed": "Failed to send invitation.",
+    "searchFailed": "Failed to search members.",
+    "enterKeyword": "Please enter a keyword."
   }
 
 }

@@ -92,6 +92,22 @@
     "cancelButton": "キャンセル",
     "createSuccess": "グループが正常に作成されました！",
     "createFailed": "グループの作成に失敗しました！"
+  },
+
+  "groupInvite": {
+    "title": "グループに招待",
+    "searchPlaceholder": "名前またはメールで検索...",
+    "search": "検索",
+    "close": "閉じる",
+    "invite": "招待",
+    "previous": "前へ",
+    "next": "次へ",
+    "page": "ページ",
+    "selectAtLeastOne": "少なくとも1人を選択してください。",
+    "inviteSuccess": "招待を送信しました！",
+    "inviteFailed": "招待の送信に失敗しました。",
+    "searchFailed": "検索に失敗しました。",
+    "enterKeyword": "キーワードを入力してください。"
   }
 
 }

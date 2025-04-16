@@ -37,7 +37,7 @@ const GroupForm = () => {
                 formData.append("picture", data.picture);
             }
 
-            await createGroup(formData).unwrap();
+            await createGroup(formData);
             toast.success(t('groupForm.createSuccess'), { autoClose: 2000 }); // ✅ Toastify here
             navigate("/groups/joins");
             reset();

@@ -4,7 +4,6 @@ import RegisterForm from "../page/signin/register.jsx";
 import MemberProfile from "../page/member/MemberProfile.jsx";
 import AuthCallBack from "../page/signin/AuthCallBack.jsx";
 import LoginPage from "../page/signin/LoginPage.jsx";
-import OTPPage from "../page/ui/Otp.jsx";
 import ChallengeForm from "../page/challenge/ChallengeForm.jsx";
 import ChangePassword from "../page/signin/ChangePassword.jsx";
 import HomePage from "../page/ui/HomePage.jsx";
@@ -30,6 +29,8 @@ import AdminChallengeDetail from "../page/admin/detailmodal/ChallengeDetail.jsx"
 import NotFoundPage from "../component/NotFoundPage.jsx";
 import ReportDetail from "../page/admin/detailmodal/ReportDetail.jsx";
 import {AdminRoute, MemberRoute} from "./ProtectRouter.jsx";
+import Statistics from "../page/member/Statistics.jsx";
+import Achievement from "../page/member/Achievement.jsx";
 
 const router = createBrowserRouter([
     { path: "/", element: <Navigate to="/homepage" /> },
@@ -39,10 +40,12 @@ const router = createBrowserRouter([
     { path: "/login", element: <LoginPage /> },
     { path: "/register", element: <RegisterForm /> },
     { path: "/aboutus", element: <AboutUsPage /> },
-    { path: "/forgot-password", element: <ForgotPassword /> },
+    {
+        path: "/forgotPassword",
+        element: <ForgotPassword />,
+    },
     { path: "/enter-otp", element: <EnterOTP /> },
     { path: "/reset-password", element: <ResetPassword /> },
-    { path: "/otp", element: <OTPPage /> },
     { path: "/auth/callback", element: <AuthCallBack /> },
     { path: "/home", element: <Home /> },
 
@@ -62,6 +65,24 @@ const router = createBrowserRouter([
             </MemberRoute>
         ),
         children: [{ index: true, element: <MemberProfile /> }]
+    },
+    {
+        path: "/statistics",
+        element: (
+            <MemberRoute>
+                <Layout />
+            </MemberRoute>
+        ),
+        children: [{ index: true, element: <Statistics /> }]
+    },
+    {
+        path: "/achievement",
+        element: (
+            <MemberRoute>
+                <Layout />
+            </MemberRoute>
+        ),
+        children: [{ index: true, element: <Achievement /> }]
     },
     {
         path: "/password",
