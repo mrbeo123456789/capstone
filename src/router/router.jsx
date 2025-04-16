@@ -31,6 +31,7 @@ import AdminChallengeDetail from "../page/admin/detailmodal/ChallengeDetail.jsx"
 import NotFoundPage from "../component/NotFoundPage.jsx";
 import ReportDetail from "../page/admin/detailmodal/ReportDetail.jsx";
 import AdminSettings from "../page/admin/list/Settings.jsx";
+import {element} from "prop-types";
 const router = createBrowserRouter([
     {
         path: "/", // ✅ Redirect root to homepage
@@ -150,41 +151,40 @@ const router = createBrowserRouter([
         errorElement:<ErrorPage/>,
         children:[
             {
-                path:"/admin/dashboard",
+                path:"dashboard",
                 errorElement:<ErrorPage/>,
                 element: <AdminDashboard/>,
             },
             {
-                path:"/admin/userlist",
+                path:"userlist",
                 errorElement:<ErrorPage/>,
                 element: <UserList/>,
             },
             {
-                path:"/admin/evidencelist",
+                path:"evidencelist",
                 errorElement:<ErrorPage/>,
                 element: <ChallengeEvidencePage/>,
             },
             {
-                path:"/admin/reportlist",
+                path:"reports/*",
                 errorElement:<ErrorPage/>,
                 element: <ReportList/>,
+                children:[{
+                    element: <ReportDetail/>,
+                }
+                ]
             },
             {
-                path:"/admin/reportdetail",
-                errorElement:<ErrorPage/>,
-                element: <ReportDetail/>,
-            },
-            {
-                path:"/admin/grouplist",
+                path:"grouplist",
                 element: <GroupList/>,
             },
             {
-                path:"/admin/challengelist",
+                path:"challengelist",
                 errorElement:<ErrorPage/>,
                 element: <ChallengeList/>,
             },
             {
-                path:"/admin/settings",
+                path:"settings",
                 errorElement:<ErrorPage/>,
                 element: <AdminSettings/>,
             },

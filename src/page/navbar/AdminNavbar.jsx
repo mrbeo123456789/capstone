@@ -174,7 +174,7 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
 
                         <li>
                             <NavLink
-                                to="/admin/reportlist"
+                                to="/admin/reports"
                                 className={({ isActive }) =>
                                     `flex items-center ${
                                         isCollapsed ? "justify-center" : "px-4"

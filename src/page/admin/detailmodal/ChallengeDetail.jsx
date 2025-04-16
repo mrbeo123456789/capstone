@@ -10,7 +10,6 @@ import EvidenceList from "../list/EvidenceList.jsx";
 
 const ChallengeDetail = () => {
     const { id } = useParams();
-    const challengeId = id ? parseInt(id, 10) : null;
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState("info");
     const { data: challenge, error, isLoading, refetch } = useGetChallengeDetailQuery(id);
