@@ -51,10 +51,16 @@ public class ChallengeReportServiceImpl implements ChallengeReportService {
     }
 
     @Override
-    public Page<ChallengeReportResponseDTO> filterReports(ReportType type, int page, int size) {
+    public Page<ChallengeReportResponseDTO> filterReports(String type, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return challengeReportRepository.filterReportsForAdmin(type, pageable);
+
+        ReportType reportType = (type == null || type.isBlank())
+                ? null
+                : ReportType.valueOf(type.toUpperCase());
+
+        return challengeReportRepository.filterReportsForAdmin(reportType, pageable);
     }
+
 
     @Override
     @Transactional
