@@ -1,5 +1,4 @@
-import {createBrowserRouter, Navigate} from "react-router-dom";
-import ErrorPage from "../component/ErrorPage.jsx";
+import {createBrowserRouter, Navigate, Outlet} from "react-router-dom";
 import Layout from "../page/ui/Layout.jsx";
 import RegisterForm from "../page/signin/register.jsx";
 import MemberProfile from "../page/member/MemberProfile.jsx";
@@ -19,7 +18,7 @@ import UserList from "../page/admin/list/UserList.jsx";
 import ChallengeDetail from "../page/challenge/ChallengeDetail.jsx";
 import JoinedChallengeDetail from "../page/challenge/JoinedChallengeDetail.jsx";
 import YourChallenge from "../page/challenge/YourChallenge.jsx";
-import GroupUsers from "../page/group/GroupUsers.jsx";
+import GroupUsers from "../page/group/JoinedGroupDetail.jsx";
 import GroupForm from "../page/group/GroupForm.jsx";
 import YourGroup from "../page/group/YourGroup.jsx";
 import Home from "../heroBanner/Home.jsx";
@@ -30,209 +29,97 @@ import AboutUsPage from "../page/ui/AboutUs.jsx";
 import AdminChallengeDetail from "../page/admin/detailmodal/ChallengeDetail.jsx"
 import NotFoundPage from "../component/NotFoundPage.jsx";
 import ReportDetail from "../page/admin/detailmodal/ReportDetail.jsx";
+import {AdminRoute, MemberRoute} from "./ProtectRouter.jsx";
+
 import AdminSettings from "../page/admin/list/Settings.jsx";
 import {element} from "prop-types";
 const router = createBrowserRouter([
+    { path: "/", element: <Navigate to="/homepage" /> },
+    { path: "*", element: <NotFoundPage /> },
+
+    // Public Pages
+    { path: "/login", element: <LoginPage /> },
+    { path: "/register", element: <RegisterForm /> },
+    { path: "/aboutus", element: <AboutUsPage /> },
+    { path: "/forgot-password", element: <ForgotPassword /> },
+    { path: "/enter-otp", element: <EnterOTP /> },
+    { path: "/reset-password", element: <ResetPassword /> },
+    { path: "/otp", element: <OTPPage /> },
+    { path: "/auth/callback", element: <AuthCallBack /> },
+    { path: "/home", element: <Home /> },
+
+    // Public Homepage
     {
-        path: "/", // ✅ Redirect root to homepage
-        element: <Navigate to="/homepage" />
+        path: "/homepage",
+        element: <Layout />,
+        children: [{ index: true, element: <HomePage /> }]
     },
     {
-        path: "*", // ✅ Redirect root to homepage
-        element: <NotFoundPage></NotFoundPage>
+        path: "/profile",
+        element: (
+            <MemberRoute>
+                <Layout />
+            </MemberRoute>
+        ),
+        children: [{ index: true, element: <MemberProfile /> }]
     },
     {
-        path:"/homepage",
-        errorElement:<ErrorPage/>,
-        element: <Layout></Layout>,
-        children:[
-            {
-                index: true,  // This sets the default page for /member
-                element: <HomePage />  // Replace with your default component
-            }
+        path: "/password",
+        element: (
+            <MemberRoute>
+                <Layout />
+            </MemberRoute>
+        ),
+        children: [{ index: true, element: <ChangePassword /> }]
+    },
+    {
+        path: "/groups",
+        element: (
+            <MemberRoute>
+                <Layout />
+            </MemberRoute>
+        ),
+        children: [
+            { path: "/groups/create", element: <GroupForm /> },
+            { path: "/groups/joins", element: <YourGroup /> },
+            { path: "/groups/joins/:id", element: <GroupUsers /> }
         ]
     },
     {
-        path:"/home",
-        errorElement:<ErrorPage/>,
-        element: <Home/>,
-    },
-    {
-        path:"/login",
-        errorElement:<ErrorPage/>,
-        element: <LoginPage/>,
-    },
-    {
-        path:"/register",
-        errorElement:<ErrorPage/>,
-        element: <RegisterForm />  // Replace with your default component
-    },
-    {
-        path:"/aboutus",
-        errorElement:<ErrorPage/>,
-        element: <AboutUsPage />  // Replace with your default component
+        path: "/challenges",
+        element: (
+            <MemberRoute>
+                <Layout />
+            </MemberRoute>
+        ),
+        children: [
+            { index: true, element: <ChallengePage /> },
+            { path: "/challenges/joins", element: <YourChallenge /> },
+            { path: "/challenges/create", element: <ChallengeForm /> },
+            { path: "/challenges/detail/:id", element: <ChallengeDetail /> },
+            { path: "/challenges/joins/detail/:id", element: <JoinedChallengeDetail /> }
+        ]
     },
 
+    // Admin-only Pages
     {
-        path:"/password",
-        errorElement:<ErrorPage/>,
-        element: <Layout></Layout>,
-        children:[
-            {
-                index: true,  // This sets the default page for /member
-                element: <ChangePassword />  // Replace with your default component
-            }
+        path: "/admin",
+        element: (
+            <AdminRoute>
+                <Outlet />
+            </AdminRoute>
+        ),
+        children: [
+            { path: "/admin/dashboard", element: <AdminDashboard /> },
+            { path: "/admin/userlist", element: <UserList /> },
+            { path: "/admin/evidencelist", element: <ChallengeEvidencePage /> },
+            { path: "/admin/reportlist", element: <ReportList /> },
+            { path: "/admin/reportdetail", element: <ReportDetail /> },
+            { path: "/admin/grouplist", element: <GroupList /> },
+            { path: "/admin/challengelist", element: <ChallengeList /> },
+            { path: "/admin/challenge/:id/detail", element: <AdminChallengeDetail /> }
         ]
     },
-    {
-        path:"/forgot-password",
-        errorElement:<ErrorPage/>,
-        element: <Layout></Layout>,
-        children:[
-            {
-                index: true,  // This sets the default page for /member
-                element: <ForgotPassword />  // Replace with your default component
-            }
-        ]
-    },
-    {
-        path:"/enter-otp",
-        errorElement:<ErrorPage/>,
-        element: <Layout></Layout>,
-        children:[
-            {
-                index: true,  // This sets the default page for /member
-                element: <EnterOTP />  // Replace with your default component
-            }
-        ]
-    },
-    {
-        path:"/reset-password",
-        errorElement:<ErrorPage/>,
-        element: <Layout></Layout>,
-        children:[
-            {
-                index: true,  // This sets the default page for /member
-                element: <ResetPassword />  // Replace with your default component
-            }
-        ]
-    },
-    {
-        path:"/otp",
-        errorElement:<ErrorPage/>,
-        element: <OTPPage/>,
-    },
-    {
-        path:"/auth/callback",
-        errorElement:<ErrorPage/>,
-        element: <AuthCallBack/>,
-    },
-    {
-        path:"/groups",
-        // errorElement:<ErrorPage/>,
-        element: <Layout></Layout>,
-        children:[
-            {
-                path:"/groups/create",
-                element: <GroupForm />
-            },
-            {
-                path:"/groups/joins",
-                element: <YourGroup />
-            },
-            {
-                path:"/groups/joins/:id",
-                element: <GroupUsers />
-            }
-        ]
-    },
-    {
-        path:"/admin",
-        errorElement:<ErrorPage/>,
-        children:[
-            {
-                path:"dashboard",
-                errorElement:<ErrorPage/>,
-                element: <AdminDashboard/>,
-            },
-            {
-                path:"userlist",
-                errorElement:<ErrorPage/>,
-                element: <UserList/>,
-            },
-            {
-                path:"evidencelist",
-                errorElement:<ErrorPage/>,
-                element: <ChallengeEvidencePage/>,
-            },
-            {
-                path:"reports/*",
-                errorElement:<ErrorPage/>,
-                element: <ReportList/>,
-                children:[{
-                    element: <ReportDetail/>,
-                }
-                ]
-            },
-            {
-                path:"grouplist",
-                element: <GroupList/>,
-            },
-            {
-                path:"challengelist",
-                errorElement:<ErrorPage/>,
-                element: <ChallengeList/>,
-            },
-            {
-                path:"settings",
-                errorElement:<ErrorPage/>,
-                element: <AdminSettings/>,
-            },
-            {
-                path:"/admin/challenge/:id/detail",
-                errorElement:<ErrorPage/>,
-                element: <AdminChallengeDetail/>,
-            },
-        ]
-    },
-    {
-        path:"/profile",
-        errorElement:<ErrorPage/>,
-        element: <Layout></Layout>,
-        children:[
-            {
-                index: true,  // This sets the default page for /member
-                element: <MemberProfile />  // Replace with your default component
-            }
-        ]
-    },
-    {
-        path:"/challenges",
-        // errorElement:<ErrorPage/>,
-        element: <Layout></Layout>,
-        children:[
-            {
-                index: true,  // This sets the default page for /member
-                element: <ChallengePage />  // Replace with your default component
-            },
-            {
-                path:"/challenges/joins",
-                element: <YourChallenge />
-            },
-            {
-                path:"/challenges/create",
-                element: <ChallengeForm />
-            },
-            {
-                path:"/challenges/detail/:id",
-                element: <ChallengeDetail />
-            },
-            {
-                path: "/challenges/joins/detail/:id",
-                element: <JoinedChallengeDetail />
-            }
-        ]
-    }
 ]);
 
 export default  router;

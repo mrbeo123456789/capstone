@@ -1,0 +1,97 @@
+{
+  "menu": {
+    "about": "私たちについて",
+    "guide": "ガイド",
+    "challenges": "チャレンジ",
+    "leaderboard": "ランキング",
+    "news": "ニュース",
+    "logout": "ログアウト"
+  },
+
+  "profileUpdated": "プロフィールが正常に更新されました！",
+  "updateFailed": "プロフィールの更新に失敗しました。",
+  "removed": "削除されました",
+  "move": "移動",
+  "undo": "元に戻す",
+  "changePicture": "写真を変更",
+  "uploadHint": "クリックしてアップロードまたはドラッグ＆ドロップ",
+  "uploadSubHint": "SVG、PNG、JPG、またはGIF（最大サイズ800x400px）",
+  "email": "メールアドレス",
+  "username": "ユーザー名",
+  "generalInformation": "基本情報",
+  "fullName": "氏名",
+  "firstName": "名",
+  "lastName": "姓",
+  "dateOfBirth": "生年月日",
+  "gender": "性別",
+  "chooseGender": "性別を選択",
+  "male": "男性",
+  "female": "女性",
+  "other": "その他",
+  "phone": "電話番号",
+  "province": "都道府県",
+  "selectProvince": "都道府県を選択",
+  "district": "市区町村",
+  "selectDistrict": "市区町村を選択",
+  "ward": "町域",
+  "selectWard": "町域を選択",
+  "yourInterest": "あなたの興味",
+  "addInterest": "興味を追加",
+  "updating": "更新中...",
+  "updateProfile": "プロフィールを更新",
+  "selectChallengeType": "チャレンジタイプを選択",
+
+  "challengeInvite": {
+    "memberList": "メンバーリスト",
+    "searchPlaceholder": "名前またはメールアドレスで検索...",
+    "search": "検索",
+    "close": "閉じる",
+    "invite": "招待する",
+    "previous": "前へ",
+    "next": "次へ",
+    "page": "ページ",
+    "selectAtLeastOne": "少なくとも1人のメンバーを選択してください。",
+    "inviteSuccess": "招待が正常に送信されました！",
+    "inviteFailed": "招待の送信に失敗しました。",
+    "searchFailed": "メンバーの検索に失敗しました。",
+    "title": "チャレンジへの招待",
+    "inviteMembers": "メンバーを招待",
+    "inviteGroups": "グループを招待"
+  },
+
+  "sidebar": {
+    "myChallenge": "マイチャレンジ",
+    "myGroup": "マイグループ",
+    "profile": "プロフィール",
+    "password": "パスワード",
+    "achievement": "実績",
+    "statistics": "統計"
+  },
+
+  "invitePermission": {
+    "select": "招待権限を選択",
+    "everyone": "全員が招待できる",
+    "noOne": "誰も招待できない",
+    "sameGroup": "同じグループのメンバーのみ招待できる"
+  },
+
+  "groupForm": {
+    "title": "グループ情報",
+    "groupName": "グループ名",
+    "groupNamePlaceholder": "グループ名を入力してください",
+    "privacy": "プライバシー",
+    "public": "公開",
+    "private": "非公開",
+    "description": "説明",
+    "descriptionPlaceholder": "グループの説明を入力してください",
+    "uploadHint": "クリックしてアップロードまたはドラッグ＆ドロップ",
+    "uploadSubHint": "SVG、PNG、JPG、またはGIF（最大800x400px）",
+    "changePicture": "画像を変更",
+    "creating": "作成中...",
+    "createButton": "グループを作成",
+    "cancelButton": "キャンセル",
+    "createSuccess": "グループが正常に作成されました！",
+    "createFailed": "グループの作成に失敗しました！"
+  }
+
+}

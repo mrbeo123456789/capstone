@@ -1,4 +1,13 @@
 {
+  "menu": {
+    "about": "About",
+    "guide": "Guide",
+    "challenges": "Challenges",
+    "leaderboard": "Leaderboard",
+    "news": "News",
+    "logout": "Logout"
+  },
+
   "profileUpdated": "Profile updated successfully!",
   "updateFailed": "Failed to update profile.",
   "removed": "Removed",
@@ -30,5 +39,59 @@
   "addInterest": "Add Interest",
   "updating": "Updating...",
   "updateProfile": "Update Profile",
-  "selectChallengeType": "Select Challenge Type"
+  "selectChallengeType": "Select Challenge Type",
+
+  "challengeInvite": {
+    "memberList": "Member List",
+    "searchPlaceholder": "Search by name or email...",
+    "search": "Search",
+    "close": "Close",
+    "invite": "Invite",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page",
+    "selectAtLeastOne": "Please select at least one member.",
+    "inviteSuccess": "Invitation sent successfully!",
+    "inviteFailed": "Failed to send invitation.",
+    "searchFailed": "Failed to search members.",
+    "title": "Invite to Challenge",
+    "inviteMembers": "Invite Members",
+    "inviteGroups": "Invite Groups"
+  },
+
+  "sidebar": {
+    "myChallenge": "My Challenge",
+    "myGroup": "My Group",
+    "profile": "Profile",
+    "password": "Password",
+    "achievement": "Achievement",
+    "statistics": "Statistics"
+  },
+
+  "invitePermission": {
+    "select": "Select Invite Permission",
+    "everyone": "Everyone can invite",
+    "noOne": "No one can invite",
+    "sameGroup": "Only same group members can invite"
+  },
+
+  "groupForm": {
+    "title": "Group Information",
+    "groupName": "Group Name",
+    "groupNamePlaceholder": "Enter group name",
+    "privacy": "Privacy",
+    "public": "Public",
+    "private": "Private",
+    "description": "Description",
+    "descriptionPlaceholder": "Describe the group",
+    "uploadHint": "Click to upload or drag and drop",
+    "uploadSubHint": "SVG, PNG, JPG, or GIF (MAX. 800x400px)",
+    "changePicture": "Change Picture",
+    "creating": "Creating...",
+    "createButton": "Create Group",
+    "cancelButton": "Cancel",
+    "createSuccess": "Group created successfully!",
+    "createFailed": "Failed to create group!"
+  }
+
 }
