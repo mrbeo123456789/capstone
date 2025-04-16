@@ -8,7 +8,7 @@ import org.capstone.backend.utils.enums.AccountStatus;
 import org.springframework.data.domain.Page;
 
 public interface AccountService {
-    Page<AccountDTO> getAllAccounts(String keyword, AccountStatus status, int page, int size);
+    Page<AccountDTO> getAllAccounts(String keyword, String  status, int page, int size);
     AccountDTO banAccount(Long id);
     AccountDTO unbanAccount(Long id);
     AccountDetailDTO getAccountDetail(Long id);

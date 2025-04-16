@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public interface MemberService {
     UserProfileResponse getMemberProfile();
-    UserProfileResponse updateMember (UserProfileRequest request, MultipartFile avatar) throws IOException;
+    UserProfileResponse updateMember (UserProfileRequest request, MultipartFile avatar) ;
 
     void changePassword( ChangePasswordRequest request);
 }

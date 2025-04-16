@@ -1,10 +1,13 @@
 package org.capstone.backend.repository;
 
+import org.capstone.backend.dto.member.MemberSubmissionProjection;
 import org.capstone.backend.entity.Challenge;
 import org.capstone.backend.entity.ChallengeMember;
 import org.capstone.backend.entity.Member;
 import org.capstone.backend.utils.enums.ChallengeMemberStatus;
 import org.capstone.backend.utils.enums.ChallengeRole;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -72,5 +75,38 @@ public interface ChallengeMemberRepository extends JpaRepository<ChallengeMember
             "AND c.endDate >= :firstDayOfMonth")
     List<ChallengeMember> findOngoingChallengesForMemberInCurrentMonth(@Param("memberId") Long memberId,
                                                                        @Param("firstDayOfMonth") LocalDate firstDayOfMonth,
+
                                                                        @Param("lastDayOfMonth") LocalDate lastDayOfMonth);
+    @Query(value = """
+        SELECT m.id AS id,
+               m.full_name AS fullName,
+               EXISTS (
+                   SELECT 1
+                   FROM evidence e
+                   WHERE e.member_id = m.id
+                     AND e.challenge_id = :challengeId
+                     AND e.status = 'PENDING'
+               ) AS hasPendingEvidence
+        FROM challenge_member cm
+        JOIN member m ON cm.member_id = m.id
+        WHERE cm.challenge_id = :challengeId
+          AND cm.status = 'JOINED'
+          AND LOWER(m.full_name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+        ORDER BY m.full_name
+        """,
+            countQuery = """
+        SELECT COUNT(*)
+        FROM challenge_member cm
+        JOIN member m ON cm.member_id = m.id
+        WHERE cm.challenge_id = :challengeId
+          AND cm.status = 'JOINED'
+          AND LOWER(m.full_name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+        """,
+            nativeQuery = true)
+    Page<MemberSubmissionProjection> findMembersWithPendingEvidence(
+            @Param("challengeId") Long challengeId,
+            @Param("keyword") String keyword,
+            Pageable pageable
+    );
+
 }

@@ -19,7 +19,7 @@ public interface GroupService {
     GroupResponse getGroupsDetail(Long groupId);
     List<AvailableGroupResponse> getAvailableGroupsToJoinChallenge();
     // ✅ CREATE & UPDATE group
-    Groups createGroup(GroupRequest request, MultipartFile picture);
+    String createGroup(GroupRequest request, MultipartFile picture);
     Groups updateGroup(Long groupId, GroupRequest request);
 
     // ✅ MEMBER ACTIONS

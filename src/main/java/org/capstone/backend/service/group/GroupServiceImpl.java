@@ -27,6 +27,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
+
 @RequiredArgsConstructor
 @Service
 public class GroupServiceImpl implements GroupService {
@@ -38,6 +39,7 @@ public class GroupServiceImpl implements GroupService {
     private final AuthService authService;
     private final GroupChallengeRepository groupChallengeRepository;
     private final ApplicationEventPublisher eventPublisher;
+
     // ========================== GET ==========================
 
     @Override
@@ -52,7 +54,7 @@ public class GroupServiceImpl implements GroupService {
     public GroupResponse getGroupsDetail(Long groupId) {
         Long memberId = authService.getMemberIdFromAuthentication();
         Groups group = groupRepository.findById(groupId)
-                .orElseThrow(() -> new EntityNotFoundException("Group not found with id " + groupId));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy nhóm với id " + groupId));
         return convertToDTO(group, memberId, true);
     }
 
@@ -92,7 +94,7 @@ public class GroupServiceImpl implements GroupService {
                 .id(groupMember.getId())
                 .memberId(groupMember.getMember().getId())
                 .imageUrl(member != null ? member.getAvatar() : "https://example.com/default-avatar.png")
-                .memberName(member != null ? member.getFullName() : "User name not found")
+                .memberName(member != null ? member.getFullName() : "Không tìm thấy tên người dùng")
                 .joinDate(groupMember.getMember().getCreatedAt())
                 .role(groupMember.getRole())
                 .status(groupMember.getStatus())
@@ -102,8 +104,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public List<GroupInvitationDTO> getPendingInvitations() {
         Member member = memberRepository.findById(authService.getMemberIdFromAuthentication())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found"));
-
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy thành viên."));
         return groupMemberRepository.findByMemberAndStatus(member, GroupMemberStatus.PENDING).stream()
                 .map(invite -> GroupInvitationDTO.builder()
                         .groupId(invite.getGroup().getId())
@@ -119,7 +120,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     @Transactional
-    public Groups createGroup(GroupRequest request, MultipartFile picture) {
+    public String createGroup(GroupRequest request, MultipartFile picture) {
         Long memberId = authService.getMemberIdFromAuthentication();
         String pictureUrl = uploadPicture(picture);
 
@@ -131,8 +132,7 @@ public class GroupServiceImpl implements GroupService {
                 .build());
 
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("Member not found"));
-
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy thành viên."));
         groupMemberRepository.save(GroupMember.builder()
                 .group(group)
                 .member(member)
@@ -141,14 +141,14 @@ public class GroupServiceImpl implements GroupService {
                 .createdBy(memberId)
                 .build());
 
-        return group;
+        return "Nhóm '" + group.getName() + "' đã được tạo thành công!";
     }
 
     private String uploadPicture(MultipartFile picture) {
         try {
             return (picture != null && !picture.isEmpty()) ? firebaseUpload.uploadFile(picture, "group") : null;
         } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Upload failed: " + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Tải lên thất bại: " + e.getMessage());
         }
     }
 
@@ -157,8 +157,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Groups updateGroup(Long groupId, GroupRequest request) {
         Groups group = groupRepository.findById(groupId)
-                .orElseThrow(() -> new RuntimeException("Group not found"));
-
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy nhóm."));
         group.setName(request.getName());
         group.setUpdatedBy(authService.getMemberIdFromAuthentication());
         return groupRepository.save(group);
@@ -169,21 +168,18 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public void kickMember(Long groupId, Long memberId) {
         Groups group = groupRepository.findById(groupId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Group not found"));
-
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy nhóm."));
         if (!Objects.equals(group.getCreatedBy(), authService.getMemberIdFromAuthentication())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to kick members from this group");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền xóa thành viên ra khỏi nhóm này.");
         }
-
         GroupMember memberToKick = groupMemberRepository.findByGroupIdAndMemberIdAndStatus(groupId, memberId, GroupMemberStatus.ACTIVE)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found in this group"));
-
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy thành viên trong nhóm này."));
         memberToKick.setStatus(GroupMemberStatus.BANNED);
         eventPublisher.publishEvent(new InvitationSentEvent(
                 memberId.toString(),
                 "Bạn đã bị kick khỏi nhóm",
                 "Bạn đã bị quản trị viên xóa khỏi nhóm '" + group.getName() + "'.",
-                NotificationType. SYSTEM_NOTIFICATION
+                NotificationType.SYSTEM_NOTIFICATION
         ));
         groupMemberRepository.save(memberToKick);
     }
@@ -194,8 +190,7 @@ public class GroupServiceImpl implements GroupService {
                         groupId,
                         authService.getMemberIdFromAuthentication(),
                         GroupMemberStatus.ACTIVE)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "You are not a member of this group"));
-
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Bạn không phải là thành viên của nhóm này."));
         groupMember.setStatus(GroupMemberStatus.LEFT);
         groupMemberRepository.save(groupMember);
     }
@@ -205,13 +200,11 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public void inviteMembers(GroupInviteRequest request) {
         Groups group = groupRepository.findById(request.getGroupId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Group not found"));
-
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy nhóm."));
         List<Member> membersToInvite = memberRepository.findAllById(request.getMemberIds());
         if (membersToInvite.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No members found with provided IDs");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Không tìm thấy thành viên với ID được cung cấp.");
         }
-
         List<GroupMember> invitations = membersToInvite.stream()
                 .filter(member -> !groupMemberRepository.existsByGroupAndMember(group, member))
                 .map(member -> GroupMember.builder()
@@ -222,53 +215,42 @@ public class GroupServiceImpl implements GroupService {
                         .createdBy(group.getCreatedBy())
                         .build())
                 .collect(Collectors.toList());
-
         if (!invitations.isEmpty()) {
             groupMemberRepository.saveAll(invitations);
         }
         eventPublisher.publishEvent(new InvitationSentEvent(
                 request.getMemberIds().toString(),
                 "Bạn có lời mời mới",
-                "Bạn đã nhận được lời mời tham gia nhóm ",
+                "Bạn đã nhận được lời mời tham gia nhóm.",
                 NotificationType.INVITATION));
-
     }
 
     @Override
     public void respondToInvitation(Long groupId, GroupMemberStatus status) {
         Member member = memberRepository.findById(authService.getMemberIdFromAuthentication())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found"));
-
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy thành viên."));
         Groups group = groupRepository.findById(groupId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Group not found"));
-
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy nhóm."));
         GroupMember groupMember = groupMemberRepository.findByGroupAndMember(group, member)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invitation not found"));
-
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy lời mời."));
         groupMember.setStatus(status == GroupMemberStatus.ACCEPTED ? GroupMemberStatus.ACTIVE : status);
         groupMemberRepository.save(groupMember);
     }
 
     // ========================== SEARCH ==========================
+
     @Override
     public List<MemberSearchResponse> searchMembers(MemberSearchRequest request) {
         Pageable pageable = PageRequest.of(0, 20); // Lấy nhiều hơn 5 để đủ sau khi filter
-
         Page<Member> memberPage = memberRepository.searchMembersByKeyword(request.getKeyword(), pageable);
         Long currentMemberId = authService.getMemberIdFromAuthentication();
         List<Member> members = memberPage.getContent();
-
-        // Lấy danh sách ID của các member (loại bỏ currentMemberId)
         List<Long> memberIds = members.stream()
                 .map(Member::getId)
                 .filter(id -> !id.equals(currentMemberId))
-                .toList();
-
-        // Batch query với check trạng thái ACTIVE cho GroupMemberStatus
+                .collect(Collectors.toList());
         List<Long> commonGroupMemberIds = groupMemberRepository.findCommonGroupMemberIds(currentMemberId, memberIds);
         List<Long> alreadyJoinedMemberIds = groupMemberRepository.findAlreadyJoinedActiveMemberIds(currentMemberId, memberIds);
-
-        // Lọc danh sách member theo InvitePermission và loại bỏ những người đã gia nhập nhóm (với trạng thái ACTIVE)
         return members.stream()
                 .filter(m -> !m.getId().equals(currentMemberId))
                 .filter(m -> {
@@ -290,7 +272,7 @@ public class GroupServiceImpl implements GroupService {
                         m.getAccount().getEmail(),
                         m.getAvatar(),
                         m.getFullName(),
-                        "" // lý do có thể để trống
+                        ""
                 ))
                 .collect(Collectors.toList());
     }
@@ -304,52 +286,44 @@ public class GroupServiceImpl implements GroupService {
     @Transactional
     public void disbandGroup(Long groupId) {
         Long memberId = authService.getMemberIdFromAuthentication(); // null nếu là admin
-
         Groups group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nhóm không tồn tại."));
-
         if (memberId != null) {
-            // Member đang đăng nhập → phải là HOST mới được giải tán nhóm
             GroupMember host = groupMemberRepository.findByGroupIdAndMemberId(groupId, memberId)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không tham gia nhóm này."));
-
             if (!Objects.equals(host.getId(), group.getCreatedBy())) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Chỉ host hoặc admin mới có quyền giải tán nhóm.");
             }
         }
-        // ✅ Trước khi xóa, gửi Notification cho tất cả thành viên
         List<GroupMember> members = groupMemberRepository.findByGroupId(groupId);
         members.forEach(m -> {
             eventPublisher.publishEvent(new InvitationSentEvent(
                     m.getMember().getId().toString(),
                     "Nhóm đã bị giải tán",
-                    "Nhóm '" + group.getName() + "' đã bị giải tán .",
-                    NotificationType. SYSTEM_NOTIFICATION
+                    "Nhóm '" + group.getName() + "' đã bị giải tán.",
+                    NotificationType.SYSTEM_NOTIFICATION
             ));
         });
-        // ✅ Nếu là Admin (memberId == null) hoặc là Host → cho phép xóa
-        groupMemberRepository.deleteByGroupId(groupId); // Xóa tất cả thành viên
-        groupRepository.delete(group); // Xóa nhóm
+        groupMemberRepository.deleteByGroupId(groupId);
+        groupRepository.delete(group);
     }
 
     @Override
     public List<AvailableGroupResponse> getAvailableGroupsToJoinChallenge() {
         Long memberId = authService.getMemberIdFromAuthentication();
-
         List<Groups> groups = groupMemberRepository.findAvailableGroupsForMember(memberId);
-
         return groups.stream()
                 .map(group -> new AvailableGroupResponse(
                         group.getId(),
                         group.getName(),
                         group.getPicture()
                 ))
-                .toList();
+                .collect(Collectors.toList());
     }
+
+    @Override
     public Page<GroupChallengeHistoryDTO> getGroupChallengeHistories(Long groupId, GroupChallengeStatus status, int page) {
         Pageable pageable = PageRequest.of(page, 10, Sort.by("joinDate").descending());
         return groupChallengeRepository.findGroupChallengeHistories(groupId, status, pageable);
     }
-
-
 }

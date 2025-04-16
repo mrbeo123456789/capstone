@@ -11,11 +11,11 @@ public interface AuthService {
 
     String loginWithOAuth2(OAuth2User oAuth2User);
 
-    void sendOtpToVerifyAccount(String email) throws Exception;
+    void sendOtpToVerifyAccount(String email) ;
 
     boolean verifyAccount(String email, String otp);
 
-    void sendOtpForPasswordReset(String email) throws Exception;
+    void sendOtpForPasswordReset(String email) ;
 
     boolean resetPassword(String email, String newPassword);
 

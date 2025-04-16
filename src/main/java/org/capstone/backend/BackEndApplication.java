@@ -10,8 +10,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableScheduling
 @EnableAsync
-@EnableJpaAuditing(auditorAwareRef = "auditorAware")
-
 public class BackEndApplication {
 
     public static void main(String[] args) {

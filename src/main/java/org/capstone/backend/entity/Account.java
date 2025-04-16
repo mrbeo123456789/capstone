@@ -7,6 +7,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.capstone.backend.utils.enums.AccountStatus;
 import org.capstone.backend.utils.enums.Role;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -15,6 +20,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)  // Thêm dòng này để Spring quản lý các trường audit
 @Table(name = "account")
 public class Account {
 
@@ -38,16 +44,16 @@ public class Account {
     @Column(nullable = false)
     private AccountStatus status = AccountStatus.INACTIVE; // Mặc định tài khoản chưa kích hoạt
 
-
+    @CreatedDate
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
+    @LastModifiedBy
     @Column(name = "created_by")
     private String createdBy;
-    
+    @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-    
+    @LastModifiedBy
     @Column(name = "updated_by")
     private String updatedBy;
 

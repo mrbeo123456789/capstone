@@ -10,13 +10,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/member/invitations")
 public class InvitationController {
 
     private final InvitationService invitationService;
-
 
     @PostMapping("/send/personal")
     public ResponseEntity<String> sendInvitation(@RequestBody @Valid InviteMemberRequest request) {
@@ -25,12 +25,10 @@ public class InvitationController {
     }
 
     @PostMapping("/respond")
-    public ResponseEntity<String> respondToInvitation(
-            @RequestBody @Valid InvitationRespondRequestDTO request) {
+    public ResponseEntity<String> respondToInvitation(@RequestBody @Valid InvitationRespondRequestDTO request) {
         String response = invitationService.respondToInvitation(request);
         return ResponseEntity.ok(response);
     }
-
 
     @GetMapping("/member")
     public ResponseEntity<List<InvitationResponseDTO>> getInvitationsForMember() {
@@ -39,26 +37,29 @@ public class InvitationController {
     }
 
     @PostMapping("/search")
-    public List<MemberSearchResponse> searchMembers(@RequestBody ChallengeSearchRequest keyword) {
-        return invitationService.searchMembersForChallengeInvite(keyword);
+    public ResponseEntity<List<MemberSearchResponse>> searchMembers(@RequestBody @Valid ChallengeSearchRequest keyword) {
+        List<MemberSearchResponse> members = invitationService.searchMembersForChallengeInvite(keyword);
+        return ResponseEntity.ok(members);
     }
 
     @GetMapping("/suggest/{challengeId}")
-    public List<MemberSearchResponse> getSuggestion(@PathVariable("challengeId") Long challengeId) {
-        return invitationService.suggestMembers(challengeId);
+    public ResponseEntity<List<MemberSearchResponse>> getSuggestion(@PathVariable("challengeId") Long challengeId) {
+        List<MemberSearchResponse> suggestions = invitationService.suggestMembers(challengeId);
+        return ResponseEntity.ok(suggestions);
     }
 
     @PostMapping("/send/group")
-    public ResponseEntity<String> inviteGroupToChallenge(@Valid @RequestBody InviteGroupToChallengeRequest request) {
+    public ResponseEntity<String> inviteGroupToChallenge(@RequestBody @Valid InviteGroupToChallengeRequest request) {
         String responseMessage = invitationService.sendGroupInvitationToChallenge(request);
         return ResponseEntity.ok(responseMessage);
     }
 
     @GetMapping("/{challengeId}/search-leaders")
-    public List<MemberSearchResponse> searchAvailableGroupLeaders(
+    public ResponseEntity<List<MemberSearchResponse>> searchAvailableGroupLeaders(
             @PathVariable Long challengeId,
             @Valid MemberSearchRequest request
     ) {
-        return invitationService.searchAvailableGroupLeaders(challengeId, request.getKeyword());
+        List<MemberSearchResponse> leaders = invitationService.searchAvailableGroupLeaders(challengeId, request.getKeyword());
+        return ResponseEntity.ok(leaders);
     }
 }

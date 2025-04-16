@@ -41,7 +41,10 @@ public class DashboardServiceImpl implements DashboardService {
 
         List<Object[]> statusList = challengeRepository.countChallengesByStatus();
         Map<String, Long> statusMap = statusList.stream()
-                .collect(Collectors.toMap(o -> o[0].toString(), o -> (Long) o[1]));
+                .collect(Collectors.toMap(
+                        o -> o[0].toString(),
+                        o -> (Long) o[1]
+                ));
 
         return DashboardResponseDTO.builder()
                 .totalMembers(memberRepository.count())
@@ -68,19 +71,20 @@ public class DashboardServiceImpl implements DashboardService {
         List<Object[]> memberStats = memberRepository.countNewMembersGroupedByDate(startDate, now);
         List<Object[]> challengeStats = challengeRepository.countNewChallengesGroupedByDate(startDate, now);
 
-        // ✅ Sửa lỗi ép kiểu: o[0] là Date, không phải String
         Map<String, Integer> memberMap = memberStats.stream().collect(Collectors.toMap(
-                o -> o[0].toString(), // ✅ chuyển thành chuỗi bằng toString()
+                o -> o[0].toString(),
                 o -> ((Long) o[1]).intValue()
         ));
 
         Map<String, Integer> challengeMap = challengeStats.stream().collect(Collectors.toMap(
-                o -> o[0].toString(), // ✅ tương tự
+                o -> o[0].toString(),
                 o -> ((Long) o[1]).intValue()
         ));
 
         List<String> dates = Stream.concat(memberMap.keySet().stream(), challengeMap.keySet().stream())
-                .distinct().sorted().toList();
+                .distinct()
+                .sorted()
+                .toList();
 
         List<Integer> newMembers = dates.stream().map(d -> memberMap.getOrDefault(d, 0)).toList();
         List<Integer> newChallenges = dates.stream().map(d -> challengeMap.getOrDefault(d, 0)).toList();
@@ -91,5 +95,4 @@ public class DashboardServiceImpl implements DashboardService {
                 .newChallenges(newChallenges)
                 .build();
     }
-
 }

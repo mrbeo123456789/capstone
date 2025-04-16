@@ -2,6 +2,7 @@ package org.capstone.backend.service.challenge;
 
 import lombok.RequiredArgsConstructor;
 import org.capstone.backend.dto.challenge.*;
+import org.capstone.backend.dto.member.MemberSubmissionProjection;
 import org.capstone.backend.entity.*;
 import org.capstone.backend.event.AchievementTriggerEvent;
 import org.capstone.backend.event.ChallengeRoleUpdatedEvent;
@@ -32,6 +33,17 @@ import java.util.stream.Collectors;
 @Service
 public class ChallengeServiceImpl implements ChallengeService {
 
+    // --- Các thông báo lỗi ---
+    private static final String MEMBER_NOT_FOUND_MSG = "Không tìm thấy thành viên.";
+    private static final String CHALLENGE_NOT_FOUND_MSG = "Không tìm thấy thử thách.";
+    private static final String GROUP_NOT_FOUND_MSG = "Không tìm thấy nhóm.";
+    private static final String UPLOAD_FAILED_MSG = "Tải lên thất bại: ";
+    private static final String CHALLENGE_NOT_JOINABLE = "Thử thách hiện không có sẵn để tham gia.";
+    private static final String CHALLENGE_FULL = "Thử thách đã đầy.";
+    private static final String ALREADY_JOINED_MSG = "Thành viên đã tham gia thử thách này rồi.";
+    private static final String KICK_YOURSELF_MSG = "Bạn không thể kick chính mình.";
+
+    // --- Các dependency được inject ---
     private final ChallengeRepository challengeRepository;
     private final MemberRepository memberRepository;
     private final ChallengeTypeRepository challengeTypeRepository;
@@ -43,123 +55,129 @@ public class ChallengeServiceImpl implements ChallengeService {
     private final GroupChallengeRepository groupChallengeRepository;
     private final GroupRepository groupRepository;
 
-    // Lấy thông tin member hiện tại (nếu có)
+    // --- Phương thức hỗ trợ chung ---
+
+    /**
+     * Lấy thông tin member hiện tại hoặc ném lỗi khi không tìm thấy.
+     */
     private Member getCurrentMember() {
         Long memberId = authService.getMemberIdFromAuthentication();
         return memberRepository.findById(memberId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MEMBER_NOT_FOUND_MSG));
     }
 
-    // Lấy Challenge theo id
-    private Challenge findChallenge(Long challengeId) {
+    /**
+     * Lấy thử thách theo id hoặc ném lỗi khi không tìm thấy.
+     */
+    private Challenge getChallenge(Long challengeId) {
         return challengeRepository.findById(challengeId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Challenge not found."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, CHALLENGE_NOT_FOUND_MSG));
     }
 
-    // Upload file nếu có (dùng Firebase)
+    /**
+     * Upload file nếu có và trả về URL; nếu có lỗi sẽ ném lỗi.
+     */
     private String uploadImageIfPresent(MultipartFile file) {
-        try {
-            if (file != null && !file.isEmpty()) {
+        if (file != null && !file.isEmpty()) {
+            try {
                 return firebaseUpload.uploadFile(file, "evidence");
+            } catch (IOException e) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, UPLOAD_FAILED_MSG + e.getMessage());
             }
-        } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Upload failed: " + e.getMessage());
         }
         return null;
     }
 
-    // ============================
-    // Helper methods để thêm thành viên vào challenge
-    // ============================
-
     /**
-     * Thêm Host (người tạo) vào challenge.
-     * Dùng cho Member tạo challenge.
+     * Gửi sự kiện kích hoạt thành tích.
      */
+    private void publishAchievementEvent(Long memberId, AchievementTriggerEvent.TriggerType triggerType) {
+        eventPublisher.publishEvent(new AchievementTriggerEvent(memberId, triggerType));
+    }
+
+    // --- Các phương thức hỗ trợ quản lý thành viên của thử thách ---
+
     protected void addHostAsChallengeMember(Challenge challenge, Member member) {
         ChallengeMember challengeMember = ChallengeMember.builder()
                 .challenge(challenge)
                 .member(member)
                 .role(ChallengeRole.HOST)
                 .status(ChallengeMemberStatus.JOINED)
-                .groupId(null) // Tham gia cá nhân
+                .groupId(null)
                 .joinBy(member.getId())
                 .createdAt(LocalDateTime.now())
                 .build();
         challengeMemberRepository.save(challengeMember);
     }
 
-    /**
-     * Thêm một thành viên khác vào challenge với vai trò MEMBER.
-     * Nếu groupId != null thì đó là việc join qua group.
-     */
     protected void addParticipantAsChallengeMember(Challenge challenge, Member member, Long groupId) {
-        // Nếu đã tồn tại bản ghi cho member này trong challenge
-        // kiểm tra trạng thái, nếu là KICKED thì không cho tham gia lại.
         challengeMemberRepository.findByChallengeIdAndMemberId(challenge.getId(), member.getId()).ifPresent(existing -> {
             if (existing.getStatus() == ChallengeMemberStatus.KICKED) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                         "Bạn đã bị kick khỏi thử thách và không thể tham gia lại.");
             } else {
-                throw new ResponseStatusException(HttpStatus.CONFLICT,
-                        "Thành viên đã tham gia thử thách này rồi.");
+                throw new ResponseStatusException(HttpStatus.CONFLICT, ALREADY_JOINED_MSG);
             }
         });
-
-        // Nếu chưa có bản ghi nào, tạo mới
         ChallengeMember challengeMember = ChallengeMember.builder()
                 .challenge(challenge)
                 .member(member)
                 .role(ChallengeRole.MEMBER)
                 .status(ChallengeMemberStatus.JOINED)
-                .groupId(groupId) // null đối với tham gia cá nhân
+                .groupId(groupId)
                 .joinBy(member.getId())
                 .createdAt(LocalDateTime.now())
                 .build();
         challengeMemberRepository.save(challengeMember);
     }
 
-    // ============================
-    // Các phương thức public của Service
-    // ============================
-
     /**
-     * Cho Member tham gia thử thách (join cá nhân).
-     * Chỉ cho phép nếu thử thách có trạng thái UPCOMING và chưa đầy.
+     * Kiểm tra quyền kick: nếu caller cố gắng kick chính mình hoặc không đủ quyền thì ném lỗi.
      */
+    private void assertKickPermission(Long callerId, ChallengeMember callerRecord, ChallengeMember targetRecord) {
+        if (callerId.equals(targetRecord.getMember().getId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, KICK_YOURSELF_MSG);
+        }
+        ChallengeRole callerRole = callerRecord.getRole();
+        ChallengeRole targetRole = targetRecord.getRole();
+        if (callerRole == ChallengeRole.HOST) {
+            if (targetRole == ChallengeRole.HOST) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Host không thể kick thành viên có vai trò Host.");
+            }
+        } else if (callerRole == ChallengeRole.CO_HOST) {
+            if (targetRole != ChallengeRole.MEMBER) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Co-Host chỉ có thể kick thành viên thường.");
+            }
+        } else {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền kick thành viên.");
+        }
+    }
+
+    // --- Các phương thức nghiệp vụ của thử thách ---
+
     @Override
     public String joinChallenge(Long challengeId) {
         Member member = getCurrentMember();
-        Challenge challenge = findChallenge(challengeId);
+        Challenge challenge = getChallenge(challengeId);
 
         if (challenge.getStatus() != ChallengeStatus.UPCOMING) {
-            return "Challenge is not currently available for joining.";
+            return CHALLENGE_NOT_JOINABLE;
         }
-
         if (challenge.getChallengeMembers().size() >= challenge.getMaxParticipants()) {
-            return "Challenge is full.";
+            return CHALLENGE_FULL;
         }
-
         addParticipantAsChallengeMember(challenge, member, null);
-
-        eventPublisher.publishEvent(
-                new AchievementTriggerEvent(member.getId(), AchievementTriggerEvent.TriggerType.JOIN_CHALLENGE)
-        );
-        return "Joined challenge successfully.";
+        publishAchievementEvent(member.getId(), AchievementTriggerEvent.TriggerType.JOIN_CHALLENGE);
+        return "Tham gia thử thách thành công.";
     }
 
-    /**
-     * Tạo thử thách.
-     * Nếu có memberId (Member tạo) thì thêm bản ghi ChallengeMember với vai trò HOST.
-     * Nếu không có memberId (Admin tạo) thì chỉ lưu Challenge.
-     */
     @Override
     public String createChallenge(ChallengeRequest request, MultipartFile picture, MultipartFile banner) {
         Long memberId = authService.getMemberIdFromAuthentication();
         boolean isMember = (memberId != null);
 
         ChallengeType challengeType = challengeTypeRepository.findById(request.getChallengeTypeId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ChallengeType not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Loại thử thách không tồn tại."));
 
         String pictureUrl = uploadImageIfPresent(picture);
         String bannerUrl = uploadImageIfPresent(banner);
@@ -183,15 +201,12 @@ public class ChallengeServiceImpl implements ChallengeService {
 
         if (isMember) {
             Member member = memberRepository.findById(memberId)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found"));
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MEMBER_NOT_FOUND_MSG));
             addHostAsChallengeMember(challenge, member);
         }
 
-        eventPublisher.publishEvent(
-                new AchievementTriggerEvent(memberId, AchievementTriggerEvent.TriggerType.CREATE_CHALLENGE)
-        );
-
-        return "Challenge đã được tạo thành công.";
+        publishAchievementEvent(memberId, AchievementTriggerEvent.TriggerType.CREATE_CHALLENGE);
+        return "Thử thách đã được tạo thành công.";
     }
 
     @Override
@@ -199,18 +214,11 @@ public class ChallengeServiceImpl implements ChallengeService {
         return challengeTypeRepository.findAll();
     }
 
-    /**
-     * Phê duyệt/trả về trạng thái của thử thách dựa trên ngày tháng.
-     */
     @Override
     public String reviewChallenge(ReviewChallengeRequest request) {
-        Challenge challenge = findChallenge(request.getChallengeId());
-        ChallengeStatus status;
-        try {
-            status = ChallengeStatus.valueOf(request.getStatus().toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid status value.");
-        }
+        Challenge challenge = getChallenge(request.getChallengeId());
+        ChallengeStatus status = convertChallengeStatus(request.getStatus());
+
         LocalDate now = LocalDate.now();
         if (status == ChallengeStatus.APPROVED) {
             if (challenge.getEndDate().isBefore(now)) {
@@ -221,23 +229,15 @@ public class ChallengeServiceImpl implements ChallengeService {
                 status = ChallengeStatus.ONGOING;
             }
         }
+
         challenge.setStatus(status);
         challenge.setAdminNote(request.getAdminNote());
         challengeRepository.save(challenge);
 
-        // 🔥 Bắn event thông báo thử thách được cập nhật trạng thái
         eventPublisher.publishEvent(new ChallengeStatusUpdatedEvent(challenge, status.name()));
-
-        return "Challenge status updated successfully.";
+        return "Trạng thái thử thách đã được cập nhật thành công.";
     }
 
-
-    /**
-     * Toggle role Co-Host cho một thành viên trong thử thách.
-     * Quyền thực hiện:
-     * - Nếu là Admin (memberId == null) được toggle luôn.
-     * - Nếu là Member, thì phải là Host của thử thách.
-     */
     @Override
     @Transactional
     public void toggleCoHost(Long challengeId, Long targetMemberId) {
@@ -248,34 +248,26 @@ public class ChallengeServiceImpl implements ChallengeService {
             ChallengeMember hostMember = challengeMemberRepository.findHostByChallengeId(challengeId)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Thử thách không có Host."));
             if (!hostMember.getMember().getId().equals(currentMemberId)) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền thay đổi role Co-Host.");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền thay đổi vai trò Co-Host.");
             }
         }
 
         ChallengeMember targetMember = challengeMemberRepository.findByChallengeIdAndMemberId(challengeId, targetMemberId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Thành viên không tham gia thử thách."));
-
         ChallengeRole newRole = (targetMember.getRole() == ChallengeRole.CO_HOST)
                 ? ChallengeRole.MEMBER
                 : ChallengeRole.CO_HOST;
-
         challengeMemberRepository.updateRole(challengeId, targetMemberId, newRole);
-
-        // 🔥 Bắn event thông báo thay đổi role
         eventPublisher.publishEvent(new ChallengeRoleUpdatedEvent(targetMember, newRole));
     }
 
-    /**
-     * Lấy danh sách challenge cho Admin (sử dụng phân trang và query theo tên & trạng thái).
-     */
-    public Page<AdminChallengesResponse> getChallenges(String name, ChallengeStatus status, int page, int size) {
+    @Override
+    public Page<AdminChallengesResponse> getChallenges(String name, String status, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return challengeRepository.findAllByStatusAndPriority(name, status, pageable);
+        ChallengeStatus challengeStatus = convertChallengeStatus(status);
+        return challengeRepository.findAllByStatusAndPriority(name, challengeStatus, pageable);
     }
 
-    /**
-     * Lấy danh sách challenge đã được phê duyệt, chưa được join bởi thành viên.
-     */
     @Override
     public Page<ChallengeResponse> getApprovedChallenges(int page, int size) {
         Long memberId = authService.getMemberIdFromAuthentication();
@@ -283,9 +275,6 @@ public class ChallengeServiceImpl implements ChallengeService {
         return challengeRepository.findApprovedChallengesNotJoined(memberId, pageable);
     }
 
-    /**
-     * Lấy danh sách challenge liên quan đến một member theo role (Host, Member, v.v...).
-     */
     @Override
     public List<MyChallengeResponse> getChallengesByMember(ChallengeRole role) {
         Long memberId = authService.getMemberIdFromAuthentication();
@@ -310,57 +299,46 @@ public class ChallengeServiceImpl implements ChallengeService {
                     remainingDays,
                     avgVotes
             );
-        }).toList();
+        }).collect(Collectors.toList());
     }
 
-    /**
-     * Cho phép nhóm tham gia thử thách.
-     * Kiểm tra các điều kiện:
-     * - Thử thách phải ở trạng thái UPCOMING.
-     * - Group chưa tham gia thử thách nào đang Ongoing.
-     * - Đủ chỗ cho toàn bộ thành viên của group.
-     * - Không có thành viên nào của group đã tham gia thử thách (qua group khác).
-     */
     @Override
     @Transactional
     public String joinGroupToChallenge(Long groupId, Long challengeId) {
         Groups group = groupRepository.findById(groupId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Group not found."));
-        Challenge challenge = findChallenge(challengeId);
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, GROUP_NOT_FOUND_MSG));
+        Challenge challenge = getChallenge(challengeId);
 
         if (challenge.getStatus() != ChallengeStatus.UPCOMING) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Challenge is not available for group joining.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Thử thách hiện không cho phép nhóm tham gia.");
         }
-
         if (groupChallengeRepository.existsByGroupAndStatus(group, GroupChallengeStatus.ONGOING)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Group has already joined a challenge.");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Nhóm đã tham gia một thử thách.");
         }
 
         int currentParticipants = challenge.getChallengeMembers().size();
         List<Member> groupMembers = group.getMembers().stream()
                 .map(GroupMember::getMember)
-                .toList();
+                .collect(Collectors.toList());
 
         if (currentParticipants + groupMembers.size() > challenge.getMaxParticipants()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not enough available spots for the group.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Không đủ chỗ cho nhóm.");
         }
 
         List<Member> alreadyJoined = groupMembers.stream()
                 .filter(member -> challengeMemberRepository.existsByChallengeAndMember(challenge, member))
-                .toList();
+                .collect(Collectors.toList());
         if (!alreadyJoined.isEmpty()) {
             String memberNames = alreadyJoined.stream()
                     .map(Member::getFullName)
                     .collect(Collectors.joining(", "));
             throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "Một số thành viên đã tham gia thử thách qua group khác: " + memberNames);
+                    "Một số thành viên đã tham gia thử thách qua nhóm khác: " + memberNames);
         }
 
         for (Member member : groupMembers) {
             addParticipantAsChallengeMember(challenge, member, groupId);
-            eventPublisher.publishEvent(
-                    new AchievementTriggerEvent(member.getId(), AchievementTriggerEvent.TriggerType.JOIN_CHALLENGE)
-            );
+            publishAchievementEvent(member.getId(), AchievementTriggerEvent.TriggerType.JOIN_CHALLENGE);
         }
 
         GroupChallenge groupChallenge = GroupChallenge.builder()
@@ -372,25 +350,23 @@ public class ChallengeServiceImpl implements ChallengeService {
                 .build();
         groupChallengeRepository.save(groupChallenge);
 
-        return "Group joined the challenge successfully.";
+        return "Nhóm đã tham gia thử thách thành công.";
     }
 
-    /**
-     * Lấy chi tiết challenge cho Member.
-     */
     @Override
     public ChallengeDetailResponse getChallengeDetail(Long challengeId) {
         Long memberId = authService.getMemberIdFromAuthentication();
         return challengeRepository.findChallengeDetailByIdAndMemberId(challengeId, memberId);
     }
+
     @Override
     @Transactional
     public String leaveChallenge(Long challengeId) {
         Member member = getCurrentMember();
-        Challenge challenge = findChallenge(challengeId);
+        Challenge challenge = getChallenge(challengeId);
 
         if (challenge.getStatus() != ChallengeStatus.UPCOMING) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Không thể rời thử thách khi đã bắt đầu hoặc đã kết thúc.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Không thể rời thử thách khi đã bắt đầu hoặc kết thúc.");
         }
 
         ChallengeMember challengeMember = challengeMemberRepository.findByChallengeIdAndMemberId(challenge.getId(), member.getId())
@@ -399,34 +375,29 @@ public class ChallengeServiceImpl implements ChallengeService {
         challengeMemberRepository.save(challengeMember);
         return "Bạn đã rời khỏi thử thách thành công.";
     }
-    /**
-     * Cho phép huỷ thử thách (cancel) nếu thử thách chưa bắt đầu (UPCOMING).
-     * Quyền huỷ: Admin hoặc Host của thử thách.
-     */
+
     @Override
     @Transactional
     public String cancelChallenge(Long challengeId) {
         Long memberId = authService.getMemberIdFromAuthentication();
         boolean isAdmin = (memberId == null);
-        Challenge challenge = findChallenge(challengeId);
+        Challenge challenge = getChallenge(challengeId);
 
         if (challenge.getStatus() != ChallengeStatus.UPCOMING) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Chỉ có thể huỷ thử thách khi nó chưa bắt đầu.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Chỉ có thể huỷ thử thách khi chưa bắt đầu.");
         }
-
         if (!isAdmin) {
             ChallengeMember hostMember = challengeMemberRepository.findHostByChallengeId(challengeId)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Thử thách này không có Host."));
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Thử thách không có Host."));
             if (!hostMember.getMember().getId().equals(memberId)) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền huỷ thử thách này.");
             }
         }
 
-        // ✅ Cập nhật trạng thái CANCELED
         challenge.setStatus(ChallengeStatus.CANCELED);
         challengeRepository.save(challenge);
 
-        // ✅ Gửi Notification cho tất cả thành viên đã tham gia
+        // Gửi thông báo cho tất cả thành viên tham gia qua event
         List<ChallengeMember> challengeMembers = challengeMemberRepository.findByChallenge(challenge);
         for (ChallengeMember cm : challengeMembers) {
             eventPublisher.publishEvent(new InvitationSentEvent(
@@ -436,69 +407,64 @@ public class ChallengeServiceImpl implements ChallengeService {
                     NotificationType.SYSTEM_NOTIFICATION
             ));
         }
-
         return "Thử thách đã được huỷ thành công.";
     }
 
-
-    /**
-     * Cho phép một member rời thử thách nếu thử thách chưa bắt đầu (UPCOMING).
-     * Thay vì xóa record, chỉ cập nhật status = LEFT để lưu lịch sử.
-     */
     @Override
     @Transactional
     public String kickMemberFromChallenge(Long challengeId, Long targetMemberId) {
-        // Lấy thông tin của người thực hiện (caller) từ authentication.
-        // Nếu memberId == null ⇒ caller là Admin.
         Long currentMemberId = authService.getMemberIdFromAuthentication();
         boolean isAdmin = (currentMemberId == null);
 
-        // Lấy bản ghi của target (thành viên cần kick) từ thử thách.
         ChallengeMember targetRecord = challengeMemberRepository.findByChallengeIdAndMemberId(challengeId, targetMemberId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Thành viên không tham gia thử thách."));
 
-        // Nếu caller không phải Admin (tức caller là Member), ta tiến hành kiểm tra quyền:
         if (!isAdmin) {
-            // Lấy bản ghi của caller trong thử thách.
             ChallengeMember callerRecord = challengeMemberRepository.findByChallengeIdAndMemberId(challengeId, currentMemberId)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không tham gia thử thách."));
-
-            // Không cho phép tự kick mình.
-            if (currentMemberId.equals(targetMemberId)) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bạn không thể kick chính mình.");
-            }
-
-            ChallengeRole callerRole = callerRecord.getRole();
-            ChallengeRole targetRole = targetRecord.getRole();
-
-            // Quy tắc:
-            // - Nếu caller là HOST: được kick nếu target là CO_HOST hoặc MEMBER.
-            // - Nếu caller là CO_HOST: chỉ được kick nếu target có vai trò MEMBER.
-            if (callerRole == ChallengeRole.HOST) {
-                if (targetRole == ChallengeRole.HOST) {
-                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Host không thể kick thành viên có vai trò Host.");
-                }
-            } else if (callerRole == ChallengeRole.CO_HOST) {
-                if (targetRole != ChallengeRole.MEMBER) {
-                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Co-Host chỉ có thể kick thành viên thường.");
-                }
-            } else {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền kick thành viên.");
-            }
+            assertKickPermission(currentMemberId, callerRecord, targetRecord);
         }
 
-        // Nếu đến đây, quyền kick đã hợp lệ (Admin luôn được phép).
-        // Cập nhật trạng thái thành LEFT để lưu lại lịch sử.
         targetRecord.setStatus(ChallengeMemberStatus.KICKED);
         challengeMemberRepository.save(targetRecord);
         eventPublisher.publishEvent(new InvitationSentEvent(
                 targetMemberId.toString(),
                 "Bạn đã bị kick khỏi thử thách",
                 "Bạn đã bị quản trị viên xóa khỏi thử thách '" + targetRecord.getChallenge().getName() + "'.",
-                NotificationType. SYSTEM_NOTIFICATION
+                NotificationType.SYSTEM_NOTIFICATION
         ));
         return "Thành viên đã bị kick khỏi thử thách thành công.";
     }
 
+    /**
+     * Chuyển đổi giá trị trạng thái từ chuỗi (không phân biệt chữ hoa chữ thường) sang enum ChallengeStatus.
+     * Nếu giá trị không hợp lệ, ném lỗi Bad Request.
+     */
+    private ChallengeStatus convertChallengeStatus(String status) {
+        if (status == null || status.isBlank()) {
+            return null;
+        }
+        String trimmed = status.trim();
+        for (ChallengeStatus cs : ChallengeStatus.values()) {
+            if (cs.name().equalsIgnoreCase(trimmed)) {
+                return cs;
+            }
+        }
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Giá trị trạng thái không hợp lệ: " + status);
+    }
 
+    public Page<MemberSubmissionProjection> getMembersWithPendingEvidence(
+            Long challengeId, String keyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return challengeMemberRepository.findMembersWithPendingEvidence(challengeId, keyword, pageable);
+    }
+    @Override
+    public Page<MemberSubmissionProjection> getJoinedMembersWithPendingEvidence(
+            Long challengeId, String keyword, int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        return challengeMemberRepository.findMembersWithPendingEvidence(
+                challengeId, keyword == null ? "" : keyword, pageable
+        );
+    }
 }
