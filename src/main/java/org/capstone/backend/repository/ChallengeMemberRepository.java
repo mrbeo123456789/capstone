@@ -89,7 +89,13 @@ public interface ChallengeMemberRepository extends JpaRepository<ChallengeMember
                      AND e.status = 'PENDING'
                ) THEN TRUE 
                ELSE FALSE 
-           END AS hasPendingEvidence
+           END AS hasPendingEvidence,
+           (
+               SELECT COUNT(*)
+               FROM evidence e2
+               WHERE e2.member_id = m.id
+                 AND e2.challenge_id = :challengeId
+           ) AS evidenceCount
     FROM challenge_member cm
     JOIN member m ON cm.member_id = m.id
     WHERE cm.challenge_id = :challengeId
