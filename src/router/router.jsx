@@ -110,14 +110,14 @@ const router = createBrowserRouter([
             </AdminRoute>
         ),
         children: [
-            { path: "/admin/dashboard", element: <AdminDashboard /> },
-            { path: "/admin/userlist", element: <UserList /> },
-            { path: "/admin/evidencelist", element: <ChallengeEvidencePage /> },
-            { path: "/admin/reportlist", element: <ReportList /> },
-            { path: "/admin/reportdetail", element: <ReportDetail /> },
-            { path: "/admin/grouplist", element: <GroupList /> },
-            { path: "/admin/challengelist", element: <ChallengeList /> },
-            { path: "/admin/challenge/:id/detail", element: <AdminChallengeDetail /> }
+            { path: "dashboard", element: <AdminDashboard /> },
+            { path: "userlist", element: <UserList /> },
+            { path: "evidencelist", element: <ChallengeEvidencePage /> },
+            { path: "reports/*", element: <ReportList />, children: [{path: "reports/:reportId/detail",element: <ReportDetail />}] },
+            { path: "reportdetail", element: <ReportDetail /> },
+            { path: "grouplist", element: <GroupList /> },
+            { path: "challengelist", element: <ChallengeList /> },
+            { path: "challenge/:id/detail", element: <AdminChallengeDetail /> }
         ]
     },
 ]);
