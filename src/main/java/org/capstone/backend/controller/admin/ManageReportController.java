@@ -22,8 +22,9 @@ public class ManageReportController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        return challengeReportService.filterReports(ReportType.valueOf(reportType), page, size);
+        return challengeReportService.filterReports(reportType, page, size);
     }
+
 
     @PutMapping("/{reportId}")
     public ResponseEntity<?> updateReportStatus(

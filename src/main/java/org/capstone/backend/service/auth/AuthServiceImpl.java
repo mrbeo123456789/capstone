@@ -143,11 +143,12 @@ public class AuthServiceImpl implements AuthService {
 
         Account account = accountRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy tài khoản."));
-        Member member = memberRepository.findByAccount(account)
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy thành viên."));
 
-        return member.getId();
+        return memberRepository.findByAccount(account)
+                .map(Member::getId)
+                .orElse(null);
     }
+
 
     private void createMemberIfNotExists(Account account) {
         if (memberRepository.findByAccount(account).isEmpty()) {

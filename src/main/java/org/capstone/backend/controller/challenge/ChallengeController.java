@@ -112,7 +112,7 @@ public class ChallengeController {
     }
 
     @GetMapping("/{challengeId}/members")
-    public ResponseEntity<Map<String, Object>> getJoinedMembersWithPendingEvidence(
+    public ResponseEntity<Page<MemberSubmissionProjection>> getJoinedMembersWithPendingEvidence(
             @PathVariable Long challengeId,
             @RequestParam(defaultValue = "") String keyword,
             @RequestParam(defaultValue = "0") int page,
@@ -121,12 +121,7 @@ public class ChallengeController {
         Page<MemberSubmissionProjection> result = challengeService
                 .getJoinedMembersWithPendingEvidence(challengeId, keyword, page, size);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("members", result.getContent());
-        response.put("currentPage", result.getNumber());
-        response.put("totalItems", result.getTotalElements());
-        response.put("totalPages", result.getTotalPages());
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(result);
     }
+
 }

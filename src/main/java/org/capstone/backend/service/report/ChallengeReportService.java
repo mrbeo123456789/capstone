@@ -9,7 +9,7 @@ import org.springframework.data.domain.Page;
 
 public interface ChallengeReportService {
     void reportChallenge( ChallengeReportRequestDTO dto);
-    Page<ChallengeReportResponseDTO> filterReports(ReportType type, int page, int size);
+    Page<ChallengeReportResponseDTO> filterReports(String type, int page, int size);
     void updateReportStatus(Long reportId, ReportStatus newStatus);
 
 }
