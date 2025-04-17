@@ -2,15 +2,15 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import {useCreateChallengeMutation, useGetChallengeTypesQuery} from "../../service/challengeService.js";
+import {useCreateChallengeMutation, useGetChallengeTypesQuery} from "../../../service/challengeService.js";
 import {FaWindowClose} from "react-icons/fa";
 import {IoCloudUploadOutline} from "react-icons/io5";
-import {challengeValidation} from "../../utils/validation.js";
+import {challengeValidation} from "../../../utils/validation.js";
 import {yupResolver} from "@hookform/resolvers/yup";
-import RichTextEditor from "../ui/RichTextEditor.jsx";
+import RichTextEditor from "../../ui/RichTextEditor.jsx";
 import {useTranslation} from "react-i18next";
 
-const CreateChallenge = () => {
+const ChallengeForm = () => {
     const { t } = useTranslation();
     const [createChallenge, { isLoading }] = useCreateChallengeMutation();
     const { data: challengeTypes, challengeTypeLoading, isError } = useGetChallengeTypesQuery();
@@ -38,12 +38,12 @@ const CreateChallenge = () => {
         trigger,
         formState:{ errors, isValid, isDirty}
     } = useForm({
-            mode: "all",
-            resolver: yupResolver(challengeValidation),
-            defaultValues: {
-                startDate: getFormattedDate(today),
-                endDate: getFormattedDate(tomorrow)
-            }
+        mode: "all",
+        resolver: yupResolver(challengeValidation),
+        defaultValues: {
+            startDate: getFormattedDate(today),
+            endDate: getFormattedDate(tomorrow)
+        }
     });
 
     const onSubmit = async (data) => {
@@ -69,8 +69,8 @@ const CreateChallenge = () => {
         // Append all fields dynamically
         Object.keys(processedData).forEach((key) => {
             if (key === "picture" || key === "banner") {
-                if (processedData.picture) {
-                    formData.append("picture", processedData.picture); // File
+                if (processedData[key]) {
+                    formData.append(key, processedData[key]); // File
                 }
             } else {
                 formData.append(key, processedData[key] ?? ""); // Avoid null/undefined
@@ -89,12 +89,19 @@ const CreateChallenge = () => {
                 toast.success("Challenge created successfully!", { id: toastId });
                 reset();
                 setPreview(null);
-                navigate("/challenges");
+                // Navigate to challenge list page
+                navigate("/admin/challengelist");
             } catch (err) {
                 console.log(err);
                 toast.error("Failed to create challenge: " + (err?.data?.message || "Unknown error"), { id: toastId });
             }
         }
+    };
+
+    const handleCancel = () => {
+        // Navigate to challenge list page when canceling
+        console.log("Canceling challenge...");
+        navigate("/admin/challengelist");
     };
 
     const handleFileChange = (event) => {
@@ -308,7 +315,7 @@ const CreateChallenge = () => {
 
                             {/* Max Participants */}
                             <div>
-                            <label className="text-sm font-medium ">Max Participants</label>
+                                <label className="text-sm font-medium ">Max Participants</label>
                                 <span className="text-red-500">*</span>
                                 <input
                                     type="number"
@@ -335,12 +342,14 @@ const CreateChallenge = () => {
 
                         {/* Buttons */}
                         <div className="flex justify-center gap-6 mt-6">
-                        <button type="submit" className="bg-red-600 px-6 py-2 rounded text-white hover:bg-red-700"
+                            <button type="submit" className="bg-red-600 px-6 py-2 rounded text-white hover:bg-red-700"
                                     disabled={isLoading}>
                                 {isLoading ? "Creating..." : "Create"}
                             </button>
-                            <button type="button" className="bg-gray-500 px-6 py-2 rounded text-white hover:bg-gray-600"
-                                    onClick={() => reset()}>
+                            <button
+                                type="button"
+                                className="bg-gray-500 px-6 py-2 rounded text-white hover:bg-gray-600"
+                                onClick={handleCancel}>
                                 Cancel
                             </button>
                         </div>
@@ -351,4 +360,4 @@ const CreateChallenge = () => {
     );
 };
 
-export default CreateChallenge;
+export default ChallengeForm;
