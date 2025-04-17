@@ -8,6 +8,7 @@ const GroupDetailModal = ({ groupId, onClose, onDisbandSuccess }) => {
         isLoading,
         isError
     } = useGetGroupDetailQuery(groupId);
+    console.log(group);
 
     // Group disband mutation
     const [disbandGroup, { isLoading: isDisbanding }] = useDeleteGroupMutation();
@@ -28,10 +29,13 @@ const GroupDetailModal = ({ groupId, onClose, onDisbandSuccess }) => {
     };
 
     // Format date helper
-    const formatDate = (dateString) => {
-        if (!dateString) return "N/A";
-        const date = new Date(dateString);
-        return date.toLocaleString();
+    const formatDate = (dateArray) => {
+        if (!Array.isArray(dateArray) || dateArray.length < 3) return "Invalid date";
+        const [year, month, day] = dateArray;
+        // Nếu số ngày hoặc tháng chỉ có 1 chữ số, thêm số 0 phía trước
+        const dd = day < 10 ? `0${day}` : day;
+        const mm = month < 10 ? `0${month}` : month;
+        return `${dd}/${mm}/${year}`;
     };
 
     if (isLoading) {
@@ -120,11 +124,21 @@ const GroupDetailModal = ({ groupId, onClose, onDisbandSuccess }) => {
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                <span className="text-sm font-medium">Last updated</span>
+                                <span className="text-sm font-medium">Group Leader</span>
                             </div>
-                            <div className="text-gray-800 pl-6">{formatDate(group.updatedAt)}</div>
+                            <div className="text-gray-800 pl-6">{(group.createdBy)}</div>
                         </div>
                     </div>
+                    <div className={"mt-6"}>
+                        <div className="bg-orange-50 p-3 rounded-lg">
+                            <div className="flex items-center mb-1 text-orange-700">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span className="text-sm font-medium">Description</span>
+                            </div>
+                            <div className="text-gray-800 pl-6">{(group.name)}</div>
+                        </div></div>
 
                     {group.members && group.members.length > 0 && (
                         <div className="mt-6">

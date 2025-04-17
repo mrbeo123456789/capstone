@@ -136,30 +136,6 @@ export const adminUserService = createApi({
             },
             invalidatesTags: ["Admin"],
         }),
-        // API filter reports: lấy danh sách báo cáo với tham số reportType, page, size
-        getReports: builder.query({
-            query: ({ reportType = "", page = 0, size = 10 } = {}) => {
-                const params = new URLSearchParams();
-                params.append("page", page);
-                params.append("size", size);
-                if (reportType.trim()) {
-                    params.append("reportType", reportType.trim());
-                }
-                const url = `/admin/reports/all?${params.toString()}`;
-                console.log("Fetching Reports URL:", url);
-                return url;
-            },
-            providesTags: ["Admin"],
-        }),
-
-        // API update report status: cập nhật trạng thái của báo cáo dựa vào reportId và status
-        updateReportStatus: builder.mutation({
-            query: ({ reportId, status }) => ({
-                url: `/admin/reports/${reportId}?status=${encodeURIComponent(status)}`,
-                method: "PUT",
-            }),
-            invalidatesTags: ["Admin"],
-        }),
 
         getChallengeTypes: builder.query({
             query: ({ keyword = "", page = 0, size = 10 } = {}) => {
@@ -243,6 +219,38 @@ export const adminUserService = createApi({
             }),
             invalidatesTags: ["Admin"],
         }),
+        filterReports: builder.query({
+            query: ({ reportType = "", page = 0, size = 10 } = {}) => {
+                const params = new URLSearchParams();
+                params.append("page", page);
+                params.append("size", size);
+                if (reportType.trim()) {
+                    params.append("reportType", reportType.trim());
+                }
+                const url = `/admin/reports/all?${params.toString()}`;
+                console.log("Fetching Reports URL:", url);
+                return url;
+            },
+            providesTags: ["Admin"],
+        }),
+        // Endpoint để cập nhật trạng thái báo cáo dựa vào reportId và status
+        updateReportStatus: builder.mutation({
+            query: ({ reportId, status }) => ({
+                url: `/admin/reports/${reportId}?status=${encodeURIComponent(status)}`,
+                method: "PUT"
+            }),
+            invalidatesTags: ["Admin"],
+        }),
+        getEvidencesByMemberAndChallenge: builder.query({
+            query: ({ memberId, challengeId, page = 0 } = {}) => {
+                const params = new URLSearchParams();
+                params.append("memberId", memberId);
+                params.append("challengeId", challengeId);
+                params.append("page", page);
+                return `/admin/challenges/getEvidence?${params.toString()}`;
+            },
+            providesTags: ["Admin"],
+        }),
     }),
 });
 
@@ -257,8 +265,6 @@ export const {
     useGetGroupsQuery,
     useGetSummaryQuery,
     useGetGrowthQuery,
-    useGetReportsQuery,
-    useUpdateReportStatusMutation,
     useGetChallengeTypesQuery,
     useCreateChallengeTypeMutation,
     useUpdateChallengeTypeMutation,
@@ -267,4 +273,7 @@ export const {
     useCreateInterestMutation,
     useUpdateInterestMutation,
     useDeleteInterestMutation,
+    useFilterReportsQuery,
+    useUpdateReportStatusMutation,
+    useGetEvidencesByMemberAndChallengeQuery,
 } = adminUserService;

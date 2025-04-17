@@ -1,38 +1,32 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FaRegClock } from "react-icons/fa";
-import { FaRunning } from "react-icons/fa";
 import { HiUsers } from "react-icons/hi";
-import {CheckCircle, XCircle, UserX, ArrowLeft, Ban} from "lucide-react";
+import { CheckCircle, XCircle, ArrowLeft, Ban, UserX } from "lucide-react";
 import Footer from "../../../component/footer.jsx";
 import { useGetChallengeDetailQuery } from "../../../service/challengeService.js";
 import { useReviewChallengeMutation } from "../../../service/adminService.js";
-import EvidenceList from "../list/EvidenceList.jsx"; // Import the EvidenceList component
+import EvidenceList from "../list/EvidenceList.jsx";
 
 const ChallengeDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState("info");
-    const [showConfirmModal, setShowConfirmModal] = useState(false);
-    const [confirmAction, setConfirmAction] = useState(null); // 'confirmed' or 'rejected'
-    const [reason, setReason] = useState("");
-    const [showKickModal, setShowKickModal] = useState(false);
-    const [memberToKick, setMemberToKick] = useState(null);
-
-    // Sử dụng API thật qua hook RTK Query để lấy chi tiết challenge
-    const { data: challenge, error, isLoading ,refetch} = useGetChallengeDetailQuery(id);
-    const [reviewChallenge] = useReviewChallengeMutation();
+    const { data: challenge, error, isLoading, refetch } = useGetChallengeDetailQuery(id);
     console.log(challenge);
+    const [reviewChallenge] = useReviewChallengeMutation();
+
     const handleGoBack = () => {
         navigate(-1);
     };
 
     const handleGoToList = () => {
-        navigate('/admin/challengelist'); // Adjust this path to your actual challenge list route
+        navigate('/admin/challengelist');
     };
 
-    // Mở modal xác nhận với challenge_id và hành động (approve/reject)
+    // Xử lý hành động duyệt (APPROVED/REJECTED) dựa trên verificationType và participationType
     const handleAction = async (challengeId, action) => {
+        // Giả sử nếu action là "confirmed" thì muốn set thành "APPROVED", còn nếu "rejected" thì thành "REJECTED"
         const newStatus = action === "confirmed" ? "APPROVED" : "REJECTED";
         try {
             const reviewRequest = { challengeId, status: newStatus };
@@ -43,6 +37,7 @@ const ChallengeDetail = () => {
             console.error(`Error ${action} challenge:`, error);
         }
     };
+
     const banChallenge = async (challengeId) => {
         try {
             const reviewRequest = { challengeId, status: "BANNED" };
@@ -54,35 +49,19 @@ const ChallengeDetail = () => {
         }
     };
 
-    // Mở modal kick thành viên
-    const openKickModal = (member) => {
-        setMemberToKick(member);
-        setReason("");
-        setShowKickModal(true);
+    const kickParticipant = (participantId) => {
+        // Implement kick member functionality here
+        console.log(`Kicking participant with ID: ${participantId}`);
+        // Add actual API call to kick participant
+        alert(`Participant ${participantId} has been kicked from the challenge`);
     };
-
-    // Xử lý khi kick thành viên
-    const handleKickMember = () => {
-        // Ở đây bạn có thể gọi API để kick thành viên khỏi challenge
-        alert(`Đã kick thành viên ${memberToKick.name} với lý do: "${reason}"`);
-        setShowKickModal(false);
-    };
-
-    // Mock data cho bảng xếp hạng - thay thế bằng dữ liệu thật từ API
-    const mockParticipants = [
-        { id: 1, name: "Nguyễn Văn A", score: 1250, rank: 1, avatar: "https://i.pravatar.cc/150?img=1" },
-        { id: 2, name: "Trần Thị B", score: 980, rank: 2, avatar: "https://i.pravatar.cc/150?img=2" },
-        { id: 3, name: "Lê Văn C", score: 875, rank: 3, avatar: "https://i.pravatar.cc/150?img=3" },
-        { id: 4, name: "Phạm Thị D", score: 720, rank: 4, avatar: "https://i.pravatar.cc/150?img=4" },
-        { id: 5, name: "Hoàng Văn E", score: 650, rank: 5, avatar: "https://i.pravatar.cc/150?img=5" }
-    ];
 
     if (isLoading) {
         return (
             <div className="flex items-center justify-center min-h-screen bg-gray-100">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-indigo-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Đang tải thông tin challenge...</p>
+                    <p className="mt-4 text-gray-600">Loading challenge information...</p>
                 </div>
             </div>
         );
@@ -92,13 +71,13 @@ const ChallengeDetail = () => {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-100">
                 <div className="bg-white p-6 rounded-lg shadow-md">
-                    <h2 className="text-red-600 text-xl font-bold mb-2">Lỗi</h2>
-                    <p className="text-gray-700">Có lỗi xảy ra khi tải thông tin challenge!</p>
+                    <h2 className="text-red-600 text-xl font-bold mb-2">Error</h2>
+                    <p className="text-gray-700">Error loading challenge information!</p>
                     <button
                         className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded"
                         onClick={handleGoBack}
                     >
-                        Quay lại
+                        Go back
                     </button>
                 </div>
             </div>
@@ -109,13 +88,13 @@ const ChallengeDetail = () => {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-100">
                 <div className="bg-white p-6 rounded-lg shadow-md">
-                    <h2 className="text-indigo-600 text-xl font-bold mb-2">Không tìm thấy</h2>
-                    <p className="text-gray-700">Không tìm thấy thông tin challenge có ID {id}</p>
+                    <h2 className="text-indigo-600 text-xl font-bold mb-2">Not Found</h2>
+                    <p className="text-gray-700">Could not find challenge with ID {id}</p>
                     <button
                         className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded"
                         onClick={handleGoBack}
                     >
-                        Quay lại
+                        Go back
                     </button>
                 </div>
             </div>
@@ -124,14 +103,14 @@ const ChallengeDetail = () => {
 
     return (
         <div className="flex flex-col min-h-screen bg-gradient-to-br from-orange-100 to-yellow-100">
-            {/* Return button - added to top left */}
+            {/* Return button */}
             <div className="p-4">
                 <button
                     onClick={handleGoToList}
                     className="flex items-center px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 shadow-md transition-colors"
                 >
                     <ArrowLeft size={18} className="mr-2" />
-                    Trở về danh sách
+                    Return to list
                 </button>
             </div>
 
@@ -152,63 +131,74 @@ const ChallengeDetail = () => {
                         </div>
                     )}
                     <div className="bg-gray-100 p-6 md:w-1/3 flex flex-col justify-between">
-                        <h2 className="text-xl font-bold text-gray-900">ĐÁNH GIÁ</h2>
-                        <div className="mt-2">
+                        <h2 className="text-xl font-bold text-gray-900">CHALLENGE INFO</h2>
+                        <div className="mt-2 text-sm text-gray-700">
+                            <p>Challenge Type: {challenge.challengeType}</p>
+                            <p>Verification: {challenge.verificationType ? challenge.verificationType.toString() : "N/A"}</p>
+                            <p>Participation: {challenge.participationType ? challenge.participationType.toString() : "N/A"}</p>
+                            <p>Duration: {challenge.duration} days</p>
+                        </div>
+                        <div className="mt-4 flex items-center">
+                            <FaRegClock className="text-gray-500 mr-2" />
+                            <p className="text-gray-700 text-sm">
+                                {new Date(challenge.startDate).toLocaleDateString('vi-VN')} - {new Date(challenge.endDate).toLocaleDateString('vi-VN')}
+                            </p>
+                        </div>
+                        <div className="mt-4 flex items-center text-lg font-semibold text-orange-500">
+                            <HiUsers className="mr-2" />
+                            <p>{challenge.participantCount} participants</p>
+                        </div>
+                        <div className="mt-4">
                             {(() => {
-                                const status = challenge.status.toUpperCase();
-                                if (status === "PENDING") {
+                                // Chuyển giá trị verificationType thành lowercase
+                                const status = challenge.verificationType
+                                    ? challenge.verificationType.toString().toLowerCase()
+                                    : "";
+                                if (status === "banned" || status === "finish" || status === "cancel") {
+                                    return null;
+                                }
+                                if (status === "pending") {
                                     return (
-                                        <>
+                                        <div className="flex space-x-2">
                                             <button
                                                 className="p-2 bg-green-100 text-green-600 rounded-md hover:bg-green-200 transition-colors"
                                                 onClick={() => handleAction(challenge.id, "confirmed")}
                                             >
-                                                <CheckCircle className="h-5 w-5" />
+                                                <CheckCircle size={18} />
                                             </button>
                                             <button
                                                 className="p-2 bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition-colors"
                                                 onClick={() => handleAction(challenge.id, "rejected")}
                                             >
-                                                <XCircle className="h-5 w-5" />
+                                                <XCircle size={18} />
                                             </button>
-                                        </>
+                                        </div>
                                     );
-                                } else if (status === "REJECTED") {
+                                }
+                                if (status === "rejected") {
                                     return (
-                                        <button
-                                            className="p-2 bg-green-100 text-green-600 rounded-md hover:bg-green-200 transition-colors"
-                                            onClick={() => handleAction(challenge.id, "confirmed")}
-                                        >
-                                            <CheckCircle className="h-5 w-5" />
-                                        </button>
+                                        <div className="flex space-x-2">
+                                            <button
+                                                className="p-2 bg-green-100 text-green-600 rounded-md hover:bg-green-200 transition-colors"
+                                                onClick={() => handleAction(challenge.id, "confirmed")}
+                                            >
+                                                <CheckCircle size={18} />
+                                            </button>
+                                        </div>
                                     );
-                                } else if (status === "BANNED" || status === "FINISH" || status === "CANCELED") {
-                                    return null;
-                                } else {
+                                }
+                                if (status === "ongoing" || status === "upcoming") {
                                     return (
                                         <button
                                             className="p-2 bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition-colors"
                                             onClick={() => banChallenge(challenge.id)}
                                         >
-                                            <Ban className="h-5 w-5" />
+                                            <Ban size={18} />
                                         </button>
                                     );
                                 }
+                                return null;
                             })()}
-                        </div>
-                        <div className="mt-4 flex items-center">
-                            <FaRegClock className="text-gray-500 mr-2"/>
-                            <p className="text-gray-700 text-sm">
-                                Thời gian: {new Date(challenge.startDate).toLocaleDateString('vi-VN')} - {new Date(challenge.endDate).toLocaleDateString('vi-VN')}
-                            </p>
-                        </div>
-                        <div className="mt-4 flex items-center">
-                            <FaRunning className="text-gray-500 mr-2" />
-                            <p className="text-gray-700 text-sm">Trạng thái: {challenge.challengeType}</p>
-                        </div>
-                        <div className="mt-4 flex items-center text-lg font-semibold text-orange-500">
-                            <HiUsers className="mr-2" />
-                            <p>{challenge.participantCount} người đã tham gia</p>
                         </div>
                     </div>
                 </div>
@@ -227,115 +217,92 @@ const ChallengeDetail = () => {
                                 }`}
                             >
                                 {tab === "info"
-                                    ? "Thông tin"
+                                    ? "Information"
                                     : tab === "rules"
-                                        ? "Quy định"
+                                        ? "Rules"
                                         : tab === "rankings"
-                                            ? "Bảng xếp hạng"
-                                            : "Bằng chứng"}
+                                            ? "Rankings"
+                                            : "Evidence"}
                             </button>
                         ))}
                     </div>
 
                     {/* Tab Content */}
                     {activeTab === "evidence" ? (
-                        // Evidence Tab - Full width like Challenge Banner Section
-                        <div className="w-full bg-white shadow-md rounded-lg mt-4">
-                            <EvidenceList challengeData={challenge} />
+                        // Evidence Tab: Chuyển toàn bộ đối tượng challenge sang EvidenceList
+                        <div className="w-full mt-4">
+                            <EvidenceList challengeId={challenge.id} />
                         </div>
                     ) : (
-                        // Other Tabs - Original layout
                         <div className="p-6 bg-white shadow-md rounded-lg mt-4 max-w-4xl mx-auto">
                             {activeTab === "info" && (
                                 <div>
-                                    <h2 className="text-2xl font-bold text-gray-900">
-                                        {challenge.name}
-                                    </h2>
+                                    <h2 className="text-2xl font-bold text-gray-900">{challenge.name}</h2>
                                     <p className="text-gray-500 mt-2">
                                         {new Date(challenge.startDate).toLocaleDateString('vi-VN')} - {new Date(challenge.endDate).toLocaleDateString('vi-VN')}
                                     </p>
-                                    <p className="text-sm text-gray-700 mt-2">
-                                        Người tạo: <span className="text-blue-500 font-semibold">{challenge.created_by}</span>
-                                    </p>
-                                    <p className="text-sm text-gray-700 mt-2">
-                                        Số người tham gia: <span className="text-blue-500 font-semibold">{challenge.participantCount}</span>
-                                    </p>
-
                                     <div className="mt-6 border-t pt-4">
-                                        <h3 className="text-lg font-semibold text-gray-800">
-                                            MÔ TẢ
-                                        </h3>
-                                        <p className="text-gray-700 mt-2">
-                                            {challenge.description}
-                                        </p>
+                                        <h3 className="text-lg font-semibold text-gray-800">DESCRIPTION</h3>
+                                        <p className="text-gray-700 mt-2">{challenge.description}</p>
                                     </div>
-
                                     <div className="mt-6 border-t pt-4">
-                                        <h3 className="text-lg font-semibold text-gray-800">
-                                            TÓM TẮT
-                                        </h3>
+                                        <h3 className="text-lg font-semibold text-gray-800">SUMMARY</h3>
                                         <p className="text-gray-700 mt-2">
-                                            {challenge.summary || "Không có tóm tắt được cung cấp cho thử thách này."}
+                                            {challenge.summary || "No summary provided for this challenge."}
                                         </p>
                                     </div>
                                 </div>
                             )}
+
                             {activeTab === "rules" && (
                                 <div>
-                                    <h3 className="text-lg font-semibold text-gray-800">QUY ĐỊNH</h3>
-                                    <p className="text-gray-700 mt-2">
-                                        {challenge.rule || "Không có quy định được cung cấp cho thử thách này."}
-                                    </p>
+                                    <h2 className="text-2xl font-bold text-gray-900">Challenge Rules</h2>
+                                    <div className="mt-4">
+                                        <p className="text-gray-500 italic">No rules have been specified for this challenge.</p>
+                                    </div>
                                 </div>
                             )}
+
                             {activeTab === "rankings" && (
                                 <div>
-                                    <h3 className="text-lg font-semibold text-gray-800">BẢNG XẾP HẠNG</h3>
-                                    <div className="mt-4 overflow-x-auto">
+                                    <h2 className="text-2xl font-bold text-gray-900 mb-4">Participant Rankings</h2>
+                                    {/* Sử dụng dữ liệu mock cho rankings */}
+                                    <div className="overflow-x-auto">
                                         <table className="min-w-full bg-white">
                                             <thead>
-                                            <tr className="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
-                                                <th className="py-3 px-6 text-left">Xếp hạng</th>
-                                                <th className="py-3 px-6 text-left">Thành viên</th>
-                                                <th className="py-3 px-6 text-right">Điểm số</th>
-                                                <th className="py-3 px-6 text-center">Hành động</th>
+                                            <tr className="bg-orange-100 text-gray-700">
+                                                <th className="py-3 px-4 text-left">Rank</th>
+                                                <th className="py-3 px-4 text-left">Participant</th>
+                                                <th className="py-3 px-4 text-center">Actions</th>
+                                                <th className="py-3 px-4 text-right">Score</th>
                                             </tr>
                                             </thead>
-                                            <tbody className="text-gray-600 text-sm">
-                                            {mockParticipants.map((participant) => (
-                                                <tr key={participant.id} className="border-b border-gray-200 hover:bg-gray-50">
-                                                    <td className="py-3 px-6 text-left whitespace-nowrap">
+                                            <tbody>
+                                            {[
+                                                { id: 1, name: "Nguyễn Văn A", score: 1250, rank: 1, avatar: "https://i.pravatar.cc/150?img=1" },
+                                                { id: 2, name: "Trần Thị B", score: 980, rank: 2, avatar: "https://i.pravatar.cc/150?img=2" },
+                                                { id: 3, name: "Lê Văn C", score: 875, rank: 3, avatar: "https://i.pravatar.cc/150?img=3" },
+                                                { id: 4, name: "Phạm Thị D", score: 720, rank: 4, avatar: "https://i.pravatar.cc/150?img=4" },
+                                                { id: 5, name: "Hoàng Văn E", score: 650, rank: 5, avatar: "https://i.pravatar.cc/150?img=5" },
+                                            ].map((participant) => (
+                                                <tr key={participant.id} className="border-b hover:bg-gray-50">
+                                                    <td className="py-3 px-4 font-medium">#{participant.rank}</td>
+                                                    <td className="py-3 px-4">
                                                         <div className="flex items-center">
-                                                                <span className={`
-                                                                    w-8 h-8 rounded-full flex items-center justify-center
-                                                                    ${participant.rank === 1 ? 'bg-yellow-400' :
-                                                                    participant.rank === 2 ? 'bg-gray-300' :
-                                                                        participant.rank === 3 ? 'bg-orange-300' : 'bg-gray-200'}
-                                                                    text-white font-bold
-                                                                `}>
-                                                                    {participant.rank}
-                                                                </span>
-                                                        </div>
-                                                    </td>
-                                                    <td className="py-3 px-6 text-left">
-                                                        <div className="flex items-center">
-                                                            <div className="mr-2">
-                                                                <img className="w-8 h-8 rounded-full" src={participant.avatar} alt={participant.name} />
-                                                            </div>
+                                                            <img src={participant.avatar} alt={participant.name} className="h-8 w-8 rounded-full mr-3" />
                                                             <span>{participant.name}</span>
                                                         </div>
                                                     </td>
-                                                    <td className="py-3 px-6 text-right">
-                                                        <span className="font-bold">{participant.score}</span>
-                                                    </td>
-                                                    <td className="py-3 px-6 text-center">
+                                                    <td className="py-3 px-4 text-center">
                                                         <button
-                                                            onClick={() => openKickModal(participant)}
-                                                            className="bg-red-100 text-red-600 py-1 px-3 rounded-full text-xs flex items-center justify-center mx-auto hover:bg-red-200"
+                                                            onClick={() => kickParticipant(participant.id)}
+                                                            className="p-2 bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition-colors"
+                                                            title="Kick member"
                                                         >
-                                                            <UserX className="h-3 w-3 mr-1" /> Kick
+                                                            <UserX size={18} />
                                                         </button>
                                                     </td>
+                                                    <td className="py-3 px-4 text-right font-semibold">{participant.score}</td>
                                                 </tr>
                                             ))}
                                             </tbody>
@@ -347,91 +314,6 @@ const ChallengeDetail = () => {
                     )}
                 </div>
             </div>
-
-            {/* Modal xác nhận Approve/Reject */}
-            {showConfirmModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
-                        <h2 className="text-xl font-bold mb-4 text-gray-700">
-                            Confirm {confirmAction === 'confirmed' ? 'Approve' : 'Reject'}?
-                        </h2>
-                        <p className="text-gray-600 mb-4">
-                            Are you sure {confirmAction === 'confirmed' ? 'approve' : 'reject'} this challenge?
-                        </p>
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Lý do (tuỳ chọn):</label>
-                            <textarea
-                                className="w-full border border-gray-300 rounded p-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                                rows="3"
-                                placeholder="Nhập lý do..."
-                                value={reason}
-                                onChange={(e) => setReason(e.target.value)}
-                            />
-                        </div>
-                        <div className="flex justify-end space-x-3">
-                            <button
-                                onClick={() => setShowConfirmModal(false)}
-                                className="px-4 py-2 rounded border border-gray-300 text-gray-600 hover:bg-gray-50"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={handleConfirmAction}
-                                className={`px-4 py-2 rounded text-white ${
-                                    confirmAction === 'confirmed'
-                                        ? 'bg-green-500 hover:bg-green-600'
-                                        : 'bg-red-500 hover:bg-red-600'
-                                }`}
-                            >
-                                OK
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Modal xác nhận Kick thành viên */}
-            {showKickModal && memberToKick && (
-                <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
-                        <h2 className="text-xl font-bold mb-4 text-gray-700">
-                            Confirm kick member
-                        </h2>
-                        <div className="flex items-center mb-4">
-                            <img className="w-10 h-10 rounded-full mr-3" src={memberToKick.avatar} alt={memberToKick.name} />
-                            <span className="font-medium">{memberToKick.name}</span>
-                        </div>
-                        <p className="text-gray-600 mb-4">
-                            Do you sure to kick this member from the challenge?
-                        </p>
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Lý do loại bỏ:</label>
-                            <textarea
-                                className="w-full border border-gray-300 rounded p-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                                rows="3"
-                                placeholder="Reason why you delete ..."
-                                value={reason}
-                                onChange={(e) => setReason(e.target.value)}
-                                required
-                            />
-                        </div>
-                        <div className="flex justify-end space-x-3">
-                            <button
-                                onClick={() => setShowKickModal(false)}
-                                className="px-4 py-2 rounded border border-gray-300 text-gray-600 hover:bg-gray-50"
-                            >
-                                Hủy
-                            </button>
-                            <button
-                                onClick={handleKickMember}
-                                className="px-4 py-2 rounded text-white bg-red-500 hover:bg-red-600"
-                            >
-                                Loại bỏ
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
 
             <Footer />
         </div>

@@ -78,6 +78,18 @@ export const challengeService = createApi({
         getChallengeDetail: builder.query({
             query: (challengeId) => `/challenges/${challengeId}/detail`,
         }),
+        getJoinedMembersWithPendingEvidence: builder.query({
+            query: ({ challengeId, keyword = "", page = 0, size = 10 } = {}) => {
+                const params = new URLSearchParams();
+                if (keyword.trim()) {
+                    params.append("keyword", keyword.trim());
+                }
+                params.append("page", page);
+                params.append("size", size);
+                return `/challenges/${challengeId}/members?${params.toString()}`;
+            },
+            providesTags: ["Challenge"]
+        }),
     }),
 });
 
@@ -91,5 +103,6 @@ export const {
     useJoinChallengeMutation, // <--- Add this!
     useGetMyChallengesMutation,
     useGetChallengeDetailQuery, // ✅ Thêm dòng này
+    useGetJoinedMembersWithPendingEvidenceQuery,
 } = challengeService;
 
