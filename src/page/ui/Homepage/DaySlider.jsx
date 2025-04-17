@@ -46,7 +46,7 @@ const DaySlider = () => {
     }, []);
 
     return (
-        <div className="bg-white p-4 rounded-3xl shadow-lg w-full text-center">
+        <div className="bg-white p-4 shadow-lg w-full text-center h-full rounded-2xl">
             {/* Header */}
             <div className="flex justify-between px-4 mb-4">
                 <h2 className="text-xl font-semibold">Hoje</h2>

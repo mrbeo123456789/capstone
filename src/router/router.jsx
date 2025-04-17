@@ -32,115 +32,74 @@ import {AdminRoute, MemberRoute} from "./ProtectRouter.jsx";
 import Statistics from "../page/member/Statistics.jsx";
 import Achievement from "../page/member/Achievement.jsx";
 
-import AdminSettings from "../page/admin/list/Settings.jsx";
-import {element} from "prop-types";
 const router = createBrowserRouter([
     { path: "/", element: <Navigate to="/homepage" /> },
     { path: "*", element: <NotFoundPage /> },
 
-    // Public Pages
+    // Public layout for non-authenticated pages
+    {
+        path: "/",
+        element: <Layout />, // ✅ Layout wraps all main pages
+        children: [
+            { path: "homepage", element: <HomePage /> },
+            { path: "aboutus", element: <AboutUsPage /> },
+            { path: "profile", element: <MemberRoute><MemberProfile /></MemberRoute> },
+            { path: "statistics", element: <MemberRoute><Statistics /></MemberRoute> },
+            { path: "achievement", element: <MemberRoute><Achievement /></MemberRoute> },
+            { path: "password", element: <MemberRoute><ChangePassword /></MemberRoute> },
+            {
+                path: "challenges",
+                element: <MemberRoute><Outlet /></MemberRoute>,
+                children: [
+                    { index: true, element: <ChallengePage /> },
+                    { path: "joins", element: <YourChallenge /> },
+                    { path: "create", element: <ChallengeForm /> },
+                    { path: "detail/:id", element: <ChallengeDetail /> },
+                    { path: "joins/detail/:id", element: <JoinedChallengeDetail /> }
+                ]
+            },
+            {
+                path: "groups",
+                element: <MemberRoute><Outlet /></MemberRoute>,
+                children: [
+                    { path: "create", element: <GroupForm /> },
+                    { path: "joins", element: <YourGroup /> },
+                    { path: "joins/:id", element: <GroupUsers /> }
+                ]
+            },
+        ]
+    },
+
+    // Standalone auth pages (outside layout)
     { path: "/login", element: <LoginPage /> },
     { path: "/register", element: <RegisterForm /> },
-    { path: "/aboutus", element: <AboutUsPage /> },
-    {
-        path: "/forgotPassword",
-        element: <ForgotPassword />,
-    },
+    { path: "/forgotPassword", element: <ForgotPassword /> },
     { path: "/enter-otp", element: <EnterOTP /> },
     { path: "/reset-password", element: <ResetPassword /> },
     { path: "/auth/callback", element: <AuthCallBack /> },
     { path: "/home", element: <Home /> },
 
-    // Public Homepage
-    {
-        path: "/homepage",
-        element: <Layout />,
-        children: [{ index: true, element: <HomePage /> }]
-    },
-    {
-        path: "/profile",
-        element: (
-            <MemberRoute>
-                <Layout />
-            </MemberRoute>
-        ),
-        children: [{ index: true, element: <MemberProfile /> }]
-    },
-    {
-        path: "/statistics",
-        element: (
-            <MemberRoute>
-                <Layout />
-            </MemberRoute>
-        ),
-        children: [{ index: true, element: <Statistics /> }]
-    },
-    {
-        path: "/achievement",
-        element: (
-            <MemberRoute>
-                <Layout />
-            </MemberRoute>
-        ),
-        children: [{ index: true, element: <Achievement /> }]
-    },
-    {
-        path: "/password",
-        element: (
-            <MemberRoute>
-                <Layout />
-            </MemberRoute>
-        ),
-        children: [{ index: true, element: <ChangePassword /> }]
-    },
-    {
-        path: "/groups",
-        element: (
-            <MemberRoute>
-                <Layout />
-            </MemberRoute>
-        ),
-        children: [
-            { path: "/groups/create", element: <GroupForm /> },
-            { path: "/groups/joins", element: <YourGroup /> },
-            { path: "/groups/joins/:id", element: <GroupUsers /> }
-        ]
-    },
-    {
-        path: "/challenges",
-        element: (
-            <MemberRoute>
-                <Layout />
-            </MemberRoute>
-        ),
-        children: [
-            { index: true, element: <ChallengePage /> },
-            { path: "/challenges/joins", element: <YourChallenge /> },
-            { path: "/challenges/create", element: <ChallengeForm /> },
-            { path: "/challenges/detail/:id", element: <ChallengeDetail /> },
-            { path: "/challenges/joins/detail/:id", element: <JoinedChallengeDetail /> }
-        ]
-    },
-
-    // Admin-only Pages
+    // Admin-only layout
     {
         path: "/admin",
-        element: (
-            <AdminRoute>
-                <Outlet />
-            </AdminRoute>
-        ),
+        element: <AdminRoute><Outlet /></AdminRoute>,
         children: [
             { path: "dashboard", element: <AdminDashboard /> },
             { path: "userlist", element: <UserList /> },
             { path: "evidencelist", element: <ChallengeEvidencePage /> },
-            { path: "reports/*", element: <ReportList />, children: [{path: "reports/:reportId/detail",element: <ReportDetail />}] },
+            {
+                path: "reports",
+                children: [
+                    { index: true, element: <ReportList /> },
+                    { path: ":reportId/detail", element: <ReportDetail /> }
+                ]
+            },
             { path: "reportdetail", element: <ReportDetail /> },
             { path: "grouplist", element: <GroupList /> },
             { path: "challengelist", element: <ChallengeList /> },
             { path: "challenge/:id/detail", element: <AdminChallengeDetail /> }
         ]
-    },
+    }
 ]);
 
 export default  router;

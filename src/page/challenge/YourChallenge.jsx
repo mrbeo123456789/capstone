@@ -159,7 +159,7 @@ const YourChallenge = () => {
                             <div
                                 key={challenge.id}
                                 onClick={() => navigate(`/challenges/joins/detail/${challenge.id}`)}
-                                className="cursor-pointer min-w-[150px] border rounded-lg flex flex-col items-center relative flex-shrink-0 hover:shadow-lg transition"
+                                className="cursor-pointer min-w-[175px] max-w-[175px] max-h-[200px] border rounded-lg flex flex-col items-center relative flex-shrink-0 hover:shadow-lg transition"
                             >
                                 <div className="relative w-full h-24 mb-2">
                                     <img
@@ -171,7 +171,7 @@ const YourChallenge = () => {
                                         <span className="absolute top-2 left-2 text-yellow-400 text-xl drop-shadow-md">👑</span>
                                     )}
                                 </div>
-                                <p className="font-medium text-center mb-2">{challenge.name}</p>
+                                <p className="font-medium text-center mb-2 overflow-hidden">{challenge.name}</p>
                                 {(() => {
                                     const { text, bg, textColor } = getStatusStyle(challenge.status);
                                     return (

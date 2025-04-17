@@ -9,7 +9,15 @@ import {useGetChallengeDetailQuery} from "../../service/challengeService.js";
 import Description from "./Description.jsx";
 import ProgressTracking from "./ProgressTracking.jsx";
 import {useGetMyEvidencesByChallengeQuery} from "../../service/evidenceService.js";
-import {FaCheckCircle, FaClipboardCheck, FaInfoCircle, FaStar, FaTrophy} from "react-icons/fa";
+import {
+    FaCheckCircle,
+    FaClipboardCheck, FaEdit, FaFlag,
+    FaInfoCircle, FaShareAlt,
+    FaSignOutAlt,
+    FaStar,
+    FaTrophy,
+    FaUserPlus
+} from "react-icons/fa";
 import ChallengeInvitePopup from "./ChallengeInvitePopup.jsx";
 
 const JoinedChallengeDetail = () => {
@@ -21,7 +29,6 @@ const JoinedChallengeDetail = () => {
         { key: "proof", label: "Proof", icon: <FaCheckCircle /> },
         { key: "ranking", label: "Ranking", icon: <FaTrophy /> },
         { key: "review", label: "Review", icon: <FaClipboardCheck /> },
-        { key: "vote", label: "Vote Other", icon: <FaStar /> },
         { key: "description", label: "Description", icon: <FaInfoCircle /> },
     ];
 
@@ -57,38 +64,38 @@ const JoinedChallengeDetail = () => {
                     <div className="w-full md:w-3/5 md:pr-6 pb-6 md:pb-0">
                         <div className="flex justify-between">
                             <h2 className="text-2xl font-bold text-gray-900">{challenge?.name}</h2>
-                            <div className="relative inline-block text-left mb-4">
+                            <div className="flex gap-3 items-center mb-4">
                                 <button
-                                    className="flex flex-col space-y-1 p-2"
-                                    onClick={() => setMenuOpen((prev) => !prev)}
+                                    title="Invite"
+                                    onClick={openInviteMember}
+                                    className="text-orange-500 hover:text-orange-700 text-xl"
                                 >
-                                    <span className="block w-6 h-1 bg-orange-400"></span>
-                                    <span className="block w-6 h-1 bg-orange-400"></span>
-                                    <span className="block w-6 h-1 bg-orange-400"></span>
+                                    <FaUserPlus/>
                                 </button>
 
-                                {menuOpen && (
-                                    <div
-                                        className="absolute z-10 mt-2 w-44 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
-                                        <div className="py-1">
-                                            <button onClick={() => openInviteMember()}
-                                                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">Invite
-                                            </button>
-                                            <button
-                                                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">Leave
-                                            </button>
-                                            <button
-                                                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">Edit
-                                            </button>
-                                            <button
-                                                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">Share
-                                            </button>
-                                            <button
-                                                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">Report
-                                            </button>
-                                        </div>
-                                    </div>
-                                )}
+                                <button
+                                    title="Leave"
+                                    onClick={() => console.log("Leave")}
+                                    className="text-red-500 hover:text-red-700 text-xl"
+                                >
+                                    <FaSignOutAlt/>
+                                </button>
+
+                                <button
+                                    title="Share"
+                                    onClick={() => console.log("Share")}
+                                    className="text-blue-500 hover:text-blue-700 text-xl"
+                                >
+                                    <FaShareAlt/>
+                                </button>
+
+                                <button
+                                    title="Report"
+                                    onClick={() => console.log("Report")}
+                                    className="text-red-500 hover:text-red-700 text-xl"
+                                >
+                                    <FaFlag/>
+                                </button>
                             </div>
                         </div>
                         <p className="text-gray-500 mt-2">
@@ -142,7 +149,6 @@ const JoinedChallengeDetail = () => {
                 )}
                 {activeTab === "ranking" && <RankingList/>}
                 {activeTab === "review" && <VoteOther />} {/* ← This is now Review tab */}
-                {activeTab === "vote" && <VoteOther/>}
                 {activeTab === "description" && <Description content={challenge?.description}/>}
                 {/* User Detail Popup */}
                 {showPopup && (

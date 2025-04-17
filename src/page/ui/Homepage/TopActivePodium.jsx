@@ -1,6 +1,6 @@
 const TopActivePodium = () => {
     return (
-        <div className="flex justify-between flex-col bg-white p-6 rounded-lg shadow-md min-h-80">
+        <div className="flex justify-between flex-col bg-white rounded-2xl shadow-md h-[410px]">
             <h2 className="text-xl font-bold text-center mb-4">Top Active</h2>
             <div className="flex justify-center space-x-6 h-full">
                 <div className="text-center h-full content-end">

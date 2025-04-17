@@ -7,6 +7,7 @@ import {challengeService} from "../service/challengeService.js";
 import {evidenceService} from "../service/evidenceService.js";
 import {interestService} from "../service/interestService.js";
 import {invitationService} from "../service/invitationService.js";
+import {guestService} from "../service/guestService.js";
 export const store = configureStore({
     reducer: {
         [authService.reducerPath]: authService.reducer,
@@ -17,6 +18,7 @@ export const store = configureStore({
         [evidenceService.reducerPath]: evidenceService.reducer,
         [interestService.reducerPath]: interestService.reducer,
         [invitationService.reducerPath]: invitationService.reducer,
+        [guestService.reducerPath]: guestService.reducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware()
@@ -28,5 +30,6 @@ export const store = configureStore({
             .concat(challengeService.middleware)
             .concat(evidenceService.middleware)
             .concat(interestService.middleware)
-            .concat(invitationService.middleware),
+            .concat(invitationService.middleware)
+            .concat(guestService.middleware),
 })

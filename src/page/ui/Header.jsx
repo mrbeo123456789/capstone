@@ -4,6 +4,7 @@ import { IoGlobeOutline } from "react-icons/io5";
 import { FiLogOut } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 import NotificationDropdown from "../../component/NotificationDropdown.jsx";
+import { Link } from "react-router-dom";
 
 const Header = ({ toggleSidebar }) => {
     const navigate = useNavigate();
@@ -13,7 +14,6 @@ const Header = ({ toggleSidebar }) => {
 
     const menuItems = [
         { href: "/aboutus", title: t('menu.about'), text: t('menu.about') },
-        { href: "/guide", title: t('menu.guide'), text: t('menu.guide') },
         { href: "/challenges", title: t('menu.challenges'), text: t('menu.challenges') },
         { href: "/ranking", title: t('menu.leaderboard'), text: t('menu.leaderboard') },
         { href: "/news", title: t('menu.news'), text: t('menu.news') }
@@ -44,7 +44,7 @@ const Header = ({ toggleSidebar }) => {
                         <span className="block w-6 h-1 bg-orange-400"></span>
                         <span className="block w-6 h-1 bg-orange-400"></span>
                     </button>
-                    <a href="/" className="flex items-center space-x-2">
+                    <Link to="/homepage" className="flex items-center space-x-2">
                         <img
                             src="https://firebasestorage.googleapis.com/v0/b/bookstore-f9ac2.appspot.com/o/logo%2Fimage-removebg-preview.png?alt=media&token=f16618d4-686c-4014-a9cc-99b4cf043c86"
                             alt="GoBeyond"
@@ -54,7 +54,7 @@ const Header = ({ toggleSidebar }) => {
                             <div className="text-xl font-bold text-white">Go</div>
                             <div className="text-xl font-bold text-yellow-400">Beyond</div>
                         </div>
-                    </a>
+                    </Link>
                 </div>
 
                 {/* Center: Navigation */}
@@ -62,13 +62,13 @@ const Header = ({ toggleSidebar }) => {
                     <ul className="flex space-x-4">
                         {menuItems.map((item, index) => (
                             <li key={index}>
-                                <a
-                                    href={item.href}
+                                <Link
+                                    to={item.href}
                                     title={item.title}
                                     className="text-white hover:text-orange-300 transition font-medium"
                                 >
                                     {item.text}
-                                </a>
+                                </Link>
                             </li>
                         ))}
                     </ul>

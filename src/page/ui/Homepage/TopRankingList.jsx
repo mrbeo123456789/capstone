@@ -29,9 +29,8 @@ const TopRankingList = () => {
     const currentUsers = filtered.slice((currentPage - 1) * usersPerPage, currentPage * usersPerPage);
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-bold text-center mb-4">Top Ranking</h2>
-            <div className="mb-4 flex items-center border border-gray-300 rounded px-2 py-1">
+        <div className="bg-white p-3 rounded-lg shadow-md h-[410px]">
+            <div className="flex items-center border border-gray-300 rounded px-2 py-1">
                 <FaSearch className="text-gray-500 mr-2" />
                 <input
                     type="text"
@@ -41,9 +40,9 @@ const TopRankingList = () => {
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
             </div>
-            <div className="space-y-4">
+            <div>
                 {currentUsers.map((user, i) => (
-                    <div key={i} className="flex items-center justify-between bg-gray-50 rounded p-3 shadow-sm h-[85px] overflow-hidden">
+                    <div key={i} className="flex items-center justify-between bg-gray-50 rounded shadow-sm h-[80px] overflow-hidden">
                         <div className="flex items-center space-x-3">
                             <img src={user.image} alt={user.name} className="w-12 h-12 rounded-full" />
                             <div>
@@ -56,7 +55,7 @@ const TopRankingList = () => {
                 ))}
             </div>
             {/* Pagination */}
-            <div className="flex justify-center mt-4 space-x-1">
+            <div className="flex justify-center space-x-1">
                 {Array.from({ length: totalPages }, (_, i) => (
                     <button
                         key={i}
