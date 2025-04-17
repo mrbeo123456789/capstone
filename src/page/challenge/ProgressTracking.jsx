@@ -9,7 +9,6 @@ export default function ProgressTracking({ challenge, evidence }) {
     const submittedEvidenceDates = new Set(
         evidence?.map((e) => {
             const [year, month, day] = e.submittedAt;
-            console.log("Hello" + `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`)
             return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
         })
     );

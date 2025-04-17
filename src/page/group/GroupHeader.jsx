@@ -5,10 +5,7 @@ import MemberListPopup from "../ui/MemberListPopup.jsx";
 
 const GroupHeader = (group) => {
     const [showPopup, setShowPopup] = useState(false);
-    console.log("this is group value", group)
-
     const openMemberList = () => {
-        console.log("openUserDetail");
         setShowPopup(true);
     };
 

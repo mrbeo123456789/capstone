@@ -8,7 +8,7 @@ const DaySlider = () => {
 
     const generateDays = () => {
         const days = [];
-        for (let i = -3; i <= 3; i++) {
+        for (let i = -5; i <= 5; i++) {
             days.push(selectedDate.add(i, "day"));
         }
         return days;
@@ -46,7 +46,7 @@ const DaySlider = () => {
     }, []);
 
     return (
-        <div className="bg-white p-4 rounded-3xl shadow-lg w-full max-w-md mx-auto mt-6 text-center">
+        <div className="bg-white p-4 rounded-3xl shadow-lg w-full text-center">
             {/* Header */}
             <div className="flex justify-between px-4 mb-4">
                 <h2 className="text-xl font-semibold">Hoje</h2>
@@ -102,7 +102,7 @@ const DaySlider = () => {
                 </button>
 
             </div>
-            <div className="md:col-span-1 lg:col-span-2">
+            <div className="md:col-span-1 lg:col-span-2 overflow-y-scroll">
                 <ChallengeItemList/>
             </div>
         </div>
