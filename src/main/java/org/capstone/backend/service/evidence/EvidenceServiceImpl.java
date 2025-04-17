@@ -121,6 +121,8 @@ public class EvidenceServiceImpl implements EvidenceService {
                         .build();
                 evidenceRepository.save(newEvidence);
             }
+        } catch (ResponseStatusException e) {
+            throw e; // Don't wrap if it's already a proper status!
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Không thể upload bằng chứng: " + e.getMessage());
         }

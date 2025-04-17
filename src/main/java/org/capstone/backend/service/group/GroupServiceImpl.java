@@ -62,8 +62,8 @@ public class GroupServiceImpl implements GroupService {
         GroupResponse dto = new GroupResponse();
         dto.setId(group.getId());
         dto.setName(group.getName());
-        dto.setMaxParticipants(group.getMaxParticipants());
         dto.setPicture(group.getPicture());
+        dto.setDescription(group.getDescription());
         dto.setCreatedAt(group.getCreatedAt());
         dto.setCreatedBy(group.getCreatedBy());
         dto.setUpdatedAt(group.getUpdatedAt());
@@ -76,7 +76,12 @@ public class GroupServiceImpl implements GroupService {
             dto.setMembers(memberDTOs);
         }
 
-        dto.setCurrentParticipants(group.getMembers().size());
+        // ✅ Only count ACTIVE members
+        dto.setCurrentParticipants(
+                (int) group.getMembers().stream()
+                        .filter(m -> m.getStatus() == GroupMemberStatus.ACTIVE)
+                        .count()
+        );
 
         group.getMembers().stream()
                 .filter(m -> m.getMember().getId().equals(memberId))
@@ -126,8 +131,8 @@ public class GroupServiceImpl implements GroupService {
 
         Groups group = groupRepository.save(Groups.builder()
                 .name(request.getName())
-                .maxParticipants(request.getMaxParticipants())
                 .picture(pictureUrl)
+                .description(request.getDescription())
                 .createdBy(memberId)
                 .build());
 
@@ -159,7 +164,6 @@ public class GroupServiceImpl implements GroupService {
         Groups group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy nhóm."));
         group.setName(request.getName());
-        group.setMaxParticipants(request.getMaxParticipants());
         group.setUpdatedBy(authService.getMemberIdFromAuthentication());
         return groupRepository.save(group);
     }
