@@ -1,35 +1,83 @@
-import { useState, useRef } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
-import { useVerifyAccountMutation } from "../../service/authService.js";
+import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { FaLock, FaRedo } from "react-icons/fa";
+import {
+    useSendOtpToVerifyAccountMutation,
+    useVerifyAccountMutation
+} from "../../service/authService.js";
 
 const EnterOTP = () => {
-    const location = useLocation();
-    const email = location.state?.email || "";
     const navigate = useNavigate();
-
-    const [verifyAccount, { isLoading }] = useVerifyAccountMutation();
+    const email = sessionStorage.getItem("otpEmail") || "";
+    const type = sessionStorage.getItem("otpType") || "";
 
     const [otp, setOtp] = useState(["", "", "", "", "", ""]);
     const inputsRef = useRef([]);
+    const intervalRef = useRef(null);
     const [resendTimer, setResendTimer] = useState(60);
 
-    const handleChange = (index, value) => {
-        if (/^[0-9]?$/.test(value)) {
-            const newOtp = [...otp];
-            newOtp[index] = value;
-            setOtp(newOtp);
+    const [sendOtpToVerifyAccount, { isLoading: isSending }] = useSendOtpToVerifyAccountMutation();
+    const [verifyAccount, { isLoading: isVerifying }] = useVerifyAccountMutation();
+    const hasAttempted = useRef(false);
 
-            if (value && index < 5) {
-                inputsRef.current[index + 1].focus();
-            }
+    // Tự động xử lý gửi hoặc khởi động timer một lần duy nhất
+    useEffect(() => {
+        if (!email || !type || hasAttempted.current) return;
+        hasAttempted.current = true;
+
+        if (type === "forgot") {
+            // Forgot flow: OTP đã gửi ở trang trước, chỉ chạy timer
+            startResendTimer();
+            return;
+        }
+
+        // Register flow: gửi lần đầu
+        sendOtpToVerifyAccount(email)
+            .unwrap()
+            .then(() => {
+                toast.success("OTP đã được gửi đến email.");
+                startResendTimer();
+            })
+            .catch((err) => {
+                console.error("❌ OTP gửi thất bại:", err);
+                toast.error(err?.data?.message || "Gửi OTP thất bại.");
+            });
+
+        return () => clearInterval(intervalRef.current);
+    }, []);
+
+    // Cleanup khi unmount
+    useEffect(() => () => clearInterval(intervalRef.current), []);
+
+    const startResendTimer = () => {
+        setResendTimer(60);
+        if (intervalRef.current) clearInterval(intervalRef.current);
+
+        intervalRef.current = setInterval(() => {
+            setResendTimer((prev) => {
+                if (prev <= 1) {
+                    clearInterval(intervalRef.current);
+                    intervalRef.current = null;
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+    };
+
+    const handleChange = (idx, val) => {
+        if (/^\d?$/.test(val)) {
+            const next = [...otp];
+            next[idx] = val;
+            setOtp(next);
+            if (val && idx < 5) inputsRef.current[idx + 1]?.focus();
         }
     };
 
-    const handleKeyDown = (index, e) => {
-        if (e.key === "Backspace" && !otp[index] && index > 0) {
-            inputsRef.current[index - 1].focus();
+    const handleKeyDown = (idx, e) => {
+        if (e.key === "Backspace" && !otp[idx] && idx > 0) {
+            inputsRef.current[idx - 1]?.focus();
         }
     };
 
@@ -37,46 +85,56 @@ const EnterOTP = () => {
         e.preventDefault();
         const code = otp.join("");
         if (code.length < 6) {
-            toast.error("Please enter the complete OTP.");
+            toast.error("Vui lòng nhập đủ 6 chữ số OTP.");
             return;
         }
 
         try {
-            const response = await verifyAccount({ email, otp: code }).unwrap();
-            toast.success(response.message || "OTP verified successfully!");
-            navigate("/reset-password", { state: { email } });
-        } catch (error) {
-            toast.error(error?.data?.message || "Invalid OTP or expired!");
+            await verifyAccount({ email, otp: code }).unwrap();
+            toast.success("Xác thực OTP thành công!");
+
+            // Dọn dẹp dữ liệu
+            sessionStorage.removeItem("otpEmail");
+            sessionStorage.removeItem("otpType");
+
+            setTimeout(() => {
+                if (type === "forgot") {
+                    navigate("/reset-password", { state: { email } });
+                } else {
+                    navigate("/login");
+                }
+            }, 1200);
+        } catch (err) {
+            const errorMsg = err?.data?.message || err?.data?.error || "OTP không hợp lệ hoặc đã hết hạn.";
+            toast.error(errorMsg);
         }
     };
 
-    const handleResend = () => {
-        if (resendTimer > 0) return;
-        // 🔁 You should hook this to resend OTP API if available
-        toast.success("OTP resent to your email.");
-        setResendTimer(60);
-    };
+    const handleResend = async () => {
+        if (resendTimer > 0 || isSending) return;
 
-    // ⏳ Countdown
-    useState(() => {
-        const interval = setInterval(() => {
-            setResendTimer((prev) => (prev > 0 ? prev - 1 : 0));
-        }, 1000);
-        return () => clearInterval(interval);
-    }, []);
+        try {
+            await sendOtpToVerifyAccount(email).unwrap();
+            toast.success("OTP đã được gửi lại.");
+            startResendTimer();
+        } catch (err) {
+            toast.error(err?.data?.error || err?.data?.message || "Gửi lại OTP thất bại.");
+        }
+    };
 
     return (
         <div className="relative min-h-screen bg-black">
+            {/* Background giữ nguyên */}
             <div
-                className="absolute inset-0 w-full h-screen bg-cover bg-center opacity-50"
+                className="absolute inset-0 w-full h-screen bg-cover bg-center opacity-50 z-0"
                 style={{
                     backgroundImage:
                         "url(https://firebasestorage.googleapis.com/v0/b/bookstore-f9ac2.appspot.com/o/pexels-bess-hamiti-83687-36487.jpg?alt=media&token=f1fb933e-2fe4-4f6f-a604-7eb7e47314fd)",
                 }}
-            ></div>
+            />
 
-            {/* Logo */}
-            <div className="absolute top-5 left-5 flex items-end">
+            {/* Logo giữ nguyên */}
+            <div className="absolute top-5 left-5 flex items-end z-10">
                 <img
                     src="https://firebasestorage.googleapis.com/v0/b/bookstore-f9ac2.appspot.com/o/logo%2Fimage-removebg-preview.png?alt=media&token=f16618d4-686c-4014-a9cc-99b4cf043c86"
                     alt="GoBeyond Logo"
@@ -88,58 +146,59 @@ const EnterOTP = () => {
                 </div>
             </div>
 
-            {/* OTP Card */}
-            <div className="w-full h-screen flex items-center justify-center relative">
+            {/* Form nhập OTP */}
+            <div className="relative z-10 flex items-center justify-center min-h-screen">
                 <div className="bg-white p-8 rounded-lg shadow-lg w-96">
-                    <div className="flex flex-col items-center mb-4">
-                        <FaLock className="text-4xl text-red-600 mb-2" />
-                        <h2 className="text-2xl font-bold text-red-600">Enter OTP</h2>
-                        <p className="text-gray-600 text-sm text-center">Check your email and enter the code</p>
-                    </div>
-
+                    <h2 className="text-2xl font-bold text-center text-red-600 mb-4">Xác minh OTP</h2>
                     <form onSubmit={handleSubmit} className="flex flex-col gap-6">
                         <div className="flex justify-between gap-2">
-                            {otp.map((val, idx) => (
+                            {otp.map((digit, i) => (
                                 <input
-                                    key={idx}
-                                    ref={(el) => (inputsRef.current[idx] = el)}
-                                    type="password"
+                                    key={i}
+                                    ref={el => inputsRef.current[i] = el}
+                                    type="text"
+                                    inputMode="numeric"
                                     maxLength={1}
-                                    value={val}
-                                    onChange={(e) => handleChange(idx, e.target.value)}
-                                    onKeyDown={(e) => handleKeyDown(idx, e)}
-                                    className="w-12 h-12 border-2 rounded-lg text-xl text-center tracking-widest focus:outline-none focus:ring-2 focus:ring-red-500"
+                                    value={digit}
+                                    onChange={e => handleChange(i, e.target.value)}
+                                    onKeyDown={e => handleKeyDown(i, e)}
+                                    className="w-12 h-12 border-2 rounded-lg text-xl text-center focus:ring-2 focus:ring-red-500"
                                 />
                             ))}
                         </div>
 
                         <button
                             type="submit"
+                            disabled={isVerifying}
                             className="w-full bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition"
-                            disabled={isLoading}
                         >
-                            {isLoading ? "Verifying..." : "Submit"}
+                            {isVerifying ? "Đang xác minh..." : "Xác nhận"}
                         </button>
 
                         <div className="flex items-center justify-between text-sm text-gray-600">
-                            <span>Didn't receive code?</span>
+                            <span>Không nhận được mã?</span>
                             <button
                                 type="button"
-                                className="text-red-500 hover:underline flex items-center gap-1"
                                 onClick={handleResend}
-                                disabled={resendTimer > 0}
+                                disabled={resendTimer > 0 || isSending}
+                                className="flex items-center gap-1 text-red-500 hover:underline"
                             >
-                                <FaRedo /> Resend ({resendTimer}s)
+                                <FaRedo />
+                                {resendTimer > 0 ? `Gửi lại (${resendTimer}s)` : "Gửi lại"}
                             </button>
                         </div>
 
                         <div className="text-center mt-2">
                             <button
                                 type="button"
+                                onClick={() => {
+                                    sessionStorage.removeItem("otpEmail");
+                                    sessionStorage.removeItem("otpType");
+                                    navigate("/login");
+                                }}
                                 className="text-red-500 hover:underline"
-                                onClick={() => navigate("/login")}
                             >
-                                Back to Login
+                                Quay về trang đăng nhập
                             </button>
                         </div>
                     </form>

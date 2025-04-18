@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { BASE_URL } from "../contant/contant.js";
-import {toast} from "react-toastify";
+import { toast } from "react-toastify";
 
 export const authService = createApi({
     reducerPath: "auth",
@@ -106,6 +106,22 @@ export const authService = createApi({
             transformResponse: (response) => ({ message: response }),
         }),
 
+        // Thêm mutation để gửi OTP xác nhận tài khoản
+        sendOtpToVerifyAccount: builder.mutation({
+            query: (email) => {
+                console.log("📨 sendOtpToVerifyAccount API CALLED with:", email);
+                return {
+                    url: "/auth/verify-account",
+                    method: "POST",
+                    body: { email },
+                };
+            },
+            transformResponse: (response) => {
+                console.log("✅ sendOtpToVerifyAccount RESPONSE:", response);
+                return { message: response };
+            },
+        }),
+
     }),
 });
 
@@ -115,4 +131,5 @@ export const {
     useForgotPasswordMutation,
     useResetPasswordMutation,
     useVerifyAccountMutation,
+    useSendOtpToVerifyAccountMutation, // Export function sendOtpToVerifyAccount
 } = authService;
