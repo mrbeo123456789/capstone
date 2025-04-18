@@ -56,7 +56,6 @@ export const challengeValidation = yup.object({
 
     maxParticipants: yup.number()
         .typeError("Max participants must be a number")
-        .required("Max participants is required")
         .positive("Max participants must be greater than 0")
         .integer("Max participants must be an integer"),
 
@@ -64,8 +63,6 @@ export const challengeValidation = yup.object({
         .required("Description is required")
         .trim()
         .min(10, "Description should be at least 10 characters long"),
-
-    rule: yup.string(),
 
     picture: yup
         .mixed()

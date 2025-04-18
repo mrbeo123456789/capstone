@@ -32,6 +32,7 @@ import {AdminRoute, MemberRoute} from "./ProtectRouter.jsx";
 import Statistics from "../page/member/Statistics.jsx";
 import Achievement from "../page/member/Achievement.jsx";
 import CreateChallenge from "../page/admin/detailmodal/CreateChallenge.jsx";
+import Settings from "../page/admin/list/Settings.jsx";
 
 const router = createBrowserRouter([
     { path: "/", element: <Navigate to="/homepage" /> },
@@ -99,8 +100,8 @@ const router = createBrowserRouter([
             { path: "groupmanagement", element: <GroupList /> },
             { path: "challengelist", element: <ChallengeList /> },
             { path: "challenge/create", element: <CreateChallenge /> },
-            { path: "/adminchallenge/:id/detail", element: <AdminChallengeDetail /> }
-
+            { path: "/adminchallenge/:id/detail", element: <AdminChallengeDetail /> },
+            { path: "settings", element: <Settings /> }
         ]
     }
 ]);
