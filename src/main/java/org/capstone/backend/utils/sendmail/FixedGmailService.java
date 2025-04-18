@@ -7,14 +7,13 @@ import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.UserCredentials;
-import io.github.cdimascio.dotenv.Dotenv;
 import org.capstone.backend.config.EnvService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import javax.mail.Session;
 import javax.mail.MessagingException;
+import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.ByteArrayOutputStream;
@@ -27,24 +26,18 @@ public class FixedGmailService {
 
     private static final String APPLICATION_NAME = "Gmail API Fixed Sender";
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
-    private static final Dotenv dotenv = Dotenv.load();
-    private static final String CLIENT_ID = dotenv.get("GOOGLE_CLIENT_ID");
-    private static final String CLIENT_SECRET = dotenv.get("GOOGLE_CLIENT_SECRET");
-    private static final String FIXED_SENDER = dotenv.get("FIXED_SENDER_EMAIL");
 
     @Autowired
-    private EnvService envService; // ✅ Inject đúng EnvService
+    private EnvService envService;
 
     private Gmail getGmailService() throws Exception {
-        String refreshToken = envService.getGoogleRefreshToken(); // ✅ Luôn lấy refresh token động mới nhất
-
         UserCredentials credentials = UserCredentials.newBuilder()
-                .setClientId(CLIENT_ID)
-                .setClientSecret(CLIENT_SECRET)
-                .setRefreshToken(refreshToken)
+                .setClientId(envService.getGoogleClientId())
+                .setClientSecret(envService.getGoogleClientSecret())
+                .setRefreshToken(envService.getGoogleRefreshToken())
                 .build();
 
-        credentials.refreshIfExpired(); // Đảm bảo access token luôn còn hạn
+        credentials.refreshIfExpired();
 
         return new Gmail.Builder(
                 GoogleNetHttpTransport.newTrustedTransport(),
@@ -58,7 +51,7 @@ public class FixedGmailService {
         Session session = Session.getInstance(props);
 
         MimeMessage email = new MimeMessage(session);
-        email.setFrom(new InternetAddress(FIXED_SENDER));
+        email.setFrom(new InternetAddress(envService.getFixedSenderEmail()));
         email.addRecipient(javax.mail.Message.RecipientType.TO, new InternetAddress(to));
         email.setSubject(subject);
         email.setText(bodyText);

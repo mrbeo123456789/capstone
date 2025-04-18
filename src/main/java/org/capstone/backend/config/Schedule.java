@@ -1,8 +1,8 @@
 package org.capstone.backend.config;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.capstone.backend.entity.Challenge;
-import org.capstone.backend.entity.ChallengeMember;
 import org.capstone.backend.entity.GroupChallenge;
 import org.capstone.backend.event.ChallengeResultAnnounceEvent;
 import org.capstone.backend.event.ChallengeStartedEvent;
@@ -21,136 +21,148 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@Transactional
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class Schedule {
 
-//    private final EvidenceService assignmentService;
-//    private final EvidenceService evidenceService;
-//    private final ChallengeRepository challengeRepository;
-//    private final ChallengeMemberRepository challengeMemberRepository;
-//    private final GroupChallengeRepository groupChallengeRepository;
-//    private final RankingService rankingService;
-//    private final ApplicationEventPublisher eventPublisher;
-//
-//    @Scheduled(cron = "0 0 0 * * ?")
-//    @Transactional
-//    public void updateChallengeStatuses() {
-//        LocalDate today = LocalDate.now();
-//
-//        // 1. Update thử thách từ UPCOMING -> ONGOING
-//        List<Challenge> startingChallenges = challengeRepository.findByStatusAndStartDate(ChallengeStatus.UPCOMING, today);
-//        startingChallenges.forEach(challenge -> {
-//            challenge.setStatus(ChallengeStatus.ONGOING);
-//            eventPublisher.publishEvent(new ChallengeStartedEvent(challenge)); // 🔥 Bắn sự kiện khi bắt đầu
-//        });
-//
-//        // 2. Update thử thách từ ONGOING -> FINISH
-//        List<Challenge> finishingChallenges = challengeRepository.findByStatusAndEndDate(ChallengeStatus.ONGOING, today);
-//        finishingChallenges.forEach(challenge -> challenge.setStatus(ChallengeStatus.FINISH));
-//
-//        // 3. Gộp lại tất cả challenges để save
-//        List<Challenge> challengesToUpdate = Stream.concat(
-//                startingChallenges.stream(),
-//                finishingChallenges.stream()
-//        ).collect(Collectors.toList());
-//
-//        challengeRepository.saveAll(challengesToUpdate);
-//    }
-//
-//    @Transactional
-//    public void updateGroupChallengeStatuses(LocalDate today) {
-//        List<GroupChallenge> updatedGroupChallenges = groupChallengeRepository
-//                .findGroupChallengesByStatusAndEndDate(GroupChallengeStatus.ONGOING, today)
-//                .stream()
-//                .filter(gc -> gc.getChallenge().getParticipationType() == ParticipationType.GROUP)
-//                .filter(gc -> {
-//                    List<ChallengeMember> challengeMembers = challengeMemberRepository.findByChallengeAndGroupId(
-//                            gc.getChallenge(), gc.getGroup().getId());
-//                    if (challengeMembers.isEmpty()) {
-//                        return false;
-//                    }
-//                    LocalDate startDate = gc.getChallenge().getStartDate();
-//                    long daysInChallenge = java.time.temporal.ChronoUnit.DAYS.between(startDate, today) + 1;
-//                    long totalEvidenceNeeded = challengeMembers.size() * daysInChallenge;
-//                    long totalEvidenceSubmitted = challengeMembers.stream()
-//                            .mapToLong(member -> evidenceService.getSubmittedEvidenceCount(
-//                                    member.getMember().getId(),
-//                                    gc.getChallenge().getId(),
-//                                    startDate,
-//                                    today))
-//                            .sum();
-//                    double submissionPercentage = (totalEvidenceSubmitted * 100.0) / totalEvidenceNeeded;
-//                    return submissionPercentage >= 80.0;
-//                })
-//                .peek(gc -> gc.setSuccess(true))
-//                .collect(Collectors.toList());
-//
-//        groupChallengeRepository.saveAll(updatedGroupChallenges);
-//    }
-//
-//    @Scheduled(cron = "0 15 0 * * *")
-//    @Transactional
-//    public void updateChallengeMemberCompletionStatus() {
-//        LocalDate today = LocalDate.now();
-//
-//        challengeRepository.findByStatusAndEndDate(ChallengeStatus.FINISH, today)
-//                .forEach(challenge -> {
-//                    List<ChallengeMember> updatedMembers = challengeMemberRepository.findByChallenge(challenge)
-//                            .stream()
-//                            .peek(member -> {
-//                                double approvedPercentage = evidenceService.getApprovedEvidencePercentage(
-//                                        member.getMember().getId(), challenge.getId());
-//                                if (approvedPercentage >= 80.0) {
-//                                    member.setIsCompleted(true);
-//                                }
-//                            })
-//                            .collect(Collectors.toList());
-//                    challengeMemberRepository.saveAll(updatedMembers);
-//                });
-//    }
-//
-//    @Scheduled(cron = "0 30 0 * * *")
-//    @Transactional
-//    public void announceChallengeResults() {
-//        LocalDate today = LocalDate.now();
-//        List<Challenge> finishedChallenges = challengeRepository.findByStatusAndEndDate(ChallengeStatus.FINISH, today);
-//
-//        for (Challenge challenge : finishedChallenges) {
-//            eventPublisher.publishEvent(new ChallengeResultAnnounceEvent(challenge));
-//        }
-//    }
-//
-//    @Scheduled(cron = "0 * * * * *")
-//    public void updateAllChallengeProgressRankings() {
-//        rankingService.recalculateAllChallengeProgressRankings();
-//    }
-//
-//    @Scheduled(cron = "0 10 0 * * *")
-//    public void scheduleAssignmentForNormalDays() {
-//        challengeRepository.findCrossCheckChallengesHappeningToday(ChallengeStatus.ONGOING, VerificationType.MEMBER_REVIEW)
-//                .forEach(assignmentService::assignPendingReviewersForChallenge);
-//    }
-//
-//    @Scheduled(cron = "0 10 21 * * *")
-//    public void scheduleAssignmentForEndDays() {
-//        LocalDate today = LocalDate.now();
-//        challengeRepository.findChallengesEndingToday(today)
-//                .forEach(assignmentService::assignPendingReviewersForChallenge);
-//    }
-//
-//    @Scheduled(cron = "0 * * * * *")
-//    public void scheduledStarRatingUpdate() {
-//        rankingService.updateChallengeStarRatings();
-//    }
-//
-//    @Scheduled(cron = "0 * * * * *")
-//    public void refreshGlobalRanking() {
-//        rankingService.updateGlobalRanking();
-//    }
+    private final EvidenceService assignmentService;
+    private final EvidenceService evidenceService;
+    private final ChallengeRepository challengeRepository;
+    private final ChallengeMemberRepository challengeMemberRepository;
+    private final GroupChallengeRepository groupChallengeRepository;
+    private final RankingService rankingService;
+    private final ApplicationEventPublisher eventPublisher;
+
+    // ==== 00:00 – Roll UPCOMING → ONGOING & ONGOING → FINISH ====
+    @Transactional
+    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Bangkok")
+    public void rollChallengeStatuses() {
+        LocalDate today = LocalDate.now();
+
+        var toStart = challengeRepository
+                .findByStatusAndStartDate(ChallengeStatus.UPCOMING, today)
+                .stream()
+                .peek(ch -> {
+                    ch.setStatus(ChallengeStatus.ONGOING);
+                    eventPublisher.publishEvent(new ChallengeStartedEvent(ch));
+                    log.info("Challenge {} started", ch.getId());
+                });
+
+        var toFinish = challengeRepository
+                .findByStatusAndEndDate(ChallengeStatus.ONGOING, today)
+                .stream()
+                .peek(ch -> {
+                    ch.setStatus(ChallengeStatus.FINISH);
+                    log.info("Challenge {} finished", ch.getId());
+                });
+
+        // persist both start & finish updates
+        challengeRepository.saveAll(
+                Stream.concat(toStart, toFinish).toList()
+        );
+
+        // now that some challenges have just finished, run their post‑finish logic:
+        markMemberCompletion(today);
+        updateGroupChallengeStatuses(today);
+    }
+
+    // ==== 00:05 – Assign daily cross‑check reviewers ====
+    @Scheduled(cron = "0 5 0 * * *", zone = "Asia/Bangkok")
+    public void assignDailyReviewers() {
+        challengeRepository
+                .findCrossCheckChallengesHappeningToday(ChallengeStatus.ONGOING, VerificationType.MEMBER_REVIEW)
+                .forEach(assignmentService::assignPendingReviewersForChallenge);
+    }
+
+    // ==== 00:15 – Announce results ====
+    @Scheduled(cron = "0 15 0 * * *", zone = "Asia/Bangkok")
+    public void announceResults() {
+        LocalDate today = LocalDate.now();
+        challengeRepository.findByStatusAndEndDate(ChallengeStatus.FINISH, today)
+                .forEach(ch -> {
+                    eventPublisher.publishEvent(new ChallengeResultAnnounceEvent(ch));
+                    log.info("Announced result for challenge {}", ch.getId());
+                });
+    }
+
+    // ==== 00:30 – Update star ratings & global ranking (daily) ====
+    @Scheduled(cron = "0 30 0 * * *", zone = "Asia/Bangkok")
+    public void updateStarRatingsAndGlobalRankings() {
+        rankingService.updateChallengeStarRatings();
+        rankingService.updateGlobalRanking();
+        log.debug("Updated star ratings & global ranking");
+    }
+
+    // ==== HH:45 – Recalculate progress ranking (hourly) ====
+    @Scheduled(cron = "0 45 * * * *", zone = "Asia/Bangkok")
+    public void recalculateChallengeProgressRankings() {
+        rankingService.recalculateAllChallengeProgressRankings();
+        log.debug("Recalculated challenge progress rankings");
+    }
+
+    // ==== 21:10 – Assign reviewers for challenges ending today ====
+    @Scheduled(cron = "0 10 21 * * *", zone = "Asia/Bangkok")
+    public void assignEndDayReviewers() {
+        LocalDate today = LocalDate.now();
+        challengeRepository
+                .findChallengesEndingToday(today)
+                .forEach(assignmentService::assignPendingReviewersForChallenge);
+    }
+
+    // ==== Helper invoked immediately when a challenge finishes ====
+    @Transactional
+    protected void markMemberCompletion(LocalDate today) {
+        challengeRepository.findByStatusAndEndDate(ChallengeStatus.FINISH, today)
+                .forEach(ch -> {
+                    var updated = challengeMemberRepository.findByChallenge(ch)
+                            .stream()
+                            .peek(cm -> {
+                                double pct = evidenceService.getApprovedEvidencePercentage(
+                                        cm.getMember().getId(), ch.getId());
+                                cm.setIsCompleted(pct >= 80.0);
+                            })
+                            .toList();
+                    challengeMemberRepository.saveAll(updated);
+                    log.info("Marked member completion for challenge {}", ch.getId());
+                });
+    }
+
+    // ==== Helper invoked immediately when a challenge finishes ====
+    @Transactional
+    protected void updateGroupChallengeStatuses(LocalDate today) {
+        List<GroupChallenge> successList = groupChallengeRepository
+                .findGroupChallengesByStatusAndEndDate(GroupChallengeStatus.ONGOING, today)
+                .stream()
+                .filter(gc -> gc.getChallenge().getParticipationType() == ParticipationType.GROUP)
+                .filter(gc -> {
+                    var members = challengeMemberRepository
+                            .findByChallengeAndGroupId(gc.getChallenge(), gc.getGroup().getId());
+                    if (members.isEmpty()) return false;
+
+                    long days = ChronoUnit.DAYS.between(gc.getChallenge().getStartDate(), today) + 1;
+                    long required = members.size() * days;
+
+                    long submitted = members.stream()
+                            .mapToLong(m -> evidenceService.getSubmittedEvidenceCount(
+                                    m.getMember().getId(),
+                                    gc.getChallenge().getId(),
+                                    gc.getChallenge().getStartDate(),
+                                    today))
+                            .sum();
+
+                    return submitted * 100.0 / required >= 80.0;
+                })
+                .peek(gc -> {
+                    gc.setSuccess(true);
+                    log.info("Marked GroupChallenge {} successful", gc.getId());
+                })
+                .toList();
+
+        groupChallengeRepository.saveAll(successList);
+    }
 }

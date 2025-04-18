@@ -76,7 +76,8 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
         c.startDate, 
         c.endDate, 
         c.picture, 
-        c.challengeType.name,  
+        c.challengeType.name,
+        c.status,               
         CASE 
             WHEN :memberId IS NULL THEN false
             WHEN EXISTS (
@@ -84,16 +85,15 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
                 WHERE cm.challenge.id = c.id AND cm.member.id = :memberId
             ) THEN true 
             ELSE false 
-        END, 
+        END,
         (SELECT COUNT(cm) FROM ChallengeMember cm WHERE cm.challenge.id = c.id),
         DATEDIFF(c.endDate, c.startDate), 
-        c.status,               
         c.verificationType,
         c.participationType
     )
     FROM Challenge c
     WHERE c.id = :challengeId
-    """)
+""")
     ChallengeDetailResponse findChallengeDetailByIdAndMemberId(
             @Param("challengeId") Long challengeId,
             @Param("memberId") Long memberId);
