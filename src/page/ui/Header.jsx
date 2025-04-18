@@ -50,7 +50,7 @@ const Header = ({ toggleSidebar }) => {
                             alt="GoBeyond"
                             className="h-10 rounded-full"
                         />
-                        <div className="flex">
+                        <div className="hidden md:flex">
                             <div className="text-xl font-bold text-white">Go</div>
                             <div className="text-xl font-bold text-yellow-400">Beyond</div>
                         </div>
@@ -112,7 +112,7 @@ const Header = ({ toggleSidebar }) => {
                     <img
                         src={avatarUrl}
                         alt="User Avatar"
-                        className="w-10 h-10 rounded-full border-2 border-white object-cover"
+                        className="w-10 h-10 rounded-full border-2 border-white object-cover hidden sm:block"
                     />
 
                     {/* Logout Button */}

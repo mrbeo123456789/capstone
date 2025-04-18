@@ -173,7 +173,7 @@ function MemberProfile() {
     return (
         <form onSubmit={handleSubmit(handleSubmitData)} autoComplete="false" className="flex flex-col items-center">
             <div
-                className="p-6 flex flex-col xl:flex-row h-full w-full relative box-border rounded-xl border-4 border-transparent z-[1]">
+                className="flex flex-col xl:flex-row h-full w-full relative box-border rounded-xl border-4 border-transparent z-[1]">
 
                 {/* Left Section: Avatar & Basic Info */}
                 <div className="bg-white rounded-lg shadow-md w-full xl:w-1/3">

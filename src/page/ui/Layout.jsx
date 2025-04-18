@@ -13,7 +13,7 @@ const Layout = ({ children }) => {
             <Sidebar isOpen={isSidebarOpen}/>
             <main
                 className={`pt-20 transition-all duration-300 min-h-screen content-center ${
-                    isSidebarOpen ? "ml-14 md:ml-64" : "ml-0"
+                    isSidebarOpen ? "lg:ml-64" : "ml-0"
                 }`}
             >
                 <div className="mx-2 md:mx-4 my-4"><Outlet/></div>
