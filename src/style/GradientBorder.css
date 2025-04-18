@@ -1,0 +1,37 @@
+.gradient-border {
+    position: relative;
+    border-radius: 1em;
+    padding: 10px;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.gradient-border::before {
+    content: "";
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    background: conic-gradient(red, orange, yellow, red);
+    z-index: -1;
+    border-radius: inherit;
+    animation: rotateBorder 3s linear infinite;
+}
+
+@keyframes rotateBorder {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(180deg);
+    }
+}
+
+.content {
+    position: relative;
+    background-color: black;
+    padding: 20px;
+    border-radius: 1em;
+    z-index: 2;
+}

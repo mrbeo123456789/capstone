@@ -1,0 +1,110 @@
+{
+  "menu": {
+    "about": "Về chúng tôi",
+    "guide": "Hướng dẫn",
+    "challenges": "Thử thách",
+    "leaderboard": "Bảng xếp hạng",
+    "news": "Tin tức",
+    "logout": "Đăng xuất"
+  },
+
+  "profileUpdated": "Cập nhật hồ sơ thành công!",
+  "updateFailed": "Cập nhật hồ sơ thất bại.",
+  "removed": "Đã loại bỏ",
+  "move": "Bỏ",
+  "undo": "Hoàn tác",
+  "changePicture": "Thay đổi ảnh",
+  "uploadHint": "Nhấn để tải lên hoặc kéo thả vào đây",
+  "uploadSubHint": "Chỉ chấp nhận SVG, PNG, JPG hoặc GIF (KÍCH THƯỚC TỐI ĐA 800x400px)",
+  "email": "Email",
+  "username": "Tên người dùng",
+  "generalInformation": "Thông tin chung",
+  "fullName": "Họ và tên",
+  "firstName": "Tên",
+  "lastName": "Họ",
+  "dateOfBirth": "Ngày sinh",
+  "gender": "Giới tính",
+  "chooseGender": "Chọn giới tính",
+  "male": "Nam",
+  "female": "Nữ",
+  "other": "Khác",
+  "phone": "Số điện thoại",
+  "province": "Tỉnh/Thành phố",
+  "selectProvince": "Chọn Tỉnh/Thành phố",
+  "district": "Quận/Huyện",
+  "selectDistrict": "Chọn Quận/Huyện",
+  "ward": "Xã/Phường",
+  "selectWard": "Chọn Xã/Phường",
+  "yourInterest": "Sở thích của bạn",
+  "addInterest": "Thêm sở thích",
+  "updating": "Đang cập nhật...",
+  "updateProfile": "Cập nhật hồ sơ",
+  "selectChallengeType": "Chọn kiểu thử thách",
+
+  "challengeInvite": {
+    "memberList": "Danh sách thành viên",
+    "searchPlaceholder": "Tìm kiếm theo tên hoặc email...",
+    "search": "Tìm kiếm",
+    "close": "Đóng",
+    "invite": "Mời",
+    "previous": "Trước",
+    "next": "Sau",
+    "page": "Trang",
+    "selectAtLeastOne": "Vui lòng chọn ít nhất một thành viên.",
+    "inviteSuccess": "Gửi lời mời thành công!",
+    "inviteFailed": "Gửi lời mời thất bại.",
+    "searchFailed": "Tìm kiếm thất bại."
+  },
+
+  "sidebar": {
+    "myChallenge": "Thử thách của tôi",
+    "myGroup": "Nhóm của tôi",
+    "profile": "Hồ sơ",
+    "password": "Mật khẩu",
+    "achievement": "Thành tựu",
+    "statistics": "Thống kê"
+  },
+
+  "invitePermission": {
+    "select": "Chọn quyền mời",
+    "everyone": "Mọi người đều có thể mời",
+    "noOne": "Không ai có thể mời",
+    "sameGroup": "Chỉ thành viên cùng nhóm mới được mời"
+  },
+
+  "groupForm": {
+    "title": "Thông tin nhóm",
+    "groupName": "Tên nhóm",
+    "groupNamePlaceholder": "Nhập tên nhóm",
+    "privacy": "Quyền riêng tư",
+    "public": "Công khai",
+    "private": "Riêng tư",
+    "description": "Mô tả",
+    "descriptionPlaceholder": "Mô tả về nhóm",
+    "uploadHint": "Nhấn để tải ảnh hoặc kéo thả",
+    "uploadSubHint": "SVG, PNG, JPG hoặc GIF (TỐI ĐA 800x400px)",
+    "changePicture": "Thay đổi hình ảnh",
+    "creating": "Đang tạo...",
+    "createButton": "Tạo nhóm",
+    "cancelButton": "Hủy",
+    "createSuccess": "Tạo nhóm thành công!",
+    "createFailed": "Tạo nhóm thất bại!"
+  },
+
+  "groupInvite": {
+    "title": "Mời vào nhóm",
+    "searchPlaceholder": "Tìm theo tên hoặc email...",
+    "search": "Tìm kiếm",
+    "close": "Đóng",
+    "invite": "Mời",
+    "previous": "Trước",
+    "next": "Tiếp",
+    "page": "Trang",
+    "selectAtLeastOne": "Vui lòng chọn ít nhất một thành viên.",
+    "inviteSuccess": "Gửi lời mời thành công!",
+    "inviteFailed": "Gửi lời mời thất bại.",
+    "searchFailed": "Tìm kiếm thất bại.",
+    "enterKeyword": "Vui lòng nhập từ khóa."
+  }
+
+}

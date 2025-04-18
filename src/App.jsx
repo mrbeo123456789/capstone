@@ -1,35 +1,53 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from "react";
+import { RouterProvider } from "react-router-dom";
+import { SidebarProvider } from "./context/SidebarContext.jsx";
+import { Bounce, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-function App() {
-  const [count, setCount] = useState(0)
+import useTokenExpirationCheck from "./hook/useTokenExpirationCheck.js";
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+import router from './router/router.jsx';
+import SplashScreen from "./component/SplashScreen.jsx";
+
+const App = () => {
+    const [loading, setLoading] = useState(true);
+
+    useTokenExpirationCheck(); // ✅ Background check token expired
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 500); // show splash for 1.5s
+
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (loading) {
+        // return <SplashScreen />;
+    }
+
+    return (
+        <>
+            {/* Toast */}
+            <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                transition={Bounce}
+            />
+
+            {/* Layout */}
+            <SidebarProvider>
+                <RouterProvider router={router} />
+            </SidebarProvider>
+        </>
+    );
 }
 
-export default App
+export default App;
