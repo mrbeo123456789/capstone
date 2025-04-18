@@ -11,20 +11,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @EnableAsync
 public class BackEndApplication {
-
     public static void main(String[] args) {
-
-        Dotenv dotenv = Dotenv.configure()
-                .ignoreIfMissing() // Cho phép chạy tiếp nếu không có file .env
-                .load();
-
-
-        // Nếu cần tích hợp với Spring Boot, bạn có thể chuyển các giá trị từ dotenv vào System properties:
-        dotenv.entries().forEach(entry ->
-                System.setProperty(entry.getKey(), entry.getValue())
-        );
-
         SpringApplication.run(BackEndApplication.class, args);
     }
+
 
 }

@@ -56,6 +56,11 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public Account register(String username, String email, String rawPassword) {
+        // Kiểm tra khoảng trắng trong các trường
+        if (username.contains(" ") || email.contains(" ") || rawPassword.contains(" ")) {
+            throw new BadRequestException("Không được chứa khoảng trắng trong tên người dùng, email hoặc mật khẩu.");
+        }
+
         if (accountRepository.findByUsername(username).isPresent()) {
             throw new BadRequestException("Tên người dùng đã tồn tại.");
         }
@@ -73,9 +78,11 @@ public class AuthServiceImpl implements AuthService {
 
         Account savedAccount = accountRepository.save(account);
         createMemberIfNotExists(savedAccount);
+        sendOtpToVerifyAccount(email);
 
         return savedAccount;
     }
+
 
     @Override
     public String loginWithOAuth2(OAuth2User oAuth2User) {

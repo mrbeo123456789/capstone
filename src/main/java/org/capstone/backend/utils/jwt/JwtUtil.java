@@ -6,13 +6,17 @@ import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
+import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -25,20 +29,32 @@ import java.util.Base64;
 @Data
 public class JwtUtil {
 
-    private final RSAKey rsaKey;
-    private final JwtEncoder jwtEncoder;
-    private final JwtDecoder jwtDecoder;
+    @Value("${jwt.private-key-path:}")
+    private String pemPathFromProperties;
 
-    public JwtUtil() throws Exception {
+    private RSAKey rsaKey;
+    private JwtEncoder jwtEncoder;
+    private JwtDecoder jwtDecoder;
+
+    @PostConstruct
+    public void init() throws Exception {
         this.rsaKey = loadRsaKeyFromPrivatePem();
         this.jwtEncoder = initJwtEncoder();
         this.jwtDecoder = initJwtDecoder();
     }
 
     private RSAKey loadRsaKeyFromPrivatePem() throws Exception {
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("private.pem");
-        if (inputStream == null) {
-            throw new IllegalArgumentException("Cannot find private.pem");
+        InputStream inputStream;
+
+        if (pemPathFromProperties != null && !pemPathFromProperties.isBlank()) {
+            System.out.println("🔐 Loading RSA key from property path: " + pemPathFromProperties);
+            inputStream = new FileInputStream(pemPathFromProperties);
+        } else {
+            System.out.println("🔐 Loading RSA key from classpath: private.pem");
+            inputStream = getClass().getClassLoader().getResourceAsStream("private.pem");
+            if (inputStream == null) {
+                throw new IllegalStateException("❌ private.pem not found in classpath and no jwt.private-key-path provided.");
+            }
         }
 
         String privateKeyPem = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8)
@@ -47,12 +63,11 @@ public class JwtUtil {
                 .replaceAll("\\s+", "");
 
         byte[] keyBytes = Base64.getDecoder().decode(privateKeyPem);
-
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
 
-        var rsaPrivateKey = (java.security.interfaces.RSAPrivateCrtKey) privateKey;
+        var rsaPrivateKey = (RSAPrivateCrtKey) privateKey;
 
         RSAPublicKeySpec publicKeySpec = new RSAPublicKeySpec(
                 rsaPrivateKey.getModulus(),
@@ -87,5 +102,4 @@ public class JwtUtil {
 
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
-
 }
