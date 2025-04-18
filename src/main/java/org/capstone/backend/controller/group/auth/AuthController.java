@@ -1,7 +1,8 @@
-package org.capstone.backend.controller.auth;
+package org.capstone.backend.controller.group.auth;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.capstone.backend.dto.auth.ForgotPasswordRequest;
 import org.capstone.backend.dto.auth.LoginRequest;
 import org.capstone.backend.dto.auth.LoginResponse;
 import org.capstone.backend.dto.auth.RegisterRequest;
@@ -34,12 +35,14 @@ public class AuthController {
         );
         return ResponseEntity.ok(Map.of("message", "Registration successful for user: " + newAccount.getUsername()));
     }
-
     @PostMapping("/verify-account")
-    public ResponseEntity<Map<String, String>> sendOtpToVerifyAccount(@RequestParam String email) {
+    public ResponseEntity<?> sendOtp(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
         authService.sendOtpToVerifyAccount(email);
         return ResponseEntity.ok(Map.of("message", "OTP đã được gửi đến email."));
     }
+
+
 
     @PostMapping("/confirm-verification")
     public ResponseEntity<Map<String, String>> verifyAccount(@RequestBody Map<String, String> request) {
@@ -53,8 +56,8 @@ public class AuthController {
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<Map<String, String>> forgotPassword(@RequestBody Map<String, String> request) {
-        String email = request.get("email");
+    public ResponseEntity<Map<String, String>> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        String email = request.getEmail();
         authService.sendOtpForPasswordReset(email);
         return ResponseEntity.ok(Map.of("message", "OTP đã được gửi đến email."));
     }

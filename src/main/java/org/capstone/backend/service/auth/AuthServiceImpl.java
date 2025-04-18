@@ -78,7 +78,6 @@ public class AuthServiceImpl implements AuthService {
 
         Account savedAccount = accountRepository.save(account);
         createMemberIfNotExists(savedAccount);
-        sendOtpToVerifyAccount(email);
 
         return savedAccount;
     }
@@ -109,6 +108,12 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void sendOtpToVerifyAccount(String email) {
+        // Kiểm tra xem email có tồn tại trong hệ thống không
+        Optional<Account> account = accountRepository.findByEmail(email);
+        if (account.isEmpty()) {
+            throw new ResourceNotFoundException("Không tìm thấy tài khoản với email: " + email);
+        }
+
         otpService.generateAndSendOtp(email);
     }
 
@@ -129,6 +134,12 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void sendOtpForPasswordReset(String email) {
+        // Kiểm tra xem email có tồn tại trong hệ thống không
+        Optional<Account> account = accountRepository.findByEmail(email);
+        if (account.isEmpty()) {
+            throw new ResourceNotFoundException("Không tìm thấy tài khoản  ");
+        }
+
         otpService.generateAndSendOtp(email);
     }
 
