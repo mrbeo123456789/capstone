@@ -59,8 +59,7 @@ const RegisterForm = () => {
 
         try {
             await register({ email, username, password }).unwrap();
-            alert("Đăng ký thành công!");
-            navigate("/login");
+            navigate("/enter-otp");
         } catch (err) {
             setError({ api: err?.data?.message || "Đăng ký thất bại. Vui lòng thử lại." });
         }

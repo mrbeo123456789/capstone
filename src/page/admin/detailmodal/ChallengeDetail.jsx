@@ -150,10 +150,10 @@ const ChallengeDetail = () => {
                         </div>
                         <div className="mt-4">
                             {(() => {
-                                // Chuyển giá trị verificationType thành lowercase
-                                const status = challenge.verificationType
-                                    ? challenge.verificationType.toString().toLowerCase()
+                                const status = challenge.challengeStatus
+                                    ? challenge.challengeStatus.toString().toLowerCase()
                                     : "";
+                                console.log(status);
                                 if (status === "banned" || status === "finish" || status === "cancel") {
                                     return null;
                                 }
