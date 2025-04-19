@@ -64,9 +64,9 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        //seedAccountsAndMembers();
-       // seedChallengeTypes();
-       // seedInterests();
+        seedAccountsAndMembers();
+         seedChallengeTypes();
+        seedInterests();
       // seedChallenges();
        // seedChallengeMembers();
       //  seedGroups();              // Seed cho Groups nếu chưa có dữ liệu

@@ -45,7 +45,7 @@ public class NotificationServiceImpl implements NotificationService {
         Long currentUserId = authService.getMemberIdFromAuthentication();
 
         Query query = db.collection("notifications")
-                .whereEqualTo("userId", currentUserId)
+                .whereEqualTo("userId", String.valueOf(currentUserId))
                 .orderBy("createdAt", Query.Direction.DESCENDING)
                 .limit(limit);
 
