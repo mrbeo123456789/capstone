@@ -8,15 +8,21 @@ const ProofUploads = ({ challenge, evidence }) => {
     const [selectedProof, setSelectedProof] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
 
-    const startDate = new Date(challenge.startDate[0], challenge.startDate[1] - 1, challenge.startDate[2]);
-    const endDate = new Date(challenge.endDate[0], challenge.endDate[1] - 1, challenge.endDate[2]);
+    // ✅ correct
+    const startDate = new Date(challenge.startDate);
+    const endDate = new Date(challenge.endDate);
+
     const duration = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
 
     const evidenceMap = {};
     evidence.forEach((e) => {
-        const dateKey = new Date(e.submittedAt[0], e.submittedAt[1] - 1, e.submittedAt[2]).toDateString();
-        if (!evidenceMap[dateKey]) evidenceMap[dateKey] = e;
+        const parsedDate = new Date(e.submittedAt);
+        if (!isNaN(parsedDate)) {
+            const dateKey = new Date(e.submittedAt).toDateString(); // ✅ Properly parse ISO string
+            if (!evidenceMap[dateKey]) evidenceMap[dateKey] = e;
+        }
     });
+
 
     const days = Array.from({ length: duration }, (_, i) => {
         const date = new Date(startDate);
@@ -51,14 +57,11 @@ const ProofUploads = ({ challenge, evidence }) => {
                     const { date, evidence } = dayInfo;
                     const isUploaded = Boolean(evidence);
                     const isVideo = isUploaded && evidence.evidenceUrl?.includes(".mp4");
-
                     const today = new Date();
                     today.setHours(0, 0, 0, 0); // remove time portion
                     const isToday = date.toDateString() === today.toDateString();
                     const isPast = date < today;
-
                     const dateLabel = date.toLocaleDateString("en-GB"); // format: dd/mm/yyyy
-
                     let borderClass = "";
                     let bgClass = "bg-gray-300";
                     let symbol = null;

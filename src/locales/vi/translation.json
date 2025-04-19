@@ -142,6 +142,21 @@
     "loading": "Đang tạo thử thách...",
     "success": "Tạo thử thách thành công!",
     "fail": "Tạo thử thách thất bại: "
+  },
+  "JoinsChallengeDetail": {
+    "notJoined": "Bạn chưa tham gia thử thách này.",
+    "loading": "Đang tải thử thách...",
+    "error": "Không thể tải chi tiết thử thách.",
+    "loadingProof": "Đang tải dữ liệu bằng chứng...",
+    "proof": "Bằng chứng",
+    "member": "Thành viên",
+    "review": "Đánh giá",
+    "description": "Mô tả",
+    "invite": "Mời thành viên",
+    "leave": "Rời thử thách",
+    "share": "Chia sẻ",
+    "report": "Báo cáo",
+    "title": "Thử thách"
   }
 
 }

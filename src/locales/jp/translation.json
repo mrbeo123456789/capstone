@@ -145,6 +145,23 @@
     "loading": "チャレンジを作成中...",
     "success": "チャレンジが正常に作成されました！",
     "fail": "チャレンジ作成に失敗しました: "
+  },
+
+  "JoinsChallengeDetail": {
+    "notJoined": "このチャレンジにはまだ参加していません。",
+    "loading": "チャレンジを読み込んでいます...",
+    "error": "チャレンジの詳細を読み込めませんでした。",
+    "loadingProof": "証拠データを読み込んでいます...",
+    "proof": "証拠",
+    "member": "メンバー",
+    "review": "レビュー",
+    "description": "説明",
+    "invite": "メンバーを招待",
+    "leave": "チャレンジを退出",
+    "share": "共有",
+    "report": "報告",
+    "title": "チャレンジ"
   }
+
 
 }

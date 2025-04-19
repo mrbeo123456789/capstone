@@ -145,6 +145,20 @@
     "loading": "Creating challenge...",
     "success": "Challenge created successfully!",
     "fail": "Failed to create challenge: "
+  },
+  "JoinsChallengeDetail": {
+    "proof": "Proof",
+    "member": "Members",
+    "review": "Review",
+    "description": "Description",
+    "invite": "Invite",
+    "leave": "Leave",
+    "share": "Share",
+    "report": "Report",
+    "title": "Challenge",
+    "notJoined": "You are not a participant of this challenge.",
+    "loading": "Loading...",
+    "error": "Error loading challenge detail",
+    "loadingProof": "Loading proof data..."
   }
-
 }
