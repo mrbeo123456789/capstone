@@ -100,7 +100,7 @@ public class RankingServiceImpl implements RankingService {
 
                     return ChallengeProgressRankingResponse.builder()
                             .memberId(memberId)
-                            .memberName(member.getFirstName())
+                            .memberName(member.getFullName())
                             .avatar(member.getAvatar()) // 👈 thêm dòng này
                             .rank(i + 1)
                             .build();
@@ -146,25 +146,38 @@ public class RankingServiceImpl implements RankingService {
     }
     @Override
     public Page<ChallengeStarRatingResponse> getStarRatingsByChallengeId(Long challengeId, Pageable pageable) {
-        Page<ChallengeStarRating> page = challengeStarRatingRepository
-                .findByChallengeIdOrderByAverageStarDescTotalRatingCountDescGivenRatingCountDesc(challengeId, pageable);
+        // Fetch all members who joined the challenge (pagination applied later)
+        List<ChallengeMember> allMembers = challengeMemberRepository.findByChallengeId(challengeId);
 
-        List<ChallengeStarRatingResponse> content = page.getContent().stream()
-                .map(rating -> {
-                    var member = memberRepository.getReferenceById(rating.getMemberId());
+        List<ChallengeStarRatingResponse> allResponses = allMembers.stream()
+                .map(cm -> {
+                    var member = cm.getMember();
+                    var rating = challengeStarRatingRepository
+                            .findByChallengeIdAndMemberId(challengeId, member.getId())
+                            .orElse(null);
 
                     return ChallengeStarRatingResponse.builder()
-                            .memberId(rating.getMemberId())
-                            .memberName(member.getFirstName())
+                            .memberId(member.getId())
+                            .memberName(member.getFullName())
                             .avatar(member.getAvatar())
-                            .averageStar(roundTo1Decimal(rating.getAverageStar())) // 👈 làm tròn ở đây
+                            .averageStar(rating != null ? roundTo1Decimal(rating.getAverageStar()) : 0.0)
                             .build();
                 })
+                .sorted(Comparator
+                        .comparing(ChallengeStarRatingResponse::getAverageStar).reversed()
+                        .thenComparing(ChallengeStarRatingResponse::getMemberName)) // Stable sort
                 .toList();
 
+        // Manual pagination AFTER sorting
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), allResponses.size());
+        List<ChallengeStarRatingResponse> paged = allResponses.subList(start, end);
 
-        return new PageImpl<>(content, pageable, page.getTotalElements());
+        return new PageImpl<>(paged, pageable, allResponses.size());
     }
+
+
+
     private double roundTo1Decimal(double value) {
         return Math.round(value * 10.0) / 10.0;
     }

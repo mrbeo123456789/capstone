@@ -20,6 +20,7 @@ public class ChallengeDetailResponse {
     private LocalDate startDate;
     private LocalDate endDate;
     private String picture;
+    private String banner;
     private String challengeType;
     private boolean joined;
     private long participantCount;

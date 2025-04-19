@@ -99,8 +99,8 @@ public class DataInitializer implements CommandLineRunner {
 
             memberRepository.save(Member.builder()
                     .fullName("User " + i)
-                    .firstName("User")
-                    .lastName(String.valueOf(i))
+//                    .firstName("User")
+//                    .lastName(String.valueOf(i))
                     .phone("098765432" + i)
                     .address("123 User Street " + i)
                     .district("User District")

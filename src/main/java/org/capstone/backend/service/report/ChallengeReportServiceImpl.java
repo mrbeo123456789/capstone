@@ -44,6 +44,7 @@ public class ChallengeReportServiceImpl implements ChallengeReportService {
         ChallengeReport report = ChallengeReport.builder()
                 .challenge(challenge)
                 .reporter(member)
+                .reportType(dto.getReportType())
                 .content(dto.getContent())
                 .build();
 
