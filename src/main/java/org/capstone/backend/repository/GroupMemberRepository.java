@@ -1,5 +1,6 @@
 package org.capstone.backend.repository;
 
+import org.capstone.backend.dto.group.GroupMemberRankingDTO;
 import org.capstone.backend.dto.group.MemberSearchResponse;
 import org.capstone.backend.entity.GroupMember;
 import org.capstone.backend.entity.Groups;
@@ -7,6 +8,7 @@ import org.capstone.backend.entity.Member;
 import org.capstone.backend.utils.enums.GroupChallengeStatus;
 import org.capstone.backend.utils.enums.GroupMemberStatus;
 import org.capstone.backend.utils.enums.InvitePermission;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -98,5 +100,28 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
     List<GroupMember> findByMemberAndRoleAndStatus(Member member, String owner, GroupMemberStatus groupMemberStatus);
 
     List<GroupMember> findByGroupId(Long groupId);
+
+    @Query("""
+    SELECT new org.capstone.backend.dto.group.GroupMemberRankingDTO(
+        m.id,
+        m.fullName,
+        m.avatar,
+        CAST(COALESCE(r.totalStars, 0) AS long),
+        gm.createdAt
+    )
+    FROM GroupMember gm
+    JOIN gm.member m
+    LEFT JOIN GlobalMemberRanking r ON r.memberId = m.id
+    WHERE gm.group.id = :groupId
+      AND gm.status = 'ACTIVE'
+      AND LOWER(m.fullName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+    ORDER BY COALESCE(r.totalStars, 0) DESC, gm.createdAt ASC
+""")
+    Page<GroupMemberRankingDTO> searchGroupRankingWithKeyword(
+            @Param("groupId") Long groupId,
+            @Param("keyword") String keyword,
+            Pageable pageable
+    );
+
 }
 

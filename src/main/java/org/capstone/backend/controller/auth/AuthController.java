@@ -1,4 +1,4 @@
-package org.capstone.backend.controller.group.auth;
+package org.capstone.backend.controller.auth;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

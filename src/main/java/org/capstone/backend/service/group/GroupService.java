@@ -20,8 +20,7 @@ public interface GroupService {
     List<AvailableGroupResponse> getAvailableGroupsToJoinChallenge();
     // ✅ CREATE & UPDATE group
     String createGroup(GroupRequest request, MultipartFile picture);
-    Groups updateGroup(Long groupId, GroupRequest request);
-
+    Groups updateGroup(Long groupId, GroupRequest request, MultipartFile picture);
     // ✅ MEMBER ACTIONS
     void kickMember(Long groupId, Long memberId);
     void leaveGroup(Long groupId);
@@ -33,6 +32,7 @@ public interface GroupService {
     Page<GroupSummaryDTO> searchGroups(String keyword, int page, int size);
     void disbandGroup(Long groupId);
     // ✅ SEARCH
+    Page<GroupMemberRankingDTO> getGroupMemberRanking(Long groupId, String keyword, int page, int size);
     List<MemberSearchResponse> searchMembers(MemberSearchRequest request);
     Page<GroupChallengeHistoryDTO> getGroupChallengeHistories(Long groupId, GroupChallengeStatus status, int page);
 }

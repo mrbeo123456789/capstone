@@ -43,10 +43,18 @@ public class GroupController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/edit/{groupId}")
-    public ResponseEntity<Groups> editGroup(@PathVariable Long groupId, @RequestBody GroupRequest request) {
-        return ResponseEntity.ok(groupService.updateGroup(groupId, request));
+    @PutMapping(value = "/edit/{groupId}", consumes = {"multipart/form-data"})
+    public ResponseEntity<Groups> editGroup(
+            @PathVariable Long groupId,
+            @Validated @ModelAttribute("data") GroupRequest request,
+            @RequestParam(value = "picture", required = false) MultipartFile picture) {
+        // Gọi service để cập nhật nhóm và trả về kết quả
+        Groups updatedGroup = groupService.updateGroup(groupId, request, picture);
+
+        // Trả về nhóm đã được cập nhật
+        return ResponseEntity.ok(updatedGroup);
     }
+
 
     @PostMapping("/{groupId}/kick")
     public ResponseEntity<String> kickMember(@PathVariable Long groupId, @RequestBody Map<String, Long> request) {
@@ -105,4 +113,16 @@ public class GroupController {
     ) {
         return ResponseEntity.ok(groupService.getGroupChallengeHistories(groupId, status, page));
     }
+
+    @GetMapping("/{groupId}/ranking")
+    public ResponseEntity<Page<GroupMemberRankingDTO>> getGroupMemberRanking(
+            @PathVariable Long groupId,
+            @RequestParam(required = false, defaultValue = "") String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Page<GroupMemberRankingDTO> result = groupService.getGroupMemberRanking(groupId, keyword, page, size);
+        return ResponseEntity.ok(result);
+    }
+
 }

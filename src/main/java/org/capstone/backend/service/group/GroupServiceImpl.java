@@ -14,10 +14,7 @@ import org.capstone.backend.utils.enums.InvitePermission;
 import org.capstone.backend.utils.enums.NotificationType;
 import org.capstone.backend.utils.upload.FirebaseUpload;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -39,7 +37,7 @@ public class GroupServiceImpl implements GroupService {
     private final AuthService authService;
     private final GroupChallengeRepository groupChallengeRepository;
     private final ApplicationEventPublisher eventPublisher;
-
+    private final GlobalMemberRankingRepository groupRankingRepository;
     // ========================== GET ==========================
 
     @Override
@@ -55,8 +53,18 @@ public class GroupServiceImpl implements GroupService {
         Long memberId = authService.getMemberIdFromAuthentication();
         Groups group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy nhóm với id " + groupId));
+
+        // ✅ Check nếu không phải thành viên ACTIVE thì ném lỗi
+        boolean isMember = group.getMembers().stream()
+                .anyMatch(m -> m.getMember().getId().equals(memberId) && m.getStatus() == GroupMemberStatus.ACTIVE);
+
+        if (!isMember) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không phải là thành viên của nhóm này.");
+        }
+
         return convertToDTO(group, memberId, true);
     }
+
 
     private GroupResponse convertToDTO(Groups group, Long memberId, boolean includeMembers) {
         GroupResponse dto = new GroupResponse();
@@ -108,21 +116,33 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public List<GroupInvitationDTO> getPendingInvitations() {
+        // Lấy thông tin thành viên từ Authentication Service
         Member member = memberRepository.findById(authService.getMemberIdFromAuthentication())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy thành viên."));
-        return groupMemberRepository.findByMemberAndStatus(member, GroupMemberStatus.PENDING).stream()
-                .map(invite -> GroupInvitationDTO.builder()
-                        .groupId(invite.getGroup().getId())
-                        .name(member.getFullName())
-                        .img(invite.getGroup().getPicture())
-                        .groupName(invite.getGroup().getName())
-                        .invitedBy(invite.getCreatedBy().toString())
-                        .build())
+
+        // Lấy tất cả các lời mời đang chờ với trạng thái PENDING của thành viên này
+        List<GroupMember> pendingInvitations = groupMemberRepository.findByMemberAndStatus(member, GroupMemberStatus.PENDING);
+
+        // Chuyển đổi các GroupMember thành GroupInvitationDTO
+        return pendingInvitations.stream()
+                .map(invite -> {
+                    String inviterName = memberRepository.findById(invite.getCreatedBy())
+                            .map(Member::getFullName)
+                            .orElse("Unknown");
+
+                    return GroupInvitationDTO.builder()
+                            .groupId(invite.getGroup().getId())                // Lấy ID nhóm
+                            .name(member.getFullName())                        // Tên của người được mời (người đang đăng nhập)
+                            .img(invite.getGroup().getPicture())              // Ảnh nhóm
+                            .groupName(invite.getGroup().getName())           // Tên nhóm
+                            .invitedBy(inviterName)                           // ✅ Tên người mời
+                            .build();
+                })
                 .collect(Collectors.toList());
+
+
+        // ========================== CREATE ==========================
     }
-
-    // ========================== CREATE ==========================
-
     @Override
     @Transactional
     public String createGroup(GroupRequest request, MultipartFile picture) {
@@ -160,14 +180,29 @@ public class GroupServiceImpl implements GroupService {
     // ========================== UPDATE ==========================
 
     @Override
-    public Groups updateGroup(Long groupId, GroupRequest request) {
+    @Transactional
+    public Groups updateGroup(Long groupId, GroupRequest request, MultipartFile picture) {
+        // Tìm nhóm theo ID
         Groups group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy nhóm."));
+
+        // Cập nhật tên và mô tả nhóm
         group.setName(request.getName());
+        group.setDescription(request.getDescription());
+
+        // Kiểm tra xem có ảnh mới không
+        if (picture != null && !picture.isEmpty()) {
+            // Nếu có ảnh mới, tải lên ảnh và cập nhật URL của ảnh vào nhóm
+            String pictureUrl = uploadPicture(picture);
+            group.setPicture(pictureUrl);  // Cập nhật ảnh mới
+        }
+
+        // Cập nhật người chỉnh sửa nhóm
         group.setUpdatedBy(authService.getMemberIdFromAuthentication());
+
+        // Lưu nhóm đã được cập nhật và trả về
         return groupRepository.save(group);
     }
-
     // ========================== ACTION ==========================
 
     @Override
@@ -204,31 +239,48 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public void inviteMembers(GroupInviteRequest request) {
+        // Tìm nhóm
         Groups group = groupRepository.findById(request.getGroupId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy nhóm."));
+
+        // Tìm các thành viên được mời
         List<Member> membersToInvite = memberRepository.findAllById(request.getMemberIds());
         if (membersToInvite.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Không tìm thấy thành viên với ID được cung cấp.");
         }
+
+        // Tạo danh sách lời mời hoặc cập nhật trạng thái thành viên
         List<GroupMember> invitations = membersToInvite.stream()
-                .filter(member -> !groupMemberRepository.existsByGroupAndMember(group, member))
-                .map(member -> GroupMember.builder()
-                        .group(group)
-                        .member(member)
-                        .role("MEMBER")
-                        .status(GroupMemberStatus.PENDING)
-                        .createdBy(group.getCreatedBy())
-                        .build())
+                .map(member -> {
+                    // Kiểm tra xem thành viên đã tham gia nhóm chưa
+                    GroupMember existingMember = groupMemberRepository.findByGroupAndMember(group, member).orElse(null);
+
+                    if (existingMember == null) {
+                        // Nếu thành viên chưa tham gia nhóm, tạo mới lời mời
+                        return GroupMember.builder()
+                                .group(group)
+                                .member(member)
+                                .role("MEMBER")
+                                .status(GroupMemberStatus.PENDING) // Trạng thái lời mời
+                                .createdBy(group.getCreatedBy())
+                                .build();
+                    } else if (existingMember.getStatus() == GroupMemberStatus.LEFT) {
+                        // Nếu thành viên đã rời nhóm (status = LEFT), thay đổi trạng thái thành PENDING
+                        existingMember.setStatus(GroupMemberStatus.PENDING);
+                        return existingMember; // Trả về bản ghi đã cập nhật
+                    }
+                    // Nếu thành viên đang ở trạng thái khác, không thay đổi gì
+                    return null;
+                })
+                .filter(Objects::nonNull) // Loại bỏ các phần tử null
                 .collect(Collectors.toList());
+
+        // Lưu các lời mời hoặc cập nhật vào cơ sở dữ liệu
         if (!invitations.isEmpty()) {
             groupMemberRepository.saveAll(invitations);
         }
-        eventPublisher.publishEvent(new InvitationSentEvent(
-                request.getMemberIds().toString(),
-                "Bạn có lời mời mới",
-                "Bạn đã nhận được lời mời tham gia nhóm.",
-                NotificationType.INVITATION));
     }
+
 
     @Override
     public void respondToInvitation(Long groupId, GroupMemberStatus status) {
@@ -296,7 +348,7 @@ public class GroupServiceImpl implements GroupService {
         if (memberId != null) {
             GroupMember host = groupMemberRepository.findByGroupIdAndMemberId(groupId, memberId)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không tham gia nhóm này."));
-            if (!Objects.equals(host.getId(), group.getCreatedBy())) {
+            if (!Objects.equals(host.getMember().getId(), group.getCreatedBy())) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Chỉ host hoặc admin mới có quyền giải tán nhóm.");
             }
         }
@@ -331,4 +383,14 @@ public class GroupServiceImpl implements GroupService {
         Pageable pageable = PageRequest.of(page, 10, Sort.by("joinDate").descending());
         return groupChallengeRepository.findGroupChallengeHistories(groupId, status, pageable);
     }
+
+    @Override
+    public Page<GroupMemberRankingDTO> getGroupMemberRanking(Long groupId, String keyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return groupMemberRepository.searchGroupRankingWithKeyword(groupId, keyword == null ? "" : keyword, pageable);
+    }
+
+
 }
+
+

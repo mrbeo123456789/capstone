@@ -9,8 +9,6 @@ public class GroupRequest {
     @NotBlank(message = "Name cannot be empty")
     @Size(max = 100, message = "Name must not exceed 100 characters")
     private String name;
-
-    private String privacy;
-
+    @NotBlank(message = "Name cannot be empty")
     private String description;
 }
