@@ -5,7 +5,7 @@ export const groupService = createApi({
     reducerPath: "group",
     baseQuery: fetchBaseQuery({
         baseUrl: BASE_URL,
-        prepareHeaders: (headers , { getState, endpoint }) => {
+        prepareHeaders: (headers, { getState, endpoint }) => {
             const token = localStorage.getItem("jwt_token");
             if (token) {
                 headers.set("Authorization", `Bearer ${token}`);
@@ -33,7 +33,7 @@ export const groupService = createApi({
         }),
         updateGroup: builder.mutation({
             query: ({ id, ...patch }) => ({
-                url: `/groups/${id}`,
+                url: `/groups/edit/${id}`,
                 method: "PUT",
                 body: patch,
             }),
@@ -48,7 +48,7 @@ export const groupService = createApi({
         }),
         searchMembers: builder.mutation({
             query: (searchPayload) => ({
-                url: "/groups/search",  // assuming this is the full path
+                url: "/groups/search",
                 method: "POST",
                 body: searchPayload,
             }),
@@ -73,8 +73,28 @@ export const groupService = createApi({
         getGroupDetail: builder.query({
             query: (groupId) => `/groups/detail/${groupId}`,
         }),
-
-
+        kickMember: builder.mutation({
+            query: ({ groupId, memberId }) => ({
+                url: `/groups/${groupId}/kick`,
+                method: "POST",
+                body: { memberId },
+            }),
+            invalidatesTags: ["Group"],
+        }),
+        leaveGroup: builder.mutation({
+            query: (groupId) => ({
+                url: `/groups/${groupId}/leave`,
+                method: "POST",
+            }),
+            invalidatesTags: ["Group"],
+        }),
+        getGroupRanking: builder.query({
+            query: ({ groupId, keyword = "", page = 0, size = 10 }) => ({
+                url: `/groups/${groupId}/ranking`,
+                method: "GET",
+                params: { keyword, page, size },
+            }),
+        }),
     }),
 });
 
@@ -88,4 +108,7 @@ export const {
     useGetPendingInvitationsQuery,
     useRespondToInvitationMutation,
     useGetGroupDetailQuery,
+    useKickMemberMutation,
+    useLeaveGroupMutation,
+    useGetGroupRankingQuery,
 } = groupService;

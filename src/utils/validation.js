@@ -50,9 +50,8 @@ export const loginValidation = yup.object({
     password: yup.string().required(t("login.passwordRequired")).min(8, t("login.passwordMin"))
 });
 
-// ✅ Group Schema
+// ✅ Validate group (NEW!! từ yêu cầu của bạn)
 export const groupValidation = yup.object({
-    name: yup.string().required(t("group.nameRequired")),
-    privacy: yup.string().oneOf(["PUBLIC", "PRIVATE"]).required(t("group.privacyRequired")),
-    description: yup.string().nullable()
+    name: yup.string().required("Group name is required!"),
+    description: yup.string().nullable(),
 });

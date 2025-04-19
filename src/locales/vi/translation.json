@@ -74,6 +74,7 @@
 
   "groupForm": {
     "title": "Thông tin nhóm",
+    "editTitle": "Chỉnh sửa nhóm",
     "groupName": "Tên nhóm",
     "groupNamePlaceholder": "Nhập tên nhóm",
     "privacy": "Quyền riêng tư",
@@ -85,10 +86,36 @@
     "uploadSubHint": "SVG, PNG, JPG hoặc GIF (TỐI ĐA 800x400px)",
     "changePicture": "Thay đổi hình ảnh",
     "creating": "Đang tạo...",
+    "updating": "Đang cập nhật...",
     "createButton": "Tạo nhóm",
+    "updateButton": "Lưu thay đổi",
     "cancelButton": "Hủy",
     "createSuccess": "Tạo nhóm thành công!",
-    "createFailed": "Tạo nhóm thất bại!"
+    "createFailed": "Tạo nhóm thất bại!",
+    "updateSuccess": "Cập nhật nhóm thành công!",
+    "updateFailed": "Cập nhật nhóm thất bại!"
+  },
+  "groupDetail": {
+    "inviteMembers": "Mời thành viên",
+    "editGroup": "Chỉnh sửa nhóm",
+    "leaveGroup": "Rời nhóm",
+    "disbandGroup": "Giải tán nhóm",
+    "description": "Mô tả",
+    "createdAt": "Ngày tạo",
+    "tabs": {
+      "members": "Thành viên",
+      "challenges": "Thử thách"
+    },
+    "comingSoon": "🔥 Tính năng thử thách sẽ sớm có mặt!",
+    "loading": "Đang tải dữ liệu nhóm...",
+    "error": "Không thể tải nhóm.",
+    "permissionDenied": "Bạn không có quyền truy cập nhóm này.",
+    "leaveSuccess": "Rời nhóm thành công",
+    "leaveFailed": "Rời nhóm thất bại. Vui lòng thử lại.",
+    "disbandSuccess": "Đã giải tán nhóm.",
+    "disbandFailed": "Giải tán nhóm thất bại. Vui lòng thử lại.",
+    "kickSuccess": "Đã loại thành viên khỏi nhóm",
+    "kickFailed": "Không thể loại thành viên. Vui lòng thử lại."
   },
 
   "groupInvite": {
@@ -142,6 +169,63 @@
     "loading": "Đang tạo thử thách...",
     "success": "Tạo thử thách thành công!",
     "fail": "Tạo thử thách thất bại: "
-  }
+  },
+  "yourGroup": {
+    "createGroup": "Tạo nhóm",
+    "searchPlaceholder": "Tìm kiếm nhóm",
+    "filter": "Bộ lọc",
+    "invitations": "Lời mời tham gia nhóm",
+    "loadingInvitations": "Đang tải lời mời...",
+    "noInvitations": "Bạn không có lời mời nào",
+    "inviteLine": "{{name}} đã mời bạn tham gia",
+    "accept": "Chấp nhận",
+    "decline": "Từ chối",
+    "invitationResponseSuccess": "Cập nhật lời mời thành công.",
+    "invitationResponseFailed": "Phản hồi lời mời thất bại.",
+    "tabs": {
+      "All": "Tất cả",
+      "leader": "Trưởng nhóm",
+      "member": "Thành viên"
+    },
+    "yourGroups": "Nhóm của bạn",
+    "noGroups": "Bạn chưa tham gia nhóm nào",
+    "loadingGroups": "Đang tải danh sách nhóm...",
+    "errorGroups": "Không thể tải danh sách nhóm.",
+    "members": "thành viên"
+  },
+
+  "notification.challengeResult.title": "Kết quả thử thách: Hoàn thành",
+  "notification.challengeResult.content": "Bạn đã hoàn thành thử thách '{{challengeName}}'! Kiểm tra thành tích của bạn nhé!",
+  "notification.groupChallengeResult.title": "Kết quả thử thách nhóm: Hoàn thành",
+  "notification.groupChallengeResult.content": "Nhóm '{{groupName}}' đã hoàn thành thử thách '{{challengeName}}'! Xem thành tích nhóm ngay!",
+  "notification.challengeRoleUpdated.title": "Cập nhật vai trò trong thử thách",
+  "notification.challengeRoleUpdated.content": "Vai trò của bạn trong thử thách '{{challengeName}}' đã được cập nhật thành: {{role}}",
+  "notification.challengeStarted.title": "Thử thách '{{challengeName}}' đã bắt đầu!",
+  "notification.challengeStarted.content": "Hãy sẵn sàng chinh phục thử thách '{{challengeName}}' cùng GoBeyond!",
+  "notification.evidence.approved.title": "Bằng chứng ngày {{day}} đã được duyệt",
+  "notification.evidence.approved.content": "Bằng chứng ngày {{day}} trong thử thách '{{challengeName}}' đã được duyệt. Tiếp tục cố gắng nhé!",
+  "notification.evidence.rejected.title": "Bằng chứng ngày {{day}} bị từ chối",
+  "notification.evidence.rejected.content": "Bằng chứng ngày {{day}} trong thử thách '{{challengeName}}' đã bị từ chối. Vui lòng kiểm tra góp ý và nộp lại nếu cần.",
+  "notification.challenge.title": "Lời mời tham gia thử thách",
+  "notification.challenge.content": "{{inviterName}} đã mời bạn tham gia thử thách '{{challengeName}}'.",
+  "notification.group.title": "Lời mời tham gia nhóm",
+  "notification.group.content": "{{inviterName}} đã mời bạn tham gia nhóm '{{groupName}}'.",
+  "notification.kickGroup.title": "Bạn đã bị rời khỏi nhóm",
+  "notification.kickGroup.content": "Bạn đã bị quản trị viên xóa khỏi nhóm '{{groupName}}'.",
+  "notification.groupInvitation.title": "Lời mời tham gia nhóm",
+  "notification.groupInvitation.content": "Bạn đã được mời tham gia nhóm '{{groupName}}'.",
+  "notification.groupDisbanded.title": "Nhóm đã bị giải tán",
+  "notification.groupDisbanded.content": "Nhóm '{{groupName}}' đã bị giải tán.",
+  "notification.challengeInvitation.title": "Bạn có lời mời mới",
+  "notification.challengeInvitation.content": "Bạn đã được mời tham gia thử thách '{{challengeName}}'.",
+  "notification.leaderChallengeInvitation.title": "Bạn có lời mời mới",
+  "notification.leaderChallengeInvitation.content": "Bạn đã được mời dẫn dắt nhóm tham gia thử thách '{{challengeName}}'.",
+  "notification.groupJoinChallenge.title": "Nhóm của bạn đã tham gia thử thách!",
+  "notification.groupJoinChallenge.content": "Nhóm '{{groupName}}' đã tham gia thử thách '{{challengeName}}'.",
+  "notification.challengeCancelled.title": "Thử thách đã bị huỷ",
+  "notification.challengeCancelled.content": "Thử thách '{{challengeName}}' đã bị huỷ bởi quản trị viên hoặc Host.",
+  "notification.kickedFromChallenge.title": "Bạn đã bị kick khỏi thử thách",
+  "notification.kickedFromChallenge.content": "Bạn đã bị quản trị viên xóa khỏi thử thách '{{challengeName}}'.",
+  "notification.empty": "Không có thông báo mới."
 
 }
