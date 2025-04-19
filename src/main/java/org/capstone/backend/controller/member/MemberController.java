@@ -3,6 +3,7 @@ package org.capstone.backend.controller.member;
 import org.capstone.backend.dto.member.ChangePasswordRequest;
 import org.capstone.backend.dto.member.UserProfileRequest;
 import org.capstone.backend.dto.member.UserProfileResponse;
+import org.capstone.backend.service.auth.AuthService;
 import org.capstone.backend.service.member.MemberService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -14,9 +15,10 @@ import org.springframework.web.multipart.MultipartFile;
 public class MemberController {
 
     private final MemberService memberService;
-
-    public MemberController(MemberService memberService) {
+private final AuthService authService;
+    public MemberController(MemberService memberService, AuthService authService) {
         this.memberService = memberService;
+        this.authService = authService;
     }
 
     @GetMapping("/profile")
@@ -39,4 +41,9 @@ public class MemberController {
         memberService.changePassword(request);
         return ResponseEntity.ok("Password changed successfully!");
     }
+    @GetMapping("/me")
+    public Long getCurrentMemberId() {
+        return authService.getMemberIdFromAuthentication();
+    }
+
 }

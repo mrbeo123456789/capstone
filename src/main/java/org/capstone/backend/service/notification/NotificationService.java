@@ -8,6 +8,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 public interface NotificationService {
-    void sendNotification(String userId, String title, String content, NotificationType type);
+    void sendNotification(String userId, String titleKey, String contentKey, NotificationType type, Map<String, String> data);
     NotificationResponse getNotifications(int limit, String lastCreatedAtStr) ;
 }

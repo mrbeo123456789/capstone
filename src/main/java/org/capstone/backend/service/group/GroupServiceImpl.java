@@ -37,7 +37,6 @@ public class GroupServiceImpl implements GroupService {
     private final AuthService authService;
     private final GroupChallengeRepository groupChallengeRepository;
     private final ApplicationEventPublisher eventPublisher;
-    private final GlobalMemberRankingRepository groupRankingRepository;
     // ========================== GET ==========================
 
     @Override
@@ -217,10 +216,13 @@ public class GroupServiceImpl implements GroupService {
         memberToKick.setStatus(GroupMemberStatus.BANNED);
         eventPublisher.publishEvent(new InvitationSentEvent(
                 memberId.toString(),
-                "Bạn đã bị kick khỏi nhóm",
-                "Bạn đã bị quản trị viên xóa khỏi nhóm '" + group.getName() + "'.",
-                NotificationType.SYSTEM_NOTIFICATION
+                "notification.kickGroup.title",
+                "notification.kickGroup.content",
+                Map.of("groupName", group.getName())
+// 📦 dynamic data để FE render
+
         ));
+
         groupMemberRepository.save(memberToKick);
     }
 
@@ -252,34 +254,43 @@ public class GroupServiceImpl implements GroupService {
         // Tạo danh sách lời mời hoặc cập nhật trạng thái thành viên
         List<GroupMember> invitations = membersToInvite.stream()
                 .map(member -> {
-                    // Kiểm tra xem thành viên đã tham gia nhóm chưa
                     GroupMember existingMember = groupMemberRepository.findByGroupAndMember(group, member).orElse(null);
 
                     if (existingMember == null) {
-                        // Nếu thành viên chưa tham gia nhóm, tạo mới lời mời
                         return GroupMember.builder()
                                 .group(group)
                                 .member(member)
                                 .role("MEMBER")
-                                .status(GroupMemberStatus.PENDING) // Trạng thái lời mời
+                                .status(GroupMemberStatus.PENDING)
                                 .createdBy(group.getCreatedBy())
                                 .build();
-                    } else if (existingMember.getStatus() == GroupMemberStatus.LEFT) {
-                        // Nếu thành viên đã rời nhóm (status = LEFT), thay đổi trạng thái thành PENDING
+                    } else if (existingMember.getStatus() == GroupMemberStatus.LEFT
+                            || existingMember.getStatus() == GroupMemberStatus.BANNED) {
                         existingMember.setStatus(GroupMemberStatus.PENDING);
-                        return existingMember; // Trả về bản ghi đã cập nhật
+                        return existingMember;
                     }
-                    // Nếu thành viên đang ở trạng thái khác, không thay đổi gì
                     return null;
                 })
-                .filter(Objects::nonNull) // Loại bỏ các phần tử null
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
-        // Lưu các lời mời hoặc cập nhật vào cơ sở dữ liệu
         if (!invitations.isEmpty()) {
             groupMemberRepository.saveAll(invitations);
+
+            // ✅ Gửi thông báo cho từng thành viên được mời
+            invitations.forEach(invite -> {
+                Member invitedMember = invite.getMember();
+                eventPublisher.publishEvent(new InvitationSentEvent(
+                        invitedMember.getId().toString(),
+                        "notification.groupInvitation.title",
+                        "notification.groupInvitation.content",
+                        Map.of("groupName", group.getName())
+                ));
+
+            });
         }
     }
+
 
 
     @Override
@@ -356,10 +367,11 @@ public class GroupServiceImpl implements GroupService {
         members.forEach(m -> {
             eventPublisher.publishEvent(new InvitationSentEvent(
                     m.getMember().getId().toString(),
-                    "Nhóm đã bị giải tán",
-                    "Nhóm '" + group.getName() + "' đã bị giải tán.",
-                    NotificationType.SYSTEM_NOTIFICATION
+                    "notification.groupDisbanded.title",
+                    "notification.groupDisbanded.content",
+                    Map.of("groupName", group.getName())
             ));
+
         });
         groupMemberRepository.deleteByGroupId(groupId);
         groupRepository.delete(group);

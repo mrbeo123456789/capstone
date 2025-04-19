@@ -87,11 +87,11 @@ public class InvitationServiceImpl implements InvitationService {
             challengeMemberRepository.saveAll(invitations);
 
             // Gửi thông báo cho từng thành viên được mời
-            invitations.forEach(invite -> eventPublisher.publishEvent(new InvitationSentEvent(
+            invitations.forEach(invite ->eventPublisher.publishEvent(new InvitationSentEvent(
                     invite.getMember().getId().toString(),
-                    "Bạn có lời mời mới",
-                    "Bạn đã được mời tham gia thử thách '" + challenge.getName() + "'.",
-                    NotificationType.INVITATION
+                    "notification.challengeInvitation.title",
+                    "notification.challengeInvitation.content",
+                    Map.of("challengeName", challenge.getName())
             )));
 
             return (status == ChallengeMemberStatus.EXPIRED)
@@ -117,9 +117,10 @@ public class InvitationServiceImpl implements InvitationService {
             // Gửi thông báo cho từng chủ nhóm được mời
             request.getMemberIds().forEach(leaderId -> eventPublisher.publishEvent(new InvitationSentEvent(
                     leaderId.toString(),
-                    "Bạn có lời mời mới",
-                    "Bạn đã được mời dẫn dắt nhóm tham gia thử thách '" + challenge.getName() + "'.",
-                    NotificationType.INVITATION
+                    "notification.leaderChallengeInvitation.title",
+                    "notification.leaderChallengeInvitation.content",
+                    Map.of("challengeName", challenge.getName())
+
             )));
 
             return (groupStatus == GroupChallengeStatus.REJECTED)
@@ -240,11 +241,16 @@ public class InvitationServiceImpl implements InvitationService {
                 .forEach(memberId -> eventPublisher.publishEvent(
                         new InvitationSentEvent(
                                 memberId,
-                                "Nhóm của bạn đã tham gia thử thách!",
-                                "Nhóm '" + group.getName() + "' đã tham gia thử thách '" + challenge.getName() + "'.",
-                                NotificationType.INVITATION
+                                "notification.groupJoinChallenge.title",
+                                "notification.groupJoinChallenge.content",
+                                Map.of(
+                                        "groupName", group.getName(),
+                                        "challengeName", challenge.getName()
+                                )
+
                         )
                 ));
+
 
 
         return "Lời mời nhóm đã được chấp nhận.";

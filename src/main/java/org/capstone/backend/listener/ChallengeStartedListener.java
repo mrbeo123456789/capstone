@@ -12,6 +12,9 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Component
 @RequiredArgsConstructor
 public class ChallengeStartedListener {
@@ -31,15 +34,20 @@ public class ChallengeStartedListener {
             String email = member.getMember().getAccount().getEmail();
             String fullName = member.getMember().getFullName();
 
-            // 1. Gửi Notification
+            // 1. Gửi Notification (đa ngôn ngữ)
+            Map<String, String> data = new HashMap<>();
+            data.put("challengeName", challengeName);
+
             notificationService.sendNotification(
                     userId,
-                    "Thử thách '" + challengeName + "' đã bắt đầu!",
-                    "Hãy sẵn sàng chinh phục thử thách '" + challengeName + "' cùng GoBeyond!",
-                    NotificationType.CHALLENGE_STARTED
+                    "notification.challengeStarted.title",
+                    "notification.challengeStarted.content",
+                    NotificationType.CHALLENGE_STARTED,
+                    data
+
             );
 
-            // 2. Gửi Gmail
+            // 2. Gửi Email
             sendChallengeStartedEmail(email, fullName, challengeName);
         });
     }
@@ -63,7 +71,7 @@ public class ChallengeStartedListener {
 
             fixedGmailService.sendEmail(toEmail, subject, body);
         } catch (Exception e) {
-            // Có thể log lỗi nếu cần (ví dụ: logger.error(...))
+            // Log nếu cần
         }
     }
 }
