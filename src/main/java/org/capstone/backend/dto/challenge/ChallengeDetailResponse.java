@@ -21,10 +21,10 @@ public class ChallengeDetailResponse {
     private LocalDate endDate;
     private String picture;
     private String challengeType;
-    private ChallengeStatus challengeStatus;// Thời gian của thử thách, tính theo số ngày
     private boolean joined;
     private long participantCount;
     private long duration;
+    private ChallengeStatus challengeStatus;// Thời gian của thử thách, tính theo số ngày
     private VerificationType verificationType;    // Cập nhật kiểu enum
     private ParticipationType participationType;   // Cập nhật kiểu enum
 }

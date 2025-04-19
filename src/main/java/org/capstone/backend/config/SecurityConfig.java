@@ -38,7 +38,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/member/**").hasAnyRole("ADMIN", "MEMBER")
                         .requestMatchers("/api/groups/**").hasAnyRole("ADMIN", "MEMBER")
-                        .requestMatchers("/api/challenges/**").hasAnyRole("ADMIN", "MEMBER")
+                        .requestMatchers("/api/challenges/**").permitAll()
                         .requestMatchers("/api/evidences/**").hasAnyRole("ADMIN", "MEMBER")
                         .requestMatchers("/api/tinymce/**").hasAnyRole("ADMIN", "MEMBER")
                         .anyRequest().authenticated()

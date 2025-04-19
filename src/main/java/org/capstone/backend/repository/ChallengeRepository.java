@@ -77,7 +77,6 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
         c.endDate, 
         c.picture, 
         c.challengeType.name,
-        c.status,               
         CASE 
             WHEN :memberId IS NULL THEN false
             WHEN EXISTS (
@@ -88,15 +87,17 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
         END,
         (SELECT COUNT(cm) FROM ChallengeMember cm WHERE cm.challenge.id = c.id),
         DATEDIFF(c.endDate, c.startDate), 
+        c.status,                
         c.verificationType,
         c.participationType
     )
     FROM Challenge c
     WHERE c.id = :challengeId
-""")
+    """)
     ChallengeDetailResponse findChallengeDetailByIdAndMemberId(
             @Param("challengeId") Long challengeId,
             @Param("memberId") Long memberId);
+
 
 
     @Query("SELECT c.id FROM Challenge c " +
@@ -127,4 +128,15 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
     @Query("SELECT c.id FROM Challenge c WHERE c.status = 'ONGOING'")
     List<Long> findAllOngoingChallengeIds();
 
-    }
+    @Query("""
+    SELECT c FROM Challenge c
+    WHERE c.status = :status
+    AND (c.startDate > :date OR c.startDate = :date)
+""")
+    Page<Challenge> findUpcomingChallenges(
+            @Param("status") ChallengeStatus status,
+            @Param("date") LocalDate date,
+            Pageable pageable
+    );
+
+}

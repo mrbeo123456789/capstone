@@ -124,4 +124,13 @@ public class ChallengeController {
         return ResponseEntity.ok(result);
     }
 
+    @GetMapping("/public/upcoming")
+    public ResponseEntity<Page<ChallengeResponse>> getUpcomingApprovedChallenges(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Page<ChallengeResponse> upcomingChallenges = challengeService.getUpcomingApprovedChallenges(page, size);
+        return ResponseEntity.ok(upcomingChallenges);
+    }
+
 }

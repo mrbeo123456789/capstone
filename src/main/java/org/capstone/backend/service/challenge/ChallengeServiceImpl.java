@@ -16,6 +16,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -185,6 +186,7 @@ public class ChallengeServiceImpl implements ChallengeService {
         Challenge challenge = Challenge.builder()
                 .name(request.getName())
                 .description(request.getDescription())
+                .summary(request.getSummary())
                 .privacy(request.getPrivacy())
                 .status(isMember ? ChallengeStatus.PENDING : ChallengeStatus.APPROVED)
                 .verificationType(request.getVerificationType())
@@ -467,4 +469,29 @@ public class ChallengeServiceImpl implements ChallengeService {
                 challengeId, keyword == null ? "" : keyword, pageable
         );
     }
+
+    @Override
+    public Page<ChallengeResponse> getUpcomingApprovedChallenges(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.asc("startDate")));
+
+        Page<Challenge> challengePage = challengeRepository.findUpcomingChallenges(
+                ChallengeStatus.UPCOMING, LocalDate.now(), pageable
+        );
+
+        return challengePage.map(this::convertToResponse);
+    }
+
+    private ChallengeResponse convertToResponse(Challenge challenge) {
+        return new ChallengeResponse(
+                challenge.getId(),
+                challenge.getName(),
+                challenge.getSummary(),
+                challenge.getPicture(),
+                challenge.getStartDate(),
+                challenge.getEndDate(),
+                challenge.getChallengeType().getName(),        // assuming challengeType is not null
+                challenge.getParticipationType()
+        );
+    }
+
 }

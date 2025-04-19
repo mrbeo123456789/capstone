@@ -27,4 +27,5 @@ public interface ChallengeService {
     String kickMemberFromChallenge(Long challengeId, Long targetMemberId);
     Page<MemberSubmissionProjection> getJoinedMembersWithPendingEvidence(
             Long challengeId, String keyword, int page, int size);
+    Page<ChallengeResponse> getUpcomingApprovedChallenges(int page, int size);
 }
