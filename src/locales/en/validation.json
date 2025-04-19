@@ -1,0 +1,34 @@
+{
+  "candidate": {
+    "fullNameRequired": "Full name is required!",
+    "dobRequired": "Date of birth is required!",
+    "dobInvalid": "You must be older than 16 years old!",
+    "genderRequired": "Gender is required!"
+  },
+  "challenge": {
+    "nameRequired": "Challenge name is required!",
+    "nameMin": "Challenge name must be at least 3 characters",
+    "startDateRequired": "Start date is required",
+    "startDateMin": "Start date must be in the future",
+    "endDateRequired": "End date is required",
+    "endDateAfterStart": "End date must be after start date",
+    "maxParticipantsType": "Max participants must be a number",
+    "maxParticipantsPositive": "Max participants must be greater than 0",
+    "maxParticipantsInteger": "Max participants must be an integer",
+    "descriptionRequired": "Description is required",
+    "descriptionMin": "Description should be at least 10 characters long",
+    "pictureRequired": "Picture is required",
+    "pictureSize": "Picture size must be less than 50MB",
+    "pictureType": "Unsupported File Format",
+    "challengeTypeRequired": "Challenge type is required"
+  },
+  "login": {
+    "usernameRequired": "Username is required!",
+    "passwordRequired": "Password is required!",
+    "passwordMin": "Password must be at least 8 characters!"
+  },
+  "group": {
+    "nameRequired": "Group name is required!",
+    "privacyRequired": "Privacy setting is required!"
+  }
+}
