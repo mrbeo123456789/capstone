@@ -49,7 +49,7 @@ const ProofUploads = ({ challenge, evidence }) => {
     };
 
     return (
-        <div className="mt-6 w-full mx-auto p-4">
+        <div className="w-full mx-auto p-4">
             <h2 className="text-xl font-bold mb-4 text-center">View your proof activity</h2>
 
             <div className="grid sm:grid-cols-6 gap-4 justify-center grid-cols-3">

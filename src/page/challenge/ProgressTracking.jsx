@@ -90,10 +90,10 @@ export default function ProgressTracking({ challenge, evidence }) {
                         <div
                             key={idx}
                             className={`relative h-10 flex items-center justify-center rounded transition-all
-                                            ${isCurrentMonth ? "cursor-pointer hover:bg-gray-400 text-gray-800" : "text-gray-400 opacity-50"}
+                                            ${isCurrentMonth ? "cursor-pointer hover:bg-gray-400 text-gray-800" : "text-gray-400 opacity-70"}
                                             ${hasEvidence ? "bg-green-200"
                                 : showRedX ? "bg-red-200"
-                                    : isWithinChallenge ? "bg-gray-200"
+                                    : isWithinChallenge ? "bg-gray-300"
                                         : ""}
                                             ${isToday ? "border border-blue-500" : ""}
                                         `}

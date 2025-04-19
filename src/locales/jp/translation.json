@@ -148,20 +148,38 @@
   },
 
   "JoinsChallengeDetail": {
-    "notJoined": "このチャレンジにはまだ参加していません。",
-    "loading": "チャレンジを読み込んでいます...",
+    "disabledDuringChallenge": "チャレンジ中または終了後はこの操作はできません。",
+    "notJoined": "このチャレンジに参加していません。",
+    "loading": "読み込み中...",
     "error": "チャレンジの詳細を読み込めませんでした。",
-    "loadingProof": "証拠データを読み込んでいます...",
+    "leaveSuccess": "チャレンジから退出しました。",
+    "leaveFail": "チャレンジから退出できませんでした。",
+    "reportSuccess": "報告が正常に送信されました。",
+    "reportFail": "報告の送信に失敗しました。",
+    "loadingProof": "証拠データを読み込み中...",
     "proof": "証拠",
     "member": "メンバー",
     "review": "レビュー",
     "description": "説明",
-    "invite": "メンバーを招待",
-    "leave": "チャレンジを退出",
+    "invite": "招待",
+    "leave": "退出",
     "share": "共有",
     "report": "報告",
-    "title": "チャレンジ"
+    "title": "チャレンジ",
+    "reportTitle": "チャレンジを報告する",
+    "reportType": "報告の種類",
+    "type": {
+      "inappropriate": "不適切な内容",
+      "spam": "スパム",
+      "harassment": "攻撃的な行為",
+      "rule": "ルール違反",
+      "other": "その他"
+    },
+    "reason": "理由",
+    "submit": "報告を送信",
+    "cancel": "キャンセル"
   }
+
 
 
 }

@@ -12,18 +12,24 @@ import VoteOther from "./VoteOther";
 import Description from "./Description.jsx";
 import ProgressTracking from "./ProgressTracking.jsx";
 import ChallengeInvitePopup from "./ChallengeInvitePopup.jsx";
-import { useGetChallengeDetailQuery } from "../../service/challengeService.js";
+import {
+    useGetChallengeDetailQuery,
+    useLeaveChallengeMutation
+} from "../../service/challengeService.js";
 import { useGetMyEvidencesByChallengeQuery } from "../../service/evidenceService.js";
+import ReportChallengeModal from "./modal/ReportChallengeModal.jsx";
 
 const JoinedChallengeDetail = () => {
     const { t } = useTranslation();
     const [activeTab, setActiveTab] = useState("proof");
     const [showPopup, setShowPopup] = useState(false);
+    const [showReportModal, setShowReportModal] = useState(false);
     const navigate = useNavigate();
     const { id } = useParams();
 
     const { data, isLoading, error } = useGetChallengeDetailQuery(id);
     const { data: evidenceData, isEvidenceLoading } = useGetMyEvidencesByChallengeQuery(id);
+    const [leaveChallenge] = useLeaveChallengeMutation();
 
     useEffect(() => {
         if (data && data.joined === false) {
@@ -39,6 +45,19 @@ const JoinedChallengeDetail = () => {
 
     const openInviteMember = () => setShowPopup(true);
     const closeUserDetail = () => setShowPopup(false);
+    const openReportModal = () => setShowReportModal(true);
+    const closeReportModal = () => setShowReportModal(false);
+
+    const handleLeave = async () => {
+        try {
+            await leaveChallenge(challenge.id).unwrap();
+            toast.success(t("JoinsChallengeDetail.leaveSuccess"));
+            navigate("/challenges/joins");
+        } catch (e) {
+            const message = e?.data?.message || t("JoinsChallengeDetail.leaveFail");
+            toast.error(message);
+        }
+    };
 
     const tabItems = [
         { key: "proof", label: t("JoinsChallengeDetail.proof"), icon: <FaCheckCircle /> },
@@ -55,22 +74,88 @@ const JoinedChallengeDetail = () => {
                         <div className="flex justify-between">
                             <h2 className="text-2xl font-bold text-gray-900">{challenge?.name}</h2>
                             <div className="flex gap-3 items-center mb-4">
-                                <button title={t("JoinsChallengeDetail.invite")} onClick={openInviteMember} className="text-orange-500 hover:text-orange-700 text-xl"><FaUserPlus /></button>
-                                <button title={t("JoinsChallengeDetail.leave")} onClick={() => console.log("Leave")} className="text-red-500 hover:text-red-700 text-xl"><FaSignOutAlt /></button>
-                                <button title={t("JoinsChallengeDetail.share")} onClick={() => console.log("Share")} className="text-blue-500 hover:text-blue-700 text-xl"><FaShareAlt /></button>
-                                <button title={t("JoinsChallengeDetail.report")} onClick={() => console.log("Report")} className="text-red-500 hover:text-red-700 text-xl"><FaFlag /></button>
+                                {/* Determine date status */}
+                                {(() => {
+                                    const now = new Date();
+                                    const start = new Date(challenge.startDate);
+                                    const end = new Date(challenge.endDate);
+                                    const isBeforeStart = now < start;
+                                    const isAfterEnd = now > end;
+                                    const isOngoing = now >= start && now <= end;
+
+                                    return (
+                                        <>
+                                            {/* Invite Button */}
+                                            <button
+                                                title={
+                                                    isOngoing
+                                                        ? t("JoinsChallengeDetail.disabledDuringChallenge")
+                                                        : t("JoinsChallengeDetail.invite")
+                                                }
+                                                onClick={isOngoing ? undefined  : openInviteMember}
+                                                disabled={isOngoing}
+                                                className={`text-xl transition ${
+                                                    isOngoing
+                                                        ? "text-gray-400 cursor-not-allowed"
+                                                        : "text-orange-500 hover:text-orange-700"
+                                                }`}
+                                            >
+                                                <FaUserPlus />
+                                            </button>
+
+                                            {/* Leave Button */}
+                                            <button
+                                                title={
+                                                    isOngoing
+                                                        ? t("JoinsChallengeDetail.disabledDuringChallenge")
+                                                        : t("JoinsChallengeDetail.leave")
+                                                }
+                                                onClick={isOngoing ? undefined  : handleLeave}
+                                                disabled={isOngoing}
+                                                className={`text-xl transition ${
+                                                    isOngoing
+                                                        ? "text-gray-400 cursor-not-allowed"
+                                                        : "text-red-500 hover:text-red-700"
+                                                }`}
+                                            >
+                                                <FaSignOutAlt />
+                                            </button>
+
+                                            {/* Share Button */}
+                                            <button
+                                                title={t("JoinsChallengeDetail.share")}
+                                                onClick={() => console.log("Share")}
+                                                className="text-blue-500 hover:text-blue-700 text-xl"
+                                            >
+                                                <FaShareAlt/>
+                                            </button>
+
+                                            {/* Report Button */}
+                                            <button
+                                                title={t("JoinsChallengeDetail.report")}
+                                                onClick={openReportModal}
+                                                className="text-red-500 hover:text-red-700 text-xl"
+                                            >
+                                                <FaFlag/>
+                                            </button>
+                                        </>
+                                    );
+                                })()}
                             </div>
+
                         </div>
                         <p className="text-gray-500 mt-2">{challenge?.startDate} - {challenge?.endDate}</p>
                         <p className="text-sm text-gray-700 mt-2">
-                            {t("JoinsChallengeDetail.title")}: <span className="text-orange-500 font-semibold">{challenge?.challengeType}</span>
+                            {t("JoinsChallengeDetail.title")}: <span
+                            className="text-orange-500 font-semibold">{challenge?.challengeType}</span>
                         </p>
                         <div>
-                            <ProgressTracking challenge={challenge} evidence={evidenceData} />
+                            <ProgressTracking challenge={challenge} evidence={evidenceData}/>
                         </div>
                     </div>
                     <div className="bg-gray-200 flex items-center justify-center rounded-lg md:w-2/5">
-                        <img src={challenge?.picture} alt={challenge?.name} className="w-full h-[450px] object-cover rounded" />
+                        <img src={challenge?.picture} alt={challenge?.name}
+                             className="w-full h-[450px] object-cover rounded"/>
                     </div>
                 </div>
             </div>
@@ -82,8 +167,8 @@ const JoinedChallengeDetail = () => {
                             key={tab.key}
                             onClick={() => setActiveTab(tab.key)}
                             className={`flex-1 flex flex-col sm:flex-row items-center justify-center px-4 py-3 transition-all
-                ${activeTab === tab.key ? "border-t-4 border-red-500 bg-orange-300 text-black" : "bg-white text-black"}
-                hover:bg-orange-100 hover:text-black`}
+                                ${activeTab === tab.key ? "border-t-4 border-red-500 bg-orange-300 text-black" : "bg-white text-black"}
+                                hover:bg-orange-100 hover:text-black`}
                         >
                             <span className="text-lg mr-2">{tab.icon}</span>
                             <span>{tab.label}</span>
@@ -101,8 +186,9 @@ const JoinedChallengeDetail = () => {
 
                 {activeTab === "ranking" && <RankingList />}
                 {activeTab === "review" && <VoteOther />}
-                {activeTab === "description" && <Description content={challenge?.description} />}
+                {activeTab === "description" && <Description content={challenge} />}
                 {showPopup && <ChallengeInvitePopup onClose={closeUserDetail} />}
+                {showReportModal && <ReportChallengeModal challengeId={challenge.id} onClose={closeReportModal} />}
             </div>
         </div>
     );
