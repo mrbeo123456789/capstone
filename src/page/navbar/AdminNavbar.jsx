@@ -24,7 +24,7 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
 
     // Check if current path is under challenge management
     useEffect(() => {
-        const challengePaths = ['/admin/challengelist', '/admin/challenge/create', '/admin/challenge/statistics'];
+        const challengePaths = ['/admin/challengemanagement', '/admin/challenge/create', '/admin/challenge/statistics'];
         const shouldOpenChallengeMenu = challengePaths.some(path => location.pathname.startsWith(path));
         setIsChallengeMenuOpen(shouldOpenChallengeMenu);
     }, [location.pathname]);
@@ -51,7 +51,7 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
 
     // Check if a challenge management route is active
     const isChallengeRouteActive = () => {
-        return ['/admin/challengelist', '/admin/challenge/create', '/admin/challenge/statistics'].some(
+        return ['/admin/challengemanagement', '/admin/challenge/create', '/admin/challenge/statistics'].some(
             path => location.pathname.startsWith(path)
         );
     };
@@ -59,7 +59,7 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
     // Challenge submenu items
     const challengeSubMenuItems = [
         {
-            path: "/admin/challengelist",
+            path: "/admin/challengemanagement",
             icon: <List size={18} />,
             title: "List"
         },
@@ -211,7 +211,7 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
                         {/* User Management */}
                         <li>
                             <NavLink
-                                to="/admin/userlist"
+                                to="/admin/usermanagement"
                                 className={({ isActive }) =>
                                     `flex items-center ${
                                         isCollapsed ? "justify-center" : "px-4"

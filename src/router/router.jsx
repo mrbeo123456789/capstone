@@ -89,19 +89,19 @@ const router = createBrowserRouter([
             { path: "dashboard", element: <AdminDashboard /> },
             { path: "usermanagement", element: <UserList /> },
             { path: "evidencemanagement", element: <ChallengeEvidencePage /> },
+            {path: "settings", element: <Settings /> },
             {
-                path: "reports",
+                path: "reports/*",
+                element: <ReportList />,
                 children: [
-                    { index: true, element: <ReportList /> },
+                    // { index: true, element: <ReportList /> },
                     { path: ":reportId/detail", element: <ReportDetail /> }
                 ]
             },
-            { path: "reportdetail", element: <ReportDetail /> },
             { path: "groupmanagement", element: <GroupList /> },
-            { path: "challengelist", element: <ChallengeList /> },
+            { path: "challengemanagement", element: <ChallengeList /> },
             { path: "challenge/create", element: <CreateChallenge /> },
-            { path: "/adminchallenge/:id/detail", element: <AdminChallengeDetail /> },
-            { path: "settings", element: <Settings /> }
+            { path: "/adminchallenge/:id/detail", element: <AdminChallengeDetail /> }
         ]
     }
 ]);

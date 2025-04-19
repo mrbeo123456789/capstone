@@ -42,7 +42,8 @@ const ChallengeForm = () => {
         resolver: yupResolver(challengeValidation),
         defaultValues: {
             startDate: getFormattedDate(today),
-            endDate: getFormattedDate(tomorrow)
+            endDate: getFormattedDate(tomorrow),
+            privacy: "PUBLIC" // Always set default privacy to PUBLIC
         }
     });
 
@@ -60,6 +61,7 @@ const ChallengeForm = () => {
         // Pre-process
         const processedData = {
             ...data,
+            privacy: "PUBLIC", // Always use PUBLIC for privacy
             maxParticipants: parseInt(data.maxParticipants),
             challengeTypeId: parseInt(data.challengeTypeId),
             startDate: formatDate(data.startDate),
@@ -241,6 +243,9 @@ const ChallengeForm = () => {
                     <h3 className="mb-4 text-xl font-bold ">Challenge Details</h3>
 
                     <form onSubmit={handleSubmit(onSubmit)} autoComplete="false">
+                        {/* Hidden input for privacy - always set to PUBLIC */}
+                        <input type="hidden" {...register("privacy")} value="PUBLIC" />
+
                         <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                             {/* Start & End Date */}
                             <div>
@@ -262,15 +267,6 @@ const ChallengeForm = () => {
                                     className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                                 />
                                 <p className="text-red-600">{errors.endDate?.message}</p>
-                            </div>
-                            {/* Privacy Status */}
-                            <div>
-                                <label className="text-sm font-medium ">Privacy</label>
-                                <select {...register("privacy")}
-                                        className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
-                                    <option value="PUBLIC">Public</option>
-                                    <option value="PRIVATE">Private</option>
-                                </select>
                             </div>
 
                             {/* Verification Type */}

@@ -9,28 +9,33 @@ const ChallengeList = () => {
     const navigate = useNavigate();
 
     // Parse URL query parameters
-    // Parse URL query parameters
     const queryParams = new URLSearchParams(location.search);
     const statusFromURL = queryParams.get('status');
 
-// State management
-// Chuyển currentPage sang 0-indexed giống UserList
+    // State management
     const [currentPage, setCurrentPage] = useState(0);
     const [searchTerm, setSearchTerm] = useState("");
     const [filterStatus, setFilterStatus] = useState(statusFromURL);
     const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
+    // Modal state
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [actionType, setActionType] = useState("");
+    const [selectedChallengeId, setSelectedChallengeId] = useState(null);
+    const [message, setMessage] = useState("");
+    const [actionError, setActionError] = useState(""); // New state for error messages
+
     const itemsPerPage = 10;
 
-// Effect để đồng bộ status filter theo URL
+    // Effect để đồng bộ status filter theo URL
     useEffect(() => {
         if (statusFromURL) {
             setFilterStatus(statusFromURL);
         }
     }, [statusFromURL]);
 
-// Gọi API phân trang (API đang nhận page ở dạng 0-indexed)
+    // Gọi API phân trang (API đang nhận page ở dạng 0-indexed)
     const {
         data: challengesResponse = {},
         isLoading,
@@ -38,13 +43,13 @@ const ChallengeList = () => {
         refetch,
     } = useGetChallengesQuery({ page: currentPage, size: itemsPerPage, search: searchTerm, status: filterStatus });
 
-// Sử dụng mutation reviewChallenge
+    // Sử dụng mutation reviewChallenge
     const [reviewChallenge] = useReviewChallengeMutation();
 
-// Giả định API trả về dữ liệu có property "content"
+    // Giả định API trả về dữ liệu có property "content"
     const allChallenges = challengesResponse?.content || [];
 
-// Hàm tính duration giữa startDate và endDate (tính theo ngày)
+    // Hàm tính duration giữa startDate và endDate (tính theo ngày)
     const computeDuration = (challenge) => {
         if (challenge.startDate && challenge.endDate) {
             let s = challenge.startDate;
@@ -63,7 +68,7 @@ const ChallengeList = () => {
         return "";
     };
 
-// Cập nhật filter status và đồng bộ URL
+    // Cập nhật filter status và đồng bộ URL
     const updateStatusFilter = (status) => {
         setFilterStatus(status);
         setIsStatusDropdownOpen(false);
@@ -77,43 +82,92 @@ const ChallengeList = () => {
         navigate({ pathname: location.pathname, search: newParams.toString() }, { replace: true });
     };
 
-// Phân trang theo dữ liệu trả về từ API
-// currentChallenges chính là kết quả phân trang từ API
+    // Phân trang theo dữ liệu trả về từ API
     const currentChallenges = challengesResponse?.content || [];
     const totalElements = challengesResponse?.totalElements || 0;
     const totalPages = challengesResponse?.totalPages || Math.ceil(totalElements / itemsPerPage);
 
-// Navigation tới trang chi tiết của challenge
+    // Navigation tới trang chi tiết của challenge
     const navigateToChallengeDetail = (challenge) => {
         navigate(`/admin/challenge/${challenge.id}/detail`);
     };
 
-// Hàm xử lý review (Approve/Reject)
-    const handleAction = async (challengeId, action) => {
-        const newStatus = action === "confirmed" ? "APPROVED" : "REJECTED";
+    // Mở modal khi người dùng nhấn action button
+    const openActionModal = (challengeId, action) => {
+        setSelectedChallengeId(challengeId);
+        setActionType(action);
+        setMessage("");
+        setActionError(""); // Clear any previous errors
+        setIsModalOpen(true);
+    };
+
+    // Đóng modal
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setSelectedChallengeId(null);
+        setActionType("");
+        setMessage("");
+        setActionError("");
+    };
+
+    // Hàm xử lý submit modal
+    const handleModalSubmit = async () => {
+        if (!selectedChallengeId || !actionType) return;
+
+        let newStatus;
+        switch (actionType) {
+            case "confirmed":
+                newStatus = "APPROVED";
+                break;
+            case "rejected":
+                newStatus = "REJECTED";
+                break;
+            case "banned":
+                newStatus = "BANNED";
+                break;
+            default:
+                return;
+        }
+
         try {
-            const reviewRequest = { challengeId, status: newStatus };
-            const response = await reviewChallenge(reviewRequest).unwrap();
-            console.log("Review challenge response:", response);
-            refetch();
+            setActionError(""); // Clear any previous errors
+
+            // Đảm bảo gửi đúng format dữ liệu mà backend mong đợi
+            const reviewRequest = {
+                challengeId: selectedChallengeId,
+                status: newStatus,
+                adminNote: message // Thêm message vào request
+            };
+
+            console.log("Sending review request:", message);
+            const resultion = await reviewChallenge(reviewRequest);
+
+            // Check if there is an error in the response
+            if (resultion.error) {
+                // If there's an error but the status is 200, it's likely a parsing error
+                // but the operation was successful
+                if (resultion.error.originalStatus === 200) {
+                    console.log("Operation successful despite parsing error");
+                    closeModal();
+                    refetch();
+                } else {
+                    // Real error
+                    console.error(`Error ${actionType} challenge:`, resultion.error);
+                    setActionError(`Error: ${resultion.error.data || 'Unknown error occurred'}`);
+                }
+            } else {
+                // Success
+                console.log(`Challenge ${actionType} successful:`, resultion.data);
+                closeModal();
+                refetch();
+            }
         } catch (error) {
-            console.error(`Error ${action} challenge:`, error);
+            console.error(`Error ${actionType} challenge:`, error);
+            setActionError(`Error: ${error.message || 'Unknown error occurred'}`);
         }
     };
 
-// Hàm xử lý ban challenge (chuyển sang status BANNED)
-    const banChallenge = async (challengeId) => {
-        try {
-            const reviewRequest = { challengeId, status: "BANNED" };
-            const response = await reviewChallenge(reviewRequest).unwrap();
-            console.log("Ban challenge response:", response);
-            refetch();
-        } catch (error) {
-            console.error("Error banning challenge:", error);
-        }
-    };
-
-// Xử lý dropdown status
+    // Xử lý dropdown status
     const toggleStatusDropdown = () => {
         setIsStatusDropdownOpen(!isStatusDropdownOpen);
     };
@@ -122,13 +176,13 @@ const ChallengeList = () => {
         updateStatusFilter(status);
     };
 
-// Xử lý thay đổi của ô search
+    // Xử lý thay đổi của ô search
     const handleSearchChange = (e) => {
         setSearchTerm(e.target.value);
         setCurrentPage(0);
     };
 
-// Pagination handlers (giống như UserList)
+    // Pagination handlers
     const nextPage = () => {
         if (currentPage < totalPages - 1) {
             setCurrentPage(currentPage + 1);
@@ -141,7 +195,7 @@ const ChallengeList = () => {
         }
     };
 
-// Hàm chuyển đổi tên hiển thị status
+    // Hàm chuyển đổi tên hiển thị status
     const getStatusDisplayName = (status) => {
         if (!status) return "All Status";
 
@@ -156,6 +210,34 @@ const ChallengeList = () => {
             case "FINISH": return "FINISH";
             case "UPCOMING": return "UPCOMING";
             default: return status;
+        }
+    };
+
+    // Hàm lấy tiêu đề cho modal dựa trên action type
+    const getModalTitle = () => {
+        switch (actionType) {
+            case "confirmed":
+                return "Approve Challenge";
+            case "rejected":
+                return "Reject Challenge";
+            case "banned":
+                return "Ban Challenge";
+            default:
+                return "Review Challenge";
+        }
+    };
+
+    // Hàm lấy placeholder text cho message input dựa trên action type
+    const getMessagePlaceholder = () => {
+        switch (actionType) {
+            case "confirmed":
+                return "Enter approval message for the challenge owner...";
+            case "rejected":
+                return "Enter reason for rejection...";
+            case "banned":
+                return "Enter reason for banning this challenge...";
+            default:
+                return "Enter message for the user...";
         }
     };
 
@@ -268,9 +350,13 @@ const ChallengeList = () => {
                                                     <div className="flex items-center space-x-3">
                                                         <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-orange-200">
                                                             <img
-                                                                src={challenge.picture}
+                                                                src={challenge.picture || "/placeholder-image.png"}
                                                                 alt={challenge.name}
                                                                 className="w-full h-full object-cover"
+                                                                onError={(e) => {
+                                                                    e.target.onerror = null;
+                                                                    e.target.src = "/placeholder-image.png";
+                                                                }}
                                                             />
                                                         </div>
                                                         <span
@@ -307,13 +393,15 @@ const ChallengeList = () => {
                                                                     <>
                                                                         <button
                                                                             className="p-2 bg-green-100 text-green-600 rounded-md hover:bg-green-200 transition-colors"
-                                                                            onClick={() => handleAction(challenge.id, "confirmed")}
+                                                                            onClick={() => openActionModal(challenge.id, "confirmed")}
+                                                                            title="Approve Challenge"
                                                                         >
                                                                             <CheckCircle className="h-5 w-5" />
                                                                         </button>
                                                                         <button
                                                                             className="p-2 bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition-colors"
-                                                                            onClick={() => handleAction(challenge.id, "rejected")}
+                                                                            onClick={() => openActionModal(challenge.id, "rejected")}
+                                                                            title="Reject Challenge"
                                                                         >
                                                                             <XCircle className="h-5 w-5" />
                                                                         </button>
@@ -323,7 +411,8 @@ const ChallengeList = () => {
                                                                 return (
                                                                     <button
                                                                         className="p-2 bg-green-100 text-green-600 rounded-md hover:bg-green-200 transition-colors"
-                                                                        onClick={() => handleAction(challenge.id, "confirmed")}
+                                                                        onClick={() => openActionModal(challenge.id, "confirmed")}
+                                                                        title="Approve Challenge"
                                                                     >
                                                                         <CheckCircle className="h-5 w-5" />
                                                                     </button>
@@ -334,7 +423,8 @@ const ChallengeList = () => {
                                                                 return (
                                                                     <button
                                                                         className="p-2 bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition-colors"
-                                                                        onClick={() => banChallenge(challenge.id)}
+                                                                        onClick={() => openActionModal(challenge.id, "banned")}
+                                                                        title="Ban Challenge"
                                                                     >
                                                                         <Ban className="h-5 w-5" />
                                                                     </button>
@@ -351,7 +441,7 @@ const ChallengeList = () => {
                             )}
                         </div>
 
-                        {/* Pagination Controls (giống UserList) */}
+                        {/* Pagination Controls */}
                         <div className="bg-gradient-to-r from-orange-50 to-yellow-50 p-4 flex flex-col md:flex-row md:items-center justify-between border-t border-orange-100 gap-4">
                             <div className="text-gray-600">
                                 Display{" "}
@@ -394,7 +484,59 @@ const ChallengeList = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Modal Component */}
+            {isModalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+                        <div className="p-6 border-b border-orange-100">
+                            <h3 className="text-lg font-semibold text-orange-700">{getModalTitle()}</h3>
+                        </div>
+                        <div className="p-6">
+                            <div className="mb-4">
+                                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+                                    Message to User
+                                </label>
+                                <textarea
+                                    id="message"
+                                    rows="4"
+                                    className="w-full border border-orange-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-orange-300"
+                                    placeholder={getMessagePlaceholder()}
+                                    value={message}
+                                    onChange={(e) => setMessage(e.target.value)}
+                                ></textarea>
+                            </div>
+                            <p className="text-sm text-gray-500 mb-4">
+                                {actionType === "confirmed" && "This message will be sent to the user when the challenge is approved."}
+                                {actionType === "rejected" && "This message will explain to the user why their challenge was rejected."}
+                                {actionType === "banned" && "This message will inform the user that their challenge has been banned."}
+                            </p>
+                        </div>
+                        <div className="p-4 bg-gray-50 rounded-b-lg flex justify-end space-x-3">
+                            <button
+                                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100"
+                                onClick={closeModal}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                className={`px-4 py-2 rounded-md text-white ${
+                                    actionType === "confirmed"
+                                        ? "bg-green-600 hover:bg-green-700"
+                                        : actionType === "rejected" || actionType === "banned"
+                                            ? "bg-red-600 hover:bg-red-700"
+                                            : "bg-orange-600 hover:bg-orange-700"
+                                }`}
+                                onClick={handleModalSubmit}
+                            >
+                                {actionType === "confirmed" ? "Approve" : actionType === "rejected" ? "Reject" : actionType === "banned" ? "Ban" : "Submit"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
+
 export default ChallengeList;

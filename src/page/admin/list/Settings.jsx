@@ -943,7 +943,7 @@ const AdminSettings = () => {
                                     {activeTab === 'challenges' && (
                                         <div>
                                             <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
-                                                <Award className="h-5 w-5 mr-2"/> Challenge Settings
+                                                <Award className="h-5 w-5 mr-2"/> Challenge Types
                                             </h2>
 
                                             <div className="mb-8">
