@@ -16,36 +16,118 @@ const ChallengeDetail = () => {
     console.log(challenge);
     const [reviewChallenge] = useReviewChallengeMutation();
 
+    // Modal state
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [actionType, setActionType] = useState("");
+    const [message, setMessage] = useState("");
+    const [actionError, setActionError] = useState("");
+
     const handleGoBack = () => {
         navigate(-1);
     };
 
     const handleGoToList = () => {
-        navigate('/admin/challengelist');
+        navigate('/admin/challengemanagement');
     };
 
-    // Xử lý hành động duyệt (APPROVED/REJECTED) dựa trên verificationType và participationType
-    const handleAction = async (challengeId, action) => {
-        // Giả sử nếu action là "confirmed" thì muốn set thành "APPROVED", còn nếu "rejected" thì thành "REJECTED"
-        const newStatus = action === "confirmed" ? "APPROVED" : "REJECTED";
+    // Open modal when user clicks action button
+    const openActionModal = (action) => {
+        setActionType(action);
+        setMessage("");
+        setActionError("");
+        setIsModalOpen(true);
+    };
+
+    // Close modal
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setActionType("");
+        setMessage("");
+        setActionError("");
+    };
+
+    // Xử lý submit modal
+    const handleModalSubmit = async () => {
+        if (!id || !actionType) return;
+
+        let newStatus;
+        switch (actionType) {
+            case "confirmed":
+                newStatus = "APPROVED";
+                break;
+            case "rejected":
+                newStatus = "REJECTED";
+                break;
+            case "banned":
+                newStatus = "BANNED";
+                break;
+            default:
+                return;
+        }
+
         try {
-            const reviewRequest = { challengeId, status: newStatus };
-            const response = await reviewChallenge(reviewRequest).unwrap();
-            console.log("Review challenge response:", response);
-            refetch();
+            setActionError("");
+
+            // Đảm bảo gửi đúng format dữ liệu mà backend mong đợi
+            const reviewRequest = {
+                challengeId: id,
+                status: newStatus,
+                adminNote: message // Include message in request
+            };
+
+            console.log("Sending review request:", reviewRequest);
+            const result = await reviewChallenge(reviewRequest);
+
+            // Check if there is an error in the response
+            if (result.error) {
+                // If there's an error but the status is 200, it's likely a parsing error
+                // but the operation was successful
+                if (result.error.originalStatus === 200) {
+                    console.log("Operation successful despite parsing error");
+                    closeModal();
+                    refetch();
+                } else {
+                    // Real error
+                    console.error(`Error ${actionType} challenge:`, result.error);
+                    setActionError(`Error: ${result.error.data || 'Unknown error occurred'}`);
+                }
+            } else {
+                // Success
+                console.log(`Challenge ${actionType} successful:`, result.data);
+                closeModal();
+                refetch();
+            }
         } catch (error) {
-            console.error(`Error ${action} challenge:`, error);
+            console.error(`Error ${actionType} challenge:`, error);
+            setActionError(`Error: ${error.message || 'Unknown error occurred'}`);
         }
     };
 
-    const banChallenge = async (challengeId) => {
-        try {
-            const reviewRequest = { challengeId, status: "BANNED" };
-            const response = await reviewChallenge(reviewRequest).unwrap();
-            console.log("Ban challenge response:", response);
-            refetch();
-        } catch (error) {
-            console.error("Error banning challenge:", error);
+    // Hàm lấy tiêu đề cho modal dựa trên action type
+    const getModalTitle = () => {
+        switch (actionType) {
+            case "confirmed":
+                return "Approve Challenge";
+            case "rejected":
+                return "Reject Challenge";
+            case "banned":
+                return "Ban Challenge";
+            default:
+                return "Review Challenge";
+        }
+    };
+
+    // Hàm lấy placeholder text cho message input dựa trên action type
+    const getMessagePlaceholder = () => {
+        switch (actionType) {
+            case "confirmed":
+                return "Enter approval message for the challenge owner...";
+            case "rejected":
+                return "Enter reason for rejection...";
+            case "banned":
+                return "Enter reason for banning this challenge...";
+            default:
+                return "Enter message for the user...";
         }
     };
 
@@ -162,13 +244,15 @@ const ChallengeDetail = () => {
                                         <div className="flex space-x-2">
                                             <button
                                                 className="p-2 bg-green-100 text-green-600 rounded-md hover:bg-green-200 transition-colors"
-                                                onClick={() => handleAction(challenge.id, "confirmed")}
+                                                onClick={() => openActionModal("confirmed")}
+                                                title="Approve Challenge"
                                             >
                                                 <CheckCircle size={18} />
                                             </button>
                                             <button
                                                 className="p-2 bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition-colors"
-                                                onClick={() => handleAction(challenge.id, "rejected")}
+                                                onClick={() => openActionModal("rejected")}
+                                                title="Reject Challenge"
                                             >
                                                 <XCircle size={18} />
                                             </button>
@@ -180,7 +264,8 @@ const ChallengeDetail = () => {
                                         <div className="flex space-x-2">
                                             <button
                                                 className="p-2 bg-green-100 text-green-600 rounded-md hover:bg-green-200 transition-colors"
-                                                onClick={() => handleAction(challenge.id, "confirmed")}
+                                                onClick={() => openActionModal("confirmed")}
+                                                title="Approve Challenge"
                                             >
                                                 <CheckCircle size={18} />
                                             </button>
@@ -191,7 +276,8 @@ const ChallengeDetail = () => {
                                     return (
                                         <button
                                             className="p-2 bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition-colors"
-                                            onClick={() => banChallenge(challenge.id)}
+                                            onClick={() => openActionModal("banned")}
+                                            title="Ban Challenge"
                                         >
                                             <Ban size={18} />
                                         </button>
@@ -206,7 +292,7 @@ const ChallengeDetail = () => {
                 {/* Tabs Section */}
                 <div className="mt-6 w-full">
                     <div className="flex border-b">
-                        {["info", "rules", "rankings", "evidence"].map((tab) => (
+                        {["info", "rules", "members", "evidence"].map((tab) => (
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
@@ -220,8 +306,8 @@ const ChallengeDetail = () => {
                                     ? "Information"
                                     : tab === "rules"
                                         ? "Rules"
-                                        : tab === "rankings"
-                                            ? "Rankings"
+                                        : tab === "members"
+                                            ? "Members"
                                             : "Evidence"}
                             </button>
                         ))}
@@ -263,10 +349,10 @@ const ChallengeDetail = () => {
                                 </div>
                             )}
 
-                            {activeTab === "rankings" && (
+                            {activeTab === "members" && (
                                 <div>
-                                    <h2 className="text-2xl font-bold text-gray-900 mb-4">Participant Rankings</h2>
-                                    {/* Sử dụng dữ liệu mock cho rankings */}
+                                    <h2 className="text-2xl font-bold text-gray-900 mb-4">Participant members</h2>
+                                    {/* Sử dụng dữ liệu mock cho members */}
                                     <div className="overflow-x-auto">
                                         <table className="min-w-full bg-white">
                                             <thead>
@@ -314,6 +400,63 @@ const ChallengeDetail = () => {
                     )}
                 </div>
             </div>
+
+            {/* Modal Component */}
+            {isModalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+                        <div className="p-6 border-b border-orange-100">
+                            <h3 className="text-lg font-semibold text-orange-700">{getModalTitle()}</h3>
+                        </div>
+                        <div className="p-6">
+                            <div className="mb-4">
+                                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+                                    Message to User
+                                </label>
+                                <textarea
+                                    id="message"
+                                    rows="4"
+                                    className="w-full border border-orange-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-orange-300"
+                                    placeholder={getMessagePlaceholder()}
+                                    value={message}
+                                    onChange={(e) => setMessage(e.target.value)}
+                                ></textarea>
+                            </div>
+                            <p className="text-sm text-gray-500 mb-4">
+                                {actionType === "confirmed" && "This message will be sent to the user when the challenge is approved."}
+                                {actionType === "rejected" && "This message will explain to the user why their challenge was rejected."}
+                                {actionType === "banned" && "This message will inform the user that their challenge has been banned."}
+                            </p>
+
+                            {actionError && (
+                                <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
+                                    {actionError}
+                                </div>
+                            )}
+                        </div>
+                        <div className="p-4 bg-gray-50 rounded-b-lg flex justify-end space-x-3">
+                            <button
+                                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100"
+                                onClick={closeModal}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                className={`px-4 py-2 rounded-md text-white ${
+                                    actionType === "confirmed"
+                                        ? "bg-green-600 hover:bg-green-700"
+                                        : actionType === "rejected" || actionType === "banned"
+                                            ? "bg-red-600 hover:bg-red-700"
+                                            : "bg-orange-600 hover:bg-orange-700"
+                                }`}
+                                onClick={handleModalSubmit}
+                            >
+                                {actionType === "confirmed" ? "Approve" : actionType === "rejected" ? "Reject" : actionType === "banned" ? "Ban" : "Submit"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <Footer />
         </div>
