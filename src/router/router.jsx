@@ -31,6 +31,8 @@ import ReportDetail from "../page/admin/detailmodal/ReportDetail.jsx";
 import {AdminRoute, MemberRoute} from "./ProtectRouter.jsx";
 import Statistics from "../page/member/Statistics.jsx";
 import Achievement from "../page/member/Achievement.jsx";
+import CreateChallenge from "../page/admin/detailmodal/CreateChallenge.jsx";
+import Settings from "../page/admin/list/Settings.jsx";
 
 const router = createBrowserRouter([
     { path: "/", element: <Navigate to="/homepage" /> },
@@ -85,8 +87,8 @@ const router = createBrowserRouter([
         element: <AdminRoute><Outlet /></AdminRoute>,
         children: [
             { path: "dashboard", element: <AdminDashboard /> },
-            { path: "userlist", element: <UserList /> },
-            { path: "evidencelist", element: <ChallengeEvidencePage /> },
+            { path: "usermanagement", element: <UserList /> },
+            { path: "evidencemanagement", element: <ChallengeEvidencePage /> },
             {
                 path: "reports",
                 children: [
@@ -95,9 +97,11 @@ const router = createBrowserRouter([
                 ]
             },
             { path: "reportdetail", element: <ReportDetail /> },
-            { path: "grouplist", element: <GroupList /> },
+            { path: "groupmanagement", element: <GroupList /> },
             { path: "challengelist", element: <ChallengeList /> },
-            { path: "challenge/:id/detail", element: <AdminChallengeDetail /> }
+            { path: "challenge/create", element: <CreateChallenge /> },
+            { path: "/adminchallenge/:id/detail", element: <AdminChallengeDetail /> },
+            { path: "settings", element: <Settings /> }
         ]
     }
 ]);

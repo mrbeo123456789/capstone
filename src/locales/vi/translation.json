@@ -105,6 +105,43 @@
     "inviteFailed": "Gửi lời mời thất bại.",
     "searchFailed": "Tìm kiếm thất bại.",
     "enterKeyword": "Vui lòng nhập từ khóa."
+  },
+
+  "createChallenge": {
+    "verificationType": {
+      "label": "Hình thức xác minh",
+      "memberReview": "Thành viên chấm chéo",
+      "hostReview": "Host kiểm duyệt"
+    },
+    "participationType": {
+      "label": "Hình thức tham gia",
+      "individual": "Cá nhân",
+      "group": "Nhóm"
+    },
+    "generalInfo": "Thông tin chung của thử thách",
+    "name": "Tên thử thách",
+    "namePlaceholder": "Nhập tên ngắn gọn và dễ nhớ",
+    "summary": "Tóm tắt (Không bắt buộc)",
+    "summaryPlaceholder": "Thêm một vài dòng truyền cảm hứng, ví dụ: Thử thách không thể nào quên",
+    "banner": "Ảnh bìa (Không bắt buộc)",
+    "picture": "Tải ảnh minh họa",
+    "clickUpload": "Bấm để tải lên hoặc kéo thả",
+    "pictureNote": "Định dạng SVG, PNG, JPG hoặc GIF (TỐI ĐA 800x400px)",
+    "changePicture": "Đổi ảnh",
+    "details": "Chi tiết thử thách",
+    "startDate": "Ngày bắt đầu",
+    "endDate": "Ngày kết thúc",
+    "privacy": "Quyền riêng tư",
+    "challengeType": "Loại thử thách",
+    "selectChallengeType": "Chọn loại thử thách",
+    "maxParticipants": "Số người tham gia tối đa",
+    "description": "Mô tả chi tiết",
+    "create": "Tạo mới",
+    "creating": "Đang tạo...",
+    "cancel": "Hủy",
+    "loading": "Đang tạo thử thách...",
+    "success": "Tạo thử thách thành công!",
+    "fail": "Tạo thử thách thất bại: "
   }
 
 }

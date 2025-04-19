@@ -66,14 +66,16 @@ export const evidenceService = createApi({
         }),
 
         getEvidencesForHost: builder.query({
-            query: ({ challengeId, memberId, status, page = 0, size = 10 } = {}) => {
-                const params = new URLSearchParams();
-                params.append("challengeId", challengeId);
-                if (memberId) params.append("memberId", memberId);
-                if (status) params.append("status", status);
-                params.append("page", page);
-                params.append("size", size);
-                return `/host/evidences?${params.toString()}`;
+            query: ({ challengeId, memberId, status, page = 0, size = 10 }) => {
+                // Build params matching backend @GetMapping("/host/evidences")
+                const params = { challengeId, page, size };
+                if (memberId != null) params.memberId = memberId;
+                if (status) params.status = status;
+                return {
+                    url: "/evidences/host/evidences",
+                    method: "GET",
+                    params,
+                };
             },
         }),
     }),
