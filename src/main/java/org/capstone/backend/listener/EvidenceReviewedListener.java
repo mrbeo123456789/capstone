@@ -11,6 +11,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -31,25 +33,32 @@ public class EvidenceReviewedListener {
 
         boolean isApproved = event.isApproved();
 
-        // 1. Gửi Notification
+        // 1. Chuẩn bị placeholders
+        Map<String, String> data = new HashMap<>();
+        data.put("day", day);
+        data.put("challengeName", challengeName);
+
+        // 2. Gửi Notification
         notificationService.sendNotification(
                 userId,
                 isApproved
-                        ? "Bằng chứng ngày " + day + " đã được duyệt"
-                        : "Bằng chứng ngày " + day + " bị từ chối",
+                        ? "notification.evidence.approved.title"
+                        : "notification.evidence.rejected.title",
                 isApproved
-                        ? "Bằng chứng ngày " + day + " trong thử thách \"" + challengeName + "\" đã được duyệt. Tiếp tục cố gắng nhé!"
-                        : "Bằng chứng ngày " + day + " trong thử thách \"" + challengeName + "\" đã bị từ chối. Vui lòng kiểm tra góp ý và nộp lại nếu cần.",
-                NotificationType.EVIDENCE_RESULT
+                        ? "notification.evidence.approved.content"
+                        : "notification.evidence.rejected.content",
+                NotificationType.EVIDENCE_RESULT,
+                data
+
         );
 
-        // 2. Gửi Email
+        // 3. Gửi Email
         try {
             String subject = "Kết quả bằng chứng ngày " + day + " - " + challengeName;
             String body = String.format("""
                     Xin chào %s,
 
-                    Bằng chứng bạn nộp cho thử thách \"%s\" (Ngày %s) đã được %s.
+                    Bằng chứng bạn nộp cho thử thách "%s" (Ngày %s) đã được %s.
 
                     Trạng thái: %s
 
@@ -67,8 +76,7 @@ public class EvidenceReviewedListener {
 
             fixedGmailService.sendEmail(email, subject, body);
         } catch (Exception e) {
-            // Có thể ghi log lỗi tại đây nếu cần
-            // logger.error("Failed to send email for EvidenceReviewedListener", e);
+            // Ghi log nếu cần
         }
     }
 }

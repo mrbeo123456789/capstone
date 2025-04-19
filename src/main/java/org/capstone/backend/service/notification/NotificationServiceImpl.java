@@ -1,5 +1,6 @@
 package org.capstone.backend.service.notification;
 
+import com.google.api.core.ApiFuture;
 import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.Query;
@@ -14,8 +15,10 @@ import org.capstone.backend.utils.enums.NotificationType;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,15 +30,17 @@ public class NotificationServiceImpl implements NotificationService {
     private final AuthService authService;
 
     @Override
-    public void sendNotification(String userId, String title, String content, NotificationType type) {
-        Map<String, Object> docData = Map.of(
-                "userId", userId,
-                "title", title,
-                "content", content,
-                "type", type.toString(),
-                "isRead", false,
-                "createdAt", Timestamp.now()
-        );
+    public void sendNotification(String userId, String titleKey, String contentKey, NotificationType type, Map<String, String> params) {
+
+        Map<String, Object> docData = new HashMap<>();
+        docData.put("userId", userId);
+        docData.put("title", titleKey);       // Key để FE dịch
+        docData.put("content", contentKey);   // Key để FE dịch
+        docData.put("type", type.toString());
+        docData.put("isRead", false);
+        docData.put("createdAt", Timestamp.now());
+        docData.put("params", params);            // Dữ liệu truyền vào để FE format
+
         db.collection("notifications").add(docData);
     }
 
@@ -43,7 +48,6 @@ public class NotificationServiceImpl implements NotificationService {
     @SneakyThrows  // Cho phép ném các checked exception ra ngoài mà không cần try-catch
     public NotificationResponse getNotifications(int limit, String lastCreatedAtStr) {
         Long currentUserId = authService.getMemberIdFromAuthentication();
-
         Query query = db.collection("notifications")
                 .whereEqualTo("userId", String.valueOf(currentUserId))
                 .orderBy("createdAt", Query.Direction.DESCENDING)
@@ -73,4 +77,6 @@ public class NotificationServiceImpl implements NotificationService {
 
         return new NotificationResponse(currentUserId, results);
     }
+
+
 }

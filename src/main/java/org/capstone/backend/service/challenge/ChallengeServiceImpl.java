@@ -28,6 +28,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -321,7 +322,7 @@ public class ChallengeServiceImpl implements ChallengeService {
         int currentParticipants = challenge.getChallengeMembers().size();
         List<Member> groupMembers = group.getMembers().stream()
                 .map(GroupMember::getMember)
-                .collect(Collectors.toList());
+                .toList();
 
         if (currentParticipants + groupMembers.size() > challenge.getMaxParticipants()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Không đủ chỗ cho nhóm.");
@@ -329,7 +330,7 @@ public class ChallengeServiceImpl implements ChallengeService {
 
         List<Member> alreadyJoined = groupMembers.stream()
                 .filter(member -> challengeMemberRepository.existsByChallengeAndMember(challenge, member))
-                .collect(Collectors.toList());
+                .toList();
         if (!alreadyJoined.isEmpty()) {
             String memberNames = alreadyJoined.stream()
                     .map(Member::getFullName)
@@ -404,11 +405,13 @@ public class ChallengeServiceImpl implements ChallengeService {
         for (ChallengeMember cm : challengeMembers) {
             eventPublisher.publishEvent(new InvitationSentEvent(
                     cm.getMember().getId().toString(),
-                    "Thử thách đã bị huỷ",
-                    "Thử thách '" + challenge.getName() + "' đã bị huỷ bởi quản trị viên hoặc Host.",
-                    NotificationType.SYSTEM_NOTIFICATION
+                    "notification.challengeCancelled.title",
+                    "notification.challengeCancelled.content",
+                    Map.of("challengeName", challenge.getName())
+
             ));
         }
+
         return "Thử thách đã được huỷ thành công.";
     }
 
@@ -431,10 +434,11 @@ public class ChallengeServiceImpl implements ChallengeService {
         challengeMemberRepository.save(targetRecord);
         eventPublisher.publishEvent(new InvitationSentEvent(
                 targetMemberId.toString(),
-                "Bạn đã bị kick khỏi thử thách",
-                "Bạn đã bị quản trị viên xóa khỏi thử thách '" + targetRecord.getChallenge().getName() + "'.",
-                NotificationType.SYSTEM_NOTIFICATION
+                "notification.kickedFromChallenge.title",
+                "notification.kickedFromChallenge.content",
+                Map.of("challengeName", targetRecord.getChallenge().getName())
         ));
+
         return "Thành viên đã bị kick khỏi thử thách thành công.";
     }
 

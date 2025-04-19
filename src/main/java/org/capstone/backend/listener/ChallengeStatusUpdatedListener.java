@@ -11,6 +11,9 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Component
 @RequiredArgsConstructor
 public class ChallengeStatusUpdatedListener {
@@ -23,23 +26,30 @@ public class ChallengeStatusUpdatedListener {
     @EventListener
     public void handleChallengeStatusUpdated(ChallengeStatusUpdatedEvent event) {
         Challenge challenge = event.challenge();
-        String status = event.newStatus();
         String challengeName = challenge.getName();
+        String status = event.newStatus();
 
         challengeMemberRepository.findByChallenge(challenge).forEach(member -> {
             String userId = member.getMember().getId().toString();
             String fullName = member.getMember().getFullName();
             String email = member.getMember().getAccount().getEmail();
 
-            // Gửi Notification
+            // i18n placeholders
+            Map<String, String> data = new HashMap<>();
+            data.put("challengeName", challengeName);
+            data.put("status", status);
+
+            // 1. Gửi Notification
             notificationService.sendNotification(
                     userId,
-                    "Cập nhật thử thách",
-                    "Thử thách '" + challengeName + "' đã được cập nhật trạng thái: " + status,
-                    NotificationType.SYSTEM_ANNOUNCEMENT
+                    "notification.challengeStatusUpdated.title",
+                    "notification.challengeStatusUpdated.content",
+                    NotificationType.SYSTEM_ANNOUNCEMENT,
+                    data
+
             );
 
-            // Gửi Email
+            // 2. Gửi Email
             try {
                 String subject = "Cập nhật trạng thái thử thách '" + challengeName + "'";
                 String body = String.format("""
@@ -55,7 +65,7 @@ public class ChallengeStatusUpdatedListener {
 
                 fixedGmailService.sendEmail(email, subject, body);
             } catch (Exception e) {
-                // Log lỗi nếu cần
+                // Ghi log nếu cần
             }
         });
     }

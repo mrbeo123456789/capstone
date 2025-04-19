@@ -8,6 +8,9 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Component
 @RequiredArgsConstructor
 public class ChallengeRoleUpdatedListener {
@@ -21,12 +24,18 @@ public class ChallengeRoleUpdatedListener {
         String challengeName = event.member().getChallenge().getName();
         String newRole = event.newRole().name();
 
+        Map<String, String> data = new HashMap<>();
+        data.put("challengeName", challengeName);
+        data.put("role", newRole);
+
         // Gửi Notification (❌ Không gửi email)
         notificationService.sendNotification(
                 userId,
-                "Cập nhật vai trò trong thử thách",
-                "Vai trò của bạn trong thử thách '" + challengeName + "' đã thay đổi thành: " + newRole,
-                NotificationType.ROLE_UPDATE
+                "notification.challengeRoleUpdated.title",
+                "notification.challengeRoleUpdated.content",
+                NotificationType.ROLE_UPDATE,
+                data
+
         );
     }
 }

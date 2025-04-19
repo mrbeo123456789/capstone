@@ -8,6 +8,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 @Component
 @RequiredArgsConstructor
 public class InvitationNotificationListener {
@@ -19,9 +21,11 @@ public class InvitationNotificationListener {
     public void handleInvitationSent(InvitationSentEvent event) {
         notificationService.sendNotification(
                 event.targetUserId(),
-                event.title(),
-                event.content(),
-                NotificationType.INVITATION  // 🔥 Luôn là INVITATION
+                event.titleKey(),    // 📌 ex: "notification.invite.challenge.title"
+                event.contentKey(),
+                NotificationType.INVITATION,// 📌 ex: "notification.invite.challenge.content"
+                event.data()     // 📌 ex: { challengeName: "Plank 30 Ngày", inviterName: "DuyLV" }
+
         );
     }
 }

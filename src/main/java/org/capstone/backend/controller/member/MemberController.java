@@ -10,15 +10,12 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @RestController
 @RequestMapping("/api/member")
 public class MemberController {
 
     private final MemberService memberService;
- private  final AuthService authService;
+private final AuthService authService;
     public MemberController(MemberService memberService, AuthService authService) {
         this.memberService = memberService;
         this.authService = authService;
@@ -45,12 +42,8 @@ public class MemberController {
         return ResponseEntity.ok("Password changed successfully!");
     }
     @GetMapping("/me")
-    public ResponseEntity<Map<String, Long>> getCurrentMemberId() {
-        Long memberId = authService.getMemberIdFromAuthentication();
-
-
-        Map<String, Long> response = new HashMap<>();
-        response.put("memberId", memberId);
-        return ResponseEntity.ok(response);
+    public Long getCurrentMemberId() {
+        return authService.getMemberIdFromAuthentication();
     }
+
 }

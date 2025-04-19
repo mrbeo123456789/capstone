@@ -15,7 +15,9 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -27,14 +29,12 @@ public class ChallengeResultAnnounceListener {
     private final FixedGmailService fixedGmailService;
 
     @Async("taskExecutor")
-
     @EventListener
     public void handleChallengeResultAnnounce(ChallengeResultAnnounceEvent event) {
         Challenge challenge = event.challenge();
         String challengeName = challenge.getName();
 
         if (challenge.getParticipationType() == ParticipationType.INDIVIDUAL) {
-            // Xử lý thử thách cá nhân
             challengeMemberRepository.findByChallenge(challenge).stream()
                     .filter(member -> Boolean.TRUE.equals(member.getIsCompleted()))
                     .forEach(member -> {
@@ -42,19 +42,23 @@ public class ChallengeResultAnnounceListener {
                         String email = member.getMember().getAccount().getEmail();
                         String fullName = member.getMember().getFullName();
 
-                        // Gửi notification
+                        // Gửi notification i18n
+                        Map<String, String> data = new HashMap<>();
+                        data.put("challengeName", challengeName);
+
                         notificationService.sendNotification(
                                 userId,
-                                "Kết quả thử thách: Hoàn thành",
-                                "Bạn đã hoàn thành thử thách '" + challengeName + "'! Kiểm tra thành tích của bạn nhé!",
-                                NotificationType.CHALLENGE_RESULT
+                                "notification.challengeResult.title",
+                                "notification.challengeResult.content",
+                                NotificationType.CHALLENGE_RESULT,
+                                data
+
                         );
 
                         // Gửi email
                         sendChallengeResultEmail(email, fullName, challengeName, true);
                     });
         } else if (challenge.getParticipationType() == ParticipationType.GROUP) {
-            // Xử lý thử thách nhóm
             groupChallengeRepository.findByChallengeId(challenge.getId()).stream()
                     .filter(GroupChallenge::isSuccess)
                     .forEach(gc -> {
@@ -65,12 +69,17 @@ public class ChallengeResultAnnounceListener {
                             String fullName = member.getMember().getFullName();
                             String groupName = gc.getGroup().getName();
 
-                            // Gửi notification
+                            // Gửi notification i18n
+                            Map<String, String> data = new HashMap<>();
+                            data.put("challengeName", challengeName);
+                            data.put("groupName", groupName);
+
                             notificationService.sendNotification(
                                     userId,
-                                    "Kết quả thử thách nhóm: Hoàn thành",
-                                    "Nhóm '" + groupName + "' đã hoàn thành thử thách '" + challengeName + "'! Xem thành tích nhóm ngay!",
-                                    NotificationType.CHALLENGE_RESULT
+                                    "notification.groupChallengeResult.title",
+                                    "notification.groupChallengeResult.content",
+                                    NotificationType.CHALLENGE_RESULT,
+                                    data
                             );
 
                             // Gửi email

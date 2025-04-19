@@ -12,7 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.capstone.backend.utils.enums.GroupMemberStatus;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface GroupService {
     List<GroupResponse> getGroupsByMemberId();
