@@ -12,11 +12,11 @@ const ReportDetail = ({ reportData }) => {
 
     // Use the reportData passed as props instead of fetching it
     const report = reportData;
-
+    console.log(report);
     // Fetch challenge details if report is loaded
     const { data: challengeData, isLoading: isLoadingChallenge, isError: isChallengeError } =
         useGetChallengeDetailQuery(report?.challengeId, { skip: !report?.challengeId });
-
+    console.log(challengeData)
     // Mutation for updating report status
     const [updateReportStatus, { isLoading: isUpdating }] = useUpdateReportStatusMutation();
 
@@ -86,7 +86,7 @@ const ReportDetail = ({ reportData }) => {
                                 >
                                     <ArrowLeft size={20} />
                                 </button>
-                                <h1 className="text-2xl font-bold text-orange-700">Report Details #{reportId}</h1>
+                                <h1 className="text-2xl font-bold text-orange-700">Report Details Of {report.challengeName}</h1>
                             </div>
 
                             {report && report.status === "PENDING" && (

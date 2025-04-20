@@ -227,5 +227,39 @@
   "notification.kickedFromChallenge.title": "Bạn đã bị kick khỏi thử thách",
   "notification.kickedFromChallenge.content": "Bạn đã bị quản trị viên xóa khỏi thử thách '{{challengeName}}'.",
   "notification.empty": "Không có thông báo mới."
+  },
+  "JoinsChallengeDetail": {
+    "disabledDuringChallenge": "Hành động này bị tắt khi thử thách đã diễn ra hoặc kết thúc.",
+    "notJoined": "Bạn chưa tham gia thử thách này.",
+    "loading": "Đang tải...",
+    "error": "Không thể tải chi tiết thử thách.",
+    "leaveSuccess": "Bạn đã rời khỏi thử thách.",
+    "leaveFail": "Không thể rời khỏi thử thách.",
+    "reportSuccess": "Báo cáo đã được gửi thành công.",
+    "reportFail": "Gửi báo cáo thất bại.",
+    "loadingProof": "Đang tải dữ liệu bằng chứng...",
+    "proof": "Bằng chứng",
+    "member": "Thành viên",
+    "review": "Chấm điểm",
+    "description": "Mô tả",
+    "invite": "Mời",
+    "leave": "Rời khỏi",
+    "share": "Chia sẻ",
+    "report": "Báo cáo",
+    "title": "Thử thách",
+    "reportTitle": "Báo cáo thử thách",
+    "reportType": "Loại báo cáo",
+    "type": {
+      "inappropriate": "Nội dung không phù hợp",
+      "spam": "Spam",
+      "harassment": "Hành vi xúc phạm",
+      "rule": "Vi phạm quy định",
+      "other": "Khác"
+    },
+    "reason": "Lý do",
+    "submit": "Gửi báo cáo",
+    "cancel": "Hủy"
+  }
+
 
 }

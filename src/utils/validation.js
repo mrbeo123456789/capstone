@@ -1,14 +1,16 @@
 import * as yup from "yup";
 import i18n from "i18next";
 
-const t = i18n.getFixedT(null, "validation"); // get translator scoped to validation.json
-
 // ✅ Candidate Schema
 export const validateCandidate = yup.object({
-    fullName: yup.string().required(t("candidate.fullNameRequired")),
-    dateOfBirth: yup.string()
-        .required(t("candidate.dobRequired"))
-        .test("is-older-than-16", t("candidate.dobInvalid"), function (value) {
+    fullName: yup
+        .string()
+        .required(() => i18n.t("candidate.fullNameRequired", { ns: "validation" })),
+
+    dateOfBirth: yup
+        .string()
+        .required(() => i18n.t("candidate.dobRequired", { ns: "validation" }))
+        .test("is-older-than-16", () => i18n.t("candidate.dobInvalid", { ns: "validation" }), function (value) {
             if (!value) return false;
             const birthDate = new Date(value);
             const today = new Date();
@@ -17,40 +19,69 @@ export const validateCandidate = yup.object({
             const d = today.getDate() - birthDate.getDate();
             return m < 0 || (m === 0 && d < 0) ? age - 1 >= 16 : age >= 16;
         }),
-    gender: yup.string().required(t("candidate.genderRequired")),
+
+    // gender: yup
+    //     .string()
+    //     .required(() => i18n.t("candidate.genderRequired", { ns: "validation" })),
 });
 
 // ✅ Challenge Schema
 export const challengeValidation = yup.object({
-    name: yup.string().required(t("challenge.nameRequired")).min(3, t("challenge.nameMin")),
-    startDate: yup.date().required(t("challenge.startDateRequired")).min(new Date(), t("challenge.startDateMin")),
-    endDate: yup.string().required(t("challenge.endDateRequired")).test(
-        "is-after-start",
-        t("challenge.endDateAfterStart"),
-        function (value) {
+    name: yup
+        .string()
+        .required(() => i18n.t("challenge.nameRequired", { ns: "validation" }))
+        .min(3, () => i18n.t("challenge.nameMin", { ns: "validation" })),
+
+    startDate: yup
+        .date()
+        .required(() => i18n.t("challenge.startDateRequired", { ns: "validation" }))
+        .min(new Date(), () => i18n.t("challenge.startDateMin", { ns: "validation" })),
+
+    endDate: yup
+        .string()
+        .required(() => i18n.t("challenge.endDateRequired", { ns: "validation" }))
+        .test("is-after-start", () => i18n.t("challenge.endDateAfterStart", { ns: "validation" }), function (value) {
             const { startDate } = this.parent;
             return value && new Date(value) > new Date(startDate);
-        }
-    ),
-    maxParticipants: yup.number()
-        .typeError(t("challenge.maxParticipantsType"))
-        .positive(t("challenge.maxParticipantsPositive"))
-        .integer(t("challenge.maxParticipantsInteger")),
-    description: yup.string().required(t("challenge.descriptionRequired")).min(10, t("challenge.descriptionMin")),
-    picture: yup.mixed()
-        .required(t("challenge.pictureRequired"))
-        .test("fileSize", t("challenge.pictureSize"), (v) => v && v.size <= 50 * 1024 * 1024)
-        .test("fileType", t("challenge.pictureType"), (v) => v && ["image/jpeg", "image/png", "image/jpg", "image/gif"].includes(v.type)),
-    challengeTypeId: yup.string().required(t("challenge.challengeTypeRequired"))
+        }),
+
+    maxParticipants: yup
+        .number()
+        .typeError(() => i18n.t("challenge.maxParticipantsType", { ns: "validation" }))
+        .positive(() => i18n.t("challenge.maxParticipantsPositive", { ns: "validation" }))
+        .integer(() => i18n.t("challenge.maxParticipantsInteger", { ns: "validation" })),
+
+    description: yup
+        .string()
+        .required(() => i18n.t("challenge.descriptionRequired", { ns: "validation" }))
+        .min(10, () => i18n.t("challenge.descriptionMin", { ns: "validation" })),
+
+    picture: yup
+        .mixed()
+        .required(() => i18n.t("challenge.pictureRequired", { ns: "validation" }))
+        .test("fileSize", () => i18n.t("challenge.pictureSize", { ns: "validation" }), (v) => v && v.size <= 50 * 1024 * 1024)
+        .test("fileType", () => i18n.t("challenge.pictureType", { ns: "validation" }), (v) =>
+            v && ["image/jpeg", "image/png", "image/jpg", "image/gif"].includes(v.type)
+        ),
+
+    challengeTypeId: yup
+        .string()
+        .required(() => i18n.t("challenge.challengeTypeRequired", { ns: "validation" })),
 });
 
 // ✅ Login Schema
 export const loginValidation = yup.object({
-    username: yup.string().required(t("login.usernameRequired")),
-    password: yup.string().required(t("login.passwordRequired")).min(8, t("login.passwordMin"))
+    username: yup
+        .string()
+        .required(() => i18n.t("login.usernameRequired", { ns: "validation" })),
+
+    password: yup
+        .string()
+        .required(() => i18n.t("login.passwordRequired", { ns: "validation" }))
+        .min(8, () => i18n.t("login.passwordMin", { ns: "validation" })),
 });
 
-// ✅ Validate group (NEW!! từ yêu cầu của bạn)
+// ✅ Group Schema
 export const groupValidation = yup.object({
     name: yup.string().required("Group name is required!"),
     description: yup.string().nullable(),

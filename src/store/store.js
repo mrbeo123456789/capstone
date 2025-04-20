@@ -9,6 +9,7 @@ import {interestService} from "../service/interestService.js";
 import {invitationService} from "../service/invitationService.js";
 import {guestService} from "../service/guestService.js";
 import {notificationService} from "../service/notficaitionService.js";
+import {rankingService} from "../service/rankingService.js";
 export const store = configureStore({
     reducer: {
         [authService.reducerPath]: authService.reducer,
@@ -20,6 +21,7 @@ export const store = configureStore({
         [interestService.reducerPath]: interestService.reducer,
         [invitationService.reducerPath]: invitationService.reducer,
         [guestService.reducerPath]: guestService.reducer,
+        [rankingService.reducerPath]: rankingService.reducer,
         [notificationService.reducerPath]: notificationService.reducer,
     },
     middleware: (getDefaultMiddleware) =>
@@ -34,5 +36,5 @@ export const store = configureStore({
             .concat(interestService.middleware)
             .concat(invitationService.middleware)
             .concat(guestService.middleware)
-             .concat(notificationService.middleware)
+            .concat(rankingService.middleware),
 })

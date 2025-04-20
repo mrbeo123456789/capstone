@@ -2,14 +2,13 @@ import { useEffect, useState } from "react";
 import MediaUpload from "../ui/MediaUpload.jsx";
 import {toast} from "react-toastify";
 
-const LOCAL_STORAGE_KEY = "markedDays";
 
 export default function ProgressTracking({ challenge, evidence }) {
-    const [markedDays, setMarkedDays] = useState({});
     const submittedEvidenceDates = new Set(
         evidence?.map((e) => {
-            const [year, month, day] = e.submittedAt;
-            return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+            const date = new Date(e.submittedAt);
+            const localDateStr = date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, '0') + "-" + String(date.getDate()).padStart(2, '0');
+            return localDateStr;
         })
     );
 
@@ -20,30 +19,10 @@ export default function ProgressTracking({ challenge, evidence }) {
     const [showModal, setShowModal] = useState(false);
     const [selectedDate, setSelectedDate] = useState(null);
 
-// Convert startDate & endDate from [YYYY, MM, DD] to Date objects
-    const startDate = challenge?.startDate
-        ? new Date(challenge.startDate[0], challenge.startDate[1] - 1, challenge.startDate[2])
-        : null;
+    const isValidDate = (d) => d instanceof Date && !isNaN(d);
 
-    const endDate = challenge?.endDate
-        ? new Date(challenge.endDate[0], challenge.endDate[1] - 1, challenge.endDate[2])
-        : null;
-
-    // Load from localStorage
-    useEffect(() => {
-        const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
-        if (stored) setMarkedDays(JSON.parse(stored));
-    }, []);
-
-    // Save to localStorage
-    useEffect(() => {
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(markedDays));
-    }, [markedDays]);
-
-    const toggleDay = (dateStr) => {
-        const updated = { ...markedDays, [dateStr]: !markedDays[dateStr] };
-        setMarkedDays(updated);
-    };
+    const startDate = isValidDate(new Date(challenge?.startDate)) ? new Date(challenge.startDate) : null;
+    const endDate = isValidDate(new Date(challenge?.endDate)) ? new Date(challenge.endDate) : null;
 
     const getCalendarGrid = () => {
         const startDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
@@ -77,8 +56,10 @@ export default function ProgressTracking({ challenge, evidence }) {
         setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
     };
 
-    const isWithinChallenge = (date) => {
-        return startDate && endDate && date >= startDate && date <= endDate;
+    const normalizeDate = (date) => {
+        const d = new Date(date);
+        d.setHours(0, 0, 0, 0);
+        return d;
     };
 
     return (
@@ -99,9 +80,9 @@ export default function ProgressTracking({ challenge, evidence }) {
                 {calendarDays.map((date, idx) => {
                     const dateStr = date.toLocaleDateString("sv-SE"); // ✅ returns "YYYY-MM-DD"
                     const isToday = date.toDateString() === new Date().toDateString();
-                    const isMarked = markedDays[dateStr];
                     const isCurrentMonth = date.getMonth() === currentMonth.getMonth();
-                    const isWithinChallenge = date >= startDate && date <= endDate;
+                    const isWithinChallenge = normalizeDate(date) >= normalizeDate(startDate) &&
+                        normalizeDate(date) <= normalizeDate(endDate);
                     const hasEvidence = submittedEvidenceDates.has(dateStr);
                     const isPast = date < today && isWithinChallenge;
                     const showRedX = isPast && !hasEvidence;
@@ -109,10 +90,10 @@ export default function ProgressTracking({ challenge, evidence }) {
                         <div
                             key={idx}
                             className={`relative h-10 flex items-center justify-center rounded transition-all
-                                            ${isCurrentMonth ? "cursor-pointer hover:bg-gray-400 text-gray-800" : "text-gray-400 opacity-50"}
+                                            ${isCurrentMonth ? "cursor-pointer hover:bg-gray-400 text-gray-800" : "text-gray-400 opacity-70"}
                                             ${hasEvidence ? "bg-green-200"
                                 : showRedX ? "bg-red-200"
-                                    : isWithinChallenge ? "bg-gray-200"
+                                    : isWithinChallenge ? "bg-gray-300"
                                         : ""}
                                             ${isToday ? "border border-blue-500" : ""}
                                         `}
@@ -120,15 +101,20 @@ export default function ProgressTracking({ challenge, evidence }) {
                                 if (isCurrentMonth) {
                                     const clickedDate = new Date(date);
                                     const todayDate = new Date();
-                                    if (
+                                    const isSameDate =
                                         clickedDate.getFullYear() === todayDate.getFullYear() &&
                                         clickedDate.getMonth() === todayDate.getMonth() &&
-                                        clickedDate.getDate() === todayDate.getDate()
-                                    ) {
+                                        clickedDate.getDate() === todayDate.getDate();
+
+                                    const isInChallengeRange =
+                                        normalizeDate(todayDate) >= normalizeDate(startDate) &&
+                                        normalizeDate(todayDate) <= normalizeDate(endDate);
+
+                                    if (isSameDate && isInChallengeRange) {
                                         setSelectedDate(date);
                                         setShowModal(true);
                                     } else {
-                                        toast.error("Today is not the day to upload evidence.", {
+                                        toast.error("That day is not the day to upload evidence.", {
                                             position: "top-right",
                                             autoClose: 2500,
                                         });

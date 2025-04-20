@@ -71,7 +71,7 @@ const Charts = () => {
     const handlePieClick = (data, index) => {
         const status = data.name;
         // Điều hướng đến trang danh sách challenge với tham số status
-        navigate(`/admin/challengelist?status=${status}`);
+        navigate(`/admin/challengemanagement?status=${status}`);
     };
 
     const CustomPieTooltip = ({ active, payload }) => {

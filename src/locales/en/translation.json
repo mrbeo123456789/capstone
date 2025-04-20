@@ -237,6 +237,40 @@
 
     "kickedFromChallenge.title": "You were removed from the challenge",
     "kickedFromChallenge.content": "You were removed from the challenge '{{challengeName}}' by the admin.",
+  },
+
+  "JoinsChallengeDetail": {
+    "disabledDuringChallenge": "This action is disabled during or after the challenge.",
+    "notJoined": "You have not joined this challenge.",
+    "loading": "Loading...",
+    "error": "Failed to load challenge details.",
+    "leaveSuccess": "You have left the challenge.",
+    "leaveFail": "Failed to leave the challenge.",
+    "reportSuccess": "Report submitted successfully.",
+    "reportFail": "Failed to submit report.",
+    "loadingProof": "Loading proof data...",
+    "proof": "Proof",
+    "member": "Members",
+    "review": "Review",
+    "description": "Description",
+    "invite": "Invite",
+    "leave": "Leave",
+    "share": "Share",
+    "report": "Report",
+    "title": "Challenge",
+    "reportTitle": "Report Challenge",
+    "reportType": "Type of report",
+    "type": {
+      "inappropriate": "Inappropriate content",
+      "spam": "Spam",
+      "harassment": "Offensive behavior",
+      "rule": "Rule violation",
+      "other": "Other"
+    },
+    "reason": "Reason",
+    "submit": "Submit Report",
+    "cancel": "Cancel"
+  }
 
     "empty": "No new notifications."
   }

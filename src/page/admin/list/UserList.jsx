@@ -285,12 +285,12 @@ const UserList = () => {
                     <div className="flex-1 overflow-auto p-4">
                         <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-orange-100 h-full flex flex-col">
                             <div className="p-4 border-b border-orange-100 bg-gradient-to-r from-orange-50 to-yellow-50">
-                                <h1 className="text-2xl font-bold text-orange-600 mb-4">User Management</h1>
+                                {/*<h1 className="text-2xl font-bold text-orange-600 mb-4">User Management</h1>*/}
                                 <div className="flex flex-col md:flex-row gap-3 justify-between">
                                     <div className="relative flex-1">
                                         <input
                                             type="text"
-                                            placeholder="Tìm kiếm theo tên hoặc email..."
+                                            placeholder="Searching user ...."
                                             className="w-full pl-10 pr-4 py-3 border border-orange-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white"
                                             value={searchTerm}
                                             onChange={(e) => {

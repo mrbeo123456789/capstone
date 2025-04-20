@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Search, ThumbsUp, ThumbsDown, HourglassIcon } from 'lucide-react';
 import { ClockIcon, CheckCircleIcon } from "lucide-react";
-import EvidenceDetailModal from "../../../component/ChallengeDetailModal.jsx";
+import EvidenceDetailModal from "../../../page/admin/detailmodal/EvidenceDetailModal.jsx"; // Fix import path if needed
 import { useGetJoinedMembersWithPendingEvidenceQuery } from '../../../service/challengeService.js';
 import { useGetEvidencesForHostQuery } from '../../../service/evidenceService.js';
 
@@ -45,6 +45,7 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
         page: currentPage,
         size: itemsPerPage
     });
+    console.log(membersData);
 
     // Fetch evidence for selected member
     const {
@@ -61,14 +62,27 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
             { skip: true },
         { skip: !selectedMember }
     );
+    console.log(evidenceData);
 
     const handleStatusFilterChange = (status) => {
         setStatusFilter(status);
         setEvidencePage(0);
     };
 
+    // Updated to store the full evidence object, not just the ID
     const handleEvidenceClick = (evidence) => {
-        setSelectedEvidence(evidence);
+        setSelectedEvidence({
+            id: evidence.evidenceId,
+            name: evidence.memberName || `Evidence #${evidence.evidenceId}`,
+            challenge: selectedMember ? `${selectedMember.fullName}'s Challenge` : "Challenge",
+            dateAdded: new Date(evidence.submittedAt).toLocaleDateString('vi-VN'),
+            type: "image", // Default type if not available
+            status: evidence.status,
+            addedBy: selectedMember ? selectedMember.fullName : "Unknown",
+            caseNumber: evidence.evidenceId,
+            description: evidence.description || "No description provided.",
+            picture: evidence.picture || "/api/placeholder/300/200"
+        });
     };
 
     const handleCloseModal = () => {
@@ -77,12 +91,14 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
 
     const handleAcceptEvidence = (evidenceId) => {
         // Here you would call an API mutation to update the evidence status
+        console.log(`Accepting evidence with ID: ${evidenceId}`);
         // After successful update, refetch the evidence data
         setSelectedEvidence(null);
     };
 
     const handleRejectEvidence = (evidenceId) => {
         // Here you would call an API mutation to update the evidence status
+        console.log(`Rejecting evidence with ID: ${evidenceId}`);
         // After successful update, refetch the evidence data
         setSelectedEvidence(null);
     };
@@ -124,6 +140,14 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
     const evidenceTotalPages = evidenceData?.totalPages || 0;
     const evidenceTotalElements = evidenceData?.totalElements || 0;
     const evidenceCurrentPage = evidenceData?.number || 0;
+
+    // Calculate evidence statistics for selected member
+    const memberEvidenceStats = selectedMember ? {
+        total: selectedMember.evidenceCount || 0,
+        approved: evidenceItems.filter(e => e.status === 'approved').length || 0,
+        pending: evidenceItems.filter(e => e.status === 'waiting').length || 0,
+        rejected: evidenceItems.filter(e => e.status === 'rejected').length || 0
+    } : null;
 
     // Pagination handlers
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
@@ -169,6 +193,7 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                         <thead className="bg-orange-50">
                                         <tr>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Member Name</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Joined At</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Evidence Count</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Status</th>
                                         </tr>
@@ -181,6 +206,9 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                                 onClick={() => setSelectedMember(member)}
                                             >
                                                 <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{member.fullName}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    {member.joinedAt ? new Date(member.joinedAt).toLocaleDateString('vi-VN') : 'N/A'}
+                                                </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{member.evidenceCount || 0}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm">
                                                     {member.hasPendingEvidence ? (
@@ -200,6 +228,7 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                         </tbody>
                                     </table>
                                 </div>
+
                                 {/* Pagination section for members */}
                                 <div className="border-t border-gray-200 px-4 py-3">
                                     <div className="flex items-center justify-between">
@@ -301,7 +330,32 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                     </div>
                                 </div>
 
-                                <div className="overflow-y-auto" style={{ maxHeight: '600px' }}>
+                                {/* Member Evidence Statistics (Moved from left panel to right panel) */}
+                                {selectedMember && (
+                                    <div className="p-4 border-b">
+                                        <h4 className="font-medium text-lg mb-2">Member Evidence Statistics</h4>
+                                        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                                            <div className="bg-gray-50 p-4 rounded-lg">
+                                                <p className="text-gray-500 text-sm">Total Evidence</p>
+                                                <p className="text-xl font-bold">{memberEvidenceStats.total}</p>
+                                            </div>
+                                            <div className="bg-gray-50 p-4 rounded-lg">
+                                                <p className="text-gray-500 text-sm">Approved</p>
+                                                <p className="text-xl font-bold text-green-600">{memberEvidenceStats.approved}</p>
+                                            </div>
+                                            <div className="bg-gray-50 p-4 rounded-lg">
+                                                <p className="text-gray-500 text-sm">Pending</p>
+                                                <p className="text-xl font-bold text-yellow-600">{memberEvidenceStats.pending}</p>
+                                            </div>
+                                            <div className="bg-gray-50 p-4 rounded-lg">
+                                                <p className="text-gray-500 text-sm">Rejected</p>
+                                                <p className="text-xl font-bold text-red-600">{memberEvidenceStats.rejected}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="overflow-y-auto" style={{ maxHeight: '500px' }}>
                                     {selectedMember ? (
                                         isLoadingEvidence ? (
                                             <div className="flex justify-center items-center h-64">
@@ -321,7 +375,7 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                                     <tr
                                                         key={evidence.evidenceId}
                                                         className="hover:bg-orange-50 cursor-pointer"
-                                                        onClick={() => handleEvidenceClick(evidence.evidenceId)}
+                                                        onClick={() => handleEvidenceClick(evidence)}
                                                     >
                                                         <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
                                                             {evidence.memberName || `Evidence #${evidence.evidenceId}`}
@@ -425,8 +479,8 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                     <EvidenceDetailModal
                         evidence={selectedEvidence}
                         onClose={handleCloseModal}
-                        onAccept={() => handleAcceptEvidence(selectedEvidence.evidenceId)}
-                        onReject={() => handleRejectEvidence(selectedEvidence.evidenceId)}
+                        onAccept={handleAcceptEvidence}
+                        onReject={handleRejectEvidence}
                     />
                 )}
             </div>

@@ -117,7 +117,7 @@ const AdminDashboard = () => {
 
                 {/* Floating Action Button for creating challenges */}
                 <NavLink
-                    to="/admin/challenges/new"
+                    to="/admin/challenge/create"
                     className="fixed bottom-10 right-10 bg-orange-600 text-white p-4 rounded-full shadow-lg hover:bg-orange-700 transition duration-200 flex items-center justify-center"
                 >
                     <FaPlus size={20}/>
