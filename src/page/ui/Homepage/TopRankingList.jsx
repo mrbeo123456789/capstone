@@ -47,8 +47,8 @@ const TopRankingList = () => {
                             <img src={user.image} alt={user.name} className="w-12 h-12 rounded-full" />
                             <div>
                                 <p className="font-semibold">{user.name}</p>
-                                <p className="text-sm text-gray-600">Avg stars: {user.rating}</p>
-                                <p className="text-xs text-gray-500">Stars: {user.votes}</p>
+                                <p className="text-sm text-gray-600">Đánh giá: {user.rating}</p>
+                                <p className="text-xs text-gray-500">Số sao: {user.votes}</p>
                             </div>
                         </div>
                     </div>
