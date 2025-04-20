@@ -33,6 +33,7 @@ import Statistics from "../page/member/Statistics.jsx";
 import Achievement from "../page/member/Achievement.jsx";
 import CreateChallenge from "../page/admin/detailmodal/CreateChallenge.jsx";
 import Settings from "../page/admin/list/Settings.jsx";
+import ChallengeEdit from "../page/challenge/ChallengeEdit.jsx";
 
 const router = createBrowserRouter([
     { path: "/", element: <Navigate to="/homepage" /> },
@@ -57,7 +58,8 @@ const router = createBrowserRouter([
                     { path: "joins", element: <YourChallenge /> },
                     { path: "create", element: <ChallengeForm /> },
                     { path: "detail/:id", element: <ChallengeDetail /> },
-                    { path: "joins/detail/:id", element: <JoinedChallengeDetail /> }
+                    { path: "joins/detail/:id", element: <JoinedChallengeDetail /> },
+                    { path: "edit/:id", element: <ChallengeEdit/>}
                 ]
             },
             {

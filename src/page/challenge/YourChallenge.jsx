@@ -171,15 +171,34 @@ const YourChallenge = () => {
                                         <span className="absolute top-2 left-2 text-yellow-400 text-xl drop-shadow-md">👑</span>
                                     )}
                                 </div>
-                                <p className="font-medium text-center mb-2 overflow-hidden">{challenge.name}</p>
+                                <div className="flex items-center justify-center gap-1 mb-2 w-full px-2">
+                                    {challenge.role === "HOST" && (
+                                        <span className="text-gray-600 hover:text-blue-600 text-sm cursor-pointer"
+                                              title="Edit challenge" onClick={(e) => {
+                                            e.stopPropagation();
+                                            navigate(`/challenges/edit/${challenge.id}`);
+                                        }}>
+      ✏️
+    </span>
+                                    )}
+                                    <p className="font-medium text-center truncate">{challenge.name}</p>
+                                </div>
+
                                 {(() => {
-                                    const { text, bg, textColor } = getStatusStyle(challenge.status);
+                                    const {text, bg, textColor} = getStatusStyle(challenge.status);
                                     return (
-                                        <div className={`${bg} ${textColor} text-xs px-2 py-1 rounded mb-1`}>
+                                        <div className={`${bg} ${textColor} text-xs px-2 py-1 rounded mb-1 flex items-end`}>
                                             {text}
+                                            {challenge.remainingDays > 0 && challenge.remainingDays < 7 && (
+                                                <div className="text-xs text-orange-500 mt-1">
+                                                    🕓 {challenge.remainingDays} day{challenge.remainingDays > 1 ? "s" : ""} left
+                                                </div>
+                                            )}
                                         </div>
                                     );
                                 })()}
+
+
                                 <div className="bg-gray-200 text-gray-800 text-xs px-2 py-1 rounded mt-auto mb-2">
                                     {challenge.role}
                                 </div>

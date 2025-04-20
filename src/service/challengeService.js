@@ -10,7 +10,7 @@ export const challengeService = createApi({
             if (token) {
                 headers.set("Authorization", `Bearer ${token}`);
             }
-            if (endpoint !== "createChallenge") {
+            if (endpoint !== "createChallenge" && endpoint !== "updateChallenge") {
                 headers.set("Content-Type", "application/json");
             }
             return headers;
@@ -31,10 +31,10 @@ export const challengeService = createApi({
             invalidatesTags: ["Challenge"],
         }),
         updateChallenge: builder.mutation({
-            query: ({ id, ...patch }) => ({
-                url: `/challenges/${id}`,
+            query: ({ id, formData }) => ({
+                url: `/challenges/${id}/update`,
                 method: "PUT",
-                body: patch,
+                body: formData,
             }),
             invalidatesTags: ["Challenge"],
         }),

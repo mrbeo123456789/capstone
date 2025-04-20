@@ -106,20 +106,27 @@ const JoinedChallengeDetail = () => {
                                             {/* Leave Button */}
                                             <button
                                                 title={
-                                                    isOngoing
-                                                        ? t("JoinsChallengeDetail.disabledDuringChallenge")
-                                                        : t("JoinsChallengeDetail.leave")
+                                                    challenge.role === "HOST"
+                                                        ? t("JoinsChallengeDetail.hostCannotLeave")
+                                                        : isOngoing
+                                                            ? t("JoinsChallengeDetail.disabledDuringChallenge")
+                                                            : t("JoinsChallengeDetail.leave")
                                                 }
-                                                onClick={isOngoing ? undefined  : handleLeave}
-                                                disabled={isOngoing}
+                                                onClick={
+                                                    challenge.role === "HOST" || isOngoing
+                                                        ? undefined
+                                                        : handleLeave
+                                                }
+                                                disabled={challenge.role === "HOST" || isOngoing}
                                                 className={`text-xl transition ${
-                                                    isOngoing
+                                                    challenge.role === "HOST" || isOngoing
                                                         ? "text-gray-400 cursor-not-allowed"
                                                         : "text-red-500 hover:text-red-700"
                                                 }`}
                                             >
                                                 <FaSignOutAlt />
                                             </button>
+
 
                                             {/* Share Button */}
                                             <button
@@ -132,11 +139,20 @@ const JoinedChallengeDetail = () => {
 
                                             {/* Report Button */}
                                             <button
-                                                title={t("JoinsChallengeDetail.report")}
-                                                onClick={openReportModal}
-                                                className="text-red-500 hover:text-red-700 text-xl"
+                                                title={
+                                                    challenge?.role === "HOST"
+                                                        ? t("JoinsChallengeDetail.hostCannotReport")
+                                                        : t("JoinsChallengeDetail.report")
+                                                }
+                                                onClick={challenge?.role === "HOST" ? undefined : openReportModal}
+                                                disabled={challenge?.role === "HOST"}
+                                                className={`text-xl transition ${
+                                                    challenge?.role === "HOST"
+                                                        ? "text-gray-400 cursor-not-allowed"
+                                                        : "text-red-500 hover:text-red-700"
+                                                }`}
                                             >
-                                                <FaFlag/>
+                                                <FaFlag />
                                             </button>
                                         </>
                                     );
