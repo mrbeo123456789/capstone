@@ -2,6 +2,7 @@ package org.capstone.backend.controller.evidence;
 
 import lombok.RequiredArgsConstructor;
 import org.capstone.backend.dto.evidence.EvidenceReviewRequest;
+import org.capstone.backend.dto.evidence.EvidenceStatusCountDTO;
 import org.capstone.backend.dto.evidence.EvidenceToReviewDTO;
 import org.capstone.backend.dto.evidence.TaskChecklistDTO;
 import org.capstone.backend.service.evidence.EvidenceService;
@@ -74,5 +75,19 @@ public class EvidenceController {
     public ResponseEntity<List<TaskChecklistDTO>> getTasksForCurrentMonth() {
         List<TaskChecklistDTO> tasks = evidenceService.getTasksForCurrentMonth();
         return ResponseEntity.ok(tasks);
+    }
+
+    @GetMapping("/count")
+    public ResponseEntity<List<EvidenceStatusCountDTO>> getEvidenceCountByStatus(
+            @RequestParam Long challengeId,
+            @RequestParam Long memberId
+    ) {
+        // Gọi service để lấy kết quả
+        List<EvidenceStatusCountDTO> result = evidenceService.countEvidenceByStatusForHost(
+                challengeId, memberId
+        );
+
+        // Trả về kết quả dưới dạng ResponseEntity
+        return ResponseEntity.ok(result);
     }
 }
