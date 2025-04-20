@@ -118,4 +118,6 @@ public interface ChallengeMemberRepository extends JpaRepository<ChallengeMember
             Pageable pageable
     );
 
+    Page<ChallengeMember> findByChallengeId(Long challengeId, Pageable pageable);
+
 }

@@ -64,9 +64,9 @@ public class MemberServiceImpl implements MemberService {
             }
         }
 
-        member.setFirstName(request.getFirstName());
+//        member.setFirstName(request.getFirstName());
+//        member.setLastName(request.getLastName());
         member.setFullName(request.getFullName());
-        member.setLastName(request.getLastName());
         member.setGender(request.getGender());
         member.setPhone(request.getPhone());
         member.setAddress(request.getAddress());
@@ -107,8 +107,8 @@ public class MemberServiceImpl implements MemberService {
         response.setUsername(member.getAccount().getUsername());
         response.setEmail(member.getAccount().getEmail());
         response.setFullName(member.getFullName());
-        response.setFirstName(member.getFirstName());
-        response.setLastName(member.getLastName());
+//        response.setFirstName(member.getFirstName());
+//        response.setLastName(member.getLastName());
         response.setGender(member.getGender());
         response.setPhone(member.getPhone());
         response.setAvatar(member.getAvatar());

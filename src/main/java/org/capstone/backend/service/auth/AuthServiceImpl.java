@@ -172,6 +172,7 @@ public class AuthServiceImpl implements AuthService {
         if (memberRepository.findByAccount(account).isEmpty()) {
             Member member = new Member();
             member.setAccount(account);
+            member.setFullName(account.getUsername());
             member.setCreatedAt(LocalDateTime.now());
             memberRepository.save(member);
         }

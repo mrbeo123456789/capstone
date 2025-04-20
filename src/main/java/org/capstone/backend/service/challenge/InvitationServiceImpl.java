@@ -279,7 +279,7 @@ public class InvitationServiceImpl implements InvitationService {
                     // Lấy tên người mời; nếu có nhiều người mời hiển thị "Multiple users"
                     List<String> inviterNames = invitations.stream()
                             .map(cm -> memberRepository.findById(cm.getJoinBy())
-                                    .map(Member::getFirstName)
+                                    .map(Member::getFullName)
                                     .orElse("Không xác định"))
                             .toList();
                     String inviterDisplay = (inviterNames.size() == 1) ? inviterNames.get(0) : "Nhiều người mời";
