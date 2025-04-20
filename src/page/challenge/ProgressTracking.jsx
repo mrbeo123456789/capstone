@@ -1,18 +1,27 @@
 import { useEffect, useState } from "react";
 import MediaUpload from "../ui/MediaUpload.jsx";
-import {toast} from "react-toastify";
-
+import { toast } from "react-toastify";
+import { FaPlus, FaCheck } from "react-icons/fa";
 
 export default function ProgressTracking({ challenge, evidence }) {
-    const submittedEvidenceDates = new Set(
-        evidence?.map((e) => {
-            const date = new Date(e.submittedAt);
-            const localDateStr = date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, '0') + "-" + String(date.getDate()).padStart(2, '0');
-            return localDateStr;
-        })
-    );
+    // Tạo map để lưu trữ bằng chứng theo ngày và trạng thái
+    const evidenceMap = {};
+    evidence?.forEach((e) => {
+        // Sử dụng format ISO chuẩn để đảm bảo tính nhất quán với ProofUploads
+        const date = new Date(e.submittedAt);
+        const dateISO = date.toISOString().split('T')[0]; // YYYY-MM-DD format
+        evidenceMap[dateISO] = {
+            evidence: e,
+            status: e.status // Lấy trạng thái của bằng chứng (approved hoặc pending)
+        };
+    });
+
+    // Debug để xem dữ liệu evidence
+    console.log("Evidence data:", evidence);
+    console.log("Evidence map:", evidenceMap);
 
     const today = new Date();
+    today.setHours(0, 0, 0, 0); // Loại bỏ phần thời gian
     const challengeId = challenge?.id;
     const [currentMonth, setCurrentMonth] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
 
@@ -78,25 +87,64 @@ export default function ProgressTracking({ challenge, evidence }) {
 
             <div className="grid grid-cols-7 gap-1 text-center text-sm">
                 {calendarDays.map((date, idx) => {
-                    const dateStr = date.toLocaleDateString("sv-SE"); // ✅ returns "YYYY-MM-DD"
-                    const isToday = date.toDateString() === new Date().toDateString();
+                    // Sử dụng format ISO để đảm bảo tính nhất quán với ProofUploads
+                    const dateISO = date.toISOString().split('T')[0]; // YYYY-MM-DD
+                    const todayISO = new Date().toISOString().split('T')[0];
+
+                    const isToday = dateISO === todayISO;
                     const isCurrentMonth = date.getMonth() === currentMonth.getMonth();
                     const isWithinChallenge = normalizeDate(date) >= normalizeDate(startDate) &&
                         normalizeDate(date) <= normalizeDate(endDate);
-                    const hasEvidence = submittedEvidenceDates.has(dateStr);
-                    const isPast = date < today && isWithinChallenge;
-                    const showRedX = isPast && !hasEvidence;
+
+                    const evidenceInfo = evidenceMap[dateISO];
+                    const hasEvidence = Boolean(evidenceInfo);
+                    const isApproved = hasEvidence && (evidenceInfo.status === "APPROVED" || evidenceInfo.evidence.status === "APPROVED");
+                    const isRejected = hasEvidence && (evidenceInfo.status === "REJECTED" || evidenceInfo.evidence.status === "REJECTED");
+
+                    const isPast = normalizeDate(date) < normalizeDate(today) && isWithinChallenge;
+
+                    // Xác định màu nền và biểu tượng theo quy tắc
+                    let bgColor = "";
+                    let icon = null;
+
+                    if (hasEvidence) {
+                        // Đã nộp
+                        if (isApproved) {
+                            // Đã nộp và đã được chấm APPROVED
+                            bgColor = "bg-green-200";
+                            icon = <span className="absolute top-0 right-1 text-green-700 text-lg font-bold"><FaCheck /></span>;
+                        } else if (isRejected) {
+                            // Đã nộp nhưng bị REJECTED
+                            bgColor = "bg-yellow-200";
+                            icon = <span className="absolute top-0 right-1 text-red-600 text-lg font-bold">✕</span>;
+                        } else {
+                            // Đã nộp nhưng chưa được chấm (pending)
+                            bgColor = "bg-green-200";
+                        }
+                    } else if (isWithinChallenge) {
+                        // Chưa nộp
+                        if (isPast) {
+                            // Ngày trong quá khứ chưa nộp
+                            bgColor = "bg-red-200";
+                            icon = <span className="absolute top-0 right-1 text-red-600 text-lg font-bold">✕</span>;
+                        } else if (isToday) {
+                            // Ngày hôm nay chưa nộp
+                            bgColor = "bg-orange-300";
+                            icon = <span className="absolute top-0 right-1 text-orange-700 text-lg font-bold"><FaPlus /></span>;
+                        } else {
+                            // Ngày trong tương lai
+                            bgColor = "bg-gray-300";
+                        }
+                    }
+
                     return (
                         <div
                             key={idx}
                             className={`relative h-10 flex items-center justify-center rounded transition-all
-                                            ${isCurrentMonth ? "cursor-pointer hover:bg-gray-400 text-gray-800" : "text-gray-400 opacity-70"}
-                                            ${hasEvidence ? "bg-green-200"
-                                : showRedX ? "bg-red-200"
-                                    : isWithinChallenge ? "bg-gray-300"
-                                        : ""}
-                                            ${isToday ? "border border-blue-500" : ""}
-                                        `}
+                                ${isCurrentMonth ? "cursor-pointer hover:bg-gray-400 text-gray-800" : "text-gray-400 opacity-70"}
+                                ${bgColor}
+                                ${isToday && !hasEvidence ? "border-2 border-orange-500" : ""}
+                            `}
                             onClick={() => {
                                 if (isCurrentMonth) {
                                     const clickedDate = new Date(date);
@@ -114,22 +162,29 @@ export default function ProgressTracking({ challenge, evidence }) {
                                         setSelectedDate(date);
                                         setShowModal(true);
                                     } else {
-                                        toast.error("That day is not the day to upload evidence.", {
-                                            position: "top-right",
-                                            autoClose: 2500,
-                                        });
+                                        // Xác định thông báo lỗi dựa vào thời gian
+                                        if (normalizeDate(clickedDate) < normalizeDate(todayDate)) {
+                                            toast.error("Đã hết hạn nộp cho ngày đó", {
+                                                position: "top-right",
+                                                autoClose: 2500,
+                                            });
+                                        } else if (normalizeDate(clickedDate) > normalizeDate(todayDate)) {
+                                            toast.error("Chưa đến ngày nộp bằng chứng", {
+                                                position: "top-right",
+                                                autoClose: 2500,
+                                            });
+                                        } else {
+                                            toast.error("Không thể nộp bằng chứng cho ngày này", {
+                                                position: "top-right",
+                                                autoClose: 2500,
+                                            });
+                                        }
                                     }
                                 }
                             }}
                         >
                             {date.getDate()}
-                            {hasEvidence ? (
-                                <span className="absolute top-0 right-1 text-green-700 text-lg font-bold">✓</span>
-                            ) : showRedX ? (
-                                <span className="absolute top-0 right-1 text-red-600 text-lg font-bold">✕</span>
-                            ) : null}
-
-
+                            {icon}
                         </div>
                     );
                 })}
@@ -141,7 +196,6 @@ export default function ProgressTracking({ challenge, evidence }) {
                     onClose={() => setShowModal(false)}
                 />
             )}
-
         </div>
     );
 }

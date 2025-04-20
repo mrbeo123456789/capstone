@@ -19,7 +19,9 @@ const GroupDetailModal = ({ groupId, onClose, onDisbandSuccess }) => {
             try {
                 const result = await disbandGroup(groupId).unwrap();
                 alert("Group disbanded successfully!");
-                onDisbandSuccess(); // Notify parent component to refresh list
+                if (onDisbandSuccess) {
+                    onDisbandSuccess(); // Notify parent component to refresh list
+                }
                 onClose(); // Close modal after success
             } catch (error) {
                 console.error("Error disbanding group:", error);
@@ -137,7 +139,7 @@ const GroupDetailModal = ({ groupId, onClose, onDisbandSuccess }) => {
                                 </svg>
                                 <span className="text-sm font-medium">Description</span>
                             </div>
-                            <div className="text-gray-800 pl-6">{(group.name)}</div>
+                            <div className="text-gray-800 pl-6">{group.description || group.name}</div>
                         </div></div>
 
                     {group.members && group.members.length > 0 && (
@@ -190,7 +192,7 @@ const GroupDetailModal = ({ groupId, onClose, onDisbandSuccess }) => {
 GroupDetailModal.propTypes = {
     groupId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     onClose: PropTypes.func.isRequired,
-    onDisbandSuccess: PropTypes.func.isRequired
+    onDisbandSuccess: PropTypes.func
 };
 
 export default GroupDetailModal;

@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { Eye, Trash } from "lucide-react"; // Sử dụng icon Eye cho xem chi tiết và Trash cho delete
+import { Eye, Trash } from "lucide-react";
 import Sidebar from "../../navbar/AdminNavbar.jsx";
 import { useGetGroupsQuery } from "../../../service/adminService.js";
-import { useDeleteGroupMutation } from "../../../service/groupService.js"; // Import mutation deleteGroup
-import GroupDetailModal from "../detailmodal/GroupDetail.jsx"; // Modal chi tiết nhóm (nếu cần xem chi tiết)
+import { useDeleteGroupMutation } from "../../../service/groupService.js";
+import GroupDetailModal from "../detailmodal/GroupDetail.jsx";
 
 const GroupList = () => {
     const [currentPage, setCurrentPage] = useState(1);
@@ -19,7 +19,7 @@ const GroupList = () => {
         isLoading: isLoadingGroups,
         isError: isErrorGroups,
         refetch: refetchGroups,
-    } = useGetGroupsQuery({ page: currentPage - 1, size: itemsPerPage, keyword: "" });
+    } = useGetGroupsQuery({ page: currentPage - 1, size: itemsPerPage, keyword: searchTerm });
 
     const groups = groupsResponse?.content || [];
     const totalPages = groupsResponse?.totalPages || 1;
@@ -53,6 +53,7 @@ const GroupList = () => {
             }
         }
     };
+
     const formatBackendDateArray = (dateArray) => {
         if (!Array.isArray(dateArray) || dateArray.length < 3) return "Invalid date";
         const [year, month, day] = dateArray;
@@ -75,6 +76,12 @@ const GroupList = () => {
         }
     };
 
+    // Handle search term change
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
+        setCurrentPage(1); // Reset to first page when searching
+    };
+
     return (
         <div className="bg-blue-50 min-h-screen flex flex-col">
             <div className="flex flex-1 overflow-hidden relative">
@@ -91,7 +98,7 @@ const GroupList = () => {
                                         type="text"
                                         placeholder="Searching group ..."
                                         value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        onChange={handleSearchChange}
                                         className="w-full pl-10 pr-4 py-2 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
                                     />
                                     <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400">
@@ -146,8 +153,8 @@ const GroupList = () => {
                                                             className="font-medium text-blue-600 hover:text-blue-800 cursor-pointer hover:underline"
                                                             onClick={() => openGroupDetail(group)}
                                                         >
-                                {group.name}
-                              </span>
+                                                            {group.name}
+                                                        </span>
                                                     </div>
                                                 </td>
                                                 <td className="p-4 text-gray-600">{group.memberCount}</td>
@@ -214,12 +221,12 @@ const GroupList = () => {
                 </div>
             </div>
 
-            {/* Modal chi tiết nhóm (nếu cần xem chi tiết) */}
+            {/* Modal chi tiết nhóm */}
             {showPopup && selectedGroupId && (
                 <GroupDetailModal
                     groupId={selectedGroupId}
                     onClose={closeGroupDetail}
-                    onDeleteSuccess={refetchGroups}
+                    onDisbandSuccess={refetchGroups}
                 />
             )}
         </div>

@@ -33,6 +33,7 @@ import Statistics from "../page/member/Statistics.jsx";
 import Achievement from "../page/member/Achievement.jsx";
 import CreateChallenge from "../page/admin/detailmodal/CreateChallenge.jsx";
 import Settings from "../page/admin/list/Settings.jsx";
+import Leaderboard from "../page/ui/Leaderboard.jsx";
 import ChallengeEdit from "../page/challenge/ChallengeEdit.jsx";
 
 const router = createBrowserRouter([
@@ -73,6 +74,7 @@ const router = createBrowserRouter([
             },
         ]
     },
+    {path: "/ranking", element: <Leaderboard/>},
 
     // Standalone auth pages (outside layout)
     { path: "/login", element: <LoginPage /> },
