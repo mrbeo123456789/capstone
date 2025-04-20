@@ -14,24 +14,24 @@ const HomePage = () => {
     const challenges = data?.content || [];
 
     return (
-        <main className="text-gray-800 grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 min-w-0 gap-4">
-            <div className="col-span-1 md:row-span-2">
+        <main className="text-gray-800 grid grid-cols-1 lg:grid-cols-4 lg:grid-rows-2 min-w-0 gap-4">
+            <div className="col-span-1 lg:row-span-2">
                 <DaySlider/>
             </div>
-            <div className="col-span-1 md:row-span-1">
+            <div className="col-span-1 lg:row-span-1">
                 <ChallengeCard challenge={challenges[0]}/>
             </div>
-            <div className="col-span-1 md:row-span-1">
+            <div className="col-span-1 lg:row-span-1">
                 <ChallengeCard challenge={challenges[1]}/>
             </div>
-            <div className="col-span-1 md:row-span-1">
+            <div className="col-span-1 lg:row-span-1">
                 <ChallengeCard challenge={challenges[2]}/>
             </div>
-            <div className="col-span-1 md:row-span-2">
+            <div className="col-span-1 lg:row-span-2">
                 <TopActivePodium/>
             </div>
             {/* Leaderboard or Slider */}
-            <div className="col-span-1 md:col-span-2 row-span-1 overflow-x-auto">
+            <div className="col-span-1 lg:col-span-2 row-span-1 overflow-x-auto">
                 <TopRankingList/>
             </div>
 

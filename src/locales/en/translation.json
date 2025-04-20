@@ -108,6 +108,76 @@
     "inviteFailed": "Failed to send invitation.",
     "searchFailed": "Failed to search members.",
     "enterKeyword": "Please enter a keyword."
+  },
+
+  "createChallenge": {
+    "verificationType": {
+      "label": "Verification Type",
+      "memberReview": "Peer to Peer",
+      "hostReview": "Host Review"
+    },
+    "participationType": {
+      "label": "Participation Type",
+      "individual": "Individual",
+      "group": "Group"
+    },
+    "generalInfo": "Challenge's General Information",
+    "name": "Challenge Name",
+    "namePlaceholder": "Give it a short distinct name",
+    "summary": "Summary (Optional)",
+    "summaryPlaceholder": "Add a short summary, e.g. An unforgettable challenge",
+    "banner": "Banner (Optional)",
+    "picture": "Add a picture",
+    "clickUpload": "Click to upload or drag and drop",
+    "pictureNote": "SVG, PNG, JPG, or GIF (MAX. 800x400px)",
+    "changePicture": "Change Picture",
+    "details": "Challenge Details",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "privacy": "Privacy",
+    "challengeType": "Challenge Type",
+    "selectChallengeType": "Select challenge type",
+    "maxParticipants": "Max Participants",
+    "description": "Description",
+    "create": "Create",
+    "creating": "Creating...",
+    "cancel": "Cancel",
+    "loading": "Creating challenge...",
+    "success": "Challenge created successfully!",
+    "fail": "Failed to create challenge: "
+  },
+
+  "JoinsChallengeDetail": {
+    "disabledDuringChallenge": "This action is disabled during or after the challenge.",
+    "notJoined": "You have not joined this challenge.",
+    "loading": "Loading...",
+    "error": "Failed to load challenge details.",
+    "leaveSuccess": "You have left the challenge.",
+    "leaveFail": "Failed to leave the challenge.",
+    "reportSuccess": "Report submitted successfully.",
+    "reportFail": "Failed to submit report.",
+    "loadingProof": "Loading proof data...",
+    "proof": "Proof",
+    "member": "Members",
+    "review": "Review",
+    "description": "Description",
+    "invite": "Invite",
+    "leave": "Leave",
+    "share": "Share",
+    "report": "Report",
+    "title": "Challenge",
+    "reportTitle": "Report Challenge",
+    "reportType": "Type of report",
+    "type": {
+      "inappropriate": "Inappropriate content",
+      "spam": "Spam",
+      "harassment": "Offensive behavior",
+      "rule": "Rule violation",
+      "other": "Other"
+    },
+    "reason": "Reason",
+    "submit": "Submit Report",
+    "cancel": "Cancel"
   }
 
 }

@@ -4,7 +4,10 @@ import { MdOutlineCategory } from "react-icons/md";
 import { IoIosPeople } from "react-icons/io";
 import { HiUsers } from "react-icons/hi";
 import { FaRunning } from "react-icons/fa";
-import {useGetChallengeDetailQuery, useJoinChallengeMutation} from "../../service/challengeService";
+import {
+    useGetChallengeDetailQuery,
+    useJoinChallengeMutation,
+} from "../../service/challengeService";
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 
@@ -12,16 +15,18 @@ const ChallengeDetail = () => {
     const [activeTab, setActiveTab] = useState("info");
     const { id } = useParams();
     const [joinChallenge, { isLoading }] = useJoinChallengeMutation();
-    const { data, isLoadingDetail, error } = useGetChallengeDetailQuery(id);
+    const {
+        data: challenge,
+        isLoading: isLoadingDetail,
+        error,
+    } = useGetChallengeDetailQuery(id);
 
     if (isLoadingDetail) return <p>Loading...</p>;
     if (error) return <p>Error loading challenge detail</p>;
 
-    const challenge = data; // ✅ để dễ xử lý
-
     const handleJoin = async () => {
         try {
-            await joinChallenge(parseInt(id)).unwrap(); // Pass id from URL
+            await joinChallenge(parseInt(id)).unwrap();
             toast.success("Joined challenge successfully!");
         } catch (err) {
             console.error(err);
@@ -35,47 +40,61 @@ const ChallengeDetail = () => {
         return `${day.toString().padStart(2, "0")}/${month.toString().padStart(2, "0")}/${year}`;
     };
 
-
     return (
-        <div className="p-6 flex flex-col items-center h-full w-full">
-            {/* Challenge Banner Section */}
+        <div className="p-6 flex flex-col items-center w-full">
+            {/* Banner Section */}
             <div className="w-full flex flex-col md:flex-row bg-white rounded-lg shadow-lg overflow-hidden">
                 <img
-                    src={challenge?.picture}
-                    alt={challenge?.name}
-                    className="w-full md:w-2/3 object-cover"
+                    src={challenge.picture}
+                    alt={challenge.name}
+                    className="object-scale-down w-full max-h-[490px]"
                 />
-                <div className="bg-gray-100 p-6 md:w-1/3 flex flex-col justify-between">
-                <h2 className="text-xl font-bold text-gray-900">MIỄN PHÍ</h2>
-                    <div className="bg-orange-500 text-white font-semibold text-center py-2 mt-2 rounded-lg">
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handleJoin();
-                            }}
-                            className="bg-orange-500 text-white px-3 py-1 rounded mt-2 hover:bg-orange-600"
-                            disabled={isLoading}
-                        >
-                            {isLoading ? "Joining..." : "Join Now"}
-                        </button>
-
+                <div className="bg-gray-100 p-6 w-full flex flex-col justify-between">
+                    <div className="flex justify-between">
+                        <h2 className="text-xl font-bold text-gray-900">MIỄN PHÍ</h2>
+                        <div className="bg-orange-500 text-white font-semibold text-center rounded-lg">
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleJoin();
+                                }}
+                                className="bg-orange-500 text-white rounded hover:bg-orange-600 p-3"
+                                disabled={isLoading || challenge.joined}
+                            >
+                                {challenge.joined
+                                    ? "Đã tham gia"
+                                    : isLoading
+                                        ? "Joining..."
+                                        : "Tham gia thử thách"}
+                            </button>
+                        </div>
                     </div>
                     <div className="mt-4 flex items-center">
-                        <FaRegClock className="text-gray-500 mr-2"/>
+                        <FaRegClock className="text-gray-500 mr-2" />
                         <p className="text-gray-700 text-sm">
-                        Hạn đăng ký: 18/09/2023 hoặc khi hết suất
+                            {formatDate(challenge.startDate)} → {formatDate(challenge.endDate)}
                         </p>
                     </div>
+
+                    <div className="mt-4 flex items-center">
+                        <MdOutlineCategory className="text-gray-500 mr-2" />
+                        <p className="text-gray-700 text-sm">Thể loại: {challenge.challengeType}</p>
+                    </div>
+
                     <div className="mt-4 flex items-center">
                         <FaRunning className="text-gray-500 mr-2" />
-                        <p className="text-gray-700 text-sm">Hạng mục: 5 km</p>
+                        <p className="text-gray-700 text-sm">Hình thức: {challenge.participationType}</p>
                     </div>
-                    <h3 className="text-gray-800 font-semibold mt-6">
-                        PHẦN THƯỞNG KHI HOÀN THÀNH
-                    </h3>
-                    <div className="mt-4 flex items-center text-lg font-semibold text-orange-500">
+
+                    <div className="mt-4 flex items-center">
+                        <IoIosPeople className="text-gray-500 mr-2" />
+                        <p className="text-gray-700 text-sm">Xác minh: {challenge.verificationType}</p>
+                    </div>
+
+                    <h3 className="text-gray-800 font-semibold mt-6">TỔNG NGƯỜI THAM GIA</h3>
+                    <div className="mt-2 flex items-center text-lg font-semibold text-orange-500">
                         <HiUsers className="mr-2" />
-                        <p>1019 người đã tham gia</p>
+                        <p>{challenge.participantCount} người đã tham gia</p>
                     </div>
                 </div>
             </div>
@@ -103,24 +122,27 @@ const ChallengeDetail = () => {
                         </button>
                     ))}
                 </div>
-                {/* Tab Content */}
+
                 <div className="p-6 bg-white shadow-md rounded-lg mt-4">
                     {activeTab === "info" && (
                         <div>
-                            <h2 className="text-2xl font-bold text-gray-900">{challenge?.name}</h2>
+                            <h2 className="text-2xl font-bold text-gray-900">{challenge.name}</h2>
                             <p className="text-gray-500 mt-2">
-                                {formatDate(challenge?.startDate)} - {formatDate(challenge?.endDate)}
+                                {formatDate(challenge.startDate)} - {formatDate(challenge.endDate)}
                             </p>
                             <p className="text-sm text-gray-700 mt-2">
-                                Thử thách: <span
-                                className="text-orange-500 font-semibold">{challenge?.challengeType}</span>
+                                Loại thử thách:{" "}
+                                <span className="text-orange-500 font-semibold">
+                  {challenge.challengeType}
+                </span>
                             </p>
                             <div
                                 className="mt-6 border-t pt-4 text-gray-700"
-                                dangerouslySetInnerHTML={{__html: challenge?.description}}
+                                dangerouslySetInnerHTML={{ __html: challenge.description }}
                             />
                         </div>
                     )}
+
                     {activeTab === "rules" && (
                         <p className="text-gray-700">Quy định chi tiết của thử thách sẽ hiển thị tại đây.</p>
                     )}

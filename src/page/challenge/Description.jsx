@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 import VideoModal from "../ui/VideoModal.jsx";
 
@@ -52,8 +52,15 @@ const Description = ({ content }) => {
 
 
     return (
-        <div className="mt-6 mx-auto p-10 w-3/4 bg-white">
-            <div className="p-4" dangerouslySetInnerHTML={{__html: content}}/>
+        <div className="rounded-2xl">
+
+            <div className="mt-6 mx-auto w-3/4 bg-white rounded-2xl">
+                <div>
+                    <img src={content?.banner} alt={content?.name} className="w-full h-[450px] object-cover"/>
+
+                </div>
+                <div className="p-10" dangerouslySetInnerHTML={{__html: content?.description}}/>
+            </div>
         </div>
 
     );

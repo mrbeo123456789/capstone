@@ -37,6 +37,9 @@ const MediaUpload = ({ date, onClose, challengeId }) => {
             setSelectedFile(null);
             setPreview(null);
             onClose();
+            setTimeout(() => {
+                window.location.reload(); // ✅ Refresh the page
+            }, 300);
         } catch (err) {
             console.error(err);
             const errorMessage =
@@ -46,6 +49,7 @@ const MediaUpload = ({ date, onClose, challengeId }) => {
             toast.error(errorMessage);
         }
     };
+
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

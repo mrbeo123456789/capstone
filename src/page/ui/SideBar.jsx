@@ -26,14 +26,14 @@ const Sidebar = ({ isOpen }) => {
     return (
         <aside
             className={clsx(
-                "fixed top-20 bottom-0 left-0 w-14 md:w-64 z-40 transition-transform duration-300 overflow-y-auto",
+                "fixed top-20 bottom-0 left-0 w-14 lg:w-64 z-40 transition-transform duration-300 overflow-y-auto",
                 {
                     "-translate-x-full": !isOpen,
                     "translate-x-0": isOpen,
                 }
             )}
         >
-            <div className="p-5 flex flex-col h-full justify-between backdrop-blur-md bg-white/10 shadow-lg border-r border-white/20">
+            <div className="p-2 flex flex-col h-full justify-between backdrop-blur-md bg-black/50 sm:bg-white/10 shadow-lg border-r border-white/20">
                 {/* Menu Section */}
                 <nav className="flex-1">
                     <ul className="space-y-4">
@@ -44,7 +44,7 @@ const Sidebar = ({ isOpen }) => {
                                     className="flex md:flex-row flex-col items-center md:items-start space-y-1 md:space-y-0 md:space-x-3 p-2 rounded-md hover:bg-orange-600 hover:text-white transition text-white"
                                 >
                                     <span className="text-lg">{item.icon}</span>
-                                    <span className="hidden md:inline">{t(`sidebar.${item.key}`)}</span>
+                                    <span className="hidden lg:inline">{t(`sidebar.${item.key}`)}</span>
                                 </Link>
                             </li>
                         ))}
@@ -58,7 +58,7 @@ const Sidebar = ({ isOpen }) => {
                         alt="GoBeyond Logo"
                         className="h-10 rounded-full"
                     />
-                    <div className="flex mt-2">
+                    <div className="hidden lg:flex mt-2">
                         <div className="text-lg font-bold text-white">Go</div>
                         <div className="text-lg font-bold text-yellow-400">Beyond</div>
                     </div>

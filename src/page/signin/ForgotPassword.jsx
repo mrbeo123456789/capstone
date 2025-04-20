@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import toast from "react-hot-toast";
+import { useState } from "react";
+import { toast } from "react-toastify"; // Dùng toast từ react-toastify
 import { useNavigate } from "react-router-dom";
-import {useForgotPasswordMutation} from "../../service/authService.js";
+import { useForgotPasswordMutation } from "../../service/authService.js";
 
 function ForgotPassword() {
     const [email, setEmail] = useState("");
@@ -16,22 +16,29 @@ function ForgotPassword() {
         }
 
         try {
-            console.log("Forgot Password Response:", email);
-            const response = await forgotPassword(email);
-            console.log("DDDDDDDDDDDDDDDDDDDDDDDDDD", email);
+            const response = await forgotPassword(email).unwrap(); // unwrap giúp xử lý trực tiếp dữ liệu
 
-            toast.success(response.message);
-            navigate("/enter-otp", { state: { email } }); // Navigate to the OTP page
+            toast.success(response.message || "OTP sent to your email");
+            sessionStorage.setItem("otpEmail", email);
+            sessionStorage.setItem("otpType", "forgot");
+            navigate("/enter-otp");
         } catch (error) {
-            toast.error(error.data?.message || "Something went wrong.");
+            if (error?.status === 404 && error?.data?.message) {
+                toast.error(error.data.message); // Hiển thị lỗi 404 nếu không tìm thấy email
+                return;
+            }
+            toast.error(error?.data?.message || "Something went wrong.");
         }
     };
 
     return (
         <div className="relative min-h-screen bg-black">
-            <div className="absolute inset-0 w-full h-screen bg-cover bg-center opacity-50"
-                 style={{backgroundImage: `url(https://firebasestorage.googleapis.com/v0/b/bookstore-f9ac2.appspot.com/o/pexels-bess-hamiti-83687-36487.jpg?alt=media&token=f1fb933e-2fe4-4f6f-a604-7eb7e47314fd)`}}>
-            </div>
+            <div
+                className="absolute inset-0 w-full h-screen bg-cover bg-center opacity-50"
+                style={{
+                    backgroundImage: `url(https://firebasestorage.googleapis.com/v0/b/bookstore-f9ac2.appspot.com/o/pexels-bess-hamiti-83687-36487.jpg?alt=media&token=f1fb933e-2fe4-4f6f-a604-7eb7e47314fd)`,
+                }}
+            />
             {/* Logo */}
             <div className="absolute top-5 left-5 flex items-end">
                 <img
@@ -47,7 +54,9 @@ function ForgotPassword() {
             <div className="w-full h-screen flex items-center justify-center relative">
                 <div className="bg-white p-8 rounded-lg shadow-lg w-96">
                     <h2 className="text-2xl font-bold text-center text-red-600">Forgot Password?</h2>
-                    <p className="text-gray-600 text-sm text-center mb-4">Enter your email to receive an OTP.</p>
+                    <p className="text-gray-600 text-sm text-center mb-4">
+                        Enter your email to receive an OTP.
+                    </p>
                     <form onSubmit={handleForgotPassword} className="space-y-4">
                         <input
                             type="email"

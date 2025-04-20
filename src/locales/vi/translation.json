@@ -105,6 +105,76 @@
     "inviteFailed": "Gửi lời mời thất bại.",
     "searchFailed": "Tìm kiếm thất bại.",
     "enterKeyword": "Vui lòng nhập từ khóa."
+  },
+
+  "createChallenge": {
+    "verificationType": {
+      "label": "Hình thức xác minh",
+      "memberReview": "Thành viên chấm chéo",
+      "hostReview": "Host kiểm duyệt"
+    },
+    "participationType": {
+      "label": "Hình thức tham gia",
+      "individual": "Cá nhân",
+      "group": "Nhóm"
+    },
+    "generalInfo": "Thông tin chung của thử thách",
+    "name": "Tên thử thách",
+    "namePlaceholder": "Nhập tên ngắn gọn và dễ nhớ",
+    "summary": "Tóm tắt (Không bắt buộc)",
+    "summaryPlaceholder": "Thêm một vài dòng truyền cảm hứng, ví dụ: Thử thách không thể nào quên",
+    "banner": "Ảnh bìa (Không bắt buộc)",
+    "picture": "Tải ảnh minh họa",
+    "clickUpload": "Bấm để tải lên hoặc kéo thả",
+    "pictureNote": "Định dạng SVG, PNG, JPG hoặc GIF (TỐI ĐA 800x400px)",
+    "changePicture": "Đổi ảnh",
+    "details": "Chi tiết thử thách",
+    "startDate": "Ngày bắt đầu",
+    "endDate": "Ngày kết thúc",
+    "privacy": "Quyền riêng tư",
+    "challengeType": "Loại thử thách",
+    "selectChallengeType": "Chọn loại thử thách",
+    "maxParticipants": "Số người tham gia tối đa",
+    "description": "Mô tả chi tiết",
+    "create": "Tạo mới",
+    "creating": "Đang tạo...",
+    "cancel": "Hủy",
+    "loading": "Đang tạo thử thách...",
+    "success": "Tạo thử thách thành công!",
+    "fail": "Tạo thử thách thất bại: "
+  },
+  "JoinsChallengeDetail": {
+    "disabledDuringChallenge": "Hành động này bị tắt khi thử thách đã diễn ra hoặc kết thúc.",
+    "notJoined": "Bạn chưa tham gia thử thách này.",
+    "loading": "Đang tải...",
+    "error": "Không thể tải chi tiết thử thách.",
+    "leaveSuccess": "Bạn đã rời khỏi thử thách.",
+    "leaveFail": "Không thể rời khỏi thử thách.",
+    "reportSuccess": "Báo cáo đã được gửi thành công.",
+    "reportFail": "Gửi báo cáo thất bại.",
+    "loadingProof": "Đang tải dữ liệu bằng chứng...",
+    "proof": "Bằng chứng",
+    "member": "Thành viên",
+    "review": "Chấm điểm",
+    "description": "Mô tả",
+    "invite": "Mời",
+    "leave": "Rời khỏi",
+    "share": "Chia sẻ",
+    "report": "Báo cáo",
+    "title": "Thử thách",
+    "reportTitle": "Báo cáo thử thách",
+    "reportType": "Loại báo cáo",
+    "type": {
+      "inappropriate": "Nội dung không phù hợp",
+      "spam": "Spam",
+      "harassment": "Hành vi xúc phạm",
+      "rule": "Vi phạm quy định",
+      "other": "Khác"
+    },
+    "reason": "Lý do",
+    "submit": "Gửi báo cáo",
+    "cancel": "Hủy"
   }
+
 
 }
