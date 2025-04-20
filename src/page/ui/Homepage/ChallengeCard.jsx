@@ -26,7 +26,10 @@ const ChallengeCard = ({ challenge }) => {
                         </p>
                     </div>
                     <div className="mt-auto text-xs text-gray-400 pt-2">
-                        <p>From: {challenge.startDate.join("/")} → {challenge.endDate.join("/")}</p>
+                        <p>
+                            From: {new Date(challenge.startDate).toLocaleDateString()} → {new Date(challenge.endDate).toLocaleDateString()}
+                        </p>
+
                         <p>Participation: {challenge.participationType}</p>
                     </div>
                 </div>

@@ -6,6 +6,10 @@ const ChallengeCardDisplay = () => {
 
     if (isLoading) return <p className="text-center mt-10">Loading challenges...</p>;
     if (isError) return <p className="text-center mt-10 text-red-500">Error loading challenges.</p>;
+    const formatDate = (dateStr) => {
+        const d = new Date(dateStr);
+        return d.toLocaleDateString("en-CA"); // e.g. 2025-04-20
+    };
 
     return (
         <div className="relative flex flex-wrap justify-center items-start gap-6">
@@ -34,7 +38,7 @@ const ChallengeCardDisplay = () => {
                                 </p>
                             </div>
                             <div className="mt-auto text-xs text-gray-400 pt-2">
-                                <p>From: {challenge.startDate.join("/")} → {challenge.endDate.join("/")}</p>
+                                <p>From: {formatDate(challenge.startDate)} → {formatDate(challenge.endDate)}</p>
                                 <p>Participation: {challenge.participationType}</p>
                             </div>
                         </div>
