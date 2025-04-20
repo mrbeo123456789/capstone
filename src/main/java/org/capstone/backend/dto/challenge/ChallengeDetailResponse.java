@@ -22,10 +22,10 @@ public class ChallengeDetailResponse {
     private String picture;
     private String banner;
     private String challengeType;
-    private boolean joined;
+    private Integer maxParticipants;    private boolean joined;
     private long participantCount;
     private long duration;
-    private ChallengeStatus challengeStatus;// Thời gian của thử thách, tính theo số ngày
-    private VerificationType verificationType;    // Cập nhật kiểu enum
-    private ParticipationType participationType;   // Cập nhật kiểu enum
+    private ChallengeStatus challengeStatus;
+    private VerificationType verificationType;
+    private ParticipationType participationType;
 }

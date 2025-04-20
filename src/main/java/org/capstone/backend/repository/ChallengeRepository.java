@@ -78,6 +78,7 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
         c.picture,
         c.banner, 
         c.challengeType.name,
+        c.maxParticipants,
         CASE 
             WHEN :memberId IS NULL THEN false
             WHEN EXISTS (

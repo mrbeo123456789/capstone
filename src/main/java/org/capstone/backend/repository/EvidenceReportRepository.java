@@ -17,4 +17,5 @@ public interface EvidenceReportRepository extends JpaRepository<EvidenceReport, 
     List<EvidenceReport> findByReviewerIdAndIsApprovedIsNull(Long reviewerId);
 
 
+
 }

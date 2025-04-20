@@ -1,6 +1,7 @@
 package org.capstone.backend.service.evidence;
 
 import org.capstone.backend.dto.evidence.EvidenceReviewRequest;
+import org.capstone.backend.dto.evidence.EvidenceStatusCountDTO;
 import org.capstone.backend.dto.evidence.EvidenceToReviewDTO;
 import org.capstone.backend.dto.evidence.TaskChecklistDTO;
 import org.capstone.backend.dto.member.MemberSubmissionProjection;
@@ -32,4 +33,8 @@ public interface EvidenceService {
     Page<EvidenceToReviewDTO> getEvidenceByMemberAndChallenge(Long memberId, Long challengeId, Pageable pageable);
     List<TaskChecklistDTO> getTasksForCurrentMonth();
     long getSubmittedEvidenceCount(Long memberId, Long challengeId, LocalDate startDate, LocalDate today);
+     List<EvidenceStatusCountDTO> countEvidenceByStatusForHost(
+            Long challengeId,
+            Long memberId
+    );
 }

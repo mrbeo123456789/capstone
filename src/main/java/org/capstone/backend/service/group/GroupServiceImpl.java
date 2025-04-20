@@ -251,10 +251,15 @@ public class GroupServiceImpl implements GroupService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Không tìm thấy thành viên với ID được cung cấp.");
         }
 
-        // Tạo danh sách lời mời hoặc cập nhật trạng thái thành viên
+        // Tạo hoặc cập nhật lời mời
         List<GroupMember> invitations = membersToInvite.stream()
                 .map(member -> {
                     GroupMember existingMember = groupMemberRepository.findByGroupAndMember(group, member).orElse(null);
+
+                    // Nếu đã là thành viên chính thức thì bỏ qua
+                    if (existingMember != null && existingMember.getStatus() == GroupMemberStatus.ACCEPTED) {
+                        return null;
+                    }
 
                     if (existingMember == null) {
                         return GroupMember.builder()
@@ -264,20 +269,17 @@ public class GroupServiceImpl implements GroupService {
                                 .status(GroupMemberStatus.PENDING)
                                 .createdBy(group.getCreatedBy())
                                 .build();
-                    } else if (existingMember.getStatus() == GroupMemberStatus.LEFT
-                            || existingMember.getStatus() == GroupMemberStatus.BANNED) {
+                    } else {
                         existingMember.setStatus(GroupMemberStatus.PENDING);
                         return existingMember;
                     }
-                    return null;
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
+        // Lưu và gửi thông báo
         if (!invitations.isEmpty()) {
             groupMemberRepository.saveAll(invitations);
-
-            // ✅ Gửi thông báo cho từng thành viên được mời
             invitations.forEach(invite -> {
                 Member invitedMember = invite.getMember();
                 eventPublisher.publishEvent(new InvitationSentEvent(
@@ -286,11 +288,9 @@ public class GroupServiceImpl implements GroupService {
                         "notification.groupInvitation.content",
                         Map.of("groupName", group.getName())
                 ));
-
             });
         }
     }
-
 
 
     @Override

@@ -1,5 +1,6 @@
 package org.capstone.backend.repository;
 
+import org.capstone.backend.dto.evidence.EvidenceStatusCountDTO;
 import org.capstone.backend.entity.Challenge;
 import org.capstone.backend.entity.Evidence;
 import org.capstone.backend.entity.Member;
@@ -104,6 +105,21 @@ public interface EvidenceRepository extends JpaRepository<Evidence, Long> {
     );
     @Query("SELECT e FROM Evidence e WHERE e.member.id = :memberId AND e.challenge.id = :challengeId")
     Optional<Evidence> findEvidenceByMemberAndChallenge(Long memberId, Long challengeId);
+
+    @Query("""
+        SELECT new org.capstone.backend.dto.evidence.EvidenceStatusCountDTO(
+                e.status, 
+                COUNT(e)
+        )
+        FROM Evidence e
+        WHERE e.challenge.id = :challengeId
+          AND e.member.id = :memberId
+        GROUP BY e.status
+    """)
+    List<EvidenceStatusCountDTO> countEvidenceByStatusForHost(
+            @Param("challengeId") Long challengeId,
+            @Param("memberId") Long memberId
+    );
 }
 
 

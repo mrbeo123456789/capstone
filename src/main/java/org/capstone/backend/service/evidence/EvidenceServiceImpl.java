@@ -3,6 +3,7 @@ package org.capstone.backend.service.evidence;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.capstone.backend.dto.evidence.EvidenceReviewRequest;
+import org.capstone.backend.dto.evidence.EvidenceStatusCountDTO;
 import org.capstone.backend.dto.evidence.EvidenceToReviewDTO;
 import org.capstone.backend.dto.evidence.TaskChecklistDTO;
 import org.capstone.backend.dto.member.MemberSubmissionProjection;
@@ -538,7 +539,15 @@ public class EvidenceServiceImpl implements EvidenceService {
         return evidenceRepository.countByMemberIdAndChallengeIdAndSubmittedAtBetween(
                 memberId, challengeId, startDateTime, endDateTime);
     }
-
+    public List<EvidenceStatusCountDTO> countEvidenceByStatusForHost(
+            Long challengeId,
+            Long memberId
+    ) {
+        // Gọi phương thức repository để lấy số lượng Evidence theo trạng thái
+        return evidenceRepository.countEvidenceByStatusForHost(
+                challengeId, memberId
+        );
+    }
 
 
 }
