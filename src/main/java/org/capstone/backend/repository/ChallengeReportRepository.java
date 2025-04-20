@@ -16,6 +16,7 @@ public interface ChallengeReportRepository extends JpaRepository<ChallengeReport
     @Query("""
     SELECT new org.capstone.backend.dto.report.ChallengeReportResponseDTO(
         r.id,
+        r.challenge.id,
         r.challenge.name,
         r.reporter.fullName,
         r.reportType,
@@ -35,6 +36,7 @@ public interface ChallengeReportRepository extends JpaRepository<ChallengeReport
     Page<ChallengeReportResponseDTO> filterReportsForAdmin(
             @Param("reportType") ReportType reportType,
             Pageable pageable);
+
     Long countByStatus(ReportStatus status);
 
 }

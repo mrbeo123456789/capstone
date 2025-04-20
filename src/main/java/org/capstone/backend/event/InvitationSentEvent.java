@@ -6,5 +6,5 @@ public record InvitationSentEvent(
         String targetUserId,
         String titleKey,
         String contentKey,
-        Map<String, String> data
+        Map<String, String> params
 ) {}

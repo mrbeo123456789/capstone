@@ -24,7 +24,7 @@ public class InvitationNotificationListener {
                 event.titleKey(),    // 📌 ex: "notification.invite.challenge.title"
                 event.contentKey(),
                 NotificationType.INVITATION,// 📌 ex: "notification.invite.challenge.content"
-                event.data()     // 📌 ex: { challengeName: "Plank 30 Ngày", inviterName: "DuyLV" }
+                event.params()    // 📌 ex: { challengeName: "Plank 30 Ngày", inviterName: "DuyLV" }
 
         );
     }
