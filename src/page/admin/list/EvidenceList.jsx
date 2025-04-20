@@ -333,44 +333,27 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                         <h2 className="text-lg font-semibold text-gray-800">
                                             Evidence {selectedMember ? `for ${selectedMember.fullName}` : ''}
                                         </h2>
-                                        <div className="flex space-x-2">
-                                            <button
-                                                onClick={() => handleStatusFilterChange('all')}
-                                                className={`px-3 py-1 rounded-full text-sm ${
-                                                    statusFilter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
-                                                }`}
-                                            >
-                                                All
-                                            </button>
-                                            <button
-                                                onClick={() => handleStatusFilterChange('waiting')}
-                                                className={`px-3 py-1 rounded-full text-sm ${
-                                                    statusFilter === 'waiting' ? 'bg-yellow-500 text-white' : 'bg-gray-200 text-gray-800'
-                                                }`}
-                                            >
-                                                Pending
-                                            </button>
-                                            <button
-                                                onClick={() => handleStatusFilterChange('approved')}
-                                                className={`px-3 py-1 rounded-full text-sm ${
-                                                    statusFilter === 'approved' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-800'
-                                                }`}
-                                            >
-                                                Approved
-                                            </button>
-                                            <button
-                                                onClick={() => handleStatusFilterChange('rejected')}
-                                                className={`px-3 py-1 rounded-full text-sm ${
-                                                    statusFilter === 'rejected' ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-800'
-                                                }`}
-                                            >
-                                                Rejected
-                                            </button>
+                                        <div className="px-2 py-1 rounded-md text-sm bg-blue-200 text-blue-800">
+                                            {statusFilter !== 'all' && (
+                                                <span className="flex items-center">
+                                                    {getEvidenceStatusIcon(statusFilter)}
+                                                    Filtering: {statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1)}
+                                                    <button
+                                                        onClick={() => handleStatusFilterChange('all')}
+                                                        className="ml-2 text-blue-500 hover:text-blue-700"
+                                                    >
+                                                        ✕
+                                                    </button>
+                                                </span>
+                                            )}
+                                            {statusFilter === 'all' && (
+                                                <span>Showing all evidence</span>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* Member Evidence Statistics with data from the API */}
+                                {/* Member Evidence Statistics with clickable cards */}
                                 {selectedMember && (
                                     <div className="p-4 border-b">
                                         <h4 className="font-medium text-lg mb-2">Member Evidence Statistics</h4>
@@ -380,21 +363,49 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                             </div>
                                         ) : (
                                             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                                                <div className="bg-gray-50 p-4 rounded-lg">
+                                                {/* Total Evidence (All) */}
+                                                <div
+                                                    className={`bg-gray-50 p-4 rounded-lg cursor-pointer transform transition-all duration-200 hover:shadow-md ${statusFilter === 'all' ? 'ring-2 ring-blue-500 shadow-md' : ''}`}
+                                                    onClick={() => handleStatusFilterChange('all')}
+                                                >
                                                     <p className="text-gray-500 text-sm">Total Evidence</p>
                                                     <p className="text-xl font-bold">{memberEvidenceStats.total}</p>
                                                 </div>
-                                                <div className="bg-gray-50 p-4 rounded-lg">
+
+                                                {/* Approved */}
+                                                <div
+                                                    className={`bg-green-50 p-4 rounded-lg cursor-pointer transform transition-all duration-200 hover:shadow-md ${statusFilter === 'approved' ? 'ring-2 ring-green-500 shadow-md' : ''}`}
+                                                    onClick={() => handleStatusFilterChange('approved')}
+                                                >
                                                     <p className="text-gray-500 text-sm">Approved</p>
-                                                    <p className="text-xl font-bold text-green-600">{memberEvidenceStats.approved}</p>
+                                                    <div className="flex items-center">
+                                                        <ThumbsUp className="mr-2 text-green-600" size={16} />
+                                                        <p className="text-xl font-bold text-green-600">{memberEvidenceStats.approved}</p>
+                                                    </div>
                                                 </div>
-                                                <div className="bg-gray-50 p-4 rounded-lg">
+
+                                                {/* Pending */}
+                                                <div
+                                                    className={`bg-yellow-50 p-4 rounded-lg cursor-pointer transform transition-all duration-200 hover:shadow-md ${statusFilter === 'waiting' ? 'ring-2 ring-yellow-500 shadow-md' : ''}`}
+                                                    onClick={() => handleStatusFilterChange('waiting')}
+                                                >
                                                     <p className="text-gray-500 text-sm">Pending</p>
-                                                    <p className="text-xl font-bold text-yellow-600">{memberEvidenceStats.pending}</p>
+                                                    <div className="flex items-center">
+                                                        <HourglassIcon className="mr-2 text-yellow-600" size={16} />
+                                                        <p className="text-xl font-bold text-yellow-600">{memberEvidenceStats.pending}</p>
+                                                    </div>
                                                 </div>
-                                                <div className="bg-gray-50 p-4 rounded-lg">
+
+                                                {/* Rejected */}
+                                                <div
+                                                    className={`bg-red-50 p-4 rounded-lg cursor-pointer transform transition-all duration-200 hover:shadow-md ${statusFilter === 'rejected' ? 'ring-2 ring-red-500 shadow-md' : ''}`}
+                                                    onClick={() => handleStatusFilterChange('rejected')}
+                                                >
                                                     <p className="text-gray-500 text-sm">Rejected</p>
-                                                    <p className="text-xl font-bold text-red-600">{memberEvidenceStats.rejected}</p>
+                                                    <div className="flex items-center">
+                                                        <ThumbsDown className="mr-2 text-red-600" size={16} />
+                                                        <p className="text-xl font-bold text-red-600">{memberEvidenceStats.rejected}</p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         )}
@@ -433,14 +444,8 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                                 {new Date(evidence.submittedAt).toLocaleDateString('vi-VN')}
                                                             </td>
-                                                            <td
-                                                                className="px-6 py-4 whitespace-nowrap text-sm"
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation(); // Prevent triggering the row click
-                                                                    handleStatusFilterChange(displayStatus);
-                                                                }}
-                                                            >
-                                                                <span className={`${getEvidenceStatusColor(displayStatus)} cursor-pointer`}>
+                                                            <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                                                <span className={getEvidenceStatusColor(displayStatus)}>
                                                                     {getEvidenceStatusIcon(displayStatus)}
                                                                     {displayStatus.charAt(0).toUpperCase() + displayStatus.slice(1)}
                                                                 </span>
