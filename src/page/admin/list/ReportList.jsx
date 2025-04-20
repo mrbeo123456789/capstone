@@ -106,7 +106,7 @@ const ReportList = () => {
     return (
         <Routes>
             <Route path="/" element={
-                <div className="bg-red-50 min-h-screen flex flex-col">
+                <div className="bg-blue-50 min-h-screen flex flex-col">
                     <div className="flex flex-1 overflow-hidden relative">
                         <div className={`transition-all duration-300 ${sidebarCollapsed ? 'w-16' : 'w-64'} flex-shrink-0`}>
                             <Sidebar
@@ -115,17 +115,17 @@ const ReportList = () => {
                             />
                         </div>
                         <div className="flex-1 overflow-auto p-4">
-                            <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-orange-100 h-full flex flex-col">
+                            <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-blue-100 h-full flex flex-col">
                                 {/* Search and Filter Section */}
-                                <div className="p-4 border-b border-orange-100 bg-gradient-to-r from-orange-50 to-yellow-50">
+                                <div className="p-4 border-b border-blue-100 bg-gradient-to-r from-blue-50 to-yellow-50">
                                     <div className="flex flex-col md:flex-row gap-4">
                                         <div className="flex-1 relative">
-                                            <h1 className="text-2xl font-bold text-orange-700">Reports List</h1>
+                                            <h1 className="text-2xl font-bold text-blue-700">Reports List</h1>
                                         </div>
                                         <div className="relative">
                                             <button
                                                 onClick={toggleStatusDropdown}
-                                                className="px-4 py-2 border border-orange-200 rounded-lg bg-white flex items-center justify-between min-w-[180px]"
+                                                className="px-4 py-2 border border-blue-200 rounded-lg bg-white flex items-center justify-between min-w-[180px]"
                                             >
                                                 <span>
                                                     {reportTypeFilter === "SPAM"
@@ -151,24 +151,24 @@ const ReportList = () => {
                                                 </svg>
                                             </button>
                                             {isStatusDropdownOpen && (
-                                                <div className="absolute right-0 mt-2 w-56 bg-white border border-orange-200 rounded-lg shadow-lg z-10">
+                                                <div className="absolute right-0 mt-2 w-56 bg-white border border-blue-200 rounded-lg shadow-lg z-10">
                                                     <div className="py-1">
-                                                        <button onClick={() => handleReportTypeChange("")} className="block w-full text-left px-4 py-2 hover:bg-orange-50">
+                                                        <button onClick={() => handleReportTypeChange("")} className="block w-full text-left px-4 py-2 hover:bg-blue-50">
                                                             All Report Types
                                                         </button>
-                                                        <button onClick={() => handleReportTypeChange("SPAM")} className="block w-full text-left px-4 py-2 hover:bg-orange-50">
+                                                        <button onClick={() => handleReportTypeChange("SPAM")} className="block w-full text-left px-4 py-2 hover:bg-blue-50">
                                                             SPAM
                                                         </button>
-                                                        <button onClick={() => handleReportTypeChange("INAPPROPRIATE_CONTENT")} className="block w-full text-left px-4 py-2 hover:bg-orange-50">
+                                                        <button onClick={() => handleReportTypeChange("INAPPROPRIATE_CONTENT")} className="block w-full text-left px-4 py-2 hover:bg-blue-50">
                                                             Inappropriate Content
                                                         </button>
-                                                        <button onClick={() => handleReportTypeChange("RULE_VIOLATION")} className="block w-full text-left px-4 py-2 hover:bg-orange-50">
+                                                        <button onClick={() => handleReportTypeChange("RULE_VIOLATION")} className="block w-full text-left px-4 py-2 hover:bg-blue-50">
                                                             Rule Violation
                                                         </button>
-                                                        <button onClick={() => handleReportTypeChange("OFFENSIVE_BEHAVIOR")} className="block w-full text-left px-4 py-2 hover:bg-orange-50">
+                                                        <button onClick={() => handleReportTypeChange("OFFENSIVE_BEHAVIOR")} className="block w-full text-left px-4 py-2 hover:bg-blue-50">
                                                             Offensive Behavior
                                                         </button>
-                                                        <button onClick={() => handleReportTypeChange("OTHER")} className="block w-full text-left px-4 py-2 hover:bg-orange-50">
+                                                        <button onClick={() => handleReportTypeChange("OTHER")} className="block w-full text-left px-4 py-2 hover:bg-blue-50">
                                                             Other
                                                         </button>
                                                     </div>
@@ -182,7 +182,7 @@ const ReportList = () => {
                                 <div className="flex-1 overflow-auto">
                                     {isLoading ? (
                                         <div className="flex justify-center items-center h-64">
-                                            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+                                            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
                                         </div>
                                     ) : isError ? (
                                         <div className="flex justify-center items-center h-64 text-red-500">
@@ -190,7 +190,7 @@ const ReportList = () => {
                                         </div>
                                     ) : (
                                         <table className="w-full">
-                                            <thead className="bg-gradient-to-r from-orange-50 to-yellow-50 text-orange-700">
+                                            <thead className="bg-gradient-to-r from-blue-50 to-yellow-50 text-blue-700">
                                             <tr>
                                                 <th className="p-4 text-left">ID</th>
                                                 <th className="p-4 text-left">Report Type</th>
@@ -211,7 +211,7 @@ const ReportList = () => {
                                                 reports.map((report) => (
                                                     <tr
                                                         key={report.id}
-                                                        className="border-b border-orange-50 hover:bg-orange-50 transition-colors"
+                                                        className="border-b border-blue-50 hover:bg-blue-50 transition-colors"
                                                     >
                                                         <td className="p-4">{report.id}</td>
                                                         <td className="p-4">
@@ -221,7 +221,7 @@ const ReportList = () => {
                                                                     : report.reportType === "INAPPROPRIATE_CONTENT"
                                                                         ? "bg-red-100 text-red-700"
                                                                         : report.reportType === "RULE_VIOLATION"
-                                                                            ? "bg-orange-100 text-orange-700"
+                                                                            ? "bg-blue-100 text-blue-700"
                                                                             : report.reportType === "OFFENSIVE_BEHAVIOR"
                                                                                 ? "bg-purple-100 text-purple-700"
                                                                                 : "bg-gray-100 text-gray-700"
@@ -293,7 +293,7 @@ const ReportList = () => {
                                 </div>
 
                                 {/* Pagination Section */}
-                                <div className="bg-gradient-to-r from-orange-50 to-yellow-50 p-4 flex flex-col md:flex-row md:items-center justify-between border-t border-orange-100 gap-4">
+                                <div className="bg-gradient-to-r from-blue-50 to-yellow-50 p-4 flex flex-col md:flex-row md:items-center justify-between border-t border-blue-100 gap-4">
                                     <div className="text-gray-600">
                                         Showing{" "}
                                         <span className="font-medium">
@@ -312,19 +312,19 @@ const ReportList = () => {
                                     </div>
                                     <div className="flex space-x-2 self-center md:self-auto">
                                         <button
-                                            className="p-2 rounded-md bg-white border border-orange-200 text-orange-600 hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                            className="p-2 rounded-md bg-white border border-blue-200 text-blue-600 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed"
                                             onClick={prevPage}
                                             disabled={currentPage === 1}
                                         >
                                             <ChevronLeft size={18} />
                                         </button>
-                                        <div className="bg-white border border-orange-200 rounded-md px-4 py-2 flex items-center">
-                                            <span className="text-orange-600 font-medium">{currentPage}</span>
+                                        <div className="bg-white border border-blue-200 rounded-md px-4 py-2 flex items-center">
+                                            <span className="text-blue-600 font-medium">{currentPage}</span>
                                             <span className="mx-1 text-gray-400">/</span>
                                             <span className="text-gray-600">{totalPages || 1}</span>
                                         </div>
                                         <button
-                                            className="p-2 rounded-md bg-white border border-orange-200 text-orange-600 hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                            className="p-2 rounded-md bg-white border border-blue-200 text-blue-600 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed"
                                             onClick={nextPage}
                                             disabled={currentPage === totalPages || totalPages === 0}
                                         >

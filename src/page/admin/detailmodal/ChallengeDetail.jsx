@@ -4,9 +4,11 @@ import { FaRegClock } from "react-icons/fa";
 import { HiUsers } from "react-icons/hi";
 import { CheckCircle, XCircle, ArrowLeft, Ban, UserX } from "lucide-react";
 import Footer from "../../../component/footer.jsx";
-import { useGetChallengeDetailQuery } from "../../../service/challengeService.js";
+import { useGetChallengeDetailQuery,  useGetJoinedMembersWithPendingEvidenceQuery,
+    useKickMemberFromChallengeMutation } from "../../../service/challengeService.js";
 import { useReviewChallengeMutation } from "../../../service/adminService.js";
 import EvidenceList from "../list/EvidenceList.jsx";
+import {toast} from "react-toastify";
 
 const ChallengeDetail = () => {
     const { id } = useParams();
@@ -103,6 +105,20 @@ const ChallengeDetail = () => {
         }
     };
 
+    const {
+        data: membersData,
+        isLoading: membersLoading,
+        error: membersError,
+        refetch: refetchMembers
+    } = useGetJoinedMembersWithPendingEvidenceQuery({
+        challengeId: id,
+        keyword: "",
+        page: 0,
+        size: 10
+    });
+    const [kickMember, { isLoading: isKicking }] =
+        useKickMemberFromChallengeMutation();
+
     // Hàm lấy tiêu đề cho modal dựa trên action type
     const getModalTitle = () => {
         switch (actionType) {
@@ -131,11 +147,15 @@ const ChallengeDetail = () => {
         }
     };
 
-    const kickParticipant = (participantId) => {
-        // Implement kick member functionality here
-        console.log(`Kicking participant with ID: ${participantId}`);
-        // Add actual API call to kick participant
-        alert(`Participant ${participantId} has been kicked from the challenge`);
+    const handleKick = async (memberId) => {
+        try {
+            await kickMember({ challengeId: id, targetMemberId: memberId }).unwrap();
+            toast.success("Member kicked successfully");
+            refetchMembers();
+        } catch (err) {
+            console.error("Kick error:", err);
+            toast.error(err.data || err.error || "Failed to kick member");
+        }
     };
 
     if (isLoading) {
@@ -184,12 +204,12 @@ const ChallengeDetail = () => {
     }
 
     return (
-        <div className="flex flex-col min-h-screen bg-gradient-to-br from-orange-100 to-yellow-100">
+        <div className="flex flex-col min-h-screen bg-gradient-to-br from-blue-100 to-yellow-100">
             {/* Return button */}
             <div className="p-4">
                 <button
                     onClick={handleGoToList}
-                    className="flex items-center px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 shadow-md transition-colors"
+                    className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 shadow-md transition-colors"
                 >
                     <ArrowLeft size={18} className="mr-2" />
                     Return to list
@@ -226,7 +246,7 @@ const ChallengeDetail = () => {
                                 {new Date(challenge.startDate).toLocaleDateString('vi-VN')} - {new Date(challenge.endDate).toLocaleDateString('vi-VN')}
                             </p>
                         </div>
-                        <div className="mt-4 flex items-center text-lg font-semibold text-orange-500">
+                        <div className="mt-4 flex items-center text-lg font-semibold text-blue-500">
                             <HiUsers className="mr-2" />
                             <p>{challenge.participantCount} participants</p>
                         </div>
@@ -298,7 +318,7 @@ const ChallengeDetail = () => {
                                 onClick={() => setActiveTab(tab)}
                                 className={`flex-1 text-center py-3 font-semibold ${
                                     activeTab === tab
-                                        ? "text-orange-500 border-b-4 border-orange-500"
+                                        ? "text-blue-500 border-b-4 border-blue-500"
                                         : "text-gray-500 hover:text-gray-800"
                                 }`}
                             >
@@ -356,7 +376,7 @@ const ChallengeDetail = () => {
                                     <div className="overflow-x-auto">
                                         <table className="min-w-full bg-white">
                                             <thead>
-                                            <tr className="bg-orange-100 text-gray-700">
+                                            <tr className="bg-blue-100 text-gray-700">
                                                 <th className="py-3 px-4 text-left">Rank</th>
                                                 <th className="py-3 px-4 text-left">Participant</th>
                                                 <th className="py-3 px-4 text-center">Actions</th>
@@ -381,7 +401,7 @@ const ChallengeDetail = () => {
                                                     </td>
                                                     <td className="py-3 px-4 text-center">
                                                         <button
-                                                            onClick={() => kickParticipant(participant.id)}
+                                                            onClick={() => handleKick(participant.id)}
                                                             className="p-2 bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition-colors"
                                                             title="Kick member"
                                                         >
@@ -405,8 +425,8 @@ const ChallengeDetail = () => {
             {isModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
-                        <div className="p-6 border-b border-orange-100">
-                            <h3 className="text-lg font-semibold text-orange-700">{getModalTitle()}</h3>
+                        <div className="p-6 border-b border-blue-100">
+                            <h3 className="text-lg font-semibold text-blue-700">{getModalTitle()}</h3>
                         </div>
                         <div className="p-6">
                             <div className="mb-4">
@@ -416,7 +436,7 @@ const ChallengeDetail = () => {
                                 <textarea
                                     id="message"
                                     rows="4"
-                                    className="w-full border border-orange-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-orange-300"
+                                    className="w-full border border-blue-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-300"
                                     placeholder={getMessagePlaceholder()}
                                     value={message}
                                     onChange={(e) => setMessage(e.target.value)}
@@ -447,7 +467,7 @@ const ChallengeDetail = () => {
                                         ? "bg-green-600 hover:bg-green-700"
                                         : actionType === "rejected" || actionType === "banned"
                                             ? "bg-red-600 hover:bg-red-700"
-                                            : "bg-orange-600 hover:bg-orange-700"
+                                            : "bg-blue-600 hover:bg-blue-700"
                                 }`}
                                 onClick={handleModalSubmit}
                             >

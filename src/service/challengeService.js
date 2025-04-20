@@ -90,6 +90,13 @@ export const challengeService = createApi({
             },
             providesTags: ["Challenge"]
         }),
+        kickMemberFromChallenge: builder.mutation({
+            query: ({ challengeId, targetMemberId }) => ({
+                url: `/challenges/${challengeId}/kick/${targetMemberId}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: ["Challenge"],
+        }),
     }),
 });
 
@@ -104,5 +111,6 @@ export const {
     useGetMyChallengesMutation,
     useGetChallengeDetailQuery, // ✅ Thêm dòng này
     useGetJoinedMembersWithPendingEvidenceQuery,
+    useKickMemberFromChallengeMutation,
 } = challengeService;
 

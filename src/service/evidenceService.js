@@ -78,6 +78,13 @@ export const evidenceService = createApi({
                 };
             },
         }),
+        getEvidenceCountByStatus: builder.query({
+            query: ({ challengeId, memberId }) => ({
+                url: "/evidences/count",
+                method: "GET",
+                params: { challengeId, memberId },
+            }),
+        }),
     }),
 });
 
@@ -88,4 +95,5 @@ export const {
     useGetEvidencesToReviewQuery,
     useGetMyEvidencesByChallengeQuery,
     useGetEvidencesForHostQuery,
+    useGetEvidenceCountByStatusQuery
 } = evidenceService;

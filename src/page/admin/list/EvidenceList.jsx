@@ -3,7 +3,10 @@ import { Search, ThumbsUp, ThumbsDown, HourglassIcon } from 'lucide-react';
 import { ClockIcon, CheckCircleIcon } from "lucide-react";
 import EvidenceDetailModal from "../../../page/admin/detailmodal/EvidenceDetailModal.jsx"; // Fix import path if needed
 import { useGetJoinedMembersWithPendingEvidenceQuery } from '../../../service/challengeService.js';
-import { useGetEvidencesForHostQuery } from '../../../service/evidenceService.js';
+import {
+    useGetEvidencesForHostQuery,
+    useGetEvidenceCountByStatusQuery // Import the new API query hook
+} from '../../../service/evidenceService.js';
 
 const MemberAndEvidenceManagement = ({ challengeId }) => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -14,6 +17,33 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
     const [currentPage, setCurrentPage] = useState(0);
     const [evidencePage, setEvidencePage] = useState(0);
     const [itemsPerPage] = useState(10);
+
+    // Status mapping functions
+    const mapStatusToBackend = (frontendStatus) => {
+        switch (frontendStatus) {
+            case 'approved':
+                return 'APPROVED';
+            case 'waiting':
+                return 'PENDING'; // Changed from 'WAITING' to 'PENDING' as per backend enum
+            case 'rejected':
+                return 'REJECTED';
+            default:
+                return undefined; // For 'all' or any other value
+        }
+    };
+
+    const mapStatusToDisplay = (backendStatus) => {
+        switch (backendStatus) {
+            case 'APPROVED':
+                return 'approved';
+            case 'PENDING': // Changed from WAITING to PENDING
+                return 'waiting'; // Keep frontend term as 'waiting'
+            case 'REJECTED':
+                return 'rejected';
+            default:
+                return backendStatus.toLowerCase();
+        }
+    };
 
     // Debounce search term
     useEffect(() => {
@@ -45,7 +75,6 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
         page: currentPage,
         size: itemsPerPage
     });
-    console.log(membersData);
 
     // Fetch evidence for selected member
     const {
@@ -55,14 +84,25 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
         selectedMember ? {
                 memberId: selectedMember.id,
                 challengeId,
-                status: statusFilter !== 'all' ? statusFilter : undefined,
+                status: statusFilter !== 'all' ? mapStatusToBackend(statusFilter) : undefined,
                 page: evidencePage,
                 size: itemsPerPage
             } :
             { skip: true },
         { skip: !selectedMember }
     );
-    console.log(evidenceData);
+
+    // Fetch evidence counts by status for the selected member
+    const {
+        data: evidenceCountData,
+        isLoading: isLoadingEvidenceCount
+    } = useGetEvidenceCountByStatusQuery(
+        selectedMember ? {
+            challengeId,
+            memberId: selectedMember.id
+        } : { skip: true },
+        { skip: !selectedMember }
+    );
 
     const handleStatusFilterChange = (status) => {
         setStatusFilter(status);
@@ -77,7 +117,7 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
             challenge: selectedMember ? `${selectedMember.fullName}'s Challenge` : "Challenge",
             dateAdded: new Date(evidence.submittedAt).toLocaleDateString('vi-VN'),
             type: "image", // Default type if not available
-            status: evidence.status,
+            status: mapStatusToDisplay(evidence.status),
             addedBy: selectedMember ? selectedMember.fullName : "Unknown",
             caseNumber: evidence.evidenceId,
             description: evidence.description || "No description provided.",
@@ -141,12 +181,12 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
     const evidenceTotalElements = evidenceData?.totalElements || 0;
     const evidenceCurrentPage = evidenceData?.number || 0;
 
-    // Calculate evidence statistics for selected member
+    // Use the actual count data from the API
     const memberEvidenceStats = selectedMember ? {
         total: selectedMember.evidenceCount || 0,
-        approved: evidenceItems.filter(e => e.status === 'approved').length || 0,
-        pending: evidenceItems.filter(e => e.status === 'waiting').length || 0,
-        rejected: evidenceItems.filter(e => e.status === 'rejected').length || 0
+        approved: evidenceCountData?.find(item => item.status === "APPROVED")?.count || 0,
+        pending: evidenceCountData?.find(item => item.status === "PENDING")?.count || 0,
+        rejected: evidenceCountData?.find(item => item.status === "REJECTED")?.count || 0
     } : null;
 
     // Pagination handlers
@@ -162,18 +202,18 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
     const isLoading = isLoadingMembers || isFetchingMembers;
 
     return (
-        <div className="bg-red-50 min-h-screen flex flex-col">
+        <div className="bg-blue-50 min-h-screen flex flex-col">
             <div className="flex-1 flex flex-col overflow-hidden">
                 <div className="container mx-auto p-4 flex-grow">
                     {isLoading ? (
                         <div className="flex justify-center items-center h-64">
-                            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+                            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
                         </div>
                     ) : (
                         <div className="flex flex-col md:flex-row gap-4">
                             {/* Left panel - Member List */}
                             <div className="w-full md:w-1/2 bg-white rounded-lg shadow overflow-hidden">
-                                <div className="bg-orange-100 px-6 py-3 border-b">
+                                <div className="bg-blue-100 px-6 py-3 border-b">
                                     <div className="flex justify-between items-center">
                                         <h2 className="text-lg font-semibold text-gray-800">Members</h2>
                                         <div className="relative max-w-md">
@@ -181,7 +221,7 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                             <input
                                                 type="text"
                                                 placeholder="Search members..."
-                                                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                                 value={searchTerm}
                                                 onChange={(e) => setSearchTerm(e.target.value)}
                                             />
@@ -190,7 +230,7 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                 </div>
                                 <div className="overflow-y-auto" style={{ maxHeight: '600px' }}>
                                     <table className="min-w-full divide-y divide-gray-200">
-                                        <thead className="bg-orange-50">
+                                        <thead className="bg-blue-50">
                                         <tr>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Member Name</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Joined At</th>
@@ -202,7 +242,7 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                         {members.map((member) => (
                                             <tr
                                                 key={member.id}
-                                                className={`hover:bg-orange-50 cursor-pointer ${selectedMember?.id === member.id ? 'bg-orange-100' : ''}`}
+                                                className={`hover:bg-blue-50 cursor-pointer ${selectedMember?.id === member.id ? 'bg-blue-100' : ''}`}
                                                 onClick={() => setSelectedMember(member)}
                                             >
                                                 <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{member.fullName}</td>
@@ -261,7 +301,7 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                                             onClick={() => paginate(pageNum)}
                                                             className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
                                                                 currentPageNumber === pageNum
-                                                                    ? 'bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 text-white focus:z-20'
+                                                                    ? 'bg-gradient-to-r from-red-500 via-blue-500 to-yellow-500 text-white focus:z-20'
                                                                     : 'text-gray-900 hover:bg-gray-50 focus:z-20'
                                                             }`}
                                                         >
@@ -288,7 +328,7 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
 
                             {/* Right panel - Evidence List */}
                             <div className="w-full md:w-1/2 bg-white rounded-lg shadow overflow-hidden">
-                                <div className="bg-orange-100 px-6 py-3 border-b">
+                                <div className="bg-blue-100 px-6 py-3 border-b">
                                     <div className="flex justify-between items-center">
                                         <h2 className="text-lg font-semibold text-gray-800">
                                             Evidence {selectedMember ? `for ${selectedMember.fullName}` : ''}
@@ -297,7 +337,7 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                             <button
                                                 onClick={() => handleStatusFilterChange('all')}
                                                 className={`px-3 py-1 rounded-full text-sm ${
-                                                    statusFilter === 'all' ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-800'
+                                                    statusFilter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
                                                 }`}
                                             >
                                                 All
@@ -330,28 +370,34 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                     </div>
                                 </div>
 
-                                {/* Member Evidence Statistics (Moved from left panel to right panel) */}
+                                {/* Member Evidence Statistics with data from the API */}
                                 {selectedMember && (
                                     <div className="p-4 border-b">
                                         <h4 className="font-medium text-lg mb-2">Member Evidence Statistics</h4>
-                                        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                                            <div className="bg-gray-50 p-4 rounded-lg">
-                                                <p className="text-gray-500 text-sm">Total Evidence</p>
-                                                <p className="text-xl font-bold">{memberEvidenceStats.total}</p>
+                                        {isLoadingEvidenceCount ? (
+                                            <div className="flex justify-center items-center h-16">
+                                                <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-blue-500"></div>
                                             </div>
-                                            <div className="bg-gray-50 p-4 rounded-lg">
-                                                <p className="text-gray-500 text-sm">Approved</p>
-                                                <p className="text-xl font-bold text-green-600">{memberEvidenceStats.approved}</p>
+                                        ) : (
+                                            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                                                <div className="bg-gray-50 p-4 rounded-lg">
+                                                    <p className="text-gray-500 text-sm">Total Evidence</p>
+                                                    <p className="text-xl font-bold">{memberEvidenceStats.total}</p>
+                                                </div>
+                                                <div className="bg-gray-50 p-4 rounded-lg">
+                                                    <p className="text-gray-500 text-sm">Approved</p>
+                                                    <p className="text-xl font-bold text-green-600">{memberEvidenceStats.approved}</p>
+                                                </div>
+                                                <div className="bg-gray-50 p-4 rounded-lg">
+                                                    <p className="text-gray-500 text-sm">Pending</p>
+                                                    <p className="text-xl font-bold text-yellow-600">{memberEvidenceStats.pending}</p>
+                                                </div>
+                                                <div className="bg-gray-50 p-4 rounded-lg">
+                                                    <p className="text-gray-500 text-sm">Rejected</p>
+                                                    <p className="text-xl font-bold text-red-600">{memberEvidenceStats.rejected}</p>
+                                                </div>
                                             </div>
-                                            <div className="bg-gray-50 p-4 rounded-lg">
-                                                <p className="text-gray-500 text-sm">Pending</p>
-                                                <p className="text-xl font-bold text-yellow-600">{memberEvidenceStats.pending}</p>
-                                            </div>
-                                            <div className="bg-gray-50 p-4 rounded-lg">
-                                                <p className="text-gray-500 text-sm">Rejected</p>
-                                                <p className="text-xl font-bold text-red-600">{memberEvidenceStats.rejected}</p>
-                                            </div>
-                                        </div>
+                                        )}
                                     </div>
                                 )}
 
@@ -359,11 +405,11 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                     {selectedMember ? (
                                         isLoadingEvidence ? (
                                             <div className="flex justify-center items-center h-64">
-                                                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+                                                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
                                             </div>
                                         ) : evidenceItems.length > 0 ? (
                                             <table className="min-w-full divide-y divide-gray-200">
-                                                <thead className="bg-orange-50">
+                                                <thead className="bg-blue-50">
                                                 <tr>
                                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Evidence</th>
                                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Date</th>
@@ -371,26 +417,37 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                                 </tr>
                                                 </thead>
                                                 <tbody className="bg-white divide-y divide-gray-200">
-                                                {evidenceItems.map((evidence) => (
-                                                    <tr
-                                                        key={evidence.evidenceId}
-                                                        className="hover:bg-orange-50 cursor-pointer"
-                                                        onClick={() => handleEvidenceClick(evidence)}
-                                                    >
-                                                        <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
-                                                            {evidence.memberName || `Evidence #${evidence.evidenceId}`}
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                            {new Date(evidence.submittedAt).toLocaleDateString('vi-VN')}
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                                                <span className={getEvidenceStatusColor(evidence.status)}>
-                                                                    {getEvidenceStatusIcon(evidence.status)}
-                                                                    {evidence.status.charAt(0).toUpperCase() + evidence.status.slice(1)}
+                                                {evidenceItems.map((evidence) => {
+                                                    // Convert backend status to frontend display format
+                                                    const displayStatus = mapStatusToDisplay(evidence.status);
+
+                                                    return (
+                                                        <tr
+                                                            key={evidence.evidenceId}
+                                                            className="hover:bg-blue-50 cursor-pointer"
+                                                            onClick={() => handleEvidenceClick(evidence)}
+                                                        >
+                                                            <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
+                                                                {evidence.memberName || `Evidence #${evidence.evidenceId}`}
+                                                            </td>
+                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                                {new Date(evidence.submittedAt).toLocaleDateString('vi-VN')}
+                                                            </td>
+                                                            <td
+                                                                className="px-6 py-4 whitespace-nowrap text-sm"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation(); // Prevent triggering the row click
+                                                                    handleStatusFilterChange(displayStatus);
+                                                                }}
+                                                            >
+                                                                <span className={`${getEvidenceStatusColor(displayStatus)} cursor-pointer`}>
+                                                                    {getEvidenceStatusIcon(displayStatus)}
+                                                                    {displayStatus.charAt(0).toUpperCase() + displayStatus.slice(1)}
                                                                 </span>
-                                                        </td>
-                                                    </tr>
-                                                ))}
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })}
                                                 </tbody>
                                             </table>
                                         ) : (
@@ -399,7 +456,7 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                                 {statusFilter !== 'all' && (
                                                     <button
                                                         onClick={() => setStatusFilter('all')}
-                                                        className="mt-2 text-orange-500 hover:underline"
+                                                        className="mt-2 text-blue-500 hover:underline"
                                                     >
                                                         Show all evidence
                                                     </button>
@@ -446,7 +503,7 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                                                 onClick={() => paginateEvidence(pageNum)}
                                                                 className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
                                                                     evidenceCurrentPage === pageNum
-                                                                        ? 'bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 text-white focus:z-20'
+                                                                        ? 'bg-gradient-to-r from-red-500 via-blue-500 to-yellow-500 text-white focus:z-20'
                                                                         : 'text-gray-900 hover:bg-gray-50 focus:z-20'
                                                                 }`}
                                                             >

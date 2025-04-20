@@ -46,7 +46,7 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
         navigate("/login");
     };
 
-    const activeClasses = "bg-gradient-to-r from-orange-100 to-yellow-100 text-orange-600 font-medium";
+    const activeClasses = "bg-gradient-to-r from-blue-100 to-yellow-100 text-blue-600 font-medium";
     const hoverClasses = "hover:bg-gray-100";
 
     // Check if a challenge management route is active
@@ -96,19 +96,19 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
                 }`}
             >
                 {/* Logo */}
-                <div className="py-6 px-4 bg-orange-50 flex justify-between items-center">
+                <div className="py-6 px-4 bg-blue-50 flex justify-between items-center">
                     {!isCollapsed ? (
-                        <div onClick={handleHomepage} className="text-orange-600 text-2xl font-bold cursor-pointer">
+                        <div onClick={handleHomepage} className="text-blue-600 text-2xl font-bold cursor-pointer">
                             GOBEYOND
                         </div>
                     ) : (
-                        <div onClick={handleHomepage} className="text-orange-600 text-2xl font-bold mx-auto cursor-pointer">
+                        <div onClick={handleHomepage} className="text-blue-600 text-2xl font-bold mx-auto cursor-pointer">
                             G
                         </div>
                     )}
                     <button
                         onClick={toggleCollapse}
-                        className="hidden md:block p-1 rounded-full hover:bg-orange-100 text-orange-500"
+                        className="hidden md:block p-1 rounded-full hover:bg-blue-100 text-blue-500"
                     >
                         {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
                     </button>
@@ -163,15 +163,15 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
 
                                 {/* Horizontal submenu items for expanded sidebar */}
                                 {!isCollapsed && isChallengeMenuOpen && (
-                                    <div className="mt-1 mb-1 flex bg-orange-50 rounded-md overflow-hidden">
+                                    <div className="mt-1 mb-1 flex bg-blue-50 rounded-md overflow-hidden">
                                         {challengeSubMenuItems.map((item, index) => (
                                             <NavLink
                                                 key={item.path}
                                                 to={item.path}
                                                 className={({ isActive }) =>
                                                     `flex items-center justify-center py-2 px-2 flex-1 transition duration-200 ${
-                                                        isActive ? "bg-orange-100 text-orange-600 font-medium" : "hover:bg-orange-100"
-                                                    } ${index !== 0 ? "border-l border-orange-200" : ""}`
+                                                        isActive ? "bg-blue-100 text-blue-600 font-medium" : "hover:bg-blue-100"
+                                                    } ${index !== 0 ? "border-l border-blue-200" : ""}`
                                                 }
                                                 title={item.title}
                                             >
@@ -186,7 +186,7 @@ const Sidebar = ({ sidebarCollapsed, setSidebarCollapsed }) => {
                             {/* Mini dropdown for collapsed sidebar */}
                             {isCollapsed && isChallengeMenuOpen && (
                                 <div className="absolute left-16 top-0 bg-white shadow-lg rounded-md py-2 min-w-48 z-50">
-                                    <div className="px-4 py-2 font-medium border-b border-gray-100 text-orange-600">
+                                    <div className="px-4 py-2 font-medium border-b border-gray-100 text-blue-600">
                                         Challenge Management
                                     </div>
                                     {challengeSubMenuItems.map((item) => (
