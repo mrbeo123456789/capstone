@@ -290,7 +290,7 @@ const AdminSettings = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-orange-100 to-yellow-100 py-8">
+        <div className="min-h-screen bg-gradient-to-br from-blue-100 to-yellow-100 py-8">
             <div className="flex flex-1 overflow-hidden relative">
                 <div className={`transition-all duration-300 ${sidebarCollapsed ? 'w-16' : 'w-64'} flex-shrink-0`}>
                     <Sidebar sidebarCollapsed={sidebarCollapsed} setSidebarCollapsed={setSidebarCollapsed}/>
@@ -298,7 +298,7 @@ const AdminSettings = () => {
                 <div className="w-full px-4 sm:px-6 lg:px-8">
                     <div className="bg-white rounded-lg shadow-lg overflow-hidden">
                         {/* Header */}
-                        <div className="bg-orange-500 text-white p-6">
+                        <div className="bg-blue-500 text-white p-6">
                             <div className="flex items-center">
                                 <Settings className="h-8 w-8 mr-3"/>
                                 <h1 className="text-2xl font-bold">Admin Configuration</h1>
@@ -317,8 +317,8 @@ const AdminSettings = () => {
                                                 onClick={() => setActiveTab('general')}
                                                 className={`w-full flex items-center px-4 py-3 rounded-lg text-left ${
                                                     activeTab === 'general'
-                                                        ? 'bg-orange-500 text-white'
-                                                        : 'text-gray-700 hover:bg-orange-100'
+                                                        ? 'bg-blue-500 text-white'
+                                                        : 'text-gray-700 hover:bg-blue-100'
                                                 }`}
                                             >
                                                 <Globe className="h-5 w-5 mr-3"/>
@@ -330,8 +330,8 @@ const AdminSettings = () => {
                                                 onClick={() => setActiveTab('users')}
                                                 className={`w-full flex items-center px-4 py-3 rounded-lg text-left ${
                                                     activeTab === 'users'
-                                                        ? 'bg-orange-500 text-white'
-                                                        : 'text-gray-700 hover:bg-orange-100'
+                                                        ? 'bg-blue-500 text-white'
+                                                        : 'text-gray-700 hover:bg-blue-100'
                                                 }`}
                                             >
                                                 <Users className="h-5 w-5 mr-3"/>
@@ -343,8 +343,8 @@ const AdminSettings = () => {
                                                 onClick={() => setActiveTab('notifications')}
                                                 className={`w-full flex items-center px-4 py-3 rounded-lg text-left ${
                                                     activeTab === 'notifications'
-                                                        ? 'bg-orange-500 text-white'
-                                                        : 'text-gray-700 hover:bg-orange-100'
+                                                        ? 'bg-blue-500 text-white'
+                                                        : 'text-gray-700 hover:bg-blue-100'
                                                 }`}
                                             >
                                                 <Bell className="h-5 w-5 mr-3"/>
@@ -356,8 +356,8 @@ const AdminSettings = () => {
                                                 onClick={() => setActiveTab('email')}
                                                 className={`w-full flex items-center px-4 py-3 rounded-lg text-left ${
                                                     activeTab === 'email'
-                                                        ? 'bg-orange-500 text-white'
-                                                        : 'text-gray-700 hover:bg-orange-100'
+                                                        ? 'bg-blue-500 text-white'
+                                                        : 'text-gray-700 hover:bg-blue-100'
                                                 }`}
                                             >
                                                 <Mail className="h-5 w-5 mr-3"/>
@@ -369,8 +369,8 @@ const AdminSettings = () => {
                                                 onClick={() => setActiveTab('challenges')}
                                                 className={`w-full flex items-center px-4 py-3 rounded-lg text-left ${
                                                     activeTab === 'challenges'
-                                                        ? 'bg-orange-500 text-white'
-                                                        : 'text-gray-700 hover:bg-orange-100'
+                                                        ? 'bg-blue-500 text-white'
+                                                        : 'text-gray-700 hover:bg-blue-100'
                                                 }`}
                                             >
                                                 <Award className="h-5 w-5 mr-3"/>
@@ -382,8 +382,8 @@ const AdminSettings = () => {
                                                 onClick={() => setActiveTab('interes')}
                                                 className={`w-full flex items-center px-4 py-3 rounded-lg text-left ${
                                                     activeTab === 'interes'
-                                                        ? 'bg-orange-500 text-white'
-                                                        : 'text-gray-700 hover:bg-orange-100'
+                                                        ? 'bg-blue-500 text-white'
+                                                        : 'text-gray-700 hover:bg-blue-100'
                                                 }`}
                                             >
                                                 <Award className="h-5 w-5 mr-3"/>
@@ -395,8 +395,8 @@ const AdminSettings = () => {
                                                 onClick={() => setActiveTab('system')}
                                                 className={`w-full flex items-center px-4 py-3 rounded-lg text-left ${
                                                     activeTab === 'system'
-                                                        ? 'bg-orange-500 text-white'
-                                                        : 'text-gray-700 hover:bg-orange-100'
+                                                        ? 'bg-blue-500 text-white'
+                                                        : 'text-gray-700 hover:bg-blue-100'
                                                 }`}
                                             >
                                                 <Server className="h-5 w-5 mr-3"/>
@@ -428,7 +428,7 @@ const AdminSettings = () => {
                                                         name="siteName"
                                                         value={generalSettings.siteName}
                                                         onChange={handleGeneralChange}
-                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                     />
                                                 </div>
 
@@ -440,7 +440,7 @@ const AdminSettings = () => {
                                                         name="defaultLanguage"
                                                         value={generalSettings.defaultLanguage}
                                                         onChange={handleGeneralChange}
-                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                     >
                                                         <option value="vi-VN">Vietnamese</option>
                                                         <option value="en-US">English</option>
@@ -455,7 +455,7 @@ const AdminSettings = () => {
                                                         name="timeZone"
                                                         value={generalSettings.timeZone}
                                                         onChange={handleGeneralChange}
-                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                     >
                                                         <option value="Asia/Ho_Chi_Minh">Vietnam (GMT+7)</option>
                                                         <option value="Asia/Tokyo">Japan (GMT+9)</option>
@@ -476,7 +476,7 @@ const AdminSettings = () => {
                                                         max="100"
                                                         value={generalSettings.itemsPerPage}
                                                         onChange={handleGeneralChange}
-                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                     />
                                                 </div>
 
@@ -489,7 +489,7 @@ const AdminSettings = () => {
                                                         value={generalSettings.siteDescription}
                                                         onChange={handleGeneralChange}
                                                         rows="3"
-                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                     ></textarea>
                                                 </div>
 
@@ -504,7 +504,7 @@ const AdminSettings = () => {
                                                         max="50"
                                                         value={generalSettings.maxUploadSize}
                                                         onChange={handleGeneralChange}
-                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                     />
                                                 </div>
 
@@ -516,7 +516,7 @@ const AdminSettings = () => {
                                                             name="registrationOpen"
                                                             checked={generalSettings.registrationOpen}
                                                             onChange={handleGeneralChange}
-                                                            className="h-4 w-4 text-orange-500 focus:ring-orange-400 border-gray-300 rounded"
+                                                            className="h-4 w-4 text-blue-500 focus:ring-blue-400 border-gray-300 rounded"
                                                         />
                                                         <label htmlFor="registrationOpen" className="ml-2 block text-sm text-gray-700">
                                                             Allow New User Registrations
@@ -532,7 +532,7 @@ const AdminSettings = () => {
                                                             name="maintenanceMode"
                                                             checked={generalSettings.maintenanceMode}
                                                             onChange={handleGeneralChange}
-                                                            className="h-4 w-4 text-orange-500 focus:ring-orange-400 border-gray-300 rounded"
+                                                            className="h-4 w-4 text-blue-500 focus:ring-blue-400 border-gray-300 rounded"
                                                         />
                                                         <label htmlFor="maintenanceMode" className="ml-2 block text-sm text-gray-700">
                                                             Enable Maintenance Mode
@@ -563,7 +563,7 @@ const AdminSettings = () => {
                                                         name="defaultUserRole"
                                                         value={userSettings.defaultUserRole}
                                                         onChange={handleUserChange}
-                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                     >
                                                         <option value="member">Member</option>
                                                         <option value="contributor">Challenge Host</option>
@@ -582,7 +582,7 @@ const AdminSettings = () => {
                                                         max="20"
                                                         value={userSettings.minPasswordLength}
                                                         onChange={handleUserChange}
-                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                     />
                                                 </div>
 
@@ -597,7 +597,7 @@ const AdminSettings = () => {
                                                         max="10"
                                                         value={userSettings.maximumLoginAttempts}
                                                         onChange={handleUserChange}
-                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                     />
                                                 </div>
 
@@ -612,7 +612,7 @@ const AdminSettings = () => {
                                                         max="1440"
                                                         value={userSettings.lockoutDuration}
                                                         onChange={handleUserChange}
-                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                     />
                                                 </div>
 
@@ -627,7 +627,7 @@ const AdminSettings = () => {
                                                         max="1440"
                                                         value={userSettings.sessionTimeout}
                                                         onChange={handleUserChange}
-                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                     />
                                                 </div>
 
@@ -639,7 +639,7 @@ const AdminSettings = () => {
                                                             name="autoApproveUsers"
                                                             checked={userSettings.autoApproveUsers}
                                                             onChange={handleUserChange}
-                                                            className="h-4 w-4 text-orange-500 focus:ring-orange-400 border-gray-300 rounded"
+                                                            className="h-4 w-4 text-blue-500 focus:ring-blue-400 border-gray-300 rounded"
                                                         />
                                                         <label htmlFor="autoApproveUsers"
                                                                className="ml-2 block text-sm text-gray-700">
@@ -656,7 +656,7 @@ const AdminSettings = () => {
                                                             name="passwordRequiresSpecialChar"
                                                             checked={userSettings.passwordRequiresSpecialChar}
                                                             onChange={handleUserChange}
-                                                            className="h-4 w-4 text-orange-500 focus:ring-orange-400 border-gray-300 rounded"
+                                                            className="h-4 w-4 text-blue-500 focus:ring-blue-400 border-gray-300 rounded"
                                                         />
                                                         <label htmlFor="passwordRequiresSpecialChar"
                                                                className="ml-2 block text-sm text-gray-700">
@@ -673,7 +673,7 @@ const AdminSettings = () => {
                                                             name="passwordRequiresNumber"
                                                             checked={userSettings.passwordRequiresNumber}
                                                             onChange={handleUserChange}
-                                                            className="h-4 w-4 text-orange-500 focus:ring-orange-400 border-gray-300 rounded"
+                                                            className="h-4 w-4 text-blue-500 focus:ring-blue-400 border-gray-300 rounded"
                                                         />
                                                         <label htmlFor="passwordRequiresNumber"
                                                                className="ml-2 block text-sm text-gray-700">
@@ -699,7 +699,7 @@ const AdminSettings = () => {
                                                         name="enableEmailNotifications"
                                                         checked={notificationSettings.enableEmailNotifications}
                                                         onChange={handleNotificationChange}
-                                                        className="h-4 w-4 text-orange-500 focus:ring-orange-400 border-gray-300 rounded"
+                                                        className="h-4 w-4 text-blue-500 focus:ring-blue-400 border-gray-300 rounded"
                                                     />
                                                     <label htmlFor="enableEmailNotifications"
                                                            className="ml-2 block text-sm text-gray-700">
@@ -714,7 +714,7 @@ const AdminSettings = () => {
                                                         name="enablePushNotifications"
                                                         checked={notificationSettings.enablePushNotifications}
                                                         onChange={handleNotificationChange}
-                                                        className="h-4 w-4 text-orange-500 focus:ring-orange-400 border-gray-300 rounded"
+                                                        className="h-4 w-4 text-blue-500 focus:ring-blue-400 border-gray-300 rounded"
                                                     />
                                                     <label htmlFor="enablePushNotifications"
                                                            className="ml-2 block text-sm text-gray-700">
@@ -732,7 +732,7 @@ const AdminSettings = () => {
                                                         name="adminNotifyOnNewUser"
                                                         checked={notificationSettings.adminNotifyOnNewUser}
                                                         onChange={handleNotificationChange}
-                                                        className="h-4 w-4 text-orange-500 focus:ring-orange-400 border-gray-300 rounded"
+                                                        className="h-4 w-4 text-blue-500 focus:ring-blue-400 border-gray-300 rounded"
                                                     />
                                                     <label htmlFor="adminNotifyOnNewUser"
                                                            className="ml-2 block text-sm text-gray-700">
@@ -747,7 +747,7 @@ const AdminSettings = () => {
                                                         name="adminNotifyOnNewChallenge"
                                                         checked={notificationSettings.adminNotifyOnNewChallenge}
                                                         onChange={handleNotificationChange}
-                                                        className="h-4 w-4 text-orange-500 focus:ring-orange-400 border-gray-300 rounded"
+                                                        className="h-4 w-4 text-blue-500 focus:ring-blue-400 border-gray-300 rounded"
                                                     />
                                                     <label htmlFor="adminNotifyOnNewChallenge"
                                                            className="ml-2 block text-sm text-gray-700">
@@ -761,7 +761,7 @@ const AdminSettings = () => {
                                                         name="adminNotifyOnNewChallenge"
                                                         checked={notificationSettings.adminNotifyOnNewReport}
                                                         onChange={handleNotificationChange}
-                                                        className="h-4 w-4 text-orange-500 focus:ring-orange-400 border-gray-300 rounded"
+                                                        className="h-4 w-4 text-blue-500 focus:ring-blue-400 border-gray-300 rounded"
                                                     />
                                                     <label htmlFor="adminNotifyOnNewChallenge"
                                                            className="ml-2 block text-sm text-gray-700">
@@ -775,7 +775,7 @@ const AdminSettings = () => {
                                                         name="adminNotifyOnNewChallenge"
                                                         checked={notificationSettings.adminNotifyOnNewGroup}
                                                         onChange={handleNotificationChange}
-                                                        className="h-4 w-4 text-orange-500 focus:ring-orange-400 border-gray-300 rounded"
+                                                        className="h-4 w-4 text-blue-500 focus:ring-blue-400 border-gray-300 rounded"
                                                     />
                                                     <label htmlFor="adminNotifyOnNewChallenge"
                                                            className="ml-2 block text-sm text-gray-700">
@@ -793,7 +793,7 @@ const AdminSettings = () => {
                                                         name="challengeCreationNotification"
                                                         checked={notificationSettings.challengeCreationNotification}
                                                         onChange={handleNotificationChange}
-                                                        className="h-4 w-4 text-orange-500 focus:ring-orange-400 border-gray-300 rounded"
+                                                        className="h-4 w-4 text-blue-500 focus:ring-blue-400 border-gray-300 rounded"
                                                     />
                                                     <label htmlFor="challengeCreationNotification"
                                                            className="ml-2 block text-sm text-gray-700">
@@ -808,7 +808,7 @@ const AdminSettings = () => {
                                                         name="evidenceSubmissionNotification"
                                                         checked={notificationSettings.evidenceSubmissionNotification}
                                                         onChange={handleNotificationChange}
-                                                        className="h-4 w-4 text-orange-500 focus:ring-orange-400 border-gray-300 rounded"
+                                                        className="h-4 w-4 text-blue-500 focus:ring-blue-400 border-gray-300 rounded"
                                                     />
                                                     <label htmlFor="evidenceSubmissionNotification"
                                                            className="ml-2 block text-sm text-gray-700">
@@ -823,7 +823,7 @@ const AdminSettings = () => {
                                                         name="challengeCompletionNotification"
                                                         checked={notificationSettings.challengeCompletionNotification}
                                                         onChange={handleNotificationChange}
-                                                        className="h-4 w-4 text-orange-500 focus:ring-orange-400 border-gray-300 rounded"
+                                                        className="h-4 w-4 text-blue-500 focus:ring-blue-400 border-gray-300 rounded"
                                                     />
                                                     <label htmlFor="challengeCompletionNotification"
                                                            className="ml-2 block text-sm text-gray-700">
@@ -838,7 +838,7 @@ const AdminSettings = () => {
                                                         name="systemUpdatesNotification"
                                                         checked={notificationSettings.systemUpdatesNotification}
                                                         onChange={handleNotificationChange}
-                                                        className="h-4 w-4 text-orange-500 focus:ring-orange-400 border-gray-300 rounded"
+                                                        className="h-4 w-4 text-blue-500 focus:ring-blue-400 border-gray-300 rounded"
                                                     />
                                                     <label htmlFor="systemUpdatesNotification"
                                                            className="ml-2 block text-sm text-gray-700">
@@ -866,7 +866,7 @@ const AdminSettings = () => {
                                                         name="smtpUsername"
                                                         value={emailSettings.smtpUsername}
                                                         onChange={handleEmailChange}
-                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                     />
                                                 </div>
 
@@ -879,7 +879,7 @@ const AdminSettings = () => {
                                                         name="smtpPassword"
                                                         value={emailSettings.smtpPassword}
                                                         onChange={handleEmailChange}
-                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                     />
                                                 </div>
 
@@ -892,7 +892,7 @@ const AdminSettings = () => {
                                                         name="senderName"
                                                         value={emailSettings.senderName}
                                                         onChange={handleEmailChange}
-                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                     />
                                                 </div>
 
@@ -905,7 +905,7 @@ const AdminSettings = () => {
                                                         name="senderEmail"
                                                         value={emailSettings.senderEmail}
                                                         onChange={handleEmailChange}
-                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                     />
                                                 </div>
 
@@ -917,7 +917,7 @@ const AdminSettings = () => {
                                                             name="enableSsl"
                                                             checked={emailSettings.enableSsl}
                                                             onChange={handleEmailChange}
-                                                            className="h-4 w-4 text-orange-500 focus:ring-orange-400 border-gray-300 rounded"
+                                                            className="h-4 w-4 text-blue-500 focus:ring-blue-400 border-gray-300 rounded"
                                                         />
                                                         <label htmlFor="enableSsl"
                                                                className="ml-2 block text-sm text-gray-700">
@@ -975,7 +975,7 @@ const AdminSettings = () => {
                                                                     name="name"
                                                                     value={newChallengeType.name}
                                                                     onChange={handleChallengeTypeChange}
-                                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                                     required
                                                                 />
                                                             </div>
@@ -989,7 +989,7 @@ const AdminSettings = () => {
                                                                     value={newChallengeType.description}
                                                                     onChange={handleChallengeTypeChange}
                                                                     rows="2"
-                                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                                 ></textarea>
                                                             </div>
 
@@ -1001,7 +1001,7 @@ const AdminSettings = () => {
                                                                         name="isActive"
                                                                         checked={newChallengeType.isActive}
                                                                         onChange={handleChallengeTypeChange}
-                                                                        className="h-4 w-4 text-orange-500 focus:ring-orange-400 border-gray-300 rounded"
+                                                                        className="h-4 w-4 text-blue-500 focus:ring-blue-400 border-gray-300 rounded"
                                                                     />
                                                                     <label htmlFor="isActive" className="ml-2 block text-sm text-gray-700">
                                                                         Active (Available for new challenges)
@@ -1021,7 +1021,7 @@ const AdminSettings = () => {
                                                             <button
                                                                 type="button"
                                                                 onClick={handleAddOrUpdateChallengeType}
-                                                                className="px-3 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                                                                className="px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                                                             >
                                                                 {editingChallengeType ? 'Update Type' : 'Add Type'}
                                                             </button>
@@ -1132,7 +1132,7 @@ const AdminSettings = () => {
                                                                     name="name"
                                                                     value={newInteres.name}
                                                                     onChange={handleInteresChange}
-                                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                                     required
                                                                 />
                                                             </div>
@@ -1144,7 +1144,7 @@ const AdminSettings = () => {
                                                                         name="isActive"
                                                                         checked={newInteres.isActive}
                                                                         onChange={handleInteresChange}
-                                                                        className="h-4 w-4 text-orange-500 focus:ring-orange-400 border-gray-300 rounded"
+                                                                        className="h-4 w-4 text-blue-500 focus:ring-blue-400 border-gray-300 rounded"
                                                                     />
                                                                     <label htmlFor="isActive" className="ml-2 block text-sm text-gray-700">
                                                                         Active (Available for new interes)
@@ -1164,7 +1164,7 @@ const AdminSettings = () => {
                                                             <button
                                                                 type="button"
                                                                 onClick={handleAddOrUpdateInteres}
-                                                                className="px-3 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                                                                className="px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                                                             >
                                                                 {editingInteres ? 'Update Type' : 'Add Type'}
                                                             </button>
@@ -1247,7 +1247,7 @@ const AdminSettings = () => {
                                     <div className="mt-6 flex justify-end">
                                         <button
                                             type="submit"
-                                            className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 flex items-center"
+                                            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center"
                                         >
                                             <Save className="h-4 w-4 mr-2"/> Save Settings
                                         </button>

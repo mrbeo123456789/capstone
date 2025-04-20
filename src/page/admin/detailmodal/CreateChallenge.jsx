@@ -92,7 +92,7 @@ const ChallengeForm = () => {
                 reset();
                 setPreview(null);
                 // Navigate to challenge list page
-                navigate("/admin/challengelist");
+                navigate("/admin/challengemanagement");
             } catch (err) {
                 console.log(err);
                 toast.error("Failed to create challenge: " + (err?.data?.message || "Unknown error"), { id: toastId });
@@ -103,7 +103,7 @@ const ChallengeForm = () => {
     const handleCancel = () => {
         // Navigate to challenge list page when canceling
         console.log("Canceling challenge...");
-        navigate("/admin/challengelist");
+        navigate(-1);
     };
 
     const handleFileChange = (event) => {
@@ -233,7 +233,7 @@ const ChallengeForm = () => {
             </div>
 
             {/* Right Section: Challenge Details Form */}
-            <div className="bg-gradient-to-r from-red-700 to-orange-600 rounded-lg w-full p-px">
+            <div className="bg-gradient-to-r from-red-700 to-blue-600 rounded-lg w-full p-px">
                 <div className="bg-white flex flex-col rounded-lg shadow-md h-full">
                 </div>
             </div>

@@ -67,7 +67,7 @@ const ReportDetail = ({ reportData }) => {
     const isError = !report || isChallengeError;
 
     return (
-        <div className="bg-red-50 min-h-screen flex flex-col">
+        <div className="bg-blue-50 min-h-screen flex flex-col">
             <div className="flex flex-1 overflow-hidden relative">
                 <div className={`transition-all duration-300 ${sidebarCollapsed ? 'w-16' : 'w-64'} flex-shrink-0`}>
                     <Sidebar
@@ -76,17 +76,17 @@ const ReportDetail = ({ reportData }) => {
                     />
                 </div>
                 <div className="flex-1 overflow-auto p-4">
-                    <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-orange-100 h-full flex flex-col">
+                    <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-blue-100 h-full flex flex-col">
                         {/* Header */}
-                        <div className="p-4 border-b border-orange-100 bg-gradient-to-r from-orange-50 to-yellow-50 flex justify-between items-center">
+                        <div className="p-4 border-b border-blue-100 bg-gradient-to-r from-blue-50 to-yellow-50 flex justify-between items-center">
                             <div className="flex items-center">
                                 <button
                                     onClick={goBack}
-                                    className="mr-4 p-2 rounded-md hover:bg-orange-100 transition-colors"
+                                    className="mr-4 p-2 rounded-md hover:bg-blue-100 transition-colors"
                                 >
                                     <ArrowLeft size={20} />
                                 </button>
-                                <h1 className="text-2xl font-bold text-orange-700">Report Details Of {report.challengeName}</h1>
+                                <h1 className="text-2xl font-bold text-blue-700">Report Details Of {report.challengeName}</h1>
                             </div>
 
                             {report && report.status === "PENDING" && (
@@ -119,7 +119,7 @@ const ReportDetail = ({ reportData }) => {
                         <div className="flex-1 overflow-y-auto p-6">
                             {isLoading ? (
                                 <div className="flex justify-center items-center h-64">
-                                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+                                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
                                 </div>
                             ) : isError ? (
                                 <div className="flex justify-center items-center h-64 text-red-500">
@@ -128,8 +128,8 @@ const ReportDetail = ({ reportData }) => {
                             ) : (
                                 <div className="space-y-8">
                                     {/* Report Information */}
-                                    <div className="bg-orange-50 p-6 rounded-lg">
-                                        <h3 className="text-lg font-semibold mb-4 text-orange-700">Report Information</h3>
+                                    <div className="bg-blue-50 p-6 rounded-lg">
+                                        <h3 className="text-lg font-semibold mb-4 text-blue-700">Report Information</h3>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <div>
                                                 <p className="text-gray-500 text-sm">ID</p>
@@ -143,7 +143,7 @@ const ReportDetail = ({ reportData }) => {
                                                         : report?.reportType === "INAPPROPRIATE_CONTENT"
                                                             ? "bg-red-100 text-red-700"
                                                             : report?.reportType === "RULE_VIOLATION"
-                                                                ? "bg-orange-100 text-orange-700"
+                                                                ? "bg-blue-100 text-blue-700"
                                                                 : report?.reportType === "OFFENSIVE_BEHAVIOR"
                                                                     ? "bg-purple-100 text-purple-700"
                                                                     : "bg-gray-100 text-gray-700"
@@ -177,12 +177,12 @@ const ReportDetail = ({ reportData }) => {
                                             </div>
                                             <div className="md:col-span-2">
                                                 <p className="text-gray-500 text-sm">Report Content</p>
-                                                <p className="mt-2 bg-white p-4 rounded border border-orange-100">{report?.content || "No content provided"}</p>
+                                                <p className="mt-2 bg-white p-4 rounded border border-blue-100">{report?.content || "No content provided"}</p>
                                             </div>
                                             {report?.reporter && (
                                                 <div className="md:col-span-2">
                                                     <p className="text-gray-500 text-sm">Reported By</p>
-                                                    <div className="mt-2 bg-white p-4 rounded border border-orange-100">
+                                                    <div className="mt-2 bg-white p-4 rounded border border-blue-100">
                                                         <div className="flex items-center">
                                                             {report.reporter.avatar && (
                                                                 <img

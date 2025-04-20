@@ -44,9 +44,9 @@ const AdminDashboard = () => {
                                             {summaryData?.memberGrowth >= 0 ? '+' : ''}{summaryData?.memberGrowth}% this month
                                         </p>
                                     </div>
-                                    <div className="bg-white p-6 rounded-lg shadow-md border-t-4 border-purple-500">
+                                    <div className="bg-white p-6 rounded-lg shadow-md border-t-4 border-indigo-500">
                                         <h3 className="font-bold text-lg mb-2 text-gray-800">Active Challenges</h3>
-                                        <p className="text-3xl font-bold text-purple-600">{summaryData?.activeChallenges}</p>
+                                        <p className="text-3xl font-bold text-indigo-600">{summaryData?.activeChallenges}</p>
                                         <p className={`text-sm mt-2 ${summaryData?.challengeGrowth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                                             {summaryData?.challengeGrowth >= 0 ? '+' : ''}{summaryData?.challengeGrowth}% from last week
                                         </p>
@@ -67,7 +67,7 @@ const AdminDashboard = () => {
                         {/* Dashboard View with Stacked Charts in Cards */}
                         <div className="grid grid-cols-1 gap-6 mb-6">
                             {/* Card 1 - Main Charts */}
-                            <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-orange-500">
+                            <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500">
                                 <h2 className="text-xl font-bold mb-4 text-gray-800">Overview Stats</h2>
                                 {Charts && <Charts />}
                             </div>
@@ -80,7 +80,7 @@ const AdminDashboard = () => {
     };
 
     return (
-        <div className="flex bg-orange-50 min-h-screen text-gray-800">
+        <div className="flex bg-blue-50 min-h-screen text-gray-800">
             {/* Side Navigation */}
             <div className="flex flex-1 overflow-hidden relative">
                 {/* Sidebar - Collapsible */}
@@ -91,15 +91,15 @@ const AdminDashboard = () => {
                 {/* Main Content */}
                 <div className="flex-1 flex flex-col p-6">
                     {/* Header/Title Bar */}
-                    <div className="flex justify-between items-center mb-6 pb-4 border-b border-orange-200">
-                        <h1 className="text-2xl font-bold text-orange-800">
+                    <div className="flex justify-between items-center mb-6 pb-4 border-b border-blue-200">
+                        <h1 className="text-2xl font-bold text-blue-800">
                             {activeTab === "dashboard" && "Admin Dashboard"}
                             {activeTab === "reports" && "Reports & Members"}
                             {activeTab === "challenges" && "Challenges & Evidence"}
                         </h1>
                         <div className="flex space-x-3">
                             <button
-                                className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg transition duration-200 shadow-sm">
+                                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition duration-200 shadow-sm">
                                 Export Data
                             </button>
                             <NavLink to="/admin/settings"
@@ -118,7 +118,7 @@ const AdminDashboard = () => {
                 {/* Floating Action Button for creating challenges */}
                 <NavLink
                     to="/admin/challenge/create"
-                    className="fixed bottom-10 right-10 bg-orange-600 text-white p-4 rounded-full shadow-lg hover:bg-orange-700 transition duration-200 flex items-center justify-center"
+                    className="fixed bottom-10 right-10 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition duration-200 flex items-center justify-center"
                 >
                     <FaPlus size={20}/>
                     <span className="ml-2 hidden md:inline font-medium">New Challenge</span>
