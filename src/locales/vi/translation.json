@@ -177,7 +177,30 @@
     "reason": "Lý do",
     "submit": "Gửi báo cáo",
     "cancel": "Hủy"
-  }
+  },
+
+  "ChallengeDetail": {
+    "joinedStatus": "Đã tham gia",
+    "joining": "Đang tham gia...",
+    "joinButton": "Tham gia thử thách",
+    "joinSuccess": "Tham gia thử thách thành công!",
+    "joinFail": "Không thể tham gia thử thách.",
+    "category": "Thể loại",
+    "participation": "Hình thức",
+    "verification": "Xác minh",
+    "totalParticipants": "TỔNG NGƯỜI THAM GIA",
+    "peopleJoined": "người đã tham gia",
+    "tab": {
+      "info": "Thông tin",
+      "rules": "Quy định",
+      "team": "BXH Đội",
+      "individual": "BXH Cá nhân"
+    },
+    "rulesText": "Quy định chi tiết của thử thách sẽ hiển thị tại đây.",
+    "teamRanking": "Bảng xếp hạng đội sẽ hiển thị tại đây.",
+    "individualRanking": "Bảng xếp hạng cá nhân sẽ hiển thị tại đây."
+
+}
 
 
 }

@@ -180,6 +180,28 @@
     "reason": "Reason",
     "submit": "Submit Report",
     "cancel": "Cancel"
+  },
+
+  "ChallengeDetail": {
+    "joinedStatus": "Joined",
+    "joining": "Joining...",
+    "joinButton": "Join Challenge",
+    "joinSuccess": "Successfully joined the challenge!",
+    "joinFail": "Failed to join the challenge.",
+    "category": "Category",
+    "participation": "Participation",
+    "verification": "Verification",
+    "totalParticipants": "TOTAL PARTICIPANTS",
+    "peopleJoined": "people have joined",
+    "tab": {
+      "info": "Information",
+      "rules": "Rules",
+      "team": "Team Ranking",
+      "individual": "Individual Ranking"
+    },
+    "rulesText": "Detailed challenge rules will be displayed here.",
+    "teamRanking": "Team ranking will be displayed here.",
+    "individualRanking": "Individual ranking will be displayed here."
   }
 
 }

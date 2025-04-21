@@ -180,8 +180,30 @@
     "reason": "理由",
     "submit": "報告を送信",
     "cancel": "キャンセル"
-  }
+  },
 
+  "ChallengeDetail": {
+    "joinedStatus": "参加済み",
+    "joining": "参加中...",
+    "joinButton": "チャレンジに参加する",
+    "joinSuccess": "チャレンジへの参加が成功しました！",
+    "joinFail": "チャレンジに参加できませんでした。",
+    "category": "カテゴリー",
+    "participation": "参加形式",
+    "verification": "検証方法",
+    "totalParticipants": "参加者合計",
+    "peopleJoined": "人が参加しました",
+    "tab": {
+      "info": "情報",
+      "rules": "ルール",
+      "team": "チームランキング",
+      "individual": "個人ランキング"
+    },
+    "rulesText": "チャレンジの詳細なルールがここに表示されます。",
+    "teamRanking": "チームランキングがここに表示されます。",
+    "individualRanking": "個人ランキングがここに表示されます。"
+
+}
 
 
 }

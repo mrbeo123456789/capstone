@@ -51,6 +51,7 @@ const router = createBrowserRouter([
             { path: "statistics", element: <MemberRoute><Statistics /></MemberRoute> },
             { path: "achievement", element: <MemberRoute><Achievement /></MemberRoute> },
             { path: "password", element: <MemberRoute><ChangePassword /></MemberRoute> },
+            { path: "challenges/detail/:id", element: <ChallengeDetail /> },
             {
                 path: "challenges",
                 element: <MemberRoute><Outlet /></MemberRoute>,
@@ -58,7 +59,6 @@ const router = createBrowserRouter([
                     { index: true, element: <ChallengePage /> },
                     { path: "joins", element: <YourChallenge /> },
                     { path: "create", element: <ChallengeForm /> },
-                    { path: "detail/:id", element: <ChallengeDetail /> },
                     { path: "joins/detail/:id", element: <JoinedChallengeDetail /> },
                     { path: "edit/:id", element: <ChallengeEdit/>}
                 ]
