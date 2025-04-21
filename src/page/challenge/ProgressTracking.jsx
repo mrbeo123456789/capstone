@@ -20,8 +20,10 @@ export default function ProgressTracking({ challenge, evidence }) {
     console.log("Evidence data:", evidence);
     console.log("Evidence map:", evidenceMap);
 
+    // Lấy ngày hiện tại và reset time portion - QUAN TRỌNG: dùng cùng logic với ProofUploads
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Loại bỏ phần thời gian
+
     const challengeId = challenge?.id;
     const [currentMonth, setCurrentMonth] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
 
@@ -71,8 +73,26 @@ export default function ProgressTracking({ challenge, evidence }) {
         return d;
     };
 
+    // Kiểm tra xem có bằng chứng nào chưa
+    const hasNoProofs = evidence?.length === 0;
+
+    // Format ngày hiện tại để hiển thị
+    const formattedToday = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getFullYear()}`;
+
     return (
         <div className="bg-white shadow-md rounded-lg p-4 mx-auto">
+            {/* Thông báo ngày hiện tại */}
+            <div className="mb-4 text-center">
+                <p className="font-semibold">Hôm nay: {formattedToday}</p>
+            </div>
+
+            {/* Thông báo khi không có bằng chứng */}
+            {hasNoProofs && (
+                <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 p-4 rounded mb-4">
+                    <p className="font-medium">Bạn chưa có bằng chứng nào. Hãy bắt đầu nộp bằng chứng cho ngày hôm nay.</p>
+                </div>
+            )}
+
             <div className="flex items-center justify-between mb-4">
                 <button onClick={goPrevMonth} className="text-gray-700 hover:text-black text-3xl">&lt;</button>
                 <div className="text-lg font-semibold">{monthName} {year}</div>
@@ -89,7 +109,7 @@ export default function ProgressTracking({ challenge, evidence }) {
                 {calendarDays.map((date, idx) => {
                     // Sử dụng format ISO để đảm bảo tính nhất quán với ProofUploads
                     const dateISO = date.toISOString().split('T')[0]; // YYYY-MM-DD
-                    const todayISO = new Date().toISOString().split('T')[0];
+                    const todayISO = today.toISOString().split('T')[0];
 
                     const isToday = dateISO === todayISO;
                     const isCurrentMonth = date.getMonth() === currentMonth.getMonth();
@@ -148,7 +168,8 @@ export default function ProgressTracking({ challenge, evidence }) {
                             onClick={() => {
                                 if (isCurrentMonth) {
                                     const clickedDate = new Date(date);
-                                    const todayDate = new Date();
+                                    // Đảm bảo so sánh ngày chính xác
+                                    const todayDate = new Date(today);
                                     const isSameDate =
                                         clickedDate.getFullYear() === todayDate.getFullYear() &&
                                         clickedDate.getMonth() === todayDate.getMonth() &&
