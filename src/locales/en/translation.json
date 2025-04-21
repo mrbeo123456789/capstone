@@ -197,6 +197,9 @@
     "fail": "Failed to update challenge: "
   },
   "notification": {
+    "challengeStatusUpdated.title" : "Your challenge status have been updated",
+    "challengeStatusUpdated.content" : "|{{challengeName}}| has been updated to active",
+
     "challengeResult.title": "Challenge Result: Completed",
     "challengeResult.content": "You have successfully completed the challenge '{{challengeName}}'! Check out your achievement now!",
 
