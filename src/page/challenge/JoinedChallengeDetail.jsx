@@ -18,12 +18,14 @@ import {
 } from "../../service/challengeService.js";
 import { useGetMyEvidencesByChallengeQuery } from "../../service/evidenceService.js";
 import ReportChallengeModal from "./modal/ReportChallengeModal.jsx";
+import MemberManagementModal from "./modal/MemberManagementModal.jsx";
 
 const JoinedChallengeDetail = () => {
     const { t } = useTranslation();
     const [activeTab, setActiveTab] = useState("proof");
     const [showPopup, setShowPopup] = useState(false);
     const [showReportModal, setShowReportModal] = useState(false);
+    const [showMemberModal, setShowMemberModal] = useState(false);
     const navigate = useNavigate();
     const { id } = useParams();
 
@@ -47,6 +49,8 @@ const JoinedChallengeDetail = () => {
     const closeUserDetail = () => setShowPopup(false);
     const openReportModal = () => setShowReportModal(true);
     const closeReportModal = () => setShowReportModal(false);
+    const openMemberModal = () => setShowMemberModal(true);
+    const closeMemberModal = () => setShowMemberModal(false);
 
     const handleLeave = async () => {
         try {
@@ -85,6 +89,16 @@ const JoinedChallengeDetail = () => {
 
                                     return (
                                         <>
+                                            {challenge?.role === "HOST" && (
+                                                <button
+                                                    title={t("JoinsChallengeDetail.memberManagement")}
+                                                    onClick={openMemberModal}
+                                                    className="text-green-500 hover:text-green-700 text-xl"
+                                                >
+                                                    <FaUsers />
+                                                </button>
+                                            )}
+
                                             {/* Invite Button */}
                                             <button
                                                 title={
@@ -158,7 +172,6 @@ const JoinedChallengeDetail = () => {
                                     );
                                 })()}
                             </div>
-
                         </div>
                         <p className="text-gray-500 mt-2">{challenge?.startDate} - {challenge?.endDate}</p>
                         <p className="text-sm text-gray-700 mt-2">
@@ -205,6 +218,16 @@ const JoinedChallengeDetail = () => {
                 {activeTab === "description" && <Description content={challenge} />}
                 {showPopup && <ChallengeInvitePopup onClose={closeUserDetail} />}
                 {showReportModal && <ReportChallengeModal challengeId={challenge.id} onClose={closeReportModal} />}
+                {showMemberModal && (
+                    <MemberManagementModal
+                        show={showMemberModal}
+                        onClose={closeMemberModal}
+                        challengeId={challenge.id}
+                    />
+                )}
+
+
+
             </div>
         </div>
     );

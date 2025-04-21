@@ -145,18 +145,18 @@ const ChallengeEdit = () => {
     };
 
     return (
-        <div className="bg-white p-6 w-full rounded-xl border-4 border-transparent">
+        <div className="bg-white p-1 sm:p-6 w-full rounded-xl border-4 border-transparent">
             <form onSubmit={handleSubmit(onSubmit, onError)}>
                 <h2 className="text-xl font-bold mb-4">{t("createChallenge.editTitle")}</h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-4">
                         <label>{t("createChallenge.name")}*</label>
-                        <input {...register("name")} className="w-full p-2 border rounded" />
+                        <input {...register("name")} className="w-full p-2 border rounded"/>
                         <p className="text-red-600">{errors.name?.message}</p>
 
                         <label>{t("createChallenge.summary")}</label>
-                        <input {...register("summary")} className="w-full p-2 border rounded" />
+                        <input {...register("summary")} className="w-full p-2 border rounded"/>
 
                         <label>{t("createChallenge.banner")}</label>
                         <label htmlFor="banner-upload"
@@ -196,14 +196,15 @@ const ChallengeEdit = () => {
                                                onClick={() => handleClosePreview("picture")}/>
                             )}
                             {preview ? (
-                                       <img src={preview} className="w-full h-full object-cover rounded-lg" />
-                                   ) : (
-                                       <div className="w-full h-full flex flex-col items-center justify-center border-2 border-dashed rounded-lg bg-gray-50">
-                                           <IoCloudUploadOutline className="text-2xl" />
-                                           <p className="text-sm text-gray-500">{t("createChallenge.clickUpload")}</p>
-                                           <p className="text-xs text-gray-500">{t("createChallenge.pictureNote")}</p>
-                                       </div>
-                                   )}
+                                <img src={preview} className="w-full h-full object-cover rounded-lg"/>
+                            ) : (
+                                <div
+                                    className="w-full h-full flex flex-col items-center justify-center border-2 border-dashed rounded-lg bg-gray-50">
+                                    <IoCloudUploadOutline className="text-2xl"/>
+                                    <p className="text-sm text-gray-500">{t("createChallenge.clickUpload")}</p>
+                                    <p className="text-xs text-gray-500">{t("createChallenge.pictureNote")}</p>
+                                </div>
+                            )}
                         </div>
                         <p className="text-red-600">{errors.picture?.message}</p>
                     </label>
@@ -215,17 +216,20 @@ const ChallengeEdit = () => {
                         onChange={(e) => handleFileChange(e, "picture")}
                     />
                 </div>
-
+                <div className="bg-gradient-to-r from-red-700 to-blue-600 rounded-lg w-full p-px">
+                    <div className="bg-white flex flex-col rounded-lg shadow-md h-full">
+                    </div>
+                </div>
                 {/* Challenge Detail Section */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
                     <div>
                         <label>{t("createChallenge.startDate")}</label>
-                        <input type="date" {...register("startDate")} className="w-full p-2 border rounded" />
+                        <input type="date" {...register("startDate")} className="w-full p-2 border rounded"/>
                         <p className="text-red-600">{errors.startDate?.message}</p>
                     </div>
                     <div>
                         <label>{t("createChallenge.endDate")}</label>
-                        <input type="date" {...register("endDate")} className="w-full p-2 border rounded" />
+                        <input type="date" {...register("endDate")} className="w-full p-2 border rounded"/>
                         <p className="text-red-600">{errors.endDate?.message}</p>
                     </div>
                     <div>
@@ -237,7 +241,7 @@ const ChallengeEdit = () => {
                     </div>
                     <div>
                         <label>{t("createChallenge.maxParticipants")}</label>
-                        <input type="number" {...register("maxParticipants")} className="w-full p-2 border rounded" />
+                        <input type="number" {...register("maxParticipants")} className="w-full p-2 border rounded"/>
                     </div>
                     <div>
                         <label>{t("createChallenge.verificationType.label")}</label>
@@ -271,11 +275,11 @@ const ChallengeEdit = () => {
                         value={description}
                         onChange={(val) => {
                             setDescription(val); // update local state
-                            setValue("description", val, { shouldValidate: true }); // sync to react-hook-form
+                            setValue("description", val, {shouldValidate: true}); // sync to react-hook-form
                             trigger("description");
                         }}
                     />
-                    <input type="hidden" {...register("description")} value={description} />
+                    <input type="hidden" {...register("description")} value={description}/>
 
                     <p className="text-red-600">{errors.description?.message}</p>
                 </div>
