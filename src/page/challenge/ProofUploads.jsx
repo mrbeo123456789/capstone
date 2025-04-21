@@ -8,13 +8,13 @@ const ProofUploads = ({ challenge, evidence }) => {
     const [selectedProof, setSelectedProof] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
 
-    // ✅ correct
-    const startDate = new Date(challenge.startDate);
-    const endDate = new Date(challenge.endDate);
+    // Lấy ngày hiện tại và reset time portion để đảm bảo đồng bộ
     const today = new Date();
     today.setHours(0, 0, 0, 0); // remove time portion
 
     // Calculate duration up to today or end date, whichever comes first
+    const startDate = new Date(challenge.startDate);
+    const endDate = new Date(challenge.endDate);
     const displayEndDate = today < endDate ? today : endDate;
     const duration = Math.floor((displayEndDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
 
@@ -45,6 +45,9 @@ const ProofUploads = ({ challenge, evidence }) => {
         currentPage * ITEMS_PER_PAGE
     );
 
+    // Check if there are no proofs
+    const hasNoProofs = evidence?.length === 0;
+
     const handlePrev = () => {
         if (currentPage > 1) setCurrentPage(currentPage - 1);
     };
@@ -53,16 +56,26 @@ const ProofUploads = ({ challenge, evidence }) => {
         if (currentPage < totalPages) setCurrentPage(currentPage + 1);
     };
 
+    // Format ngày hiện tại để hiển thị
+    const formattedToday = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getFullYear()}`;
+
     return (
         <div className="w-full mx-auto p-4">
             <h2 className="text-xl font-bold mb-4 text-center">Xem các bằng chứng của bạn</h2>
+
+            {/* Thông báo khi không có bằng chứng nào */}
+            {hasNoProofs && (
+                <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 p-4 rounded mb-4">
+                    <p className="font-medium">Bạn chưa có bằng chứng nào. Hãy kiểm tra ngày hôm nay ({formattedToday}) để bắt đầu nộp bằng chứng.</p>
+                </div>
+            )}
 
             <div className="grid sm:grid-cols-6 gap-4 justify-center grid-cols-3">
                 {currentPageDays.map((dayInfo, index) => {
                     const { date, evidence } = dayInfo;
                     const isUploaded = Boolean(evidence);
                     const isVideo = isUploaded && evidence.evidenceUrl?.includes(".mp4");
-                    const isApproved = isUploaded && evidence.status === "approved"; // Kiểm tra nếu đã được chấm
+                    const isApproved = isUploaded && evidence.status === "APPROVED"; // Kiểm tra nếu đã được chấm
 
                     // Sử dụng format ISO để so sánh ngày
                     const dateISO = date.toISOString().split('T')[0];
@@ -71,7 +84,10 @@ const ProofUploads = ({ challenge, evidence }) => {
                     // Check if date is today or past
                     const isToday = dateISO === todayISO;
                     const isPast = date < today;
-                    const dateLabel = date.toLocaleDateString("en-GB"); // format: dd/mm/yyyy
+
+                    // Sửa lại định dạng ngày thành dd/mm/yyyy theo yêu cầu
+                    const dateLabel = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+
                     let borderClass = "";
                     let bgClass = "bg-gray-300";
                     let symbol = null;

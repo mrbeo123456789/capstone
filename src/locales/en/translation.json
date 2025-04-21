@@ -146,6 +146,16 @@
     "validationError": "Please correct all errors before submitting.",
     "fail": "Failed to update challenge: "
   },
+  "ProofUpLoads": {
+    "loading": "Loading data",
+    "view evidence": "View all evidences",
+    "has no proof": "You don't have any proof yet!",
+    "uploaded": "Uploaded",
+    "not have evidence": "Don't have evidence for this day",
+    "previous": "Previous",
+    "page": "Page",
+    "next": "Next"
+  },
 
   "JoinsChallengeDetail": {
     "disabledDuringChallenge": "This action is disabled during or after the challenge.",
