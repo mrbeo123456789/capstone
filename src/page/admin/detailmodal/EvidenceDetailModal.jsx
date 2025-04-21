@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { ThumbsUp, ThumbsDown, HourglassIcon } from 'lucide-react';
+import { useReviewEvidenceMutation } from '../../../service/evidenceService.js'; // Nhớ điều chỉnh đường dẫn đúng
 
 const EvidenceDetailModal = ({ evidence, onClose, onAccept, onReject }) => {
     const [isLoading, setIsLoading] = useState(false);
+    const [reviewEvidence] = useReviewEvidenceMutation();
 
     // Determine if the media is a video or image based on type
     const isVideo = evidence?.type === 'video';
@@ -29,32 +31,53 @@ const EvidenceDetailModal = ({ evidence, onClose, onAccept, onReject }) => {
         }
     };
 
-    const handleAccept = () => {
+    const handleAccept = async () => {
         setIsLoading(true);
-        // Simulate API call
-        setTimeout(() => {
+        try {
+            await reviewEvidence({
+                evidenceId: evidence.id,
+                status: 'APPROVED'
+            }).unwrap();
+
+            // Callback to parent component
             onAccept(evidence.id);
+        } catch (error) {
+            console.error("Error accepting evidence:", error);
+            alert("Failed to accept evidence. Please try again.");
+        } finally {
             setIsLoading(false);
-        }, 500);
+        }
     };
 
-    const handleReject = () => {
+    const handleReject = async () => {
         setIsLoading(true);
-        // Simulate API call
-        setTimeout(() => {
+        try {
+            await reviewEvidence({
+                evidenceId: evidence.id,
+                status: 'REJECTED'
+            }).unwrap();
+
+            // Callback to parent component
             onReject(evidence.id);
+        } catch (error) {
+            console.error("Error rejecting evidence:", error);
+            alert("Failed to reject evidence. Please try again.");
+        } finally {
             setIsLoading(false);
-        }, 500);
+        }
     };
 
     const getEvidenceStatusIcon = (status) => {
         switch (status) {
             case 'approved':
+            case 'APPROVED':
                 return <ThumbsUp className="inline mr-2 text-green-600" size={16} />;
             case 'rejected':
+            case 'REJECTED':
                 return <ThumbsDown className="inline mr-2 text-red-600" size={16} />;
             case 'waiting':
             case 'pending':
+            case 'PENDING':
                 return <HourglassIcon className="inline mr-2 text-yellow-600" size={16} />;
             default:
                 return null;
@@ -62,7 +85,9 @@ const EvidenceDetailModal = ({ evidence, onClose, onAccept, onReject }) => {
     };
 
     const getEvidenceStatusColor = (status) => {
-        switch (status) {
+        const normalizedStatus = status ? status.toLowerCase() : '';
+
+        switch (normalizedStatus) {
             case 'approved':
                 return 'text-green-600 bg-green-100 px-3 py-1.5 rounded-full';
             case 'rejected':
@@ -91,7 +116,9 @@ const EvidenceDetailModal = ({ evidence, onClose, onAccept, onReject }) => {
 
     // Check if status is pending (handles both 'waiting' and 'pending' values)
     const isPending = (status) => {
-        return status && (status.toLowerCase() === 'waiting' || status.toLowerCase() === 'pending');
+        if (!status) return false;
+        const normalizedStatus = status.toLowerCase();
+        return normalizedStatus === 'waiting' || normalizedStatus === 'pending';
     };
 
     if (!evidence) return null;
@@ -122,13 +149,13 @@ const EvidenceDetailModal = ({ evidence, onClose, onAccept, onReject }) => {
                                     <video
                                         controls
                                         className="w-full h-auto"
-                                        src="/api/placeholder/800/600"
+                                        src={evidence.evidenceUrl || "/api/placeholder/800/600"}
                                     >
                                         Your browser does not support the video tag.
                                     </video>
                                 ) : (
                                     <img
-                                        src={evidence.picture || "/api/placeholder/800/600"}
+                                        src={evidence.evidenceUrl || evidence.picture || "/api/placeholder/800/600"}
                                         alt="Evidence proof"
                                         className="w-full h-auto"
                                     />
@@ -164,50 +191,66 @@ const EvidenceDetailModal = ({ evidence, onClose, onAccept, onReject }) => {
                                     <button
                                         onClick={handleAccept}
                                         disabled={isLoading}
-                                        className="px-4 py-3 bg-green-500 text-white hover:bg-green-600 rounded-md flex items-center justify-center"
+                                        className="px-4 py-3 bg-green-500 text-white hover:bg-green-600 rounded-md flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        <ThumbsUp className="mr-2" size={18} />
+                                        {isLoading ? (
+                                            <span className="inline-block h-4 w-4 rounded-full border-2 border-white border-t-transparent animate-spin mr-2"></span>
+                                        ) : (
+                                            <ThumbsUp className="mr-2" size={18} />
+                                        )}
                                         Accept Evidence
                                     </button>
                                     <button
                                         onClick={handleReject}
                                         disabled={isLoading}
-                                        className="px-4 py-3 border border-red-500 text-red-500 hover:bg-red-50 rounded-md flex items-center justify-center"
+                                        className="px-4 py-3 border border-red-500 text-red-500 hover:bg-red-50 rounded-md flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        <ThumbsDown className="mr-2" size={18} />
+                                        {isLoading ? (
+                                            <span className="inline-block h-4 w-4 rounded-full border-2 border-red-500 border-t-transparent animate-spin mr-2"></span>
+                                        ) : (
+                                            <ThumbsDown className="mr-2" size={18} />
+                                        )}
                                         Reject Evidence
                                     </button>
                                 </>
                             )}
 
                             {/* Show only Accept button when rejected */}
-                            {evidence.status === 'rejected' && (
+                            {evidence.status?.toLowerCase() === 'rejected' && (
                                 <button
                                     onClick={handleAccept}
                                     disabled={isLoading}
-                                    className="px-4 py-3 bg-green-500 text-white hover:bg-green-600 rounded-md flex items-center justify-center"
+                                    className="px-4 py-3 bg-green-500 text-white hover:bg-green-600 rounded-md flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    <ThumbsUp className="mr-2" size={18} />
+                                    {isLoading ? (
+                                        <span className="inline-block h-4 w-4 rounded-full border-2 border-white border-t-transparent animate-spin mr-2"></span>
+                                    ) : (
+                                        <ThumbsUp className="mr-2" size={18} />
+                                    )}
                                     Accept Evidence
                                 </button>
                             )}
 
                             {/* Show only Reject button when approved */}
-                            {evidence.status === 'approved' && (
+                            {evidence.status?.toLowerCase() === 'approved' && (
                                 <button
                                     onClick={handleReject}
                                     disabled={isLoading}
-                                    className="px-4 py-3 border border-red-500 text-red-500 hover:bg-red-50 rounded-md flex items-center justify-center"
+                                    className="px-4 py-3 border border-red-500 text-red-500 hover:bg-red-50 rounded-md flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    <ThumbsDown className="mr-2" size={18} />
+                                    {isLoading ? (
+                                        <span className="inline-block h-4 w-4 rounded-full border-2 border-red-500 border-t-transparent animate-spin mr-2"></span>
+                                    ) : (
+                                        <ThumbsDown className="mr-2" size={18} />
+                                    )}
                                     Reject Evidence
                                 </button>
                             )}
 
                             {/* Show message when there are no actions available */}
                             {!isPending(evidence.status) &&
-                                evidence.status !== 'approved' &&
-                                evidence.status !== 'rejected' && (
+                                evidence.status?.toLowerCase() !== 'approved' &&
+                                evidence.status?.toLowerCase() !== 'rejected' && (
                                     <p className="text-center text-gray-500 italic">
                                         No actions available for this evidence status.
                                     </p>

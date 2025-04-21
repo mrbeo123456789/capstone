@@ -1,11 +1,75 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import { useReviewEvidenceMutation } from "../../service/evidenceService";
-import { toast } from "react-toastify"; // ✅
+import { toast } from "react-toastify";
 
 const VideoModal = ({ show, onClose, videoSrc, onPrevious, onNext, uploader, evidenceId }) => {
-    if (!show) return null;
     const [reviewEvidence] = useReviewEvidenceMutation();
+    const [isReviewed, setIsReviewed] = useState(false);
+
+    if (!show) return null;
+
+    // Handle approving the video
+    const handleApprove = async () => {
+        if (isReviewed) return;
+
+        try {
+            await reviewEvidence({
+                evidenceId: evidenceId,
+                isApproved: true,
+                feedback: "I approve this video"
+            }).unwrap();
+
+            toast.success("Approved successfully!");
+            setIsReviewed(true);
+
+            // Add this evidence ID to localStorage to track it's been reviewed
+            const reviewedKey = `reviewedEvidences-${evidenceId.split('-')[0]}`;
+            const savedReviewed = JSON.parse(localStorage.getItem(reviewedKey) || "[]");
+            if (!savedReviewed.includes(evidenceId)) {
+                localStorage.setItem(reviewedKey, JSON.stringify([...savedReviewed, evidenceId]));
+            }
+
+            // Move to next video automatically after a short delay
+            setTimeout(() => {
+                onNext();
+            }, 1000);
+        } catch (error) {
+            toast.error("Failed to approve!");
+            console.error(error);
+        }
+    };
+
+    // Handle rejecting the video
+    const handleReject = async () => {
+        if (isReviewed) return;
+
+        try {
+            await reviewEvidence({
+                evidenceId: evidenceId,
+                isApproved: false,
+                feedback: "I don't approve this video"
+            }).unwrap();
+
+            toast.success("Rejected successfully!");
+            setIsReviewed(true);
+
+            // Add this evidence ID to localStorage to track it's been reviewed
+            const reviewedKey = `reviewedEvidences-${evidenceId.split('-')[0]}`;
+            const savedReviewed = JSON.parse(localStorage.getItem(reviewedKey) || "[]");
+            if (!savedReviewed.includes(evidenceId)) {
+                localStorage.setItem(reviewedKey, JSON.stringify([...savedReviewed, evidenceId]));
+            }
+
+            // Move to next video automatically after a short delay
+            setTimeout(() => {
+                onNext();
+            }, 1000);
+        } catch (error) {
+            toast.error("Failed to reject!");
+            console.error(error);
+        }
+    };
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
@@ -25,51 +89,35 @@ const VideoModal = ({ show, onClose, videoSrc, onPrevious, onNext, uploader, evi
                     </video>
                 </div>
 
-                {/* Action Buttons */}
-                <div className="flex justify-center gap-4 p-4 bg-gray-100">
-                    <button
-                        className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-lg"
-                        onClick={async () => {
-                            try {
-                                await reviewEvidence({
-                                    evidenceId: evidenceId,
-                                    isApproved: false,
-                                    feedback: "I don't approve this video"
-                                }).unwrap();
-                                toast.success("Rejected successfully!");
-                                onNext(); // Move to next video automatically
-                            } catch (error) {
-                                toast.error("Failed to reject!");
-                                console.error(error);
-                            }
-                        }}
-                    >
-                        <FaTimesCircle className="text-2xl" />
-                        I don't approve this video
-                    </button>
+                {/* Action Buttons - Hide if already reviewed */}
+                {!isReviewed && (
+                    <div className="flex justify-center gap-4 p-4 bg-gray-100">
+                        <button
+                            className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-lg"
+                            onClick={handleReject}
+                        >
+                            <FaTimesCircle className="text-2xl" />
+                            I don't approve this video
+                        </button>
 
-                    <button
-                        className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg"
-                        onClick={async () => {
-                            try {
-                                await reviewEvidence({
-                                    evidenceId: evidenceId,
-                                    isApproved: true,
-                                    feedback: "I approve this video"
-                                });
-                                toast.success("Approved successfully!");
-                                onNext(); // Move to next video automatically
-                            } catch (error) {
-                                toast.error("Failed to approve!");
-                                console.error(error);
-                            }
-                        }}
-                    >
-                        <FaCheckCircle className="text-2xl" />
-                        I approved this video
-                    </button>
-                </div>
+                        <button
+                            className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg"
+                            onClick={handleApprove}
+                        >
+                            <FaCheckCircle className="text-2xl" />
+                            I approve this video
+                        </button>
+                    </div>
+                )}
 
+                {/* Show message if already reviewed */}
+                {isReviewed && (
+                    <div className="flex justify-center p-4 bg-gray-100">
+                        <div className="text-green-600 font-bold text-lg">
+                            Review submitted successfully!
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Previous Video Button */}

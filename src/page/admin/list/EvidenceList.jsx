@@ -23,8 +23,8 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
         switch (frontendStatus) {
             case 'approved':
                 return 'APPROVED';
-            case 'waiting':
-                return 'PENDING'; // Changed from 'WAITING' to 'PENDING' as per backend enum
+            case 'pending':
+                return 'PENDING'; // Changed from 'pending' to 'PENDING' as per backend enum
             case 'rejected':
                 return 'REJECTED';
             default:
@@ -33,16 +33,52 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
     };
 
     const mapStatusToDisplay = (backendStatus) => {
-        switch (backendStatus) {
+        if (!backendStatus) return '';
+
+        switch (backendStatus.toUpperCase()) {
             case 'APPROVED':
                 return 'approved';
-            case 'PENDING': // Changed from WAITING to PENDING
-                return 'waiting'; // Keep frontend term as 'waiting'
+            case 'PENDING': // Changed from pending to PENDING
+                return 'pending'; // Keep frontend term as 'pending'
             case 'REJECTED':
                 return 'rejected';
             default:
                 return backendStatus.toLowerCase();
         }
+    };
+
+
+    const formatDate = (dateValue) => {
+        if (!dateValue) return "Invalid date";
+
+        let dateObj;
+
+        // Xử lý trường hợp dữ liệu là mảng (kiểu cũ)
+        if (Array.isArray(dateValue) && dateValue.length >= 3) {
+            const [year, month, day] = dateValue;
+            dateObj = new Date(year, month - 1, day);
+        }
+        // Xử lý trường hợp dữ liệu là timestamp hoặc chuỗi ngày tháng
+        else {
+            try {
+                dateObj = new Date(dateValue);
+            } catch (error) {
+                console.error("Error parsing date:", error);
+                return "Invalid date";
+            }
+        }
+
+        // Kiểm tra xem dateObj có phải là ngày hợp lệ không
+        if (isNaN(dateObj.getTime())) {
+            return "Invalid date";
+        }
+
+        // Format thành dd/mm/yyyy
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const year = dateObj.getFullYear();
+
+        return `${day}/${month}/${year}`;
     };
 
     // Debounce search term
@@ -91,6 +127,7 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
             { skip: true },
         { skip: !selectedMember }
     );
+    console.log("Evidence data:", evidenceData);
 
     // Fetch evidence counts by status for the selected member
     const {
@@ -103,25 +140,31 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
         } : { skip: true },
         { skip: !selectedMember }
     );
+    console.log("Evidence count data:", evidenceCountData);
 
     const handleStatusFilterChange = (status) => {
+        console.log("Setting status filter to:", status);
         setStatusFilter(status);
         setEvidencePage(0);
     };
 
     // Updated to store the full evidence object, not just the ID
     const handleEvidenceClick = (evidence) => {
+        console.log("Selected evidence:", evidence);
         setSelectedEvidence({
+            ...evidence,
             id: evidence.evidenceId,
             name: evidence.memberName || `Evidence #${evidence.evidenceId}`,
             challenge: selectedMember ? `${selectedMember.fullName}'s Challenge` : "Challenge",
-            dateAdded: new Date(evidence.submittedAt).toLocaleDateString('vi-VN'),
-            type: "image", // Default type if not available
+            submittedAt: evidence.submittedAt,
+            dateAdded: formatDate(evidence.submittedAt),
+            type: evidence.evidenceUrl?.includes('.mp4') ? "video" : "image",
             status: mapStatusToDisplay(evidence.status),
             addedBy: selectedMember ? selectedMember.fullName : "Unknown",
             caseNumber: evidence.evidenceId,
             description: evidence.description || "No description provided.",
-            picture: evidence.picture || "/api/placeholder/300/200"
+            evidenceUrl: evidence.evidenceUrl || "/api/placeholder/300/200",
+            picture: evidence.evidenceUrl || "/api/placeholder/300/200"
         });
     };
 
@@ -149,7 +192,7 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                 return <ThumbsUp className="inline mr-2 text-green-600" size={16} />;
             case 'rejected':
                 return <ThumbsDown className="inline mr-2 text-red-600" size={16} />;
-            case 'waiting':
+            case 'pending':
                 return <HourglassIcon className="inline mr-2 text-yellow-600" size={16} />;
             default:
                 return null;
@@ -162,7 +205,7 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                 return 'text-green-600 bg-green-100 px-2 py-1 rounded-full';
             case 'rejected':
                 return 'text-red-600 bg-red-100 px-2 py-1 rounded-full';
-            case 'waiting':
+            case 'pending':
                 return 'text-yellow-600 bg-yellow-100 px-2 py-1 rounded-full';
             default:
                 return '';
@@ -183,7 +226,7 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
 
     // Use the actual count data from the API
     const memberEvidenceStats = selectedMember ? {
-        total: selectedMember.evidenceCount || 0,
+        total: evidenceCountData?.reduce((total, item) => total + (item.count || 0), 0) || 0,
         approved: evidenceCountData?.find(item => item.status === "APPROVED")?.count || 0,
         pending: evidenceCountData?.find(item => item.status === "PENDING")?.count || 0,
         rejected: evidenceCountData?.find(item => item.status === "REJECTED")?.count || 0
@@ -233,7 +276,6 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                         <thead className="bg-blue-50">
                                         <tr>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Member Name</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Joined At</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Evidence Count</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Status</th>
                                         </tr>
@@ -246,9 +288,6 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                                 onClick={() => setSelectedMember(member)}
                                             >
                                                 <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{member.fullName}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    {member.joinedAt ? new Date(member.joinedAt).toLocaleDateString('vi-VN') : 'N/A'}
-                                                </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{member.evidenceCount || 0}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm">
                                                     {member.hasPendingEvidence ? (
@@ -386,8 +425,8 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
 
                                                 {/* Pending */}
                                                 <div
-                                                    className={`bg-yellow-50 p-4 rounded-lg cursor-pointer transform transition-all duration-200 hover:shadow-md ${statusFilter === 'waiting' ? 'ring-2 ring-yellow-500 shadow-md' : ''}`}
-                                                    onClick={() => handleStatusFilterChange('waiting')}
+                                                    className={`bg-yellow-50 p-4 rounded-lg cursor-pointer transform transition-all duration-200 hover:shadow-md ${statusFilter === 'pending' ? 'ring-2 ring-yellow-500 shadow-md' : ''}`}
+                                                    onClick={() => handleStatusFilterChange('pending')}
                                                 >
                                                     <p className="text-gray-500 text-sm">Pending</p>
                                                     <div className="flex items-center">
@@ -442,7 +481,7 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                                                 {evidence.memberName || `Evidence #${evidence.evidenceId}`}
                                                             </td>
                                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                                {new Date(evidence.submittedAt).toLocaleDateString('vi-VN')}
+                                                                {formatDate(evidence.submittedAt)}
                                                             </td>
                                                             <td className="px-6 py-4 whitespace-nowrap text-sm">
                                                                 <span className={getEvidenceStatusColor(displayStatus)}>
