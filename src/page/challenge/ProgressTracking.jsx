@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import MediaUpload from "../ui/MediaUpload.jsx";
 import { toast } from "react-toastify";
-import { FaPlus, FaCheck } from "react-icons/fa";
+import { FaPlus, FaCheck, FaQuestionCircle } from "react-icons/fa";
 
 export default function ProgressTracking({ challenge, evidence }) {
     // Tạo map để lưu trữ bằng chứng theo ngày và trạng thái
@@ -31,6 +31,7 @@ export default function ProgressTracking({ challenge, evidence }) {
 
     const [showModal, setShowModal] = useState(false);
     const [selectedDate, setSelectedDate] = useState(null);
+    const [showHelpModal, setShowHelpModal] = useState(false);
 
     const isValidDate = (d) => d instanceof Date && !isNaN(d);
 
@@ -91,7 +92,16 @@ export default function ProgressTracking({ challenge, evidence }) {
         <div className="bg-white shadow-md rounded-lg p-4 mx-auto">
             <div className="flex items-center justify-between mb-4">
                 <button onClick={goPrevMonth} className="text-gray-700 hover:text-black text-3xl">&lt;</button>
-                <div className="text-lg font-semibold">{monthName} {year}</div>
+                <div className="flex items-center">
+                    <div className="text-lg font-semibold">{monthName} {year}</div>
+                    <button
+                        onClick={() => setShowHelpModal(true)}
+                        className="ml-2 text-blue-500 hover:text-blue-700"
+                        title="Xem giải thích"
+                    >
+                        <FaQuestionCircle />
+                    </button>
+                </div>
                 <button onClick={goNextMonth} className="text-gray-700 hover:text-black text-3xl">&gt;</button>
             </div>
 
@@ -212,6 +222,82 @@ export default function ProgressTracking({ challenge, evidence }) {
                     challengeId={challengeId}
                     onClose={() => setShowModal(false)}
                 />
+            )}
+
+            {/* Modal Giải thích trạng thái */}
+            {showHelpModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg max-w-md w-full max-h-[90vh] overflow-auto">
+                        <h3 className="text-xl font-bold mb-4">Giải thích các trạng thái</h3>
+
+                        <div className="space-y-4">
+                            <div className="flex items-center">
+                                <div className="w-10 h-10 bg-green-200 rounded-md flex items-center justify-center mr-3 relative">
+                                    <span className="absolute top-0 right-1 text-green-700 text-lg"><FaCheck /></span>
+                                </div>
+                                <div>
+                                    <p className="font-medium">Đã nộp và được chấp nhận</p>
+                                    <p className="text-sm text-gray-600">Bằng chứng đã được xác nhận</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center">
+                                <div className="w-10 h-10 bg-green-200 rounded-md flex items-center justify-center mr-3"></div>
+                                <div>
+                                    <p className="font-medium">Đã nộp, đang chờ duyệt</p>
+                                    <p className="text-sm text-gray-600">Bằng chứng đang được xem xét</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center">
+                                <div className="w-10 h-10 bg-yellow-200 rounded-md flex items-center justify-center mr-3 relative">
+                                    <span className="absolute top-0 right-1 text-red-600 text-lg font-bold">✕</span>
+                                </div>
+                                <div>
+                                    <p className="font-medium">Đã nộp nhưng bị từ chối</p>
+                                    <p className="text-sm text-gray-600">Bằng chứng không hợp lệ, cần nộp lại</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center">
+                                <div className="w-10 h-10 bg-red-200 rounded-md flex items-center justify-center mr-3 relative">
+                                    <span className="absolute top-0 right-1 text-red-600 text-lg font-bold">✕</span>
+                                </div>
+                                <div>
+                                    <p className="font-medium">Chưa nộp (quá hạn)</p>
+                                    <p className="text-sm text-gray-600">Đã hết thời gian nộp cho ngày này</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center">
+                                <div className="w-10 h-10 bg-orange-300 rounded-md flex items-center justify-center mr-3 relative">
+                                    <span className="absolute top-0 right-1 text-orange-700 text-lg"><FaPlus /></span>
+                                </div>
+                                <div>
+                                    <p className="font-medium">Ngày hôm nay (chưa nộp)</p>
+                                    <p className="text-sm text-gray-600">Nhấp vào để nộp bằng chứng</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center">
+                                <div className="w-10 h-10 bg-gray-300 rounded-md flex items-center justify-center mr-3"></div>
+                                <div>
+                                    <p className="font-medium">Ngày trong tương lai</p>
+                                    <p className="text-sm text-gray-600">Chưa đến thời gian nộp</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="mt-6 text-right">
+                            <button
+                                onClick={() => setShowHelpModal(false)}
+                                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                            >
+                                Đóng
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );
