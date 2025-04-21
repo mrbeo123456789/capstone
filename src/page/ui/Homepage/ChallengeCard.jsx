@@ -22,12 +22,15 @@ const ChallengeCard = ({ challenge }) => {
                             {challenge.name}
                         </h1>
                         <p className="text-sm text-slate-400 leading-5 mt-1 line-clamp-2">
-                            {challenge.summary || "No description provided."}
+                            {challenge.summary || "Không có bản tóm tắt cho thử thách này"}
                         </p>
                     </div>
                     <div className="mt-auto text-xs text-gray-400 pt-2">
-                        <p>From: {challenge.startDate.join("/")} → {challenge.endDate.join("/")}</p>
-                        <p>Participation: {challenge.participationType}</p>
+                        <p>
+                            Từ ngày: {new Date(challenge.startDate).toLocaleDateString()} đến {new Date(challenge.endDate).toLocaleDateString()}
+                        </p>
+
+                        <p>Kiểu tham gia: {challenge.participationType}</p>
                     </div>
                 </div>
             </div>

@@ -1,12 +1,13 @@
 import React, {useRef, useState} from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 
-const RichTextEditor = ({ onChange }) => {
+const RichTextEditor = ({ value, onChange }) => {
     const editorRef = useRef(null);
 
     return (
         <div>
             <Editor
+                value={value}
                 apiKey='u5vai3dczlua38irw5yxf1fzobnooqknlvbi8tesy4aqtxoo'
                 onInit={(evt, editor) => (editorRef.current = editor)}
                 onEditorChange={(content) => {

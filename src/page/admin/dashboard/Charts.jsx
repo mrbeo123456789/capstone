@@ -77,9 +77,9 @@ const Charts = () => {
     const CustomPieTooltip = ({ active, payload }) => {
         if (active && payload && payload.length) {
             return (
-                <div className="bg-white p-3 shadow-lg rounded-lg border border-orange-200">
+                <div className="bg-white p-3 shadow-lg rounded-lg border border-blue-200">
                     <p className="font-medium text-gray-800">{payload[0].name}</p>
-                    <p className="text-lg font-bold text-orange-600">{payload[0].value} Challenges</p>
+                    <p className="text-lg font-bold text-blue-600">{payload[0].value} Challenges</p>
                     <p className="text-sm text-gray-500">
                         {totalChallenges > 0 ? ((payload[0].value / totalChallenges) * 100).toFixed(1) : "0"}% of total
                     </p>
@@ -92,7 +92,7 @@ const Charts = () => {
     const CustomLineTooltip = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
             return (
-                <div className="bg-white p-3 shadow-lg rounded-lg border border-orange-200">
+                <div className="bg-white p-3 shadow-lg rounded-lg border border-blue-200">
                     <p className="font-medium text-gray-800 mb-2">{label}</p>
                     {payload.map((entry, index) => (
                         <p key={index} style={{ color: entry.color }} className="font-semibold">
@@ -108,9 +108,9 @@ const Charts = () => {
     return (
         <div className="grid grid-cols-1 gap-6 mt-4">
             {/* Growth Line Chart */}
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-orange-100">
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-blue-100">
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-3">
-                    <h2 className="text-orange-800 font-bold text-lg">Growth Analysis</h2>
+                    <h2 className="text-blue-800 font-bold text-lg">Growth Analysis</h2>
                     <div className="flex gap-2">
                         {["WEEK", "MONTH", "YEAR", "ALL"].map((period) => (
                             <button
@@ -118,8 +118,8 @@ const Charts = () => {
                                 onClick={() => setTimePeriod(period)}
                                 className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
                                     timePeriod === period
-                                        ? "bg-orange-500 text-white"
-                                        : "bg-orange-100 text-orange-800 hover:bg-orange-200"
+                                        ? "bg-blue-500 text-white"
+                                        : "bg-blue-100 text-blue-800 hover:bg-blue-200"
                                 }`}
                             >
                                 {period.charAt(0) + period.slice(1).toLowerCase()}
@@ -130,7 +130,7 @@ const Charts = () => {
 
                 {isLoading ? (
                     <div className="flex justify-center items-center h-64">
-                        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-orange-500 border-b-2"></div>
+                        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-blue-500 border-b-2"></div>
                     </div>
                 ) : (
                     <ResponsiveContainer width="100%" height={400}>
@@ -174,13 +174,13 @@ const Charts = () => {
             </div>
 
             {/* Challenge Status Donut Chart */}
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-orange-100">
-                <h2 className="text-orange-800 font-bold mb-4 text-lg">Challenge Status</h2>
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-blue-100">
+                <h2 className="text-blue-800 font-bold mb-4 text-lg">Challenge Status</h2>
                 <div className="flex flex-col md:flex-row">
                     <div className="relative w-full md:w-2/3 h-80 flex justify-center items-center">
                         {summaryLoading ? (
                             <div className="flex justify-center items-center h-full">
-                                <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-orange-500 border-b-2"></div>
+                                <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-blue-500 border-b-2"></div>
                             </div>
                         ) : summaryError ? (
                             <div className="text-red-500">Error loading summary data</div>
@@ -210,7 +210,7 @@ const Charts = () => {
                         )}
                         <div className="absolute inset-0 flex flex-col items-center justify-center">
                             <span className="text-lg font-medium text-gray-500">Total</span>
-                            <span className="text-3xl font-extrabold text-orange-600">{totalChallenges}</span>
+                            <span className="text-3xl font-extrabold text-blue-600">{totalChallenges}</span>
                         </div>
                     </div>
 
@@ -218,7 +218,7 @@ const Charts = () => {
                         {challengesData.map((item, index) => (
                             <div
                                 key={index}
-                                className="flex items-center p-2 rounded-md hover:bg-orange-50 transition-colors cursor-pointer"
+                                className="flex items-center p-2 rounded-md hover:bg-blue-50 transition-colors cursor-pointer"
                                 onClick={() => handlePieClick(item, index)}
                             >
                                 <div className="w-4 h-4 rounded-full mr-3" style={{ backgroundColor: item.color }}></div>

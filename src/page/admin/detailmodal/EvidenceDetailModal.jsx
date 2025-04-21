@@ -100,7 +100,7 @@ const EvidenceDetailModal = ({ evidence, onClose, onAccept, onReject }) => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-screen overflow-auto">
                 {/* Header */}
-                <div className="border-b px-6 py-4 flex justify-between items-center bg-orange-100">
+                <div className="border-b px-6 py-4 flex justify-between items-center bg-blue-100">
                     <h2 className="text-xl font-semibold text-gray-800">Evidence Detail</h2>
                     <button
                         onClick={onClose}

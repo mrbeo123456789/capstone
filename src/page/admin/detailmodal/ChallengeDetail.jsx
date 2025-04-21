@@ -1,286 +1,247 @@
-import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { FaRegClock } from "react-icons/fa";
+import React, { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { FaRegClock, FaSearch } from "react-icons/fa";
 import { HiUsers } from "react-icons/hi";
 import { CheckCircle, XCircle, ArrowLeft, Ban, UserX } from "lucide-react";
+import toast from "react-hot-toast";
 import Footer from "../../../component/footer.jsx";
 import { useGetChallengeDetailQuery } from "../../../service/challengeService.js";
 import { useReviewChallengeMutation } from "../../../service/adminService.js";
+import {
+    useGetJoinedMembersWithPendingEvidenceQuery,
+    useKickMemberFromChallengeMutation
+} from "../../../service/challengeService.js";
 import EvidenceList from "../list/EvidenceList.jsx";
 
 const ChallengeDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+
+    // Tabs
     const [activeTab, setActiveTab] = useState("info");
-    const { data: challenge, error, isLoading, refetch } = useGetChallengeDetailQuery(id);
-    console.log(challenge);
+
+    // Challenge detail
+    const {
+        data: challenge,
+        error,
+        isLoading,
+        refetch: refetchChallenge
+    } = useGetChallengeDetailQuery(id);
+
+    // Admin review
     const [reviewChallenge] = useReviewChallengeMutation();
 
-    // Modal state
+    // Members + kick
+    const [searchTerm, setSearchTerm] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const {
+        data: membersData = { content: [], totalPages: 1 },
+        isLoading: isMembersLoading,
+        error: membersError,
+        refetch: refetchMembers
+    } = useGetJoinedMembersWithPendingEvidenceQuery({
+        challengeId: id,
+        keyword: searchTerm,
+        page: currentPage - 1,
+        size: 5
+    });
+    const [kickMember, { isLoading: isKicking }] =
+        useKickMemberFromChallengeMutation();
+
+    // Review modal
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [actionType, setActionType] = useState("");
     const [message, setMessage] = useState("");
     const [actionError, setActionError] = useState("");
 
-    const handleGoBack = () => {
-        navigate(-1);
-    };
+    // Navigation
+    const goBack = () => navigate(-1);
+    const goList = () => navigate("/admin/challengemanagement");
 
-    const handleGoToList = () => {
-        navigate('/admin/challengemanagement');
-    };
-
-    // Open modal when user clicks action button
-    const openActionModal = (action) => {
-        setActionType(action);
+    // Review modal handlers
+    const openActionModal = (type) => {
+        setActionType(type);
         setMessage("");
         setActionError("");
         setIsModalOpen(true);
     };
+    const closeModal = () => setIsModalOpen(false);
 
-    // Close modal
-    const closeModal = () => {
-        setIsModalOpen(false);
-        setActionType("");
-        setMessage("");
-        setActionError("");
-    };
-
-    // Xử lý submit modal
     const handleModalSubmit = async () => {
         if (!id || !actionType) return;
-
-        let newStatus;
-        switch (actionType) {
-            case "confirmed":
-                newStatus = "APPROVED";
-                break;
-            case "rejected":
-                newStatus = "REJECTED";
-                break;
-            case "banned":
-                newStatus = "BANNED";
-                break;
-            default:
-                return;
-        }
+        let newStatus = "";
+        if (actionType === "confirmed") newStatus = "APPROVED";
+        else if (actionType === "rejected") newStatus = "REJECTED";
+        else if (actionType === "banned") newStatus = "BANNED";
+        else return;
 
         try {
             setActionError("");
-
-            // Đảm bảo gửi đúng format dữ liệu mà backend mong đợi
-            const reviewRequest = {
-                challengeId: id,
-                status: newStatus,
-                adminNote: message // Include message in request
-            };
-
-            console.log("Sending review request:", reviewRequest);
-            const result = await reviewChallenge(reviewRequest);
-
-            // Check if there is an error in the response
-            if (result.error) {
-                // If there's an error but the status is 200, it's likely a parsing error
-                // but the operation was successful
-                if (result.error.originalStatus === 200) {
-                    console.log("Operation successful despite parsing error");
-                    closeModal();
-                    refetch();
-                } else {
-                    // Real error
-                    console.error(`Error ${actionType} challenge:`, result.error);
-                    setActionError(`Error: ${result.error.data || 'Unknown error occurred'}`);
-                }
+            const payload = { challengeId: id, status: newStatus, adminNote: message };
+            const result = await reviewChallenge(payload);
+            if (result.error && result.error.originalStatus !== 200) {
+                setActionError(`Error: ${result.error.data || "Unknown error"}`);
             } else {
-                // Success
-                console.log(`Challenge ${actionType} successful:`, result.data);
                 closeModal();
-                refetch();
+                refetchChallenge();
             }
-        } catch (error) {
-            console.error(`Error ${actionType} challenge:`, error);
-            setActionError(`Error: ${error.message || 'Unknown error occurred'}`);
+        } catch (e) {
+            setActionError(`Error: ${e.message}`);
         }
     };
 
-    // Hàm lấy tiêu đề cho modal dựa trên action type
     const getModalTitle = () => {
-        switch (actionType) {
-            case "confirmed":
-                return "Approve Challenge";
-            case "rejected":
-                return "Reject Challenge";
-            case "banned":
-                return "Ban Challenge";
-            default:
-                return "Review Challenge";
-        }
+        if (actionType === "confirmed") return "Approve Challenge";
+        if (actionType === "rejected")  return "Reject Challenge";
+        if (actionType === "banned")    return "Ban Challenge";
+        return "Review Challenge";
     };
-
-    // Hàm lấy placeholder text cho message input dựa trên action type
     const getMessagePlaceholder = () => {
-        switch (actionType) {
-            case "confirmed":
-                return "Enter approval message for the challenge owner...";
-            case "rejected":
-                return "Enter reason for rejection...";
-            case "banned":
-                return "Enter reason for banning this challenge...";
-            default:
-                return "Enter message for the user...";
+        if (actionType === "confirmed") return "Enter approval message...";
+        if (actionType === "rejected")  return "Enter reason for rejection...";
+        if (actionType === "banned")    return "Enter reason for banning...";
+        return "";
+    };
+
+    // Kick handler
+    const handleKick = async (memberId) => {
+        // Add validation to prevent undefined memberId
+        if (!memberId) {
+            toast.error("Invalid member ID");
+            return;
+        }
+
+        try {
+            const result = await kickMember({
+                challengeId: id,
+                targetMemberId: memberId
+            });
+
+            // Check if there's a parsing error but status is 200 (success)
+            if (result.error && result.error.status === 'PARSING_ERROR' && result.error.originalStatus === 200) {
+                // This is actually a success case with non-JSON response
+                toast.success("Member kicked successfully");
+
+                // Refresh both the members list AND the challenge data
+                refetchMembers();
+                refetchChallenge();
+            } else if (result.error) {
+                // This is a real error
+                throw result.error;
+            } else {
+                // Normal success case
+                toast.success("Member kicked successfully");
+                refetchMembers();
+                refetchChallenge();
+            }
+        } catch (err) {
+            console.error(err);
+            toast.error(err.data || err.error || "Failed to kick member");
         }
     };
 
-    const kickParticipant = (participantId) => {
-        // Implement kick member functionality here
-        console.log(`Kicking participant with ID: ${participantId}`);
-        // Add actual API call to kick participant
-        alert(`Participant ${participantId} has been kicked from the challenge`);
-    };
+    // Filter search
+    const filteredMembers = membersData.content.filter((m) =>
+        m.fullName.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
+    // Loading/Error screens
     if (isLoading) {
         return (
             <div className="flex items-center justify-center min-h-screen bg-gray-100">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-indigo-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Loading challenge information...</p>
-                </div>
+                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-indigo-600"/>
+                <p className="mt-4 text-gray-600">Loading challenge...</p>
             </div>
         );
     }
-
-    if (error) {
+    if (error || !challenge) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-100">
-                <div className="bg-white p-6 rounded-lg shadow-md">
-                    <h2 className="text-red-600 text-xl font-bold mb-2">Error</h2>
-                    <p className="text-gray-700">Error loading challenge information!</p>
-                    <button
-                        className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded"
-                        onClick={handleGoBack}
-                    >
-                        Go back
+            <div className="flex items-center justify-center min-h-screen bg-gray-100">
+                <div className="bg-white p-6 rounded shadow-md text-center">
+                    <h2 className="text-red-600 text-xl mb-2">Error</h2>
+                    <p>Could not load challenge #{id}.</p>
+                    <button onClick={goBack} className="mt-4 bg-indigo-600 text-white px-4 py-2 rounded">
+                        Go Back
                     </button>
                 </div>
             </div>
         );
     }
 
-    if (!challenge) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-100">
-                <div className="bg-white p-6 rounded-lg shadow-md">
-                    <h2 className="text-indigo-600 text-xl font-bold mb-2">Not Found</h2>
-                    <p className="text-gray-700">Could not find challenge with ID {id}</p>
-                    <button
-                        className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded"
-                        onClick={handleGoBack}
-                    >
-                        Go back
-                    </button>
-                </div>
-            </div>
-        );
+    // Determine available tabs based on challenge status
+    const isMembersEvidenceHidden =
+        challenge.challengeStatus.toLowerCase() === "pending" ||
+        challenge.challengeStatus.toLowerCase() === "upcoming";
+
+    // Available tabs based on status
+    const availableTabs = ["info", "rules"];
+    if (!isMembersEvidenceHidden) {
+        availableTabs.push("members", "evidence");
+    }
+
+    // Ensure active tab is valid
+    if (!availableTabs.includes(activeTab)) {
+        setActiveTab("info");
     }
 
     return (
-        <div className="flex flex-col min-h-screen bg-gradient-to-br from-orange-100 to-yellow-100">
-            {/* Return button */}
+        <div className="flex flex-col min-h-screen bg-gradient-to-br from-blue-100 to-yellow-100">
+            {/* Header */}
             <div className="p-4">
                 <button
-                    onClick={handleGoToList}
-                    className="flex items-center px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 shadow-md transition-colors"
+                    onClick={goList}
+                    className="flex items-center px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                 >
-                    <ArrowLeft size={18} className="mr-2" />
-                    Return to list
+                    <ArrowLeft size={18} className="mr-2"/> Return to list
                 </button>
             </div>
 
+            {/* Main Content */}
             <div className="p-6 flex flex-col items-center w-full">
-                {/* Challenge Banner Section */}
-                <div className="w-full flex flex-col md:flex-row bg-white rounded-lg shadow-lg overflow-hidden">
+                {/* Banner & Info */}
+                <div className="w-full flex flex-col md:flex-row bg-white rounded shadow-lg overflow-hidden">
                     {challenge.picture ? (
-                        <img
-                            src={challenge.picture}
-                            alt={challenge.name}
-                            className="w-full md:w-2/3 object-cover"
-                        />
+                        <img src={challenge.picture} alt="" className="w-full md:w-2/3 object-cover"/>
                     ) : (
-                        <div className="w-full md:w-2/3 bg-gray-200 flex items-center justify-center h-64">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-24 w-24 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                        </div>
+                        <div className="w-full md:w-2/3 bg-gray-200 h-64"/>
                     )}
                     <div className="bg-gray-100 p-6 md:w-1/3 flex flex-col justify-between">
-                        <h2 className="text-xl font-bold text-gray-900">CHALLENGE INFO</h2>
-                        <div className="mt-2 text-sm text-gray-700">
-                            <p>Challenge Type: {challenge.challengeType}</p>
-                            <p>Verification: {challenge.verificationType ? challenge.verificationType.toString() : "N/A"}</p>
-                            <p>Participation: {challenge.participationType ? challenge.participationType.toString() : "N/A"}</p>
+                        {/* Changed from CHALLENGE INFO to challenge name */}
+                        <h2 className="text-xl font-bold">{challenge.name}</h2>
+                        <div className="mt-2 text-sm text-gray-700 space-y-1">
+                            {/* Only keeping type, duration, participants, and action */}
+                            <p>Type: {challenge.challengeType}</p>
                             <p>Duration: {challenge.duration} days</p>
-                        </div>
-                        <div className="mt-4 flex items-center">
-                            <FaRegClock className="text-gray-500 mr-2" />
-                            <p className="text-gray-700 text-sm">
-                                {new Date(challenge.startDate).toLocaleDateString('vi-VN')} - {new Date(challenge.endDate).toLocaleDateString('vi-VN')}
-                            </p>
-                        </div>
-                        <div className="mt-4 flex items-center text-lg font-semibold text-orange-500">
-                            <HiUsers className="mr-2" />
-                            <p>{challenge.participantCount} participants</p>
+                            <div className="mt-4 flex items-center text-blue-500">
+                                <HiUsers className="mr-2"/> {challenge.participantCount} participants
+                            </div>
                         </div>
                         <div className="mt-4">
                             {(() => {
-                                const status = challenge.challengeStatus
-                                    ? challenge.challengeStatus.toString().toLowerCase()
-                                    : "";
-                                console.log(status);
-                                if (status === "banned" || status === "finish" || status === "cancel") {
-                                    return null;
-                                }
-                                if (status === "pending") {
+                                const st = challenge.challengeStatus.toLowerCase();
+                                if (st === "pending") {
                                     return (
                                         <div className="flex space-x-2">
                                             <button
-                                                className="p-2 bg-green-100 text-green-600 rounded-md hover:bg-green-200 transition-colors"
                                                 onClick={() => openActionModal("confirmed")}
-                                                title="Approve Challenge"
-                                            >
-                                                <CheckCircle size={18} />
-                                            </button>
+                                                className="p-2 bg-green-100 text-green-600 rounded hover:bg-green-200"
+                                                title="Approve"
+                                            ><CheckCircle size={18}/></button>
                                             <button
-                                                className="p-2 bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition-colors"
                                                 onClick={() => openActionModal("rejected")}
-                                                title="Reject Challenge"
-                                            >
-                                                <XCircle size={18} />
-                                            </button>
+                                                className="p-2 bg-red-100 text-red-600 rounded hover:bg-red-200"
+                                                title="Reject"
+                                            ><XCircle size={18}/></button>
                                         </div>
                                     );
                                 }
-                                if (status === "rejected") {
-                                    return (
-                                        <div className="flex space-x-2">
-                                            <button
-                                                className="p-2 bg-green-100 text-green-600 rounded-md hover:bg-green-200 transition-colors"
-                                                onClick={() => openActionModal("confirmed")}
-                                                title="Approve Challenge"
-                                            >
-                                                <CheckCircle size={18} />
-                                            </button>
-                                        </div>
-                                    );
-                                }
-                                if (status === "ongoing" || status === "upcoming") {
+                                if (st === "ongoing" || st === "upcoming") {
                                     return (
                                         <button
-                                            className="p-2 bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition-colors"
                                             onClick={() => openActionModal("banned")}
-                                            title="Ban Challenge"
-                                        >
-                                            <Ban size={18} />
-                                        </button>
+                                            className="p-2 bg-red-100 text-red-600 rounded hover:bg-red-200"
+                                            title="Ban"
+                                        ><Ban size={18}/></button>
                                     );
                                 }
                                 return null;
@@ -289,16 +250,16 @@ const ChallengeDetail = () => {
                     </div>
                 </div>
 
-                {/* Tabs Section */}
-                <div className="mt-6 w-full">
+                {/* Tabs */}
+                <div className="mt-6 w-full max-w-4xl">
                     <div className="flex border-b">
-                        {["info", "rules", "members", "evidence"].map((tab) => (
+                        {availableTabs.map((tab) => (
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
-                                className={`flex-1 text-center py-3 font-semibold ${
+                                className={`flex-1 py-3 font-semibold text-center ${
                                     activeTab === tab
-                                        ? "text-orange-500 border-b-4 border-orange-500"
+                                        ? "text-blue-500 border-b-4 border-blue-500"
                                         : "text-gray-500 hover:text-gray-800"
                                 }`}
                             >
@@ -314,151 +275,195 @@ const ChallengeDetail = () => {
                     </div>
 
                     {/* Tab Content */}
-                    {activeTab === "evidence" ? (
-                        // Evidence Tab: Chuyển toàn bộ đối tượng challenge sang EvidenceList
-                        <div className="w-full mt-4">
-                            <EvidenceList challengeId={challenge.id} />
+                    {activeTab === "info" && (
+                        <div className="p-6 bg-white shadow-md rounded">
+                            <h2 className="text-2xl font-bold mb-2">{challenge.name}</h2>
+                            <p className="text-gray-500 mb-4">
+                                {new Date(challenge.startDate).toLocaleDateString("vi-VN")} –{" "}
+                                {new Date(challenge.endDate).toLocaleDateString("vi-VN")}
+                            </p>
+                            {/* All challenge info is now displayed here */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                <div>
+                                    <h3 className="font-semibold mb-1">Challenge Type</h3>
+                                    <p className="text-gray-700">{challenge.challengeType}</p>
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold mb-1">Verification Type</h3>
+                                    <p className="text-gray-700">{challenge.verificationType}</p>
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold mb-1">Participation Type</h3>
+                                    <p className="text-gray-700">{challenge.participationType}</p>
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold mb-1">Duration</h3>
+                                    <p className="text-gray-700">{challenge.duration} days</p>
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold mb-1">Status</h3>
+                                    <p className="text-gray-700">{challenge.challengeStatus}</p>
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold mb-1">Participants</h3>
+                                    <p className="text-gray-700">{challenge.participantCount}</p>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 className="font-semibold mb-1">Description</h3>
+                                <p className="text-gray-700">{challenge.description}</p>
+                            </div>
                         </div>
-                    ) : (
-                        <div className="p-6 bg-white shadow-md rounded-lg mt-4 max-w-4xl mx-auto">
-                            {activeTab === "info" && (
-                                <div>
-                                    <h2 className="text-2xl font-bold text-gray-900">{challenge.name}</h2>
-                                    <p className="text-gray-500 mt-2">
-                                        {new Date(challenge.startDate).toLocaleDateString('vi-VN')} - {new Date(challenge.endDate).toLocaleDateString('vi-VN')}
-                                    </p>
-                                    <div className="mt-6 border-t pt-4">
-                                        <h3 className="text-lg font-semibold text-gray-800">DESCRIPTION</h3>
-                                        <p className="text-gray-700 mt-2">{challenge.description}</p>
-                                    </div>
-                                    <div className="mt-6 border-t pt-4">
-                                        <h3 className="text-lg font-semibold text-gray-800">SUMMARY</h3>
-                                        <p className="text-gray-700 mt-2">
-                                            {challenge.summary || "No summary provided for this challenge."}
-                                        </p>
-                                    </div>
-                                </div>
-                            )}
+                    )}
 
-                            {activeTab === "rules" && (
-                                <div>
-                                    <h2 className="text-2xl font-bold text-gray-900">Challenge Rules</h2>
-                                    <div className="mt-4">
-                                        <p className="text-gray-500 italic">No rules have been specified for this challenge.</p>
-                                    </div>
-                                </div>
-                            )}
+                    {activeTab === "rules" && (
+                        <div className="p-6 bg-white shadow-md rounded text-gray-500 italic">
+                            No rules specified for this challenge.
+                        </div>
+                    )}
 
-                            {activeTab === "members" && (
-                                <div>
-                                    <h2 className="text-2xl font-bold text-gray-900 mb-4">Participant members</h2>
-                                    {/* Sử dụng dữ liệu mock cho members */}
-                                    <div className="overflow-x-auto">
-                                        <table className="min-w-full bg-white">
-                                            <thead>
-                                            <tr className="bg-orange-100 text-gray-700">
-                                                <th className="py-3 px-4 text-left">Rank</th>
-                                                <th className="py-3 px-4 text-left">Participant</th>
-                                                <th className="py-3 px-4 text-center">Actions</th>
-                                                <th className="py-3 px-4 text-right">Score</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            {[
-                                                { id: 1, name: "Nguyễn Văn A", score: 1250, rank: 1, avatar: "https://i.pravatar.cc/150?img=1" },
-                                                { id: 2, name: "Trần Thị B", score: 980, rank: 2, avatar: "https://i.pravatar.cc/150?img=2" },
-                                                { id: 3, name: "Lê Văn C", score: 875, rank: 3, avatar: "https://i.pravatar.cc/150?img=3" },
-                                                { id: 4, name: "Phạm Thị D", score: 720, rank: 4, avatar: "https://i.pravatar.cc/150?img=4" },
-                                                { id: 5, name: "Hoàng Văn E", score: 650, rank: 5, avatar: "https://i.pravatar.cc/150?img=5" },
-                                            ].map((participant) => (
-                                                <tr key={participant.id} className="border-b hover:bg-gray-50">
-                                                    <td className="py-3 px-4 font-medium">#{participant.rank}</td>
-                                                    <td className="py-3 px-4">
-                                                        <div className="flex items-center">
-                                                            <img src={participant.avatar} alt={participant.name} className="h-8 w-8 rounded-full mr-3" />
-                                                            <span>{participant.name}</span>
-                                                        </div>
-                                                    </td>
-                                                    <td className="py-3 px-4 text-center">
-                                                        <button
-                                                            onClick={() => kickParticipant(participant.id)}
-                                                            className="p-2 bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition-colors"
-                                                            title="Kick member"
-                                                        >
-                                                            <UserX size={18} />
-                                                        </button>
-                                                    </td>
-                                                    <td className="py-3 px-4 text-right font-semibold">{participant.score}</td>
-                                                </tr>
-                                            ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            )}
+                    {activeTab === "members" && !isMembersEvidenceHidden && (
+                        <div className="p-6 bg-white shadow-md rounded">
+                            <h2 className="text-2xl font-bold mb-4">Participant Members</h2>
+
+                            {/* Search */}
+                            <div className="mb-4 flex items-center border rounded px-2 py-1">
+                                <FaSearch className="text-gray-500 mr-2"/>
+                                <input
+                                    type="text"
+                                    placeholder="Search member..."
+                                    className="w-full outline-none"
+                                    value={searchTerm}
+                                    onChange={(e) => {
+                                        setSearchTerm(e.target.value);
+                                        setCurrentPage(1);
+                                    }}
+                                />
+                            </div>
+
+                            {/* Member Cards */}
+                            <div className="space-y-4">
+                                {isMembersLoading ? (
+                                    <p className="text-center">Loading members…</p>
+                                ) : membersError ? (
+                                    <p className="text-center text-red-600">Error loading members</p>
+                                ) : filteredMembers.length === 0 ? (
+                                    <p className="text-center text-gray-500">No members found</p>
+                                ) : (
+                                    filteredMembers.map((m) => (
+                                        <div
+                                            key={m.id}
+                                            className="flex items-center justify-between bg-gray-50 p-3 rounded shadow-sm"
+                                        >
+                                            <div className="flex items-center space-x-3">
+                                                <img
+                                                    src={m.avatar}
+                                                    alt={m.fullName}
+                                                    className="w-12 h-12 rounded-full"
+                                                />
+                                                <div>
+                                                    <p className="font-semibold">{m.fullName}</p>
+                                                    <p className="text-sm text-gray-600">{m.status}</p>
+                                                </div>
+                                            </div>
+                                            <button
+                                                key={`kick-${m.id}`}
+                                                onClick={() => handleKick(m.id)}
+                                                disabled={isKicking}
+                                                className="p-2 bg-red-100 text-red-600 rounded hover:bg-red-200"
+                                                title="Kick member"
+                                            >
+                                                <UserX size={18}/>
+                                            </button>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+
+                            {/* Pagination */}
+                            <div className="flex justify-center mt-6 space-x-1">
+                                {Array.from({ length: membersData.totalPages }, (_, i) => (
+                                    <button
+                                        key={`page-${i+1}`}
+                                        onClick={() => setCurrentPage(i + 1)}
+                                        className={`px-3 py-1 rounded ${
+                                            currentPage === i + 1
+                                                ? "bg-blue-500 text-white"
+                                                : "bg-gray-200 hover:bg-gray-300"
+                                        }`}
+                                    >
+                                        {i + 1}
+                                    </button>
+                                ))}
+                                {currentPage < membersData.totalPages && (
+                                    <button
+                                        key="next-page"
+                                        onClick={() => setCurrentPage(currentPage + 1)}
+                                        className="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded"
+                                    >
+                                        &gt;
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === "evidence" && !isMembersEvidenceHidden && (
+                        <div className="mt-4">
+                            <EvidenceList challengeId={challenge.id}/>
                         </div>
                     )}
                 </div>
             </div>
 
-            {/* Modal Component */}
+            {/* Review Modal */}
             {isModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
-                        <div className="p-6 border-b border-orange-100">
-                            <h3 className="text-lg font-semibold text-orange-700">{getModalTitle()}</h3>
+                        <div className="p-6 border-b">
+                            <h3 className="text-lg font-semibold text-blue-700">{getModalTitle()}</h3>
                         </div>
                         <div className="p-6">
-                            <div className="mb-4">
-                                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
-                                    Message to User
-                                </label>
-                                <textarea
-                                    id="message"
-                                    rows="4"
-                                    className="w-full border border-orange-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-orange-300"
-                                    placeholder={getMessagePlaceholder()}
-                                    value={message}
-                                    onChange={(e) => setMessage(e.target.value)}
-                                ></textarea>
-                            </div>
-                            <p className="text-sm text-gray-500 mb-4">
-                                {actionType === "confirmed" && "This message will be sent to the user when the challenge is approved."}
-                                {actionType === "rejected" && "This message will explain to the user why their challenge was rejected."}
-                                {actionType === "banned" && "This message will inform the user that their challenge has been banned."}
-                            </p>
-
+              <textarea
+                  rows={4}
+                  className="w-full border rounded p-3 focus:outline-none"
+                  placeholder={getMessagePlaceholder()}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+              />
                             {actionError && (
-                                <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
+                                <div className="mt-4 p-3 bg-red-100 text-red-700 rounded">
                                     {actionError}
                                 </div>
                             )}
                         </div>
-                        <div className="p-4 bg-gray-50 rounded-b-lg flex justify-end space-x-3">
+                        <div className="flex justify-end p-4 bg-gray-50 space-x-3">
                             <button
-                                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100"
+                                className="px-4 py-2 border rounded text-gray-700 hover:bg-gray-100"
                                 onClick={closeModal}
                             >
                                 Cancel
                             </button>
                             <button
-                                className={`px-4 py-2 rounded-md text-white ${
+                                className={`px-4 py-2 rounded text-white ${
                                     actionType === "confirmed"
                                         ? "bg-green-600 hover:bg-green-700"
-                                        : actionType === "rejected" || actionType === "banned"
-                                            ? "bg-red-600 hover:bg-red-700"
-                                            : "bg-orange-600 hover:bg-orange-700"
+                                        : "bg-red-600 hover:bg-red-700"
                                 }`}
                                 onClick={handleModalSubmit}
                             >
-                                {actionType === "confirmed" ? "Approve" : actionType === "rejected" ? "Reject" : actionType === "banned" ? "Ban" : "Submit"}
+                                {actionType === "confirmed"
+                                    ? "Approve"
+                                    : actionType === "rejected"
+                                        ? "Reject"
+                                        : "Ban"}
                             </button>
                         </div>
                     </div>
                 </div>
             )}
 
-            <Footer />
+            <Footer/>
         </div>
     );
 };
