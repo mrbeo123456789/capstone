@@ -3,6 +3,7 @@ package org.capstone.backend.dto.challenge;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.capstone.backend.utils.enums.ChallengeRole;
 import org.capstone.backend.utils.enums.ChallengeStatus;
 import org.capstone.backend.utils.enums.ParticipationType;
 import org.capstone.backend.utils.enums.VerificationType;
@@ -28,4 +29,5 @@ public class ChallengeDetailResponse {
     private ChallengeStatus challengeStatus;
     private VerificationType verificationType;
     private ParticipationType participationType;
+    private ChallengeRole role;
 }

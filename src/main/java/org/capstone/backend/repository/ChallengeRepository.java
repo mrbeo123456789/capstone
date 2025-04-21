@@ -93,15 +93,20 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
         DATEDIFF(c.endDate, c.startDate), 
         c.status,                
         c.verificationType,
-        c.participationType
+        c.participationType,
+        (
+            SELECT cm.role 
+            FROM ChallengeMember cm 
+            WHERE cm.challenge.id = c.id AND cm.member.id = :memberId
+        )
     )
     FROM Challenge c
     WHERE c.id = :challengeId
     """)
     ChallengeDetailResponse findChallengeDetailByIdAndMemberId(
             @Param("challengeId") Long challengeId,
-            @Param("memberId") Long memberId);
-
+            @Param("memberId") Long memberId
+    );
 
 
     @Query("SELECT c.id FROM Challenge c " +

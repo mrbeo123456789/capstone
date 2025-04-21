@@ -133,4 +133,25 @@ public class ChallengeController {
         return ResponseEntity.ok(upcomingChallenges);
     }
 
+    @PutMapping(value = "/{challengeId}/update", consumes = {"multipart/form-data"})
+    public ResponseEntity<String> updateChallenge(
+            @PathVariable Long challengeId,
+            @Validated @ModelAttribute ChallengeRequest request,
+            @RequestParam(value = "picture", required = false) MultipartFile picture,
+            @RequestParam(value = "banner", required = false) MultipartFile banner,
+            @RequestParam(value = "pictureUrl", required = false) String pictureUrl,
+            @RequestParam(value = "bannerUrl", required = false) String bannerUrl
+    ) {
+        String resultMessage = challengeService.updateChallenge(
+                challengeId,
+                request,
+                picture,
+                banner,
+                pictureUrl,
+                bannerUrl
+        );
+        return ResponseEntity.ok(resultMessage);
+    }
+
+
 }

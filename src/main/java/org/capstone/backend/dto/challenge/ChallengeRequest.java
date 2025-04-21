@@ -18,6 +18,7 @@ public class ChallengeRequest {
     private String summary;
 
     @NotBlank(message = "Description cannot be empty")
+    @Size(min = 10 , message = "Description cannot be under 10 character")
     private String description;
 
 

@@ -481,6 +481,47 @@ public class ChallengeServiceImpl implements ChallengeService {
         return challengePage.map(this::convertToResponse);
     }
 
+    @Override
+    @Transactional
+    public String updateChallenge(Long challengeId, ChallengeRequest request, MultipartFile picture, MultipartFile banner, String pictureUrl, String bannerUrl) {
+        Challenge challenge = challengeRepository.findById(challengeId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, CHALLENGE_NOT_FOUND_MSG));
+
+        ChallengeType challengeType = challengeTypeRepository.findById(request.getChallengeTypeId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Loại thử thách không hợp lệ."));
+
+        challenge.setName(request.getName());
+        challenge.setSummary(request.getSummary());
+        challenge.setStartDate(request.getStartDate());
+        challenge.setEndDate(request.getEndDate());
+        challenge.setPrivacy(request.getPrivacy());
+        challenge.setVerificationType(request.getVerificationType());
+        challenge.setParticipationType(request.getParticipationType());
+        challenge.setChallengeType(challengeType);
+        challenge.setMaxParticipants(request.getMaxParticipants());
+        challenge.setDescription(request.getDescription());
+
+        // ✅ Handle picture
+        if (picture != null && !picture.isEmpty()) {
+            String pictureUrlUploaded = uploadImageIfPresent(picture);
+            challenge.setPicture(pictureUrlUploaded);
+        } else if (pictureUrl != null && !pictureUrl.isBlank()) {
+            challenge.setPicture(pictureUrl);
+        }
+
+        // ✅ Handle banner
+        if (banner != null && !banner.isEmpty()) {
+            String bannerUrlUploaded = uploadImageIfPresent(banner);
+            challenge.setBanner(bannerUrlUploaded);
+        } else if (bannerUrl != null && !bannerUrl.isBlank()) {
+            challenge.setBanner(bannerUrl);
+        }
+
+        challengeRepository.save(challenge);
+        return "Thử thách đã được cập nhật thành công.";
+    }
+
+
     private ChallengeResponse convertToResponse(Challenge challenge) {
         return new ChallengeResponse(
                 challenge.getId(),
