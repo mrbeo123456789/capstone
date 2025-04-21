@@ -8,29 +8,32 @@ import {
     useGetChallengeDetailQuery,
     useJoinChallengeMutation,
 } from "../../service/challengeService";
-import toast from "react-hot-toast";
+import {toast} from "react-toastify";
 import { useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const ChallengeDetail = () => {
     const [activeTab, setActiveTab] = useState("info");
     const { id } = useParams();
+    const { t } = useTranslation();
     const [joinChallenge, { isLoading }] = useJoinChallengeMutation();
+
     const {
         data: challenge,
         isLoading: isLoadingDetail,
         error,
     } = useGetChallengeDetailQuery(id);
 
-    if (isLoadingDetail) return <p>Loading...</p>;
-    if (error) return <p>Error loading challenge detail</p>;
+    if (isLoadingDetail) return <p>{t("loading")}</p>;
+    if (error) return <p>{t("error")}</p>;
 
     const handleJoin = async () => {
         try {
             await joinChallenge(parseInt(id)).unwrap();
-            toast.success("Joined challenge successfully!");
+            toast.success(t("ChallengeDetail.joinSuccess"));
         } catch (err) {
             console.error(err);
-            toast.error("Failed to join challenge.");
+            toast.error(t("ChallengeDetail.joinFail"));
         }
     };
 
@@ -50,23 +53,24 @@ const ChallengeDetail = () => {
                     className="object-scale-down w-full max-h-[490px]"
                 />
                 <div className="bg-gray-100 p-6 w-full flex flex-col justify-between">
-                    <div className="flex justify-between">
-                        <h2 className="text-xl font-bold text-gray-900">MIỄN PHÍ</h2>
+                    <div className="flex justify-end">
                         <div className="bg-orange-500 text-white font-semibold text-center rounded-lg">
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleJoin();
-                                }}
-                                className="bg-orange-500 text-white rounded hover:bg-orange-600 p-3"
-                                disabled={isLoading || challenge.joined}
-                            >
-                                {challenge.joined
-                                    ? "Đã tham gia"
-                                    : isLoading
-                                        ? "Joining..."
-                                        : "Tham gia thử thách"}
-                            </button>
+                            {challenge.joined ? (
+                                <p className="bg-green-500 px-4 py-3 rounded">{t("ChallengeDetail.joinedStatus")}</p>
+                            ) : (
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleJoin();
+                                    }}
+                                    className="bg-orange-500 text-white rounded hover:bg-orange-600 p-3"
+                                    disabled={isLoading}
+                                >
+                                    {isLoading
+                                        ? t("ChallengeDetail.joining")
+                                        : t("ChallengeDetail.joinButton")}
+                                </button>
+                            )}
                         </div>
                     </div>
                     <div className="mt-4 flex items-center">
@@ -78,23 +82,29 @@ const ChallengeDetail = () => {
 
                     <div className="mt-4 flex items-center">
                         <MdOutlineCategory className="text-gray-500 mr-2" />
-                        <p className="text-gray-700 text-sm">Thể loại: {challenge.challengeType}</p>
+                        <p className="text-gray-700 text-sm">
+                            {t("ChallengeDetail.category")}: {challenge.challengeType}
+                        </p>
                     </div>
 
                     <div className="mt-4 flex items-center">
                         <FaRunning className="text-gray-500 mr-2" />
-                        <p className="text-gray-700 text-sm">Hình thức: {challenge.participationType}</p>
+                        <p className="text-gray-700 text-sm">
+                            {t("ChallengeDetail.participation")}: {challenge.participationType}
+                        </p>
                     </div>
 
                     <div className="mt-4 flex items-center">
                         <IoIosPeople className="text-gray-500 mr-2" />
-                        <p className="text-gray-700 text-sm">Xác minh: {challenge.verificationType}</p>
+                        <p className="text-gray-700 text-sm">
+                            {t("ChallengeDetail.verification")}: {challenge.verificationType}
+                        </p>
                     </div>
 
-                    <h3 className="text-gray-800 font-semibold mt-6">TỔNG NGƯỜI THAM GIA</h3>
+                    <h3 className="text-gray-800 font-semibold mt-6">{t("ChallengeDetail.totalParticipants")}</h3>
                     <div className="mt-2 flex items-center text-lg font-semibold text-orange-500">
                         <HiUsers className="mr-2" />
-                        <p>{challenge.participantCount} người đã tham gia</p>
+                        <p>{challenge.participantCount} {t("ChallengeDetail.peopleJoined")}</p>
                     </div>
                 </div>
             </div>
@@ -112,13 +122,7 @@ const ChallengeDetail = () => {
                                     : "text-gray-500 hover:text-gray-800"
                             }`}
                         >
-                            {tab === "info"
-                                ? "Thông tin"
-                                : tab === "rules"
-                                    ? "Quy định"
-                                    : tab === "team"
-                                        ? "BXH Đội"
-                                        : "BXH Cá nhân"}
+                            {t(`ChallengeDetail.tab.${tab}`)}
                         </button>
                     ))}
                 </div>
@@ -131,10 +135,8 @@ const ChallengeDetail = () => {
                                 {formatDate(challenge.startDate)} - {formatDate(challenge.endDate)}
                             </p>
                             <p className="text-sm text-gray-700 mt-2">
-                                Loại thử thách:{" "}
-                                <span className="text-orange-500 font-semibold">
-                  {challenge.challengeType}
-                </span>
+                                {t("ChallengeDetail.category")}:
+                                <span className="text-orange-500 font-semibold"> {challenge.challengeType}</span>
                             </p>
                             <div
                                 className="mt-6 border-t pt-4 text-gray-700"
@@ -144,13 +146,13 @@ const ChallengeDetail = () => {
                     )}
 
                     {activeTab === "rules" && (
-                        <p className="text-gray-700">Quy định chi tiết của thử thách sẽ hiển thị tại đây.</p>
+                        <p className="text-gray-700">{t("ChallengeDetail.rulesText")}</p>
                     )}
                     {activeTab === "team" && (
-                        <p className="text-gray-700">Bảng xếp hạng đội sẽ hiển thị tại đây.</p>
+                        <p className="text-gray-700">{t("ChallengeDetail.teamRanking")}</p>
                     )}
                     {activeTab === "individual" && (
-                        <p className="text-gray-700">Bảng xếp hạng cá nhân sẽ hiển thị tại đây.</p>
+                        <p className="text-gray-700">{t("ChallengeDetail.individualRanking")}</p>
                     )}
                 </div>
             </div>
