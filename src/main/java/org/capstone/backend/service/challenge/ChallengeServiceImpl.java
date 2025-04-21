@@ -459,11 +459,7 @@ public class ChallengeServiceImpl implements ChallengeService {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Giá trị trạng thái không hợp lệ: " + status);
     }
 
-    public Page<MemberSubmissionProjection> getMembersWithPendingEvidence(
-            Long challengeId, String keyword, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return challengeMemberRepository.findMembersWithPendingEvidence(challengeId, keyword, pageable);
-    }
+
     @Override
     public Page<MemberSubmissionProjection> getJoinedMembersWithPendingEvidence(
             Long challengeId, String keyword, int page, int size) {

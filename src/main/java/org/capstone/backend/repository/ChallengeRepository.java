@@ -54,18 +54,20 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
 
 
     @Query("""
-   SELECT new org.capstone.backend.dto.challenge.MyChallengeBaseResponse(
-       c.id, c.name, c.picture, c.status, cm.role, c.startDate, c.endDate
-   )
-   FROM ChallengeMember cm
-   JOIN cm.challenge c
-   WHERE cm.member.id = :memberId
-   AND (:role IS NULL OR cm.role = :role) 
-   ORDER BY c.updatedAt DESC
-""")
-    List<MyChallengeBaseResponse> findChallengesByMemberAndRole(@Param("memberId") Long memberId,
-                                                                @Param("role") ChallengeRole role);
-    ;
+       SELECT new org.capstone.backend.dto.challenge.MyChallengeBaseResponse(
+           c.id, c.name, c.picture, c.status, cm.role, c.startDate, c.endDate
+       )
+       FROM ChallengeMember cm
+       JOIN cm.challenge c
+       WHERE cm.member.id = :memberId
+         AND cm.status = org.capstone.backend.utils.enums.ChallengeMemberStatus.JOINED
+         AND (:role IS NULL OR cm.role = :role)
+       ORDER BY c.updatedAt DESC
+    """)
+    List<MyChallengeBaseResponse> findChallengesByMemberAndRole(
+            @Param("memberId") Long memberId,
+            @Param("role") ChallengeRole role
+    );
 
     @Query("""
     SELECT new org.capstone.backend.dto.challenge.ChallengeDetailResponse(

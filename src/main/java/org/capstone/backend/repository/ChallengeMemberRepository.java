@@ -59,7 +59,9 @@ public interface ChallengeMemberRepository extends JpaRepository<ChallengeMember
                     @Param("newRole") ChallengeRole newRole);
     int countByMemberId(Long memberId);
     int countByMemberIdAndIsCompletedTrue(Long memberId);
-    List<ChallengeMember> findByChallengeId(Long challengeId);
+    // ChallengeMemberRepository.java
+    @Query("SELECT cm FROM ChallengeMember cm WHERE cm.challenge.id = :challengeId AND cm.status = 'JOINED'")
+    List<ChallengeMember> findJoinedMembersByChallengeId(@Param("challengeId") Long challengeId);
     @Query("SELECT cm.member.id FROM ChallengeMember cm WHERE cm.challenge.id = :challengeId AND cm.status = 'JOINED'")
     List<Long> findMemberIdsByChallengeId(@Param("challengeId") Long challengeId);
     List<ChallengeMember> findByChallenge(Challenge challenge);

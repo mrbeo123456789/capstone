@@ -65,13 +65,13 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) {
         seedAccountsAndMembers();
-         seedChallengeTypes();
-        seedInterests();
+        seedChallengeTypes();
+       // seedInterests();
       // seedChallenges();
-       // seedChallengeMembers();
-      //  seedGroups();              // Seed cho Groups nếu chưa có dữ liệu
-       // seedGroupChallenges();     // Seed cho GroupChallenge
-      //  seedTestEvidenceAndReview();
+      //  seedChallengeMembers();
+    //   seedGroups();              // Seed cho Groups nếu chưa có dữ liệu
+      //  seedGroupChallenges();     // Seed cho GroupChallenge
+     //  seedTestEvidenceAndReview();
         System.out.println("✅ Data seeding completed successfully.");
     }
 
@@ -302,19 +302,12 @@ public class DataInitializer implements CommandLineRunner {
                     .member(submitter)
                     .evidenceUrl("https://example.com/test-video-" + submitter.getId() + ".mp4")
                     .status(EvidenceStatus.PENDING)
-                    .submittedAt(LocalDateTime.now().minusDays(random.nextInt(30)))
+                    .submittedAt(LocalDateTime.now().minusDays(1))
                     .updatedAt(LocalDateTime.now())
                     .build();
             evidenceRepository.save(evidence);
 
-            EvidenceReport report = EvidenceReport.builder()
-                    .evidence(evidence)
-                    .reviewer(reviewer)
-                    .feedback("Nội dung đạt yêu cầu.")
-                    .isApproved(true)
-                    .updatedBy(reviewer.getId())
-                    .build();
-            evidenceReportRepository.save(report);
+
         }
 
         System.out.println("✅ Seeded 1 evidence per user.");

@@ -72,7 +72,7 @@ public class Schedule {
     }
 
     // ==== 00:05 – Assign daily cross‑check reviewers ====
-    @Scheduled(cron = "0 5 0 * * *", zone = "Asia/Bangkok")
+   // @Scheduled(cron = "0 * * * * *", zone = "Asia/Bangkok")
     public void assignDailyReviewers() {
         challengeRepository
                 .findCrossCheckChallengesHappeningToday(ChallengeStatus.ONGOING, VerificationType.MEMBER_REVIEW)
