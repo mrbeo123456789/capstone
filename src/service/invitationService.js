@@ -38,13 +38,15 @@ export const invitationService = createApi({
             }),
         }),
 
-        // POST: /api/member/invitations/respond/{invitationId}?accept=true
         respondInvitation: builder.mutation({
-            query: ({ invitationId, accept }) => ({
-                url: `/member/invitations/respond/${invitationId}?accept=${accept}`,
+            query: ({ invitationId, invitationType, accept }) => ({
+                url: `/member/invitations/respond`,
                 method: "POST",
+                body: { invitationId, invitationType, accept }, // 👈 gửi đúng dạng DTO
             }),
         }),
+
+
 
         // GET: /api/member/invitations/member
         getMyInvitations: builder.query({

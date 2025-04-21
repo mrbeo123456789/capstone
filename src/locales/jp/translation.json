@@ -56,7 +56,8 @@
     "searchFailed": "メンバーの検索に失敗しました。",
     "title": "チャレンジへの招待",
     "inviteMembers": "メンバーを招待",
-    "inviteGroups": "グループを招待"
+    "inviteGroups": "グループを招待",
+    "suggestedTitle": "招待のおすすめメンバー"
   },
 
   "sidebar": {
@@ -91,7 +92,58 @@
     "createButton": "グループを作成",
     "cancelButton": "キャンセル",
     "createSuccess": "グループが正常に作成されました！",
-    "createFailed": "グループの作成に失敗しました！"
+    "createFailed": "グループの作成に失敗しました！",
+    "editTitle": "グループを編集",
+    "updateButton": "グループを更新",
+    "updating": "更新中...",
+    "updateSuccess": "グループが正常に更新されました！",
+    "updateFailed": "グループの更新に失敗しました！"
+  },
+
+  "groupDetail": {
+    "inviteMembers": "メンバーを招待",
+    "editGroup": "グループを編集",
+    "leaveGroup": "グループを退出",
+    "disbandGroup": "グループを解散",
+    "description": "説明",
+    "createdAt": "作成日",
+    "tabs": {
+      "members": "メンバー",
+      "challenges": "チャレンジ"
+    },
+    "comingSoon": "🔥 チャレンジ機能はまもなく公開されます！",
+    "loading": "グループのデータを読み込んでいます...",
+    "error": "グループの読み込みに失敗しました。",
+    "permissionDenied": "このグループにアクセスする権限がありません。",
+    "leaveSuccess": "グループを退出しました",
+    "leaveFailed": "グループの退出に失敗しました。もう一度お試しください。",
+    "disbandSuccess": "グループが解散されました。",
+    "disbandFailed": "グループの解散に失敗しました。もう一度お試しください。",
+    "kickSuccess": "メンバーをグループから削除しました",
+    "kickFailed": "メンバーを削除できませんでした。もう一度お試しください。"
+  },
+  "yourGroup": {
+    "createGroup": "グループを作成",
+    "searchPlaceholder": "グループを検索",
+    "filter": "フィルター",
+    "invitations": "グループの招待",
+    "loadingInvitations": "招待を読み込み中...",
+    "noInvitations": "招待はありません",
+    "inviteLine": "{{name}}さんがあなたを招待しました",
+    "accept": "承認",
+    "decline": "辞退",
+    "invitationResponseSuccess": "招待を更新しました。",
+    "invitationResponseFailed": "招待への応答に失敗しました。",
+    "tabs": {
+      "All": "すべて",
+      "leader": "リーダー",
+      "member": "メンバー"
+    },
+    "yourGroups": "参加中のグループ",
+    "noGroups": "参加しているグループがありません",
+    "loadingGroups": "グループを読み込み中...",
+    "errorGroups": "グループの読み込みに失敗しました。",
+    "members": "メンバー"
   },
 
   "groupInvite": {
@@ -181,6 +233,101 @@
     "submit": "報告を送信",
     "cancel": "キャンセル"
   },
+  "notification": {
+    "challengeResult.title": "チャレンジ結果：達成",
+    "challengeResult.content": "チャレンジ「{{challengeName}}」を達成しました！あなたの成果を確認しましょう！",
+
+    "groupChallengeResult.title": "グループチャレンジ結果：達成",
+    "groupChallengeResult.content": "グループ「{{groupName}}」がチャレンジ「{{challengeName}}」を達成しました！グループの成果を見てみましょう！",
+
+    "challengeRoleUpdated.title": "チャレンジ役割の更新",
+    "challengeRoleUpdated.content": "チャレンジ「{{challengeName}}」でのあなたの役割が {{role}} に変更されました。",
+
+    "challengeStarted.title": "チャレンジ「{{challengeName}}」が開始されました！",
+    "challengeStarted.content": "GoBeyond と一緒に「{{challengeName}}」に挑戦しましょう！",
+
+    "evidence.approved.title": "{{day}} の証拠が承認されました",
+    "evidence.approved.content": "チャレンジ「{{challengeName}}」で提出した {{day}} の証拠が承認されました。引き続き頑張ってください！",
+
+    "evidence.rejected.title": "{{day}} の証拠が拒否されました",
+    "evidence.rejected.content": "チャレンジ「{{challengeName}}」で提出した {{day}} の証拠が拒否されました。フィードバックを確認して、再提出してください。",
+
+    "invite.challenge.title": "チャレンジへの招待",
+    "invite.challenge.content": "{{inviterName}} さんがあなたをチャレンジ「{{challengeName}}」に招待しました。",
+
+    "invite.group.title": "グループへの招待",
+    "invite.group.content": "{{inviterName}} さんがあなたをグループ「{{groupName}}」に招待しました。",
+
+    "invite.kickGroup.title": "グループから削除されました",
+    "invite.kickGroup.content": "あなたはグループ「{{groupName}}」から管理者により削除されました。",
+
+    "invite.groupInvitation.title": "グループへの招待",
+    "invite.groupInvitation.content": "あなたはグループ「{{groupName}}」に招待されました。",
+
+    "groupDisbanded.title": "グループが解散されました",
+    "groupDisbanded.content": "グループ「{{groupName}}」は解散されました。",
+
+    "challengeInvitation.title": "新しいチャレンジの招待",
+    "challengeInvitation.content": "あなたはチャレンジ「{{challengeName}}」に招待されました。",
+
+    "leaderChallengeInvitation.title": "新しいチャレンジの招待",
+    "leaderChallengeInvitation.content": "あなたはチャレンジ「{{challengeName}}」でリーダーとして招待されました。",
+
+    "groupJoinChallenge.title": "あなたのグループがチャレンジに参加しました！",
+    "groupJoinChallenge.content": "グループ「{{groupName}}」がチャレンジ「{{challengeName}}」に参加しました。",
+
+    "challengeCancelled.title": "チャレンジがキャンセルされました",
+    "challengeCancelled.content": "チャレンジ「{{challengeName}}」は管理者またはホストによってキャンセルされました。",
+
+    "kickedFromChallenge.title": "チャレンジから削除されました",
+    "kickedFromChallenge.content": "あなたはチャレンジ「{{challengeName}}」から管理者により削除されました。",
+
+    "empty": "新しい通知はありません。"
+  },
+
+  "yourChallenge": {
+    "create": "チャレンジを作成",
+    "search": "検索",
+    "filter": "フィルター",
+    "invitations": "招待",
+    "loadingInvitations": "招待を読み込み中...",
+    "noInvitations": "チャレンジへの招待はありません",
+    "accept": "承諾",
+    "decline": "辞退",
+    "accepted": "招待を承諾しました！",
+    "declined": "招待を辞退しました！",
+    "failedResponse": "応答に失敗しました。もう一度お試しください。",
+    "inviteText": "があなたを招待しました：",
+    "tabs": {
+      "all": "すべて",
+      "host": "ホスト",
+      "cohost": "共同ホスト",
+      "member": "メンバー"
+    },
+    "joinedChallenges": "参加中のチャレンジ",
+    "loadingChallenges": "チャレンジを読み込み中...",
+    "noJoined": "まだチャレンジに参加していません",
+    "status": {
+      "approved": "承認済み",
+      "pending": "保留中",
+      "rejected": "却下",
+      "canceled": "キャンセル済み"
+    }
+  },
+
+  "inviteGroups": "グループを招待する",
+  "searchPlaceholder": "グループ名を検索...",
+  "noResults": "グループが見つかりませんでした。",
+  "previous": "前へ",
+  "next": "次へ",
+  "page": "ページ",
+  "invite": "招待",
+  "loading": "グループを読み込み中...",
+  "loadError": "グループの読み込みに失敗しました。",
+  "selectWarning": "少なくとも1つのグループを選択してください。",
+  "success": "グループを正常に招待しました！",
+  "searchPlaceholderGroup":"グループ名を入力してください...",
+
 
   "ChallengeDetail": {
     "joinedStatus": "参加済み",
@@ -202,8 +349,5 @@
     "rulesText": "チャレンジの詳細なルールがここに表示されます。",
     "teamRanking": "チームランキングがここに表示されます。",
     "individualRanking": "個人ランキングがここに表示されます。"
-
 }
-
-
 }

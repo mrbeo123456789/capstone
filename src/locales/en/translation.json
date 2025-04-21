@@ -56,7 +56,8 @@
     "searchFailed": "Failed to search members.",
     "title": "Invite to Challenge",
     "inviteMembers": "Invite Members",
-    "inviteGroups": "Invite Groups"
+    "inviteGroups": "Invite Groups",
+    "suggestedTitle": "Suggested members to invite"
   },
 
   "sidebar": {
@@ -87,13 +88,62 @@
     "uploadHint": "Click to upload or drag and drop",
     "uploadSubHint": "SVG, PNG, JPG, or GIF (MAX. 800x400px)",
     "changePicture": "Change Picture",
+    "editTitle": "Update Group",
+    "updateButton": "Update Group",
+    "updating": "Updating...",
     "creating": "Creating...",
     "createButton": "Create Group",
     "cancelButton": "Cancel",
     "createSuccess": "Group created successfully!",
-    "createFailed": "Failed to create group!"
+    "createFailed": "Failed to create group!",
+    "updateSuccess": "Group updated successfully!",
+    "updateFailed": "Failed to update group!"
   },
-
+  "groupDetail": {
+    "inviteMembers": "Invite Members",
+    "editGroup": "Edit Group",
+    "leaveGroup": "Leave Group",
+    "disbandGroup": "Disband Group",
+    "description": "Description",
+    "createdAt": "Created At",
+    "tabs": {
+      "members": "Members",
+      "challenges": "Challenges"
+    },
+    "comingSoon": "🔥 Challenge feature coming soon!",
+    "loading": "Loading group data...",
+    "error": "Failed to load group.",
+    "permissionDenied": "You do not have permission to access this group.",
+    "leaveSuccess": "Left group successfully",
+    "leaveFailed": "Failed to leave group. Please try again.",
+    "disbandSuccess": "Group has been disbanded.",
+    "disbandFailed": "Failed to disband group. Please try again.",
+    "kickSuccess": "Member removed from group",
+    "kickFailed": "Failed to remove member. Please try again."
+  },
+  "yourGroup": {
+    "createGroup": "Create a group",
+    "searchPlaceholder": "Search Groups",
+    "filter": "Filter",
+    "invitations": "Group Invitations",
+    "loadingInvitations": "Loading invitations...",
+    "noInvitations": "You have no group invites",
+    "inviteLine": "{{name}} invites you to join",
+    "accept": "Accept",
+    "decline": "Decline",
+    "invitationResponseSuccess": "Invitation updated successfully.",
+    "invitationResponseFailed": "Failed to respond to the invitation.",
+    "tabs": {
+      "All": "All",
+      "leader": "Leader",
+      "member": "Member"
+    },
+    "yourGroups": "Your Groups",
+    "noGroups": "You haven't joined any group",
+    "loadingGroups": "Loading groups...",
+    "errorGroups": "Failed to load groups.",
+    "members": "members"
+  },
   "groupInvite": {
     "title": "Invite to Group",
     "searchPlaceholder": "Search by name or email...",
@@ -146,6 +196,56 @@
     "validationError": "Please correct all errors before submitting.",
     "fail": "Failed to update challenge: "
   },
+  "notification": {
+    "challengeResult.title": "Challenge Result: Completed",
+    "challengeResult.content": "You have successfully completed the challenge '{{challengeName}}'! Check out your achievement now!",
+
+    "groupChallengeResult.title": "Group Challenge Result: Completed",
+    "groupChallengeResult.content": "Your group '{{groupName}}' has completed the challenge '{{challengeName}}'! View your group achievement now!",
+
+    "challengeRoleUpdated.title": "Challenge Role Updated",
+    "challengeRoleUpdated.content": "Your role in the challenge '{{challengeName}}' has been updated to: {{role}}",
+
+    "challengeStarted.title": "The challenge '{{challengeName}}' has started!",
+    "challengeStarted.content": "Get ready to conquer the challenge '{{challengeName}}' with GoBeyond!",
+
+    "evidence.approved.title": "Proof on {{day}} approved",
+    "evidence.approved.content": "Your proof submitted on {{day}} in the challenge '{{challengeName}}' has been approved. Keep it up!",
+
+    "evidence.rejected.title": "Proof on {{day}} rejected",
+    "evidence.rejected.content": "Your proof submitted on {{day}} in the challenge '{{challengeName}}' was rejected. Please check feedback and resubmit if needed.",
+
+    "invite.challenge.title": "Challenge Invitation",
+    "invite.challenge.content": "{{inviterName}} has invited you to join the challenge '{{challengeName}}'.",
+
+    "invite.group.title": "Group Invitation",
+    "invite.group.content": "{{inviterName}} has invited you to join the group '{{groupName}}'.",
+
+    "invite.kickGroup.title": "You were removed from the group",
+    "invite.kickGroup.content": "You were removed from the group '{{groupName}}' by the admin.",
+
+    "invite.groupInvitation.title": "Group Invitation",
+    "invite.groupInvitation.content": "You have been invited to join the group '{{groupName}}'.",
+
+    "groupDisbanded.title": "Group Disbanded",
+    "groupDisbanded.content": "The group '{{groupName}}' has been disbanded.",
+
+    "challengeInvitation.title": "You have a new invitation",
+    "challengeInvitation.content": "You have been invited to join the challenge '{{challengeName}}'.",
+
+    "leaderChallengeInvitation.title": "You have a new invitation",
+    "leaderChallengeInvitation.content": "You have been invited to lead a group in the challenge '{{challengeName}}'.",
+
+    "groupJoinChallenge.title": "Your group has joined a challenge!",
+    "groupJoinChallenge.content": "The group '{{groupName}}' has joined the challenge '{{challengeName}}'.",
+
+    "challengeCancelled.title": "Challenge Cancelled",
+    "challengeCancelled.content": "The challenge '{{challengeName}}' was cancelled by the admin or host.",
+
+    "kickedFromChallenge.title": "You were removed from the challenge",
+    "kickedFromChallenge.content": "You were removed from the challenge '{{challengeName}}' by the admin.",
+    "empty": "No new notifications."
+  },
 
   "JoinsChallengeDetail": {
     "disabledDuringChallenge": "This action is disabled during or after the challenge.",
@@ -181,6 +281,48 @@
     "submit": "Submit Report",
     "cancel": "Cancel"
   },
+  "yourChallenge": {
+    "create": "Create a challenge",
+    "search": "Search",
+    "filter": "Filter",
+    "invitations": "Invitations",
+    "loadingInvitations": "Loading invitations...",
+    "noInvitations": "You have no challenge invites",
+    "accept": "Accept",
+    "decline": "Decline",
+    "accepted": "Invitation accepted!",
+    "declined": "Invitation declined!",
+    "failedResponse": "Failed to respond. Try again.",
+    "inviteText": "invites you to:",
+    "tabs": {
+      "all": "All",
+      "host": "Host",
+      "cohost": "Cohost",
+      "member": "Member"
+    },
+    "joinedChallenges": "Joined Challenges",
+    "loadingChallenges": "Loading challenges...",
+    "noJoined": "You haven't joined any challenge",
+    "status": {
+      "approved": "Approved",
+      "pending": "Pending",
+      "rejected": "Rejected",
+      "canceled": "Canceled"
+    }
+  },
+  "members": "members",
+  "inviteGroups": "Invite Groups",
+  "searchPlaceholder": "Search group name...",
+  "noResults": "No groups found.",
+  "previous": "Previous",
+  "next": "Next",
+  "page": "Page",
+  "invite": "Invite",
+  "loading": "Loading groups...",
+  "loadError": "Failed to load groups.",
+  "selectWarning": "Please select at least one group.",
+  "success": "Groups invited successfully!",
+  "searchPlaceholderGroup":"Enter group name...",
 
   "ChallengeDetail": {
     "joinedStatus": "Joined",

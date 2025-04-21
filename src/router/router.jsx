@@ -67,11 +67,18 @@ const router = createBrowserRouter([
                 path: "groups",
                 element: <MemberRoute><Outlet /></MemberRoute>,
                 children: [
+                    // Tạo mới nhóm
                     { path: "create", element: <GroupForm /> },
+
+                    // Danh sách nhóm đã tham gia
                     { path: "joins", element: <YourGroup /> },
-                    { path: "joins/:id", element: <GroupUsers /> }
+
+                    // Chi tiết nhóm đã tham gia
+                    { path: "joins/:id", element: <GroupUsers /> },
+
+                    { path: ":id/edit", element: <GroupForm /> } // ✅ Chính xác
                 ]
-            },
+            }
         ]
     },
     {path: "/ranking", element: <Leaderboard/>},
