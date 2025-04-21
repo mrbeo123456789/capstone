@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import { useReviewEvidenceMutation } from "../../service/evidenceService";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 const VideoModal = ({ show, onClose, videoSrc, onPrevious, onNext, uploader, evidenceId }) => {
+    const { t } = useTranslation();
     const [reviewEvidence] = useReviewEvidenceMutation();
     const [isReviewed, setIsReviewed] = useState(false);
 
@@ -17,10 +19,10 @@ const VideoModal = ({ show, onClose, videoSrc, onPrevious, onNext, uploader, evi
             await reviewEvidence({
                 evidenceId: evidenceId,
                 isApproved: true,
-                feedback: "I approve this video"
+                feedback: t("VideoModal.approveMessage")
             }).unwrap();
 
-            toast.success("Approved successfully!");
+            toast.success(t("VideoModal.approveSuccess"));
             setIsReviewed(true);
 
             // Add this evidence ID to localStorage to track it's been reviewed
@@ -35,7 +37,7 @@ const VideoModal = ({ show, onClose, videoSrc, onPrevious, onNext, uploader, evi
                 onNext();
             }, 1000);
         } catch (error) {
-            toast.error("Failed to approve!");
+            toast.error(t("VideoModal.approveFail"));
             console.error(error);
         }
     };
@@ -48,10 +50,10 @@ const VideoModal = ({ show, onClose, videoSrc, onPrevious, onNext, uploader, evi
             await reviewEvidence({
                 evidenceId: evidenceId,
                 isApproved: false,
-                feedback: "I don't approve this video"
+                feedback: t("VideoModal.rejectMessage")
             }).unwrap();
 
-            toast.success("Rejected successfully!");
+            toast.success(t("VideoModal.rejectSuccess"));
             setIsReviewed(true);
 
             // Add this evidence ID to localStorage to track it's been reviewed
@@ -66,7 +68,7 @@ const VideoModal = ({ show, onClose, videoSrc, onPrevious, onNext, uploader, evi
                 onNext();
             }, 1000);
         } catch (error) {
-            toast.error("Failed to reject!");
+            toast.error(t("VideoModal.rejectFail"));
             console.error(error);
         }
     };
@@ -85,7 +87,7 @@ const VideoModal = ({ show, onClose, videoSrc, onPrevious, onNext, uploader, evi
                 <div className="flex-1 bg-black flex justify-center items-center">
                     <video key={videoSrc} controls className="h-full rounded">
                         <source src={videoSrc} type="video/mp4" />
-                        Your browser does not support the video tag.
+                        {t("VideoModal.browserNotSupported")}
                     </video>
                 </div>
 
@@ -97,7 +99,7 @@ const VideoModal = ({ show, onClose, videoSrc, onPrevious, onNext, uploader, evi
                             onClick={handleReject}
                         >
                             <FaTimesCircle className="text-2xl" />
-                            I don't approve this video
+                            {t("VideoModal.rejectButton")}
                         </button>
 
                         <button
@@ -105,7 +107,7 @@ const VideoModal = ({ show, onClose, videoSrc, onPrevious, onNext, uploader, evi
                             onClick={handleApprove}
                         >
                             <FaCheckCircle className="text-2xl" />
-                            I approve this video
+                            {t("VideoModal.approveButton")}
                         </button>
                     </div>
                 )}
@@ -114,7 +116,7 @@ const VideoModal = ({ show, onClose, videoSrc, onPrevious, onNext, uploader, evi
                 {isReviewed && (
                     <div className="flex justify-center p-4 bg-gray-100">
                         <div className="text-green-600 font-bold text-lg">
-                            Review submitted successfully!
+                            {t("VideoModal.reviewSubmitted")}
                         </div>
                     </div>
                 )}
@@ -125,7 +127,7 @@ const VideoModal = ({ show, onClose, videoSrc, onPrevious, onNext, uploader, evi
                 onClick={onPrevious}
                 className="absolute left-4 px-4 py-2 rounded-lg"
             >
-                <div aria-label="Previous" role="button" tabIndex={0}
+                <div aria-label={t("VideoModal.previous")} role="button" tabIndex={0}
                      className="flex items-center justify-center h-12 w-12 rounded-full bg-gray-500 hover:bg-white text-white hover:text-gray-700 transition">
                     <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
                         <path d="M14.791 5.207 8 12l6.793 6.793a1 1 0 1 1-1.415 1.414l-7.5-7.5a1 1 0 0 1 0-1.414l7.5-7.5a1 1 0 1 1 1.415 1.414z"></path>
@@ -138,7 +140,7 @@ const VideoModal = ({ show, onClose, videoSrc, onPrevious, onNext, uploader, evi
                 onClick={onNext}
                 className="absolute right-4 px-4 py-2 rounded-lg"
             >
-                <div aria-label="Next" role="button" tabIndex={0}
+                <div aria-label={t("VideoModal.next")} role="button" tabIndex={0}
                      className="flex items-center justify-center h-12 w-12 rounded-full bg-gray-500 hover:bg-white text-white hover:text-gray-700 transition">
                     <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
                         <path d="M9.209 5.207 16 12l-6.791 6.793a1 1 0 1 0 1.415 1.414l7.5-7.5a1 1 0 0 0 0-1.414l-7.5-7.5a1 1 0 1 0-1.415 1.414z"></path>

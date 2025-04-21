@@ -200,15 +200,63 @@
     "fail": "Failed to update challenge: "
   },
 
-  "ProofUpLoads": {
-    "loading": "Loading data",
-    "view evidence": "View all evidences",
-    "has no proof": "You don't have any proof yet!",
-    "uploaded": "Uploaded",
-    "not have evidence": "Don't have evidence for this day",
+  "ProofUploads": {
+    "loading": "Loading data...",
+    "viewEvidence": "View your evidence",
+    "proofOn": "Proof on",
+    "uploaded": "Completed",
+    "noEvidence": "No evidence for this day",
     "previous": "Previous",
     "page": "Page",
-    "next": "Next"
+    "next": "Next",
+    "fullEvidence": "Full Evidence",
+    "close": "Close"
+  },
+
+  "ProgressTracking": {
+    "viewExplanation": "View explanation",
+    "daysOfWeek": {
+      "sun": "Su",
+      "mon": "Mo",
+      "tue": "Tu",
+      "wed": "We",
+      "thu": "Th",
+      "fri": "Fr",
+      "sat": "Sa"
+    },
+    "errors": {
+      "pastDeadline": "Submission deadline for that day has passed",
+      "futureDate": "Not yet time to submit evidence",
+      "cannotSubmit": "Cannot submit evidence for this day"
+    },
+    "modal": {
+      "title": "Status Explanation",
+      "approved": {
+        "title": "Submitted and approved",
+        "description": "Evidence has been verified"
+      },
+      "pending": {
+        "title": "Submitted, awaiting review",
+        "description": "Evidence is being reviewed"
+      },
+      "rejected": {
+        "title": "Submitted but rejected",
+        "description": "Evidence is invalid, needs resubmission"
+      },
+      "missed": {
+        "title": "Not submitted (past deadline)",
+        "description": "Submission time for this day has ended"
+      },
+      "today": {
+        "title": "Today (not submitted)",
+        "description": "Click to submit evidence"
+      },
+      "future": {
+        "title": "Future date",
+        "description": "Not yet time to submit"
+      },
+      "close": "Close"
+    }
   },
   "notification": {
     "challengeStatusUpdated.title" : "Your challenge status have been updated",
@@ -391,6 +439,175 @@
     "forgot": "Forgot Password?",
     "fail": "Failed to change password.",
     "mismatch": "Passwords do not match!"
+  },
+
+  "AboutUs": {
+    "hero": {
+      "title": "About GoBeyond",
+      "subtitle": "Changing the world through meaningful challenges",
+      "learnMore": "Learn More"
+    },
+    "mission": {
+      "title": "Our Mission",
+      "description": "GoBeyond was created with the goal of connecting communities through challenges that bring positive value. We believe that small actions, when performed by many people, can create significant change for society and the environment.",
+      "pillars": {
+        "connect": {
+          "title": "Connect",
+          "description": "Build communities of people who share the same passion and desire to create positive impact"
+        },
+        "challenge": {
+          "title": "Challenge",
+          "description": "Create meaningful challenges to drive change and personal development"
+        },
+        "impact": {
+          "title": "Create Impact",
+          "description": "Transform challenges into concrete actions that improve communities and the environment"
+        }
+      }
+    },
+    "team": {
+      "title": "Our Team",
+      "description": "Passionate and dedicated people behind GoBeyond, constantly striving to bring the best experiences to the community.",
+      "roles": {
+        "analyst": "Business Analyst",
+        "backend": "Backend Developer",
+        "leader": "Leader",
+        "frontend": "Frontend Developer",
+        "tester": "Tester"
+      }
+    },
+    "values": {
+      "title": "Core Values",
+      "description": "The principles that guide all our decisions and actions",
+      "items": {
+        "responsibility": {
+          "title": "Social Responsibility",
+          "description": "We believe in creating positive impact for communities and the environment through all our activities."
+        },
+        "innovation": {
+          "title": "Innovation",
+          "description": "We continually seek new ways to solve problems and create value for users."
+        },
+        "transparency": {
+          "title": "Transparency",
+          "description": "We build trust through openness, honesty, and clarity in all our operations."
+        },
+        "collaboration": {
+          "title": "Collaboration",
+          "description": "We believe that strength comes from working together and learning from diverse perspectives."
+        }
+      }
+    },
+    "journey": {
+      "title": "Our Journey",
+      "description": "From the initial idea to a thriving growing community",
+      "milestones": {
+        "beginning": {
+          "title": "Beginning",
+          "description": "GoBeyond was formed from the idea of a group of young people passionate about creating positive change."
+        },
+        "development": {
+          "title": "Development",
+          "description": "The platform officially launched with basic features. The first user community was formed."
+        },
+        "expansion": {
+          "title": "Expansion",
+          "description": "GoBeyond grows strongly with many new features and an increasingly growing user community."
+        }
+      }
+    },
+    "contact": {
+      "title": "Connect With Us",
+      "description": "We are always ready to listen to your feedback and accompany you on your journey to create positive change",
+      "email": {
+        "title": "Email"
+      },
+      "phone": {
+        "title": "Phone"
+      },
+      "address": {
+        "title": "Address",
+        "value": "Hoa Lac Hi-tech Park, km 29, Thang Long Avenue, Hanoi"
+      },
+      "button": "Contact Now"
+    }
+  },
+
+  "VideoModal": {
+    "approveMessage": "I approve this video",
+    "approveSuccess": "Approved successfully!",
+    "approveFail": "Failed to approve!",
+    "rejectMessage": "I don't approve this video",
+    "rejectSuccess": "Rejected successfully!",
+    "rejectFail": "Failed to reject!",
+    "browserNotSupported": "Your browser does not support the video tag.",
+    "rejectButton": "I don't approve this video",
+    "approveButton": "I approve this video",
+    "reviewSubmitted": "Review submitted successfully!",
+    "previous": "Previous",
+    "next": "Next"
+  },
+  "VoteOther": {
+    "title": "Vote for Others' Proof",
+    "loading": "Loading videos...",
+    "noEvidences": "No more evidences to review.",
+    "unknownUser": "Unknown User"
+  },
+  "hostEvidence": {
+    "members": "Members",
+    "searchMembers": "Search members...",
+    "memberName": "Member Name",
+    "joinedAt": "Joined At",
+    "evidenceCount": "Evidence Count",
+    "status": "Status",
+    "notAvailable": "N/A",
+    "pending": "Pending",
+    "done": "Done",
+    "showing": "Showing",
+    "to": "to",
+    "of": "of",
+    "evidence": "Evidence",
+    "forMember": "for {{name}}",
+    "filtering": "Filtering",
+    "showingAll": "Showing all evidence",
+    "memberStats": "Member Evidence Statistics",
+    "totalEvidence": "Total Evidence",
+    "date": "Date",
+    "noEvidence": "No evidence found",
+    "showAll": "Show all evidence",
+    "selectMember": "Select a member to view evidence",
+    "unknownUser": "Unknown User",
+    "noDescription": "No description provided.",
+    "challenge": "Challenge",
+    "memberChallenge": "{{name}}'s Challenge",
+    "evidenceDetails": "Evidence Details",
+    "modal": {
+      "approve": "I approve this evidence",
+      "reject": "I don't approve this evidence",
+      "close": "Close"
+    },
+    "logs": {
+      "acceptEvidence": "Accepting evidence with ID: {{id}}",
+      "rejectEvidence": "Rejecting evidence with ID: {{id}}"
+    },
+    "status": {
+      "approved": "Approved",
+      "waiting": "Pending",
+      "rejected": "Rejected"
+    }
+  },
+
+  "rankingList": {
+    "top3Progress": "Top 3 Progress",
+    "rank": "Rank",
+    "noRankingData": "No ranking data",
+    "members": "Members",
+    "searchPlaceholder": "Search user...",
+    "loadingStarLeaderboard": "Loading star leaderboard...",
+    "noMembersFound": "No members found",
+    "avgStars": "Avg stars"
   }
 
 }
+
+

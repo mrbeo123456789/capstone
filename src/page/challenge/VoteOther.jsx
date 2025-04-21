@@ -5,8 +5,10 @@ import {
     useGetEvidencesToReviewQuery,
 } from "../../service/evidenceService.js";
 import { useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const VoteOther = () => {
+    const { t } = useTranslation();
     const [activeIndex, setActiveIndex] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [reviewedEvidences, setReviewedEvidences] = useState([]);
@@ -73,12 +75,12 @@ const VoteOther = () => {
 
     return (
         <div className="w-full mx-auto">
-            <h2 className="text-xl font-bold text-center">Vote for Others' Proof</h2>
+            <h2 className="text-xl font-bold text-center">{t("VoteOther.title")}</h2>
 
             {isLoading ? (
-                <div className="text-center py-10">Loading videos...</div>
+                <div className="text-center py-10">{t("VoteOther.loading")}</div>
             ) : evidencesToReview.length === 0 ? (
-                <div className="text-center py-10 text-gray-500">No more evidences to review.</div>
+                <div className="text-center py-10 text-gray-500">{t("VoteOther.noEvidences")}</div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                     {evidencesToReview.map((item, index) => (
@@ -96,7 +98,7 @@ const VoteOther = () => {
                                 <FaPlayCircle className="text-xl" />
                             </div>
                             <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded">
-                                {item?.uploaderName || "Unknown User"}
+                                {item?.uploaderName || t("VoteOther.unknownUser")}
                             </div>
                         </div>
                     ))}
@@ -114,7 +116,7 @@ const VoteOther = () => {
                         // This is just a fallback if needed
                         handleNext();
                     }}
-                    uploader={evidencesToReview[activeIndex]?.uploaderName || "Unknown User"}
+                    uploader={evidencesToReview[activeIndex]?.uploaderName || t("VoteOther.unknownUser")}
                     evidenceId={evidencesToReview[activeIndex]?.evidenceId}
                 />
             )}
