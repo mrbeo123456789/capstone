@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { CheckCircle, XCircle, Ban } from "lucide-react";
 import Sidebar from "../../navbar/AdminNavbar.jsx";
 import { useGetChallengesQuery, useReviewChallengeMutation } from "../../../service/adminService.js";
+import { toast } from "react-toastify"; // Import toast for notifications
 
 const ChallengeList = () => {
     const location = useLocation();
@@ -134,15 +135,20 @@ const ChallengeList = () => {
         if (!selectedChallengeId || !actionType) return;
 
         let newStatus;
+        let successMessage;
+
         switch (actionType) {
             case "confirmed":
                 newStatus = "APPROVED";
+                successMessage = "Challenge approved successfully";
                 break;
             case "rejected":
                 newStatus = "REJECTED";
+                successMessage = "Challenge rejected successfully";
                 break;
             case "banned":
                 newStatus = "BANNED";
+                successMessage = "Challenge banned successfully";
                 break;
             default:
                 return;
@@ -157,19 +163,23 @@ const ChallengeList = () => {
                 adminNote: message
             };
 
-            const result = await reviewChallenge(reviewRequest).unwrap()
-                .then(() => {
-                    closeModal();
-                    refetch();
-                })
-                .catch((error) => {
-                    console.error(`Error ${actionType} challenge:`, error);
-                    setActionError(`Error: ${error.data || 'Unknown error occurred'}`);
-                });
+            await reviewChallenge(reviewRequest).unwrap();
+
+            // Close modal first
+            closeModal();
+
+            // Show success toast notification
+            toast.success(successMessage);
+
+            // Refetch data to update the list
+            refetch();
 
         } catch (error) {
             console.error(`Error ${actionType} challenge:`, error);
-            setActionError(`Error: ${error.message || 'Unknown error occurred'}`);
+            setActionError(`Error: ${error.data?.message || error.message || 'Unknown error occurred'}`);
+
+            // Show error toast
+            toast.error(`Failed to ${actionType} challenge: ${error.data?.message || error.message || 'Unknown error'}`);
         }
     }, [selectedChallengeId, actionType, message, reviewChallenge, closeModal, refetch]);
 

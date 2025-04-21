@@ -170,6 +170,16 @@
     "validationError": "Vui lòng điền đầy đủ và chính xác các trường bắt buộc.",
     "fail": "Cập nhật thử thách thất bại: "
   },
+  "ProofUpLoads": {
+    "loading": "Đang tải dữ liệu",
+    "view evidence": "Danh sách bằng chứng",
+    "has no proof": "Bạn chưa có bằng chứng nào.",
+    "uploaded": "Đã hoàn thành",
+    "not have evidence": "Không có bằng chứng của ngày này",
+    "previous": "Trước",
+    "page": "/",
+    "next": "Sau"
+  },
 
   "yourGroup": {
     "createGroup": "Tạo nhóm",

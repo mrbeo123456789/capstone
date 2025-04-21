@@ -130,7 +130,7 @@ export const challengeService = createApi({
                 }
                 params.append("page", page);
                 params.append("size", size);
-                return `/challenges/${challengeId}/members?${params.toString()}`;
+                return `challenges/${challengeId}/members?${params.toString()}`;
             },
             providesTags: ["Challenge"]
         }),
