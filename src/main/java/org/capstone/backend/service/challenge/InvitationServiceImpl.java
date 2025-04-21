@@ -71,23 +71,31 @@ public class InvitationServiceImpl implements InvitationService {
 
             List<ChallengeMember> invitations = memberRepository.findAllById(request.getMemberIds())
                     .stream()
-                    .filter(member -> challengeMemberRepository.findByMemberAndChallenge(member, challenge)
-                            .map(cm -> cm.getStatus() != ChallengeMemberStatus.JOINED)
-                            .orElse(true))
-                    .map(member -> ChallengeMember.builder()
-                            .challenge(challenge)
-                            .member(member)
-                            .role(ChallengeRole.MEMBER)
-                            .status(status)
-                            .joinBy(invitedBy.getId())
-                            .createdAt(now)
-                            .build())
+                    .map(member -> {
+                        Optional<ChallengeMember> existing = challengeMemberRepository.findByMemberAndChallenge(member, challenge);
+                        if (existing.isPresent()) {
+                            ChallengeMember cm = existing.get();
+                            if (cm.getStatus() == ChallengeMemberStatus.JOINED) return null;
+                            cm.setStatus(status);
+                            cm.setJoinBy(invitedBy.getId());
+                            cm.setUpdatedAt(now);
+                            return cm;
+                        }
+                        return ChallengeMember.builder()
+                                .challenge(challenge)
+                                .member(member)
+                                .role(ChallengeRole.MEMBER)
+                                .status(status)
+                                .joinBy(invitedBy.getId())
+                                .createdAt(now)
+                                .build();
+                    })
+                    .filter(Objects::nonNull)
                     .toList();
 
             challengeMemberRepository.saveAll(invitations);
 
-            // Gửi thông báo cho từng thành viên được mời
-            invitations.forEach(invite ->eventPublisher.publishEvent(new InvitationSentEvent(
+            invitations.forEach(invite -> eventPublisher.publishEvent(new InvitationSentEvent(
                     invite.getMember().getId().toString(),
                     "notification.challengeInvitation.title",
                     "notification.challengeInvitation.content",
@@ -114,13 +122,11 @@ public class InvitationServiceImpl implements InvitationService {
 
             groupChallengeRepository.saveAll(groupInvitations);
 
-            // Gửi thông báo cho từng chủ nhóm được mời
             request.getMemberIds().forEach(leaderId -> eventPublisher.publishEvent(new InvitationSentEvent(
                     leaderId.toString(),
                     "notification.leaderChallengeInvitation.title",
                     "notification.leaderChallengeInvitation.content",
                     Map.of("challengeName", challenge.getName())
-
             )));
 
             return (groupStatus == GroupChallengeStatus.REJECTED)
@@ -159,6 +165,7 @@ public class InvitationServiceImpl implements InvitationService {
         }
     }
 
+
     /**
      * Xử lý lời mời cá nhân (member tự chấp nhận/từ chối).
      */
@@ -186,9 +193,6 @@ public class InvitationServiceImpl implements InvitationService {
         return accept ? "Lời mời cá nhân đã được chấp nhận." : "Lời mời cá nhân đã bị từ chối.";
     }
 
-    /**
-     * Xử lý lời mời nhóm (Leader chấp nhận -> thêm thành viên nhóm vào thử thách).
-     */
     private String handleGroupInvitation(Long invitationId, Member member, boolean accept, Long selectedGroupId) {
         GroupChallenge groupChallenge = groupChallengeRepository.findById(invitationId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lời mời nhóm không tồn tại."));
@@ -216,7 +220,6 @@ public class InvitationServiceImpl implements InvitationService {
         groupChallenge.setUpdatedAt(LocalDateTime.now());
         groupChallengeRepository.save(groupChallenge);
 
-        // Thêm tất cả thành viên trong nhóm vào thử thách
         List<ChallengeMember> newChallengeMembers = group.getMembers().stream()
                 .map(GroupMember::getMember)
                 .filter(groupMember -> !challengeMemberRepository.existsByChallengeAndMember(challenge, groupMember))
@@ -233,7 +236,6 @@ public class InvitationServiceImpl implements InvitationService {
 
         challengeMemberRepository.saveAll(newChallengeMembers);
 
-        // Gửi thông báo cho từng thành viên trong nhóm
         newChallengeMembers.stream()
                 .map(ChallengeMember::getMember)
                 .map(Member::getId)
@@ -247,15 +249,11 @@ public class InvitationServiceImpl implements InvitationService {
                                         "groupName", group.getName(),
                                         "challengeName", challenge.getName()
                                 )
-
                         )
                 ));
 
-
-
         return "Lời mời nhóm đã được chấp nhận.";
     }
-
     /**
      * Lấy danh sách tất cả lời mời tham gia thử thách của thành viên hiện tại.
      * Gộp lời mời cá nhân (ChallengeMember với status WAITING) và lời mời nhóm (GroupChallenge với status PENDING, khi member là Leader).
@@ -378,27 +376,44 @@ public class InvitationServiceImpl implements InvitationService {
         Member invitedBy = getAuthenticatedMember();
         Challenge challenge = challengeRepository.findById(request.getChallengeId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy thử thách."));
-        Groups group = groupRepository.findById(request.getGroupId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy nhóm."));
 
-        // Xác định trạng thái lời mời theo trạng thái của thử thách
         ChallengeMemberStatus status = (challenge.getStatus() != ChallengeStatus.UPCOMING)
                 ? ChallengeMemberStatus.EXPIRED : ChallengeMemberStatus.WAITING;
         LocalDateTime now = LocalDateTime.now();
 
-        // Lấy danh sách thành viên ACTIVE trong nhóm (trừ người gửi)
-        List<Member> groupMembers = groupMemberRepository.findMembersByGroupIdAndStatus(group.getId(), GroupMemberStatus.ACTIVE)
-                .stream()
-                .filter(member -> !member.getId().equals(invitedBy.getId()))
-                .collect(Collectors.toList());
+        // Duyệt qua từng groupId để lấy thành viên ACTIVE
+        Set<Member> allGroupMembers = new HashSet<>();
+        for (Long groupId : request.getGroupIds()) {
+            Groups group = groupRepository.findById(groupId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy nhóm với ID: " + groupId));
 
-        List<ChallengeMember> invitations = createInvitationsForChallenge(challenge, groupMembers, invitedBy.getId(), status, now);
+            List<Member> members = groupMemberRepository.findMembersByGroupIdAndStatus(groupId, GroupMemberStatus.ACTIVE);
+            for (Member member : members) {
+                if (!member.getId().equals(invitedBy.getId())) {
+                    allGroupMembers.add(member); // dùng Set để tránh trùng người
+                }
+            }
+        }
+
+        List<ChallengeMember> invitations = createInvitationsForChallenge(
+                challenge,
+                new ArrayList<>(allGroupMembers),
+                invitedBy.getId(),
+                status,
+                now
+        );
+        invitations.forEach(invite -> {
+            if (invite.getRole() == null) {
+                invite.setRole(ChallengeRole.MEMBER); // Hoặc enum ChallengeRole.MEMBER nếu bạn dùng Enum
+            }
+        });
         challengeMemberRepository.saveAll(invitations);
 
         return (status == ChallengeMemberStatus.EXPIRED)
                 ? "Thử thách không mở, tất cả lời mời đã hết hạn."
-                : "Lời mời đã được gửi thành công đến " + invitations.size() + " thành viên trong nhóm.";
+                : "Lời mời đã được gửi thành công đến " + invitations.size() + " thành viên trong các nhóm.";
     }
+
 
     /**
      * Tạo danh sách lời mời tham gia thử thách cho danh sách thành viên.

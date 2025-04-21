@@ -46,7 +46,7 @@ public class RankingServiceImpl implements RankingService {
             LocalDate startDate = challenge.getStartDate();
             LocalDate endDate = challenge.getEndDate();
 
-            List<ChallengeProgressRanking> rankingList = challengeMemberRepository.findByChallengeId(challengeId)
+            List<ChallengeProgressRanking> rankingList = challengeMemberRepository.findJoinedMembersByChallengeId(challengeId)
                     .stream()
                     .map(cm -> {
                         Long memberId = cm.getMember().getId();
@@ -147,7 +147,7 @@ public class RankingServiceImpl implements RankingService {
     @Override
     public Page<ChallengeStarRatingResponse> getStarRatingsByChallengeId(Long challengeId, Pageable pageable) {
         // Fetch all members who joined the challenge (pagination applied later)
-        List<ChallengeMember> allMembers = challengeMemberRepository.findByChallengeId(challengeId);
+        List<ChallengeMember> allMembers = challengeMemberRepository.findJoinedMembersByChallengeId(challengeId);
 
         List<ChallengeStarRatingResponse> allResponses = allMembers.stream()
                 .map(cm -> {
