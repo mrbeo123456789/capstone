@@ -90,13 +90,38 @@ const ReportList = () => {
         }
     };
 
-    const formatBackendDateArray = (dateArray) => {
-        if (!Array.isArray(dateArray) || dateArray.length < 3) return "Invalid date";
-        const [year, month, day] = dateArray;
-        // Add leading zero if day or month has only one digit
-        const dd = day < 10 ? `0${day}` : day;
-        const mm = month < 10 ? `0${month}` : month;
-        return `${dd}/${mm}/${year}`;
+    // Hàm định dạng ngày từ dữ liệu backend
+    const formatDate = (dateValue) => {
+        if (!dateValue) return "Invalid date";
+
+        let dateObj;
+
+        // Xử lý trường hợp dữ liệu là mảng (kiểu cũ)
+        if (Array.isArray(dateValue) && dateValue.length >= 3) {
+            const [year, month, day] = dateValue;
+            dateObj = new Date(year, month - 1, day);
+        }
+        // Xử lý trường hợp dữ liệu là timestamp hoặc chuỗi ngày tháng
+        else {
+            try {
+                dateObj = new Date(dateValue);
+            } catch (error) {
+                console.error("Error parsing date:", error);
+                return "Invalid date";
+            }
+        }
+
+        // Kiểm tra xem dateObj có phải là ngày hợp lệ không
+        if (isNaN(dateObj.getTime())) {
+            return "Invalid date";
+        }
+
+        // Format thành dd/mm/yyyy
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const year = dateObj.getFullYear();
+
+        return `${day}/${month}/${year}`;
     };
 
     // Calculate pagination info
@@ -231,7 +256,7 @@ const ReportList = () => {
                                                         </td>
                                                         <td className="p-4">{report.content || "-"}</td>
                                                         <td className="p-4">
-                                                            {formatBackendDateArray(report.createdAt)}
+                                                            {formatDate(report.createdAt)}
                                                         </td>
                                                         <td className="p-4">
                                                             <span className={`px-3 py-1 rounded-full text-sm font-medium ${
@@ -296,10 +321,6 @@ const ReportList = () => {
                                 <div className="bg-gradient-to-r from-blue-50 to-yellow-50 p-4 flex flex-col md:flex-row md:items-center justify-between border-t border-blue-100 gap-4">
                                     <div className="text-gray-600">
                                         Showing{" "}
-                                        <span className="font-medium">
-                                            {reports.length > 0 ? indexOfFirstReport : 0}
-                                        </span>{" "}
-                                        to{" "}
                                         <span className="font-medium">
                                             {reports.length > 0 ? indexOfFirstReport : 0}
                                         </span>{" "}
