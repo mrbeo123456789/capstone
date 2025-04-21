@@ -103,8 +103,15 @@ public interface EvidenceRepository extends JpaRepository<Evidence, Long> {
             LocalDateTime start,
             LocalDateTime end
     );
-    @Query("SELECT e FROM Evidence e WHERE e.member.id = :memberId AND e.challenge.id = :challengeId")
-    Optional<Evidence> findEvidenceByMemberAndChallenge(Long memberId, Long challengeId);
+    @Query("SELECT e FROM Evidence e " +
+            "WHERE e.member.id = :memberId " +
+            "AND e.challenge.id = :challengeId " +
+            "AND DATE(e.submittedAt) = :date")
+    Optional<Evidence> findByMemberIdAndChallengeIdAndDate(
+            @Param("memberId") Long memberId,
+            @Param("challengeId") Long challengeId,
+            @Param("date") LocalDate date);
+
 
     @Query("""
         SELECT new org.capstone.backend.dto.evidence.EvidenceStatusCountDTO(

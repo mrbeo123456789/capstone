@@ -5,9 +5,11 @@ import lombok.Data;
 import org.capstone.backend.utils.enums.PrivacyStatus;
 import org.capstone.backend.utils.enums.ParticipationType;
 import org.capstone.backend.utils.enums.VerificationType;
+import org.capstone.backend.utils.jwt.ValidChallengeRequest;
 
 import java.time.LocalDate;
 
+@ValidChallengeRequest // <-- Gắn annotation vào class
 @Data
 public class ChallengeRequest {
 
@@ -21,13 +23,13 @@ public class ChallengeRequest {
     @Size(min = 10 , message = "Description cannot be under 10 character")
     private String description;
 
-
     @NotNull(message = "Privacy must be provided")
     private PrivacyStatus privacy;
 
     @NotNull(message = "Verification type must be provided")
     private VerificationType verificationType;
 
+    @NotNull(message = "ParticipationType type must be provided")
     private ParticipationType participationType;
 
     @NotNull(message = "Start date must be provided")
@@ -42,6 +44,6 @@ public class ChallengeRequest {
     @Positive(message = "Max participants must be a positive number")
     private Integer maxParticipants;
 
-//    @NotNull(message = "Challenge Type ID must be provided")
+    @NotNull(message = "Challenge Type ID must be provided")
     private Long challengeTypeId;
 }

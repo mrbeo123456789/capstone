@@ -8,10 +8,12 @@ import org.capstone.backend.dto.evidence.TaskChecklistDTO;
 import org.capstone.backend.service.evidence.EvidenceService;
 import org.capstone.backend.utils.enums.EvidenceStatus;
 import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -72,10 +74,18 @@ public class EvidenceController {
     }
 
     @GetMapping("/tasks")
-    public ResponseEntity<List<TaskChecklistDTO>> getTasksForCurrentMonth() {
-        List<TaskChecklistDTO> tasks = evidenceService.getTasksForCurrentMonth();
+    public ResponseEntity<List<TaskChecklistDTO>> getTasksForDate(
+            @RequestParam(value = "date", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+
+        if (date == null) {
+            date = LocalDate.now();
+        }
+
+        List<TaskChecklistDTO> tasks = evidenceService.getTasksForDate(date);
         return ResponseEntity.ok(tasks);
     }
+
 
     @GetMapping("/count")
     public ResponseEntity<List<EvidenceStatusCountDTO>> getEvidenceCountByStatus(

@@ -266,29 +266,45 @@ public class EvidenceServiceImpl implements EvidenceService {
         );
 
         return evidencePage.map(evidence -> {
-            // Trả về canEdit dựa trên thời gian và quyền chấm
-            EvidenceReport report = evidenceReportRepository.findByEvidenceId(evidence.getId()).orElse(null);
-            boolean canEdit = report != null && isTimeEligibleForReview(evidence)
-                    && isUserAllowedToReview(evidence, report, currentReviewerId);
+            try {
+                EvidenceReport report = evidenceReportRepository.findByEvidenceId(evidence.getId()).orElse(null);
+                boolean canEdit = report != null && isTimeEligibleForReview(evidence)
+                        && isUserAllowedToReview(evidence, report, currentReviewerId);
 
-            return new EvidenceToReviewDTO(
-                    evidence.getId(),
-                    evidence.getMember().getId(),
-                    evidence.getMember().getFullName(),
-                    evidence.getEvidenceUrl(),
-                    evidence.getStatus(),
-                    canEdit,
-                    evidence.getSubmittedAt()
-            );
+                return new EvidenceToReviewDTO(
+                        evidence.getId(),
+                        evidence.getMember().getId(),
+                        evidence.getMember().getFullName(),
+                        evidence.getEvidenceUrl(),
+                        evidence.getStatus(),
+                        canEdit,
+                        evidence.getSubmittedAt()
+                );
+            } catch (Exception ex) {
+                // Log lỗi nếu cần
+                System.err.println("Lỗi khi xử lý evidence ID: " + evidence.getId() + " - " + ex.getMessage());
+                ex.printStackTrace();
+
+                // Trả về object với trạng thái mặc định hoặc null
+                return new EvidenceToReviewDTO(
+                        evidence.getId(),
+                        null,
+                        "Không xác định",
+                        evidence.getEvidenceUrl(),
+                        evidence.getStatus(),
+                        false,
+                        evidence.getSubmittedAt()
+                );
+            }
         });
     }
 
-    /**
-     * Lấy danh sách bằng chứng được giao cho reviewer (đang chờ duyệt) của thử thách.
-     *
-     * @param challengeId ID của thử thách
-     * @return danh sách EvidenceToReviewDTO
-     */
+        /**
+         * Lấy danh sách bằng chứng được giao cho reviewer (đang chờ duyệt) của thử thách.
+         *
+         * @param challengeId ID của thử thách
+         * @return danh sách EvidenceToReviewDTO
+         */
     @Override
     public List<EvidenceToReviewDTO> getEvidenceAssignedForMemberToReview(Long challengeId) {
         Long reviewerId = authService.getMemberIdFromAuthentication();
@@ -476,37 +492,38 @@ public class EvidenceServiceImpl implements EvidenceService {
                 ));
     }
 
-    public List<TaskChecklistDTO> getTasksForCurrentMonth() {
-
+    @Override
+    public List<TaskChecklistDTO> getTasksForDate(LocalDate date) {
         Long memberId = authService.getMemberIdFromAuthentication();
-        // Lấy ngày đầu và ngày cuối của tháng hiện tại
-        LocalDate firstDayOfMonth = LocalDate.now().withDayOfMonth(1);
-        LocalDate lastDayOfMonth = LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth());
 
-        // Lấy tất cả thử thách của member trong tháng hiện tại có trạng thái ONGOING
-        List<ChallengeMember> challengeMembers = challengeMemberRepository.findOngoingChallengesForMemberInCurrentMonth(memberId, firstDayOfMonth, lastDayOfMonth);
+        // Lấy danh sách challenge đang ONGOING tại ngày đó
+        List<ChallengeMember> challengeMembers =
+                challengeMemberRepository.findOngoingChallengesForMemberOnDate(memberId, date);
 
         List<TaskChecklistDTO> taskList = challengeMembers.stream()
                 .map(cm -> {
                     Challenge challenge = cm.getChallenge();
-                    Evidence evidence = evidenceRepository.findEvidenceByMemberAndChallenge(memberId, challenge.getId()).orElse(null);
+
+                    // Lấy evidence đúng ngày
+                    Optional<Evidence> evidenceOpt =
+                            evidenceRepository.findByMemberIdAndChallengeIdAndDate(memberId, challenge.getId(), date);
 
                     TaskChecklistDTO taskDTO = new TaskChecklistDTO();
                     taskDTO.setChallengeId(challenge.getId());
                     taskDTO.setChallengeName(challenge.getName());
 
-                    if (evidence == null) {
+                    if (evidenceOpt.isEmpty()) {
                         taskDTO.setEvidenceSubmitted(false);
-                        taskDTO.setMessage("Chưa nộp chứng cứ");
+                        taskDTO.setMessage("evidence.not_submitted");
                     } else {
+                        Evidence evidence = evidenceOpt.get();
                         taskDTO.setEvidenceSubmitted(true);
                         taskDTO.setEvidenceStatus(evidence.getStatus().toString());
-                        taskDTO.setEvidenceSubmitted(evidence.getStatus() == EvidenceStatus.APPROVED);
 
                         if (evidence.getStatus() == EvidenceStatus.APPROVED) {
-                            taskDTO.setMessage("Đã phê duyệt");
+                            taskDTO.setMessage("evidence.approved");
                         } else {
-                            taskDTO.setMessage("Chưa phê duyệt");
+                            taskDTO.setMessage("evidence.pending");
                         }
                     }
 
@@ -514,14 +531,16 @@ public class EvidenceServiceImpl implements EvidenceService {
                 })
                 .collect(Collectors.toList());
 
+        // Trả về thông báo nếu không có thử thách nào
         if (taskList.isEmpty()) {
             TaskChecklistDTO noTaskDTO = new TaskChecklistDTO();
-            noTaskDTO.setMessage("Không có nhiệm vụ trong tháng này.");
+            noTaskDTO.setMessage("task.none_for_day");
             taskList.add(noTaskDTO);
         }
 
         return taskList;
     }
+
 
     /**
      * Đếm số lượng chứng cứ được nộp bởi thành viên cho thử thách từ ngày startDate đến today.
