@@ -50,6 +50,7 @@
     "previous": "Trước",
     "next": "Sau",
     "page": "Trang",
+    "suggestedTitle": "Gợi ý mời tham gia",
     "selectAtLeastOne": "Vui lòng chọn ít nhất một thành viên.",
     "inviteSuccess": "Gửi lời mời thành công!",
     "inviteFailed": "Gửi lời mời thất bại.",
@@ -226,8 +227,8 @@
   "notification.challengeCancelled.content": "Thử thách '{{challengeName}}' đã bị huỷ bởi quản trị viên hoặc Host.",
   "notification.kickedFromChallenge.title": "Bạn đã bị kick khỏi thử thách",
   "notification.kickedFromChallenge.content": "Bạn đã bị quản trị viên xóa khỏi thử thách '{{challengeName}}'.",
-  "notification.empty": "Không có thông báo mới."
-  },
+  "notification.empty": "Không có thông báo mới.",
+
   "JoinsChallengeDetail": {
     "disabledDuringChallenge": "Hành động này bị tắt khi thử thách đã diễn ra hoặc kết thúc.",
     "hostCannotLeave": "Quản lí thử thách không thể rời thử thách",
@@ -261,7 +262,50 @@
     "reason": "Lý do",
     "submit": "Gửi báo cáo",
     "cancel": "Hủy"
-  }
-
-
+  },
+  "yourChallenge": {
+    "create": "Tạo thử thách",
+    "search": "Tìm kiếm",
+    "filter": "Bộ lọc",
+    "invitations": "Lời mời",
+    "loadingInvitations": "Đang tải lời mời...",
+    "noInvitations": "Bạn chưa có lời mời tham gia thử thách nào",
+    "accept": "Chấp nhận",
+    "decline": "Từ chối",
+    "accepted": "Đã chấp nhận lời mời!",
+    "declined": "Đã từ chối lời mời!",
+    "failedResponse": "Phản hồi thất bại. Vui lòng thử lại.",
+    "inviteText": "đã mời bạn tham gia:",
+    "tabs": {
+      "all": "Tất cả",
+      "host": "Chủ trì",
+      "cohost": "Phụ trách",
+      "member": "Thành viên"
+    },
+    "joinedChallenges": "Thử thách đã tham gia",
+    "loadingChallenges": "Đang tải thử thách...",
+    "noJoined": "Bạn chưa tham gia thử thách nào",
+    "status": {
+      "approved": "Đã duyệt",
+      "pending": "Đang chờ",
+      "rejected": "Bị từ chối",
+      "canceled": "Đã hủy"
+    }
+  },
+  "member": "thành viên",
+  "inviteGroups": "Mời nhóm",
+  "searchPlaceholder": "Tìm kiếm tên nhóm...",
+  "noResults": "Không tìm thấy nhóm nào.",
+  "previous": "Trước",
+  "next": "Tiếp",
+  "page": "Trang",
+  "invite": "Mời",
+  "loading": "Đang tải danh sách nhóm...",
+  "loadError": "Không thể tải nhóm.",
+  "selectWarning": "Vui lòng chọn ít nhất một nhóm.",
+  "success": "Mời nhóm thành công!",
+  "searchPlaceholderGroup": "Nhập tên nhóm..."
 }
+
+
+

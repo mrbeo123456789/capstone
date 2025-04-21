@@ -36,5 +36,6 @@ export const store = configureStore({
             .concat(interestService.middleware)
             .concat(invitationService.middleware)
             .concat(guestService.middleware)
-            .concat(rankingService.middleware),
+            .concat(rankingService.middleware)
+            .concat(notificationService.middleware),
 })

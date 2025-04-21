@@ -54,7 +54,8 @@
     "searchFailed": "Failed to search members.",
     "title": "Invite to Challenge",
     "inviteMembers": "Invite Members",
-    "inviteGroups": "Invite Groups"
+    "inviteGroups": "Invite Groups",
+    "suggestedTitle": "Suggested members to invite"
   },
   "sidebar": {
     "myChallenge": "My Challenge",
@@ -237,8 +238,8 @@
 
     "kickedFromChallenge.title": "You were removed from the challenge",
     "kickedFromChallenge.content": "You were removed from the challenge '{{challengeName}}' by the admin.",
+    "empty": "No new notifications."
   },
-
   "JoinsChallengeDetail": {
     "disabledDuringChallenge": "This action is disabled during or after the challenge.",
     "hostCannotLeave": "Host cannot leave the challenge.",
@@ -272,10 +273,53 @@
     "reason": "Reason",
     "submit": "Submit Report",
     "cancel": "Cancel"
-  }
-
-    "empty": "No new notifications."
-  }
+  },
+  "yourChallenge": {
+    "create": "Create a challenge",
+    "search": "Search",
+    "filter": "Filter",
+    "invitations": "Invitations",
+    "loadingInvitations": "Loading invitations...",
+    "noInvitations": "You have no challenge invites",
+    "accept": "Accept",
+    "decline": "Decline",
+    "accepted": "Invitation accepted!",
+    "declined": "Invitation declined!",
+    "failedResponse": "Failed to respond. Try again.",
+    "inviteText": "invites you to:",
+    "tabs": {
+      "all": "All",
+      "host": "Host",
+      "cohost": "Cohost",
+      "member": "Member"
+    },
+    "joinedChallenges": "Joined Challenges",
+    "loadingChallenges": "Loading challenges...",
+    "noJoined": "You haven't joined any challenge",
+    "status": {
+      "approved": "Approved",
+      "pending": "Pending",
+      "rejected": "Rejected",
+      "canceled": "Canceled"
+    }
+  },
+  "members": "members",
+  "inviteGroups": "Invite Groups",
+  "searchPlaceholder": "Search group name...",
+  "noResults": "No groups found.",
+  "previous": "Previous",
+  "next": "Next",
+  "page": "Page",
+  "invite": "Invite",
+  "loading": "Loading groups...",
+  "loadError": "Failed to load groups.",
+  "selectWarning": "Please select at least one group.",
+  "success": "Groups invited successfully!",
+  "searchPlaceholderGroup":"Enter group name..."
 }
+
+
+
+
 
 

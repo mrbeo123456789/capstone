@@ -20,15 +20,9 @@ export const NotificationDropdown = () => {
 
     // Debug log tất cả notifications
     useEffect(() => {
-        console.log("🟨 Realtime notifications:", realtimeData);
-        console.log("🟦 Fallback notifications from BE:", backendResponse);
-    }, [realtimeData, backendResponse]);
-
-    // Mark as read
-    useEffect(() => {
         if (isOpen) {
             const unread = notifications.filter(n => !n.isRead);
-            console.log("🟧 Đánh dấu đã đọc cho:", unread);
+
             unread.forEach(async (n) => {
                 try {
                     const docRef = doc(db, "notifications", n.id);
@@ -86,7 +80,7 @@ export const NotificationDropdown = () => {
                                         {t(item.title, item.data)}
                                     </strong>
                                     <p className="text-xs text-gray-600">
-                                        {t(item.content, item.data)}
+                                        {t(item.content, item.params)}
                                     </p>
                                     {item.createdAt && (
                                         <p className="text-[10px] text-gray-400 mt-1 italic">

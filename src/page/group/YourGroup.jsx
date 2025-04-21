@@ -86,7 +86,7 @@ const YourGroup = () => {
                                 onClick={() => navigate(`/groups/detail/${invite.id}`)}
                                 className="cursor-pointer min-w-[200px] p-4 border rounded-lg space-y-2 flex-shrink-0 hover:shadow-lg transition">
                                 <p className="text-sm">
-                                    {t("yourGroup.inviteLine", { name: invite.inviter })}
+                                    {t("yourGroup.inviteLine", { name: invite.invitedBy})}
                                 </p>
                                 <div className="h-24 bg-gray-200 rounded">
                                     <img
@@ -95,7 +95,7 @@ const YourGroup = () => {
                                         className="w-full h-full object-cover rounded"
                                     />
                                 </div>
-                                <p className="font-medium">{invite.group}</p>
+                                <p className="font-medium">{invite.groupName}</p>
                                 <div className="flex gap-2">
                                     <button
                                         className="bg-green-600 text-white px-3 py-1 rounded"

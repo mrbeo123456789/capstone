@@ -32,7 +32,8 @@ const JoinedGroupDetail = () => {
 
 
     const isOwner = group?.currentMemberRole === "OWNER";
-
+    const { data: currentMemberData } = useGetCurrentMemberIdQuery();
+    const currentMemberId = currentMemberData;
     useEffect(() => {
         if (error?.status === 500 || error?.status === 404) {
             toast.error(t("groupDetail.permissionDenied"));

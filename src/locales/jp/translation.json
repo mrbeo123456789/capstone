@@ -56,7 +56,8 @@
     "searchFailed": "メンバーの検索に失敗しました。",
     "title": "チャレンジへの招待",
     "inviteMembers": "メンバーを招待",
-    "inviteGroups": "グループを招待"
+    "inviteGroups": "グループを招待",
+    "suggestedTitle": "招待のおすすめメンバー"
   },
 
   "sidebar": {
@@ -282,8 +283,54 @@
     "kickedFromChallenge.content": "あなたはチャレンジ「{{challengeName}}」から管理者により削除されました。",
 
     "empty": "新しい通知はありません。"
-  }
+  },
+
+  "yourChallenge": {
+    "create": "チャレンジを作成",
+    "search": "検索",
+    "filter": "フィルター",
+    "invitations": "招待",
+    "loadingInvitations": "招待を読み込み中...",
+    "noInvitations": "チャレンジへの招待はありません",
+    "accept": "承諾",
+    "decline": "辞退",
+    "accepted": "招待を承諾しました！",
+    "declined": "招待を辞退しました！",
+    "failedResponse": "応答に失敗しました。もう一度お試しください。",
+    "inviteText": "があなたを招待しました：",
+    "tabs": {
+      "all": "すべて",
+      "host": "ホスト",
+      "cohost": "共同ホスト",
+      "member": "メンバー"
+    },
+    "joinedChallenges": "参加中のチャレンジ",
+    "loadingChallenges": "チャレンジを読み込み中...",
+    "noJoined": "まだチャレンジに参加していません",
+    "status": {
+      "approved": "承認済み",
+      "pending": "保留中",
+      "rejected": "却下",
+      "canceled": "キャンセル済み"
+    }
+  },
+
+  "inviteGroups": "グループを招待する",
+  "searchPlaceholder": "グループ名を検索...",
+  "noResults": "グループが見つかりませんでした。",
+  "previous": "前へ",
+  "next": "次へ",
+  "page": "ページ",
+  "invite": "招待",
+  "loading": "グループを読み込み中...",
+  "loadError": "グループの読み込みに失敗しました。",
+  "selectWarning": "少なくとも1つのグループを選択してください。",
+  "success": "グループを正常に招待しました！",
 
 
 
+  "searchPlaceholderGroup":"グループ名を入力してください..."
 }
+
+
+
