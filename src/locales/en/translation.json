@@ -161,6 +161,9 @@
   },
 
   "createChallenge": {
+    "create": "Create Challenge",
+    "creating": "Creating Challenge",
+    "success": "Challenge created successfully!",
     "editTitle": "Edit Challenge",
     "successUpdate": "Challenge updated successfully!",
     "updating": "Updating...",
@@ -196,6 +199,7 @@
     "validationError": "Please correct all errors before submitting.",
     "fail": "Failed to update challenge: "
   },
+
   "ProofUpLoads": {
     "loading": "Loading data",
     "view evidence": "View all evidences",
@@ -261,6 +265,8 @@
   },
 
   "JoinsChallengeDetail": {
+    "reportTab": "Feedback & Reports",
+    "groups": "Groups",
     "disabledDuringChallenge": "This action is disabled during or after the challenge.",
     "hostCannotLeave": "Host cannot leave the challenge.",
     "hostCannotReport": "Host cannot report their own challenge.",
@@ -357,6 +363,34 @@
     "rulesText": "Detailed challenge rules will be displayed here.",
     "teamRanking": "Team ranking will be displayed here.",
     "individualRanking": "Individual ranking will be displayed here."
+  },
+
+  "forgotPassword": {
+    "title": "Forgot Password?",
+    "subtitle": "Enter your email to receive an OTP.",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email address",
+    "required": "*",
+    "sending": "Sending...",
+    "submit": "Get New Password",
+    "back": "Back to Login",
+    "errorEmpty": "Please enter your email.",
+    "success": "OTP sent to your email.",
+    "fail": "Something went wrong."
+  },
+
+  "changePassword": {
+    "title": "Change Password",
+    "old": "Current Password",
+    "oldPlaceholder": "Enter current password",
+    "new": "New Password",
+    "newPlaceholder": "Enter new password",
+    "confirm": "Confirm New Password",
+    "confirmPlaceholder": "Re-enter new password",
+    "submit": "Save Changes",
+    "forgot": "Forgot Password?",
+    "fail": "Failed to change password.",
+    "mismatch": "Passwords do not match!"
   }
 
 }

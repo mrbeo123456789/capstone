@@ -135,6 +135,9 @@
   },
 
   "createChallenge": {
+    "create": "Tạo thử thách",
+    "creating": "Đang tạo thử thách...",
+    "success": "Tạo thử thách thành công!",
     "editTitle": "Chỉnh sửa thử thách",
     "successUpdate": "Cập nhật thử thách thành công!",
     "updating": "Đang cập nhật...",
@@ -144,18 +147,18 @@
     "name": "Tên thử thách",
     "namePlaceholder": "Nhập tên thử thách",
     "summary": "Tóm tắt",
-    "summaryPlaceholder": "Mô tả ngắn về thử thách",
-    "banner": "Ảnh banner (không bắt buộc)",
-    "picture": "Ảnh minh họa thử thách",
-    "pictureNote": "Định dạng chấp nhận: JPG, PNG. Tối đa 2MB.",
-    "clickUpload": "Nhấn hoặc kéo thả tệp để tải lên",
+    "summaryPlaceholder": "Tóm tắt ngắn gọn về thử thách",
+    "banner": "Ảnh bìa (không bắt buộc)",
+    "picture": "Ảnh thử thách",
+    "pictureNote": "Định dạng chấp nhận: JPG, PNG. Dung lượng tối đa: 2MB.",
+    "clickUpload": "Nhấn hoặc kéo tệp vào để tải lên",
     "startDate": "Ngày bắt đầu",
     "endDate": "Ngày kết thúc",
-    "privacy": "Chế độ riêng tư",
+    "privacy": "Chế độ hiển thị",
     "verificationType": {
-      "label": "Hình thức xác minh",
-      "memberReview": "Thành viên chấm chéo",
-      "hostReview": "Host kiểm duyệt"
+      "label": "Cách xác minh",
+      "hostReview": "Chủ thử thách xác minh",
+      "memberReview": "Thành viên xác minh lẫn nhau"
     },
     "participationType": {
       "label": "Hình thức tham gia",
@@ -167,9 +170,10 @@
     "maxParticipants": "Số người tham gia tối đa",
     "description": "Mô tả thử thách",
     "cancel": "Hủy",
-    "validationError": "Vui lòng điền đầy đủ và chính xác các trường bắt buộc.",
-    "fail": "Cập nhật thử thách thất bại: "
+    "validationError": "Vui lòng sửa tất cả lỗi trước khi gửi.",
+    "fail": "Cập nhật thất bại: "
   },
+
   "ProofUpLoads": {
     "loading": "Đang tải dữ liệu",
     "view evidence": "Danh sách bằng chứng",
@@ -240,6 +244,8 @@
   "notification.empty": "Không có thông báo mới.",
 
   "JoinsChallengeDetail": {
+    "reportTab": "Phản hồi & Báo cáo",
+    "groups": "Nhóm",
     "disabledDuringChallenge": "Hành động này bị tắt khi thử thách đã diễn ra hoặc kết thúc.",
     "hostCannotLeave": "Quản lí thử thách không thể rời thử thách",
     "hostCannotReport": "Host không thể báo cáo thử thách của chính mình.",
@@ -337,7 +343,35 @@
     "rulesText": "Quy định chi tiết của thử thách sẽ hiển thị tại đây.",
     "teamRanking": "Bảng xếp hạng đội sẽ hiển thị tại đây.",
     "individualRanking": "Bảng xếp hạng cá nhân sẽ hiển thị tại đây."
-}
+  },
+
+  "forgotPassword": {
+    "title": "Quên mật khẩu?",
+    "subtitle": "Nhập email của bạn để nhận mã OTP.",
+    "email": "Email",
+    "emailPlaceholder": "Nhập địa chỉ email của bạn",
+    "required": "*",
+    "sending": "Đang gửi...",
+    "submit": "Lấy mật khẩu mới",
+    "back": "Quay lại đăng nhập",
+    "errorEmpty": "Vui lòng nhập email.",
+    "success": "Mã OTP đã được gửi đến email của bạn.",
+    "fail": "Đã xảy ra lỗi."
+  },
+
+  "changePassword": {
+    "title": "Đổi mật khẩu",
+    "old": "Mật khẩu hiện tại",
+    "oldPlaceholder": "Nhập mật khẩu hiện tại",
+    "new": "Mật khẩu mới",
+    "newPlaceholder": "Nhập mật khẩu mới",
+    "confirm": "Xác nhận mật khẩu",
+    "confirmPlaceholder": "Nhập lại mật khẩu mới",
+    "submit": "Lưu thay đổi",
+    "forgot": "Quên mật khẩu?",
+    "fail": "Đổi mật khẩu thất bại.",
+    "mismatch": "Mật khẩu xác nhận không khớp!"
+  }
 
 
 }

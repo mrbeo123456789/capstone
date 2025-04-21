@@ -38,14 +38,16 @@ const InviteMembers = ({ onClose }) => {
             return;
         }
         try {
-            await sendInvitation({ challengeId, memberIds: selected ,type : "MEMBER"});
-            toast.success(t("challengeInvite.inviteSuccess"));
+            const res = await sendInvitation({ challengeId, memberIds: selected, type: "MEMBER" }).unwrap();
+            toast.info(res.message || t("challengeInvite.inviteSuccess"));
             onClose();
-        } catch (error) {
-            console.error(error);
-            toast.error(t("challengeInvite.inviteFailed"));
+        } catch (err) {
+            const message = err?.data?.message || err?.data || "Something went wrong.";
+            toast.info(message);
+            onClose();
         }
     };
+
 
     const handleSearch = () => {
         if (!searchKeyword.trim()) {

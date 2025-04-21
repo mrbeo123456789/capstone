@@ -155,42 +155,48 @@
     "enterKeyword": "キーワードを入力してください。"
   },
   "createChallenge": {
+    "create": "チャレンジを作成",
+    "creating": "作成中...",
+    "success": "チャレンジが正常に作成されました！",
     "editTitle": "チャレンジを編集",
     "successUpdate": "チャレンジが正常に更新されました！",
     "updating": "更新中...",
-    "update": "更新する",
+    "update": "更新",
     "generalInfo": "基本情報",
     "details": "チャレンジの詳細",
     "name": "チャレンジ名",
-    "namePlaceholder": "チャレンジ名を入力してください",
+    "namePlaceholder": "チャレンジ名を入力",
     "summary": "概要",
     "summaryPlaceholder": "チャレンジの簡単な説明",
-    "banner": "バナー画像（任意）",
+    "banner": "バナー（任意）",
     "picture": "チャレンジ画像",
-    "pictureNote": "対応形式: JPG, PNG。最大2MB。",
-    "clickUpload": "クリックまたはファイルをドラッグしてアップロード",
+    "pictureNote": "対応形式：JPG、PNG。最大サイズ：2MB。",
+    "clickUpload": "クリックまたはドラッグしてアップロード",
     "startDate": "開始日",
     "endDate": "終了日",
-    "privacy": "公開設定",
+    "privacy": "公開範囲",
     "verificationType": {
-      "label": "確認方法",
-      "hostReview": "主催者確認",
-      "memberReview": "メンバー確認"
+      "label": "認証方法",
+      "hostReview": "ホストによる確認",
+      "memberReview": "メンバーによる確認"
     },
     "participationType": {
-      "label": "参加タイプ",
+      "label": "参加形式",
       "individual": "個人",
       "group": "グループ"
     },
-    "challengeType": "チャレンジタイプ",
-    "selectChallengeType": "チャレンジタイプを選択",
-    "maxParticipants": "最大参加者数",
+    "challengeType": "チャレンジの種類",
+    "selectChallengeType": "チャレンジの種類を選択",
+    "maxParticipants": "最大参加人数",
     "description": "チャレンジの説明",
     "cancel": "キャンセル",
-    "validationError": "送信前にすべてのエラーを修正してください。",
+    "validationError": "すべてのエラーを修正してください。",
     "fail": "チャレンジの更新に失敗しました: "
   },
+
   "JoinsChallengeDetail": {
+    "reportTab": "フィードバックと報告",
+    "groups": "グループ",
     "disabledDuringChallenge": "チャレンジ中または終了後はこの操作はできません。",
     "hostCannotLeave": "ホストはチャレンジから退出できません。",
     "hostCannotReport": "ホストは自分のチャレンジを報告できません。",
@@ -320,5 +326,34 @@
     "rulesText": "チャレンジの詳細なルールがここに表示されます。",
     "teamRanking": "チームランキングがここに表示されます。",
     "individualRanking": "個人ランキングがここに表示されます。"
-}
+  },
+  "forgotPassword": {
+    "title": "パスワードをお忘れですか？",
+    "subtitle": "OTPを受け取るためにメールアドレスを入力してください。",
+    "email": "メールアドレス",
+    "emailPlaceholder": "メールアドレスを入力してください",
+    "required": "*",
+    "sending": "送信中...",
+    "submit": "新しいパスワードを取得する",
+    "back": "ログイン画面に戻る",
+    "errorEmpty": "メールアドレスを入力してください。",
+    "success": "OTPをメールに送信しました。",
+    "fail": "エラーが発生しました。"
+  },
+
+  "changePassword": {
+    "title": "パスワードを変更",
+    "old": "現在のパスワード",
+    "oldPlaceholder": "現在のパスワードを入力",
+    "new": "新しいパスワード",
+    "newPlaceholder": "新しいパスワードを入力",
+    "confirm": "新しいパスワードの確認",
+    "confirmPlaceholder": "もう一度入力",
+    "submit": "変更を保存",
+    "forgot": "パスワードを忘れましたか？",
+    "fail": "パスワードの変更に失敗しました。",
+    "mismatch": "パスワードが一致しません！"
+  }
+
+
 }

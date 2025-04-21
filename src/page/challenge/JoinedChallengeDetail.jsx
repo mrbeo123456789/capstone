@@ -19,6 +19,9 @@ import {
 import { useGetMyEvidencesByChallengeQuery } from "../../service/evidenceService.js";
 import ReportChallengeModal from "./modal/ReportChallengeModal.jsx";
 import MemberManagementModal from "./modal/MemberManagementModal.jsx";
+import ChallengeGroupTab from "./ChallengeGroupTab.jsx";
+import EvidenceList from "../admin/list/EvidenceList.jsx";
+import HostEvidenceManagement from "./HostEvidenceManagement.jsx";
 
 const JoinedChallengeDetail = () => {
     const { t } = useTranslation();
@@ -65,10 +68,26 @@ const JoinedChallengeDetail = () => {
 
     const tabItems = [
         { key: "proof", label: t("JoinsChallengeDetail.proof"), icon: <FaCheckCircle /> },
-        { key: "ranking", label: t("JoinsChallengeDetail.member"), icon: <FaUsers /> },
+        {
+            key: "ranking",
+            label:
+                challenge.participationType === "GROUP"
+                    ? t("JoinsChallengeDetail.groups")
+                    : t("JoinsChallengeDetail.member"),
+            icon: <FaUsers />
+        },
         { key: "review", label: t("JoinsChallengeDetail.review"), icon: <FaClipboardCheck /> },
         { key: "description", label: t("JoinsChallengeDetail.description"), icon: <FaInfoCircle /> },
     ];
+
+// 👉 Thêm tab Report nếu là HOST
+    if (challenge.role === "HOST") {
+        tabItems.push({
+            key: "report",
+            label: t("JoinsChallengeDetail.reportTab"), // 🔁 nhớ thêm key vào i18n
+            icon: <FaFlag />
+        });
+    }
 
     return (
         <div className="w-full">
@@ -213,9 +232,22 @@ const JoinedChallengeDetail = () => {
                     )
                 )}
 
-                {activeTab === "ranking" && <RankingList />}
+                {activeTab === "ranking" && (
+                    challenge.participationType === "GROUP" ? (
+                        <ChallengeGroupTab />
+                    ) : (
+                        <RankingList />
+                    )
+                )}
+
                 {activeTab === "review" && <VoteOther />}
                 {activeTab === "description" && <Description content={challenge} />}
+                {activeTab === "report" && (
+                    <div className="p-4 text-center text-gray-600">
+                        {/* Bạn có thể thay bằng component thực sự nếu có */}
+                        <HostEvidenceManagement challengeId={challenge.id}/>
+                    </div>
+                )}
                 {showPopup && <ChallengeInvitePopup onClose={closeUserDetail} />}
                 {showReportModal && <ReportChallengeModal challengeId={challenge.id} onClose={closeReportModal} />}
                 {showMemberModal && (

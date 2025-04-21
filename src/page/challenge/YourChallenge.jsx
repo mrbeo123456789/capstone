@@ -182,10 +182,28 @@ const YourChallenge = () => {
                                         alt={challenge.name}
                                         className="w-full h-full object-cover rounded"
                                     />
+
+                                    {/* 👑 Host icon on the top-left */}
                                     {challenge.role === "HOST" && (
-                                        <span className="absolute top-2 left-2 text-yellow-400 text-xl drop-shadow-md">👑</span>
+                                        <span
+                                            className="absolute top-2 left-2 text-yellow-400 text-xl drop-shadow-md">👑</span>
+                                    )}
+
+                                    {/* 🧍/👥 Participation icon on the top-right */}
+                                    <span
+                                        className="absolute top-2 right-2 text-white text-xl px-1.5 py-0.5"
+                                        title={challenge.participationType === "INDIVIDUAL" ? "Individual" : "Group"}
+                                    >
+                                        {challenge.participationType === "INDIVIDUAL" ? "🧍" : "👥"}
+                                    </span>
+                                    {/* 🕓 Remaining days at bottom-right */}
+                                    {challenge.remainingDays > 0 && challenge.remainingDays < 7 && (
+                                        <div className="absolute bottom-1 right-2 text-xs text-orange-500 bg-white/80 px-2 py-0.5 rounded shadow">
+                                            🕓 {challenge.remainingDays} day{challenge.remainingDays > 1 ? "s" : ""} left
+                                        </div>
                                     )}
                                 </div>
+
                                 <div className="flex items-center justify-center gap-1 mb-2 w-full px-2">
                                     {challenge.role === "HOST" && (
                                         <span className="text-gray-600 hover:text-blue-600 text-sm cursor-pointer"
@@ -204,11 +222,6 @@ const YourChallenge = () => {
                                     return (
                                         <div className={`${bg} ${textColor} text-xs px-2 py-1 rounded mb-1 flex items-end`}>
                                             {text}
-                                            {challenge.remainingDays > 0 && challenge.remainingDays < 7 && (
-                                                <div className="text-xs text-orange-500 mt-1">
-                                                    🕓 {challenge.remainingDays} day{challenge.remainingDays > 1 ? "s" : ""} left
-                                                </div>
-                                            )}
                                         </div>
                                     );
                                 })()}
