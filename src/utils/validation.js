@@ -132,14 +132,6 @@ export const loginValidation = yup.object({
 
 // ✅ Group Schema
 export const groupValidation = yup.object({
-    name: yup
-        .string()
-        .required(() => i18n.t("group.nameRequired", { ns: "validation" })),
-
-    privacy: yup
-        .string()
-        .oneOf(["PUBLIC", "PRIVATE"])
-        .required(() => i18n.t("group.privacyRequired", { ns: "validation" })),
-
+    name: yup.string().required("Group name is required!"),
     description: yup.string().nullable(),
 });

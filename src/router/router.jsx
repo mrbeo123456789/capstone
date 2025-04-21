@@ -51,6 +51,7 @@ const router = createBrowserRouter([
             { path: "statistics", element: <MemberRoute><Statistics /></MemberRoute> },
             { path: "achievement", element: <MemberRoute><Achievement /></MemberRoute> },
             { path: "password", element: <MemberRoute><ChangePassword /></MemberRoute> },
+            { path: "challenges/detail/:id", element: <ChallengeDetail /> },
             {
                 path: "challenges",
                 element: <MemberRoute><Outlet /></MemberRoute>,
@@ -58,7 +59,6 @@ const router = createBrowserRouter([
                     { index: true, element: <ChallengePage /> },
                     { path: "joins", element: <YourChallenge /> },
                     { path: "create", element: <ChallengeForm /> },
-                    { path: "detail/:id", element: <ChallengeDetail /> },
                     { path: "joins/detail/:id", element: <JoinedChallengeDetail /> },
                     { path: "edit/:id", element: <ChallengeEdit/>}
                 ]
@@ -67,11 +67,18 @@ const router = createBrowserRouter([
                 path: "groups",
                 element: <MemberRoute><Outlet /></MemberRoute>,
                 children: [
+                    // Tạo mới nhóm
                     { path: "create", element: <GroupForm /> },
+
+                    // Danh sách nhóm đã tham gia
                     { path: "joins", element: <YourGroup /> },
-                    { path: "joins/:id", element: <GroupUsers /> }
+
+                    // Chi tiết nhóm đã tham gia
+                    { path: "joins/:id", element: <GroupUsers /> },
+
+                    { path: ":id/edit", element: <GroupForm /> } // ✅ Chính xác
                 ]
-            },
+            }
         ]
     },
     {path: "/ranking", element: <Leaderboard/>},

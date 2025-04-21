@@ -28,7 +28,7 @@ const ChallengeInvitePopup = ({ onClose }) => {
                         className={`flex items-center gap-2 px-4 py-2 rounded-md ${activeTab === "suggested" ? "bg-orange-500 text-white" : "text-gray-700 hover:bg-orange-100"}`}
                     >
                         <IoSparkles className="text-xl" />
-                        {t('challengeInvite.suggested')}
+                        {t("challengeInvite.suggestedTitle")}
                     </button>
 
                     {/* Members Tab */}

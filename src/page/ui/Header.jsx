@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { IoGlobeOutline } from "react-icons/io5";
 import { FiLogOut } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
-import NotificationDropdown from "../../component/NotificationDropdown.jsx";
+import {NotificationDropdown} from "../../component/NotificationDropdown.jsx";
 import { Link } from "react-router-dom";
 
 const Header = ({ toggleSidebar }) => {

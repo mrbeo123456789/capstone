@@ -21,6 +21,7 @@
     "chart.js": "^4.4.8",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
+    "firebase": "^11.6.0",
     "framer-motion": "^12.6.3",
     "i18next": "^24.2.3",
     "jsonwebtoken-esm": "^2.0.1",

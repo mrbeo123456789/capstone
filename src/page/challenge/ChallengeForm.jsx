@@ -106,40 +106,45 @@ const CreateChallenge = () => {
     };
 
     return (
-        <div className="bg-white p-6 w-full rounded-xl border-4 border-transparent">
-            <div className="p-6 flex flex-col">
+        <div className="bg-white p-1 sm:p-6 w-full rounded-xl border-4 border-transparent">
+            <div className="p-1 sm:p-6 flex flex-col">
                 <h3 className="mb-4 text-xl font-bold">{t("createChallenge.generalInfo")}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <div className="w-full mt-6">
-                            <label className="text-sm font-medium">{t("createChallenge.name")}</label><span className="text-red-500">*</span>
-                            <input {...register("name")} placeholder={t("createChallenge.namePlaceholder")} className="w-full p-2 border rounded-md" />
+                            <label className="text-sm font-medium">{t("createChallenge.name")}</label><span
+                            className="text-red-500">*</span>
+                            <input {...register("name")} placeholder={t("createChallenge.namePlaceholder")}
+                                   className="w-full p-2 border rounded-md"/>
                             <p className="text-red-600">{errors.name?.message}</p>
                         </div>
                         <div className="w-full mt-6">
                             <label className="text-sm font-medium">{t("createChallenge.summary")}</label>
-                            <input {...register("summary")} placeholder={t("createChallenge.summaryPlaceholder")} className="w-full p-2 border rounded-md" />
+                            <input {...register("summary")} placeholder={t("createChallenge.summaryPlaceholder")}
+                                   className="w-full p-2 border rounded-md"/>
                             <p className="text-red-600">{errors.summary?.message}</p>
                         </div>
                         <div className="w-full mt-6">
                             <label className="text-sm font-medium">{t("createChallenge.banner")}</label>
                             <label htmlFor="banner-upload" className="relative group cursor-pointer">
-                                <div className="w-full h-40 flex items-center justify-center border-2 border-dashed rounded-lg bg-gray-50">
-                                    {bannerPreview ? <img src={bannerPreview} className="w-full h-full object-cover rounded-lg" /> : (
-                                        <div className="text-center text-gray-400">
-                                            <IoCloudUploadOutline className="text-3xl mx-auto mb-2" />
-                                            <p className="text-sm">{t("createChallenge.clickUpload")}</p>
-                                        </div>
-                                    )}
+                                <div
+                                    className="w-full h-40 flex items-center justify-center border-2 border-dashed rounded-lg bg-gray-50">
+                                    {bannerPreview ?
+                                        <img src={bannerPreview} className="w-full h-full object-cover rounded-lg"/> : (
+                                            <div className="text-center text-gray-400">
+                                                <IoCloudUploadOutline className="text-3xl mx-auto mb-2"/>
+                                                <p className="text-sm">{t("createChallenge.clickUpload")}</p>
+                                            </div>
+                                        )}
                                 </div>
                             </label>
                             <input id="banner-upload" type="file" className="hidden" onChange={(e) => {
                                 const file = e.target.files[0];
                                 if (file) {
                                     setBannerPreview(URL.createObjectURL(file));
-                                    setValue("banner", file, { shouldValidate: true });
+                                    setValue("banner", file, {shouldValidate: true});
                                 }
-                            }} />
+                            }}/>
                         </div>
                     </div>
                     <label htmlFor="dropzone-file" className="relative group cursor-pointer md:m-2">
@@ -159,10 +164,14 @@ const CreateChallenge = () => {
                         </div>
                         <p className="text-red-600">{errors.picture?.message}</p>
                     </label>
-                    <input {...register("picture")} id="dropzone-file" type="file" className="hidden" onChange={handleFileChange} />
+                    <input {...register("picture")} id="dropzone-file" type="file" className="hidden"
+                           onChange={handleFileChange}/>
                 </div>
             </div>
-
+            <div className="bg-gradient-to-r from-red-700 to-blue-600 rounded-lg w-full p-px">
+                <div className="bg-white flex flex-col rounded-lg shadow-md h-full">
+                </div>
+            </div>
             <div className="rounded-lg w-full p-6">
                 <h3 className="mb-4 text-xl font-bold">{t("createChallenge.details")}</h3>
                 <form onSubmit={handleSubmit(onSubmit, onError)}>

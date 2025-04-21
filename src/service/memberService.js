@@ -59,10 +59,16 @@ export const memberService = createApi({
                 return { message: response };
             },
         }),
+        getCurrentMemberId: builder.query({
+            query: () => "/member/me",
+            providesTags: ["Member"],
+        }),
     }),
+
 });
 
 export const {
+    useGetCurrentMemberIdQuery,
     useGetMembersQuery,
     useGetMemberByIdQuery,
     useGetMyProfileQuery,

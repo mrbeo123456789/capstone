@@ -122,7 +122,7 @@ export const adminUserService = createApi({
         }),
         getGrowth: builder.query({
             query: ({ range = 'MONTH' } = {}) => `admin/dashboard/growth?range=${encodeURIComponent(range)}`,
-            providesTags: ['Dashboard'],
+            providesTags: ['Admin'],
         }),
 
         reviewChallenge: builder.mutation({

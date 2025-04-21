@@ -1,5 +1,4 @@
-import {useMemo, useState} from "react";
-import {useNavigate} from "react-router-dom";
+import React, {useMemo, useState} from "react";
 import {
     LineChart,
     Line,
@@ -14,6 +13,7 @@ import {
     Cell,
 } from "recharts";
 import { useGetGrowthQuery, useGetSummaryQuery } from "../../../service/adminService";
+import {useNavigate} from "react-router-dom";
 
 const Charts = () => {
     const navigate = useNavigate();
@@ -61,7 +61,7 @@ const Charts = () => {
                 color = "#f43f5e";  // Rose/pink
                 break;
             default:
-                color = "#9ca3af";  // Default gray
+                color = "#9ca3af";
         }
         return { name: key, value: Number(value) || 0, color };
     });
@@ -169,7 +169,6 @@ const Charts = () => {
                             />
                         </LineChart>
                     </ResponsiveContainer>
-
                 )}
             </div>
 
