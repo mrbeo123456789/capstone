@@ -54,13 +54,38 @@ const GroupList = () => {
         }
     };
 
-    const formatBackendDateArray = (dateArray) => {
-        if (!Array.isArray(dateArray) || dateArray.length < 3) return "Invalid date";
-        const [year, month, day] = dateArray;
-        // Nếu số ngày hoặc tháng chỉ có 1 chữ số, thêm số 0 phía trước
-        const dd = day < 10 ? `0${day}` : day;
-        const mm = month < 10 ? `0${month}` : month;
-        return `${dd}/${mm}/${year}`;
+    // Hàm định dạng ngày từ dữ liệu backend
+    const formatDate = (dateValue) => {
+        if (!dateValue) return "Invalid date";
+
+        let dateObj;
+
+        // Xử lý trường hợp dữ liệu là mảng (kiểu cũ)
+        if (Array.isArray(dateValue) && dateValue.length >= 3) {
+            const [year, month, day] = dateValue;
+            dateObj = new Date(year, month - 1, day);
+        }
+        // Xử lý trường hợp dữ liệu là timestamp hoặc chuỗi ngày tháng
+        else {
+            try {
+                dateObj = new Date(dateValue);
+            } catch (error) {
+                console.error("Error parsing date:", error);
+                return "Invalid date";
+            }
+        }
+
+        // Kiểm tra xem dateObj có phải là ngày hợp lệ không
+        if (isNaN(dateObj.getTime())) {
+            return "Invalid date";
+        }
+
+        // Format thành dd/mm/yyyy
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const year = dateObj.getFullYear();
+
+        return `${day}/${month}/${year}`;
     };
 
     // Pagination handlers
@@ -158,7 +183,7 @@ const GroupList = () => {
                                                     </div>
                                                 </td>
                                                 <td className="p-4 text-gray-600">{group.memberCount}</td>
-                                                <td className="p-4 text-gray-600">{formatBackendDateArray(group.createdAt)}</td>
+                                                <td className="p-4 text-gray-600">{formatDate(group.createdAt)}</td>
                                                 <td className="p-4">
                                                     <div className="flex space-x-2 justify-center">
                                                         <button
