@@ -35,7 +35,7 @@ import CreateChallenge from "../page/admin/detailmodal/CreateChallenge.jsx";
 import Settings from "../page/admin/list/Settings.jsx";
 import Leaderboard from "../page/ui/Leaderboard.jsx";
 import ChallengeEdit from "../page/challenge/ChallengeEdit.jsx";
-
+import ChallengeStatistics from "../page/admin/detailmodal/challengeStatistic.jsx";
 const router = createBrowserRouter([
     { path: "/", element: <Navigate to="/homepage" /> },
     { path: "*", element: <NotFoundPage /> },
@@ -51,6 +51,7 @@ const router = createBrowserRouter([
             { path: "statistics", element: <MemberRoute><Statistics /></MemberRoute> },
             { path: "achievement", element: <MemberRoute><Achievement /></MemberRoute> },
             { path: "password", element: <MemberRoute><ChangePassword /></MemberRoute> },
+            { path: "ranking", element: <MemberRoute><Leaderboard/></MemberRoute>},
             { path: "challenges/detail/:id", element: <ChallengeDetail /> },
             {
                 path: "challenges",
@@ -81,7 +82,7 @@ const router = createBrowserRouter([
             }
         ]
     },
-    {path: "/ranking", element: <Leaderboard/>},
+
 
     // Standalone auth pages (outside layout)
     { path: "/login", element: <LoginPage /> },
@@ -112,6 +113,7 @@ const router = createBrowserRouter([
             { path: "groupmanagement", element: <GroupList /> },
             { path: "challengemanagement", element: <ChallengeList /> },
             { path: "challenge/create", element: <CreateChallenge /> },
+            { path: "challenge/statistics", element: <ChallengeStatistics /> },
             { path: "/adminchallenge/:id/detail", element: <AdminChallengeDetail /> }
         ]
     }

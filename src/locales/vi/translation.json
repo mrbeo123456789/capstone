@@ -597,6 +597,33 @@
     "loadingStarLeaderboard": "Đang tải bảng xếp hạng sao...",
     "noMembersFound": "Không tìm thấy thành viên nào",
     "avgStars": "Sao trung bình"
+  },
+  "leaderboard": {
+    "individual": "Cá nhân",
+    "group": "Nhóm",
+    "achievements": "Thành tựu",
+    "searchPlaceholder": "Tìm kiếm người dùng...",
+    "myRank": "Xếp hạng của tôi",
+    "myGroupRank": "Xếp hạng nhóm của tôi",
+    "user": "Người dùng",
+    "group": "Nhóm",
+    "members": "Thành viên",
+    "score": "Điểm số",
+    "noUsersFound": "Không tìm thấy người dùng khớp với \"{searchTerm}\"",
+    "noGroupsFound": "Không tìm thấy nhóm khớp với \"{searchTerm}\"",
+    "previous": "Trước",
+    "next": "Tiếp",
+    "achievementsTitle": "Thành tựu của bạn",
+    "usersEarned": "người dùng đã đạt được",
+    "earned": "Đạt được vào",
+    "notEarned": "Chưa đạt được",
+    "yourProgress": "Tiến độ của bạn",
+    "achievementsCompleted": "Thành tựu đã hoàn thành",
+    "completionRate": "Tỷ lệ hoàn thành",
+    "overallProgress": "Tiến độ tổng thể",
+    "copyright": "Bản quyền © {year}",
+    "page": "Trang",
+    "of": "/"
   }
 
 

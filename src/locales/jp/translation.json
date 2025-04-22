@@ -579,7 +579,34 @@
     "loadingStarLeaderboard": "スターリーダーボードを読み込み中...",
     "noMembersFound": "メンバーが見つかりません",
     "avgStars": "平均スター"
+  },
+  "leaderboard": {
+    "individual": "個人",
+    "group": "グループ",
+    "achievements": "実績",
+    "searchPlaceholder": "ユーザーを検索...",
+    "myRank": "自分のランク",
+    "myGroupRank": "自分のグループランク",
+    "user": "ユーザー",
+    "members": "メンバー",
+    "score": "スコア",
+    "noUsersFound": "\"{searchTerm}\"に一致するユーザーが見つかりません",
+    "noGroupsFound": "\"{searchTerm}\"に一致するグループが見つかりません",
+    "previous": "前へ",
+    "next": "次へ",
+    "achievementsTitle": "あなたの実績",
+    "usersEarned": "人が獲得",
+    "earned": "獲得日",
+    "notEarned": "未獲得",
+    "yourProgress": "進捗状況",
+    "achievementsCompleted": "達成した実績",
+    "completionRate": "達成率",
+    "overallProgress": "全体の進捗",
+    "copyright": "著作権 © {year}",
+    "page": "ページ",
+    "of": "の"
   }
+
 
 
 

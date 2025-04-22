@@ -613,6 +613,32 @@
     "notCompleted": "Not Completed",
     "dailyOverview": "Daily progress overview",
     "completionRate": "Daily completion rate"
+  },
+  "leaderboard": {
+    "individual": "Individual",
+    "group": "Group",
+    "achievements": "Achievements",
+    "searchPlaceholder": "Search users...",
+    "myRank": "My Rank",
+    "myGroupRank": "My Group Rank",
+    "user": "User",
+    "members": "Members",
+    "score": "Score",
+    "noUsersFound": "No users found matching \"{searchTerm}\"",
+    "noGroupsFound": "No groups found matching \"{searchTerm}\"",
+    "previous": "Previous",
+    "next": "Next",
+    "achievementsTitle": "Your Achievements",
+    "usersEarned": "users earned this",
+    "earned": "Earned on",
+    "notEarned": "Not yet earned",
+    "yourProgress": "Your Progress",
+    "achievementsCompleted": "Achievements Completed",
+    "completionRate": "Completion Rate",
+    "overallProgress": "Overall Progress",
+    "copyright": "Copyright © {year}",
+    "page": "Page",
+    "of": "/"
   }
 
 
