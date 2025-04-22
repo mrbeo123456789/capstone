@@ -12,10 +12,9 @@ import java.util.Optional;
 
 public interface ChallengeStarRatingRepository extends JpaRepository<ChallengeStarRating, Long> {
     Optional<ChallengeStarRating> findByChallengeIdAndMemberId(Long challengeId, Long memberId);
-    Page<ChallengeStarRating> findByChallengeIdOrderByAverageStarDescTotalRatingCountDescGivenRatingCountDesc(
-            Long challengeId, Pageable pageable);
     @Query("SELECT AVG(csr.averageStar) FROM ChallengeStarRating csr WHERE csr.challengeId = :challengeId")
     Double findAverageStarByChallengeId(@Param("challengeId") Long challengeId);
+
 
 
 }

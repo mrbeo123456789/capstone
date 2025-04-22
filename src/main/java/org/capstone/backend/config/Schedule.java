@@ -36,7 +36,6 @@ public class Schedule {
     private final ApplicationEventPublisher eventPublisher;
     private final EvidenceReportRepository evidenceReportRepository;
     private final EvidenceRepository evidenceRepository;
-
     // ==== 00:00 – Roll UPCOMING → ONGOING & ONGOING → FINISH ====
     @Transactional
     @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Bangkok")
@@ -60,26 +59,14 @@ public class Schedule {
                     log.info("Challenge {} finished", ch.getId());
                 });
 
-        // persist both start & finish updates
-        challengeRepository.saveAll(
-                Stream.concat(toStart, toFinish).toList()
-        );
+        challengeRepository.saveAll(Stream.concat(toStart, toFinish).toList());
 
-        // now that some challenges have just finished, run their post‑finish logic:
         markMemberCompletion(today);
         updateGroupChallengeStatuses(today);
     }
 
-    // ==== 00:05 – Assign daily cross‑check reviewers ====
-    //@Scheduled(cron = "0 * * * * *", zone = "Asia/Bangkok")
-    public void assignDailyReviewers() {
-        challengeRepository
-                .findCrossCheckChallengesHappeningToday(ChallengeStatus.ONGOING, VerificationType.MEMBER_REVIEW)
-                .forEach(assignmentService::assignPendingReviewersForChallenge);
-    }
-
-    // ==== 00:15 – Announce results ====
-    @Scheduled(cron = "0 15 0 * * *", zone = "Asia/Bangkok")
+    // ===== 🕒 00:02 – Gửi sự kiện công bố kết quả cho các thử thách vừa kết thúc =====
+    @Scheduled(cron = "0 2 0 * * *", zone = "Asia/Bangkok")
     public void announceResults() {
         LocalDate today = LocalDate.now();
         challengeRepository.findByStatusAndEndDate(ChallengeStatus.FINISH, today)
@@ -89,30 +76,39 @@ public class Schedule {
                 });
     }
 
-    // ==== 00:30 – Update star ratings & global ranking (daily) ====
-    @Scheduled(cron = "0 30 0 * * *", zone = "Asia/Bangkok")
+    // ===== 🕓 00:10 – Tính điểm sao và tiến độ cá nhân cho tất cả thử thách đang diễn ra =====
+    @Scheduled(cron = "0 10 0 * * *", zone = "Asia/Bangkok")
     public void updateStarRatingsAndGlobalRankings() {
         rankingService.updateChallengeStarRatings();
-        rankingService.updateGlobalRanking();
+        rankingService.recalculateAllChallengeProgressRankings();
         log.debug("Updated star ratings & global ranking");
     }
 
-    // ==== HH:45 – Recalculate progress ranking (hourly) ====
-    @Scheduled(cron = "0 45 * * * *", zone = "Asia/Bangkok")
-    public void recalculateChallengeProgressRankings() {
-        rankingService.recalculateAllChallengeProgressRankings();
-        log.debug("Recalculated challenge progress rankings");
+    // ===== 🕔 00:15 – Gán reviewer tự động cho thử thách MEMBER_REVIEW trong ngày =====
+    @Scheduled(cron = "0 15 0 * * *", zone = "Asia/Bangkok")
+    public void assignDailyReviewers() {
+        challengeRepository
+                .findCrossCheckChallengesHappeningToday(ChallengeStatus.ONGOING, VerificationType.MEMBER_REVIEW)
+                .forEach(assignmentService::assignPendingReviewersForChallenge);
     }
 
-    // ==== 21:10 – Assign reviewers for challenges ending today ====
-    @Scheduled(cron = "0 10 21 * * *", zone = "Asia/Bangkok")
+    // ===== 🗓 Chủ Nhật hàng tuần lúc 01:00 – Cập nhật bảng xếp hạng tổng thể (cá nhân + nhóm) =====
+    @Scheduled(cron = "0 0 1 * * SUN", zone = "Asia/Bangkok")
+    public void updateWeeklyGlobalRankings() {
+        rankingService.updateGlobalRanking();                  // xếp hạng cá nhân
+        rankingService.calculateAndSaveGlobalGroupRanking();   // xếp hạng nhóm
+        log.debug("✅ [WEEKLY] Updated global member & group rankings (Sunday 01:00)");
+    }
+
+
+    // ===== 🌙 21:02 – Gán reviewer cuối ngày cho thử thách kết thúc hôm nay =====
+    @Scheduled(cron = "0 2 21 * * *", zone = "Asia/Bangkok")
     public void assignEndDayReviewers() {
         LocalDate today = LocalDate.now();
         challengeRepository
                 .findChallengesEndingToday(today)
                 .forEach(assignmentService::assignPendingReviewersForChallenge);
     }
-
 
     @Transactional
     protected void markMemberCompletion(LocalDate today) {

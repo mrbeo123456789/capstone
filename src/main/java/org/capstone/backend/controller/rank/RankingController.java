@@ -1,15 +1,15 @@
 package org.capstone.backend.controller.rank;
 
 import lombok.RequiredArgsConstructor;
-import org.capstone.backend.dto.rank.ChallengeProgressRankingResponse;
-import org.capstone.backend.dto.rank.ChallengeStarRatingResponse;
-import org.capstone.backend.dto.rank.GlobalMemberRankingResponse;
+import org.capstone.backend.dto.rank.*;
+import org.capstone.backend.entity.GlobalGroupRanking;
 import org.capstone.backend.entity.GlobalMemberRanking;
 import org.capstone.backend.service.ranking.RankingService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +27,11 @@ public class RankingController {
         List<ChallengeProgressRankingResponse> top3 = rankingService.getTop3RankingByChallengeId(challengeId);
         return ResponseEntity.ok(top3);
     }
+    @GetMapping("{challengeId}/group-top3-progress")
+    public ResponseEntity<List<GroupProgressRankingDTO>> getTop3GroupProgress(@PathVariable Long challengeId) {
+        return ResponseEntity.ok(rankingService.getTop3GroupProgress(challengeId));
+    }
+
     @GetMapping("/challenges/{challengeId}/stars")
     public ResponseEntity<Page<ChallengeStarRatingResponse>> getStarLeaderboard(
             @PathVariable Long challengeId,
@@ -43,12 +48,36 @@ public class RankingController {
         return ResponseEntity.ok(starRatings);
     }
 
+    // Controller update
     @GetMapping("/global")
     public Page<GlobalMemberRankingResponse> getGlobalRanking(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String keyword
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        return rankingService.getGlobalRanking(pageable);
+        return rankingService.getGlobalRanking(pageable, keyword);
     }
+
+    @GetMapping("/global/me")
+    public GlobalMemberRankingResponse getMyRanking() {
+        return rankingService.getCurrentUserRanking();
+    }
+    @GetMapping("/{challengeId}/group-star-ratings")
+    public ResponseEntity<Page<GroupStarRatingResponse>> getGroupStarRatingsByChallenge(
+            @PathVariable Long challengeId,
+            @PageableDefault(size = 10, sort = "averageStar", direction = Sort.Direction.DESC) Pageable pageable) {
+
+        Page<GroupStarRatingResponse> result =
+                rankingService.getGroupStarRatingsByChallengeId(challengeId, pageable);
+
+        return ResponseEntity.ok(result);
+    }
+    @GetMapping("/ranking/groups/global")
+    public ResponseEntity<Page<GlobalGroupRanking>> getGlobalGroupRanking(
+            @RequestParam(required = false) String keyword,
+            @PageableDefault(size = 10, sort = "totalStars", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(rankingService.getGlobalGroupRanking(pageable, keyword));
+    }
+
 }

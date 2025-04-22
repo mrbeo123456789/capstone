@@ -157,5 +157,6 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
             @Param("date") LocalDate date,
             Pageable pageable
     );
+    List<Challenge> findByStatus(ChallengeStatus status);
 
 }
