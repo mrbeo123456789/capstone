@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Search, ThumbsUp, ThumbsDown, HourglassIcon } from 'lucide-react';
 import { ClockIcon, CheckCircleIcon } from "lucide-react";
-import EvidenceDetailModal from "../../../page/admin/detailmodal/EvidenceDetailModal.jsx"; // Fix import path if needed
-import { useGetJoinedMembersWithPendingEvidenceQuery } from '../../../service/challengeService.js';
-import {
-    useGetEvidencesForHostQuery,
-    useGetEvidenceCountByStatusQuery // Import the new API query hook
-} from '../../../service/evidenceService.js';
+import { useGetJoinedMembersWithPendingEvidenceQuery } from "../../service/challengeService.js";
+import { useGetEvidenceCountByStatusQuery, useGetEvidencesForHostQuery } from "../../service/evidenceService.js";
+import EvidenceDetailModal from "../../component/ChallengeDetailModal.jsx";
+import { useTranslation } from "react-i18next";
+import ChallengeStatistic from "./ChallengeStatistic.jsx";
 
-const MemberAndEvidenceManagement = ({ challengeId }) => {
+const HostEvidenceManagement = ({ challengeId }) => {
+    const { t } = useTranslation();
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
@@ -23,8 +23,8 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
         switch (frontendStatus) {
             case 'approved':
                 return 'APPROVED';
-            case 'pending':
-                return 'PENDING'; // Changed from 'pending' to 'PENDING' as per backend enum
+            case 'waiting':
+                return 'PENDING'; // Changed from 'WAITING' to 'PENDING' as per backend enum
             case 'rejected':
                 return 'REJECTED';
             default:
@@ -33,52 +33,16 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
     };
 
     const mapStatusToDisplay = (backendStatus) => {
-        if (!backendStatus) return '';
-
-        switch (backendStatus.toUpperCase()) {
+        switch (backendStatus) {
             case 'APPROVED':
                 return 'approved';
-            case 'PENDING': // Changed from pending to PENDING
-                return 'pending'; // Keep frontend term as 'pending'
+            case 'PENDING': // Changed from WAITING to PENDING
+                return 'waiting'; // Keep frontend term as 'waiting'
             case 'REJECTED':
                 return 'rejected';
             default:
                 return backendStatus.toLowerCase();
         }
-    };
-
-
-    const formatDate = (dateValue) => {
-        if (!dateValue) return "Invalid date";
-
-        let dateObj;
-
-        // Xử lý trường hợp dữ liệu là mảng (kiểu cũ)
-        if (Array.isArray(dateValue) && dateValue.length >= 3) {
-            const [year, month, day] = dateValue;
-            dateObj = new Date(year, month - 1, day);
-        }
-        // Xử lý trường hợp dữ liệu là timestamp hoặc chuỗi ngày tháng
-        else {
-            try {
-                dateObj = new Date(dateValue);
-            } catch (error) {
-                console.error("Error parsing date:", error);
-                return "Invalid date";
-            }
-        }
-
-        // Kiểm tra xem dateObj có phải là ngày hợp lệ không
-        if (isNaN(dateObj.getTime())) {
-            return "Invalid date";
-        }
-
-        // Format thành dd/mm/yyyy
-        const day = String(dateObj.getDate()).padStart(2, '0');
-        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-        const year = dateObj.getFullYear();
-
-        return `${day}/${month}/${year}`;
     };
 
     // Debounce search term
@@ -127,7 +91,6 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
             { skip: true },
         { skip: !selectedMember }
     );
-    console.log("Evidence data:", evidenceData);
 
     // Fetch evidence counts by status for the selected member
     const {
@@ -140,31 +103,25 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
         } : { skip: true },
         { skip: !selectedMember }
     );
-    console.log("Evidence count data:", evidenceCountData);
 
     const handleStatusFilterChange = (status) => {
-        console.log("Setting status filter to:", status);
         setStatusFilter(status);
         setEvidencePage(0);
     };
 
     // Updated to store the full evidence object, not just the ID
     const handleEvidenceClick = (evidence) => {
-        console.log("Selected evidence:", evidence);
         setSelectedEvidence({
-            ...evidence,
             id: evidence.evidenceId,
-            name: evidence.memberName || `Evidence #${evidence.evidenceId}`,
-            challenge: selectedMember ? `${selectedMember.fullName}'s Challenge` : "Challenge",
-            submittedAt: evidence.submittedAt,
-            dateAdded: formatDate(evidence.submittedAt),
-            type: evidence.evidenceUrl?.includes('.mp4') ? "video" : "image",
+            name: evidence.memberName || `${t('hostEvidence.evidence')} #${evidence.evidenceId}`,
+            challenge: selectedMember ? t('hostEvidence.memberChallenge', { name: selectedMember.fullName }) : t('hostEvidence.challenge'),
+            dateAdded: new Date(evidence.submittedAt).toLocaleDateString('vi-VN'),
+            type: "image", // Default type if not available
             status: mapStatusToDisplay(evidence.status),
-            addedBy: selectedMember ? selectedMember.fullName : "Unknown",
+            addedBy: selectedMember ? selectedMember.fullName : t('hostEvidence.unknownUser'),
             caseNumber: evidence.evidenceId,
-            description: evidence.description || "No description provided.",
-            evidenceUrl: evidence.evidenceUrl || "/api/placeholder/300/200",
-            picture: evidence.evidenceUrl || "/api/placeholder/300/200"
+            description: evidence.description || t('hostEvidence.noDescription'),
+            picture: evidence.picture || "/api/placeholder/300/200"
         });
     };
 
@@ -174,14 +131,14 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
 
     const handleAcceptEvidence = (evidenceId) => {
         // Here you would call an API mutation to update the evidence status
-        console.log(`Accepting evidence with ID: ${evidenceId}`);
+        console.log(t('hostEvidence.logs.acceptEvidence', { id: evidenceId }));
         // After successful update, refetch the evidence data
         setSelectedEvidence(null);
     };
 
     const handleRejectEvidence = (evidenceId) => {
         // Here you would call an API mutation to update the evidence status
-        console.log(`Rejecting evidence with ID: ${evidenceId}`);
+        console.log(t('hostEvidence.logs.rejectEvidence', { id: evidenceId }));
         // After successful update, refetch the evidence data
         setSelectedEvidence(null);
     };
@@ -192,7 +149,7 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                 return <ThumbsUp className="inline mr-2 text-green-600" size={16} />;
             case 'rejected':
                 return <ThumbsDown className="inline mr-2 text-red-600" size={16} />;
-            case 'pending':
+            case 'waiting':
                 return <HourglassIcon className="inline mr-2 text-yellow-600" size={16} />;
             default:
                 return null;
@@ -205,7 +162,7 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                 return 'text-green-600 bg-green-100 px-2 py-1 rounded-full';
             case 'rejected':
                 return 'text-red-600 bg-red-100 px-2 py-1 rounded-full';
-            case 'pending':
+            case 'waiting':
                 return 'text-yellow-600 bg-yellow-100 px-2 py-1 rounded-full';
             default:
                 return '';
@@ -226,7 +183,7 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
 
     // Use the actual count data from the API
     const memberEvidenceStats = selectedMember ? {
-        total: evidenceCountData?.reduce((total, item) => total + (item.count || 0), 0) || 0,
+        total: selectedMember.evidenceCount || 0,
         approved: evidenceCountData?.find(item => item.status === "APPROVED")?.count || 0,
         pending: evidenceCountData?.find(item => item.status === "PENDING")?.count || 0,
         rejected: evidenceCountData?.find(item => item.status === "REJECTED")?.count || 0
@@ -245,25 +202,32 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
     const isLoading = isLoadingMembers || isFetchingMembers;
 
     return (
-        <div className="bg-blue-50 min-h-screen flex flex-col">
+        <div className="flex flex-col">
             <div className="flex-1 flex flex-col overflow-hidden">
-                <div className="container mx-auto p-4 flex-grow">
+                <div className="py-2">
+                    <ChallengeStatistic
+                        totalParticipants={25}
+                        completed={15}
+                        notCompleted={10}
+                    />
+                </div>
+                <div className="w-full flex-grow">
                     {isLoading ? (
                         <div className="flex justify-center items-center h-64">
                             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
                         </div>
                     ) : (
-                        <div className="flex flex-col md:flex-row gap-4">
+                        <div className="flex flex-col md:flex-row gap-2">
                             {/* Left panel - Member List */}
                             <div className="w-full md:w-1/2 bg-white rounded-lg shadow overflow-hidden">
                                 <div className="bg-blue-100 px-6 py-3 border-b">
                                     <div className="flex justify-between items-center">
-                                        <h2 className="text-lg font-semibold text-gray-800">Members</h2>
+                                        <h2 className="text-lg font-semibold text-gray-800">{t('hostEvidence.members')}</h2>
                                         <div className="relative max-w-md">
                                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
                                             <input
                                                 type="text"
-                                                placeholder="Search members..."
+                                                placeholder={t('hostEvidence.searchMembers')}
                                                 className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                                 value={searchTerm}
                                                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -275,9 +239,10 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                     <table className="min-w-full divide-y divide-gray-200">
                                         <thead className="bg-blue-50">
                                         <tr>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Member Name</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Evidence Count</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Status</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">{t('hostEvidence.memberName')}</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">{t('hostEvidence.joinedAt')}</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">{t('hostEvidence.evidenceCount')}</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">{t('hostEvidence.status')}</th>
                                         </tr>
                                         </thead>
                                         <tbody className="bg-white divide-y divide-gray-200">
@@ -288,17 +253,20 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                                 onClick={() => setSelectedMember(member)}
                                             >
                                                 <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{member.fullName}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    {member.joinedAt ? new Date(member.joinedAt).toLocaleDateString('vi-VN') : t('hostEvidence.notAvailable')}
+                                                </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{member.evidenceCount || 0}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm">
                                                     {member.hasPendingEvidence ? (
                                                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                                                             <ClockIcon className="mr-1 h-4 w-4" />
-                                                            Pending
+                                                            {t('hostEvidence.pending')}
                                                         </span>
                                                     ) : (
                                                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                                             <CheckCircleIcon className="mr-1 h-4 w-4" />
-                                                            Done
+                                                            {t('hostEvidence.done')}
                                                         </span>
                                                     )}
                                                 </td>
@@ -313,9 +281,9 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                     <div className="flex items-center justify-between">
                                         <div>
                                             <p className="text-sm text-gray-700">
-                                                Showing <span className="font-medium">{members.length > 0 ? currentPageNumber * itemsPerPage + 1 : 0}</span> to{' '}
-                                                <span className="font-medium">{Math.min((currentPageNumber + 1) * itemsPerPage, totalElements)}</span> of{' '}
-                                                <span className="font-medium">{totalElements}</span> members
+                                                {t('hostEvidence.showing')} <span className="font-medium">{members.length > 0 ? currentPageNumber * itemsPerPage + 1 : 0}</span> {t('hostEvidence.to')}{' '}
+                                                <span className="font-medium">{Math.min((currentPageNumber + 1) * itemsPerPage, totalElements)}</span> {t('hostEvidence.of')}{' '}
+                                                <span className="font-medium">{totalElements}</span> {t('hostEvidence.members')}
                                             </p>
                                         </div>
                                         <nav className="inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
@@ -324,7 +292,7 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                                 disabled={currentPageNumber === 0}
                                                 className={`relative inline-flex items-center rounded-l-md px-2 py-2 ${currentPageNumber === 0 ? 'text-gray-300' : 'text-gray-500 hover:bg-gray-50'}`}
                                             >
-                                                <span className="sr-only">Previous</span>
+                                                <span className="sr-only">{t('previous')}</span>
                                                 <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                                     <path fillRule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clipRule="evenodd" />
                                                 </svg>
@@ -355,7 +323,7 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                                 disabled={currentPageNumber === totalPages - 1 || totalPages === 0}
                                                 className={`relative inline-flex items-center rounded-r-md px-2 py-2 ${currentPageNumber === totalPages - 1 || totalPages === 0 ? 'text-gray-300' : 'text-gray-500 hover:bg-gray-50'}`}
                                             >
-                                                <span className="sr-only">Next</span>
+                                                <span className="sr-only">{t('next')}</span>
                                                 <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                                     <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
                                                 </svg>
@@ -370,13 +338,13 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                 <div className="bg-blue-100 px-6 py-3 border-b">
                                     <div className="flex justify-between items-center">
                                         <h2 className="text-lg font-semibold text-gray-800">
-                                            Evidence {selectedMember ? `for ${selectedMember.fullName}` : ''}
+                                            {t('hostEvidence.evidence')} {selectedMember ? t('hostEvidence.forMember', { name: selectedMember.fullName }) : ''}
                                         </h2>
                                         <div className="px-2 py-1 rounded-md text-sm bg-blue-200 text-blue-800">
                                             {statusFilter !== 'all' && (
                                                 <span className="flex items-center">
                                                     {getEvidenceStatusIcon(statusFilter)}
-                                                    Filtering: {statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1)}
+                                                    {t('hostEvidence.filtering')}: {t(`hostEvidence.status.${statusFilter}`)}
                                                     <button
                                                         onClick={() => handleStatusFilterChange('all')}
                                                         className="ml-2 text-blue-500 hover:text-blue-700"
@@ -386,7 +354,7 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                                 </span>
                                             )}
                                             {statusFilter === 'all' && (
-                                                <span>Showing all evidence</span>
+                                                <span>{t('hostEvidence.showingAll')}</span>
                                             )}
                                         </div>
                                     </div>
@@ -395,7 +363,7 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                 {/* Member Evidence Statistics with clickable cards */}
                                 {selectedMember && (
                                     <div className="p-4 border-b">
-                                        <h4 className="font-medium text-lg mb-2">Member Evidence Statistics</h4>
+                                        <h4 className="font-medium text-lg mb-2">{t('hostEvidence.memberStats')}</h4>
                                         {isLoadingEvidenceCount ? (
                                             <div className="flex justify-center items-center h-16">
                                                 <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-blue-500"></div>
@@ -407,7 +375,7 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                                     className={`bg-gray-50 p-4 rounded-lg cursor-pointer transform transition-all duration-200 hover:shadow-md ${statusFilter === 'all' ? 'ring-2 ring-blue-500 shadow-md' : ''}`}
                                                     onClick={() => handleStatusFilterChange('all')}
                                                 >
-                                                    <p className="text-gray-500 text-sm">Total Evidence</p>
+                                                    <p className="text-gray-500 text-sm">{t('hostEvidence.totalEvidence')}</p>
                                                     <p className="text-xl font-bold">{memberEvidenceStats.total}</p>
                                                 </div>
 
@@ -416,7 +384,7 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                                     className={`bg-green-50 p-4 rounded-lg cursor-pointer transform transition-all duration-200 hover:shadow-md ${statusFilter === 'approved' ? 'ring-2 ring-green-500 shadow-md' : ''}`}
                                                     onClick={() => handleStatusFilterChange('approved')}
                                                 >
-                                                    <p className="text-gray-500 text-sm">Approved</p>
+                                                    <p className="text-gray-500 text-sm">{t('hostEvidence.status.approved')}</p>
                                                     <div className="flex items-center">
                                                         <ThumbsUp className="mr-2 text-green-600" size={16} />
                                                         <p className="text-xl font-bold text-green-600">{memberEvidenceStats.approved}</p>
@@ -425,10 +393,10 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
 
                                                 {/* Pending */}
                                                 <div
-                                                    className={`bg-yellow-50 p-4 rounded-lg cursor-pointer transform transition-all duration-200 hover:shadow-md ${statusFilter === 'pending' ? 'ring-2 ring-yellow-500 shadow-md' : ''}`}
-                                                    onClick={() => handleStatusFilterChange('pending')}
+                                                    className={`bg-yellow-50 p-4 rounded-lg cursor-pointer transform transition-all duration-200 hover:shadow-md ${statusFilter === 'waiting' ? 'ring-2 ring-yellow-500 shadow-md' : ''}`}
+                                                    onClick={() => handleStatusFilterChange('waiting')}
                                                 >
-                                                    <p className="text-gray-500 text-sm">Pending</p>
+                                                    <p className="text-gray-500 text-sm">{t('hostEvidence.status.waiting')}</p>
                                                     <div className="flex items-center">
                                                         <HourglassIcon className="mr-2 text-yellow-600" size={16} />
                                                         <p className="text-xl font-bold text-yellow-600">{memberEvidenceStats.pending}</p>
@@ -440,7 +408,7 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                                     className={`bg-red-50 p-4 rounded-lg cursor-pointer transform transition-all duration-200 hover:shadow-md ${statusFilter === 'rejected' ? 'ring-2 ring-red-500 shadow-md' : ''}`}
                                                     onClick={() => handleStatusFilterChange('rejected')}
                                                 >
-                                                    <p className="text-gray-500 text-sm">Rejected</p>
+                                                    <p className="text-gray-500 text-sm">{t('hostEvidence.status.rejected')}</p>
                                                     <div className="flex items-center">
                                                         <ThumbsDown className="mr-2 text-red-600" size={16} />
                                                         <p className="text-xl font-bold text-red-600">{memberEvidenceStats.rejected}</p>
@@ -461,9 +429,9 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                             <table className="min-w-full divide-y divide-gray-200">
                                                 <thead className="bg-blue-50">
                                                 <tr>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Evidence</th>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Date</th>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Status</th>
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">{t('hostEvidence.evidence')}</th>
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">{t('hostEvidence.date')}</th>
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">{t('hostEvidence.status')}</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody className="bg-white divide-y divide-gray-200">
@@ -478,15 +446,15 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                                             onClick={() => handleEvidenceClick(evidence)}
                                                         >
                                                             <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
-                                                                {evidence.memberName || `Evidence #${evidence.evidenceId}`}
+                                                                {evidence.memberName || `${t('hostEvidence.evidence')} #${evidence.evidenceId}`}
                                                             </td>
                                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                                {formatDate(evidence.submittedAt)}
+                                                                {new Date(evidence.submittedAt).toLocaleDateString('vi-VN')}
                                                             </td>
                                                             <td className="px-6 py-4 whitespace-nowrap text-sm">
                                                                 <span className={getEvidenceStatusColor(displayStatus)}>
                                                                     {getEvidenceStatusIcon(displayStatus)}
-                                                                    {displayStatus.charAt(0).toUpperCase() + displayStatus.slice(1)}
+                                                                    {t(`hostEvidence.status.${displayStatus}`)}
                                                                 </span>
                                                             </td>
                                                         </tr>
@@ -496,20 +464,20 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                             </table>
                                         ) : (
                                             <div className="flex flex-col items-center justify-center h-64 text-gray-500">
-                                                <p>No evidence found</p>
+                                                <p>{t('hostEvidence.noEvidence')}</p>
                                                 {statusFilter !== 'all' && (
                                                     <button
                                                         onClick={() => setStatusFilter('all')}
                                                         className="mt-2 text-blue-500 hover:underline"
                                                     >
-                                                        Show all evidence
+                                                        {t('hostEvidence.showAll')}
                                                     </button>
                                                 )}
                                             </div>
                                         )
                                     ) : (
                                         <div className="flex justify-center items-center h-64 text-gray-500">
-                                            <p>Select a member to view evidence</p>
+                                            <p>{t('hostEvidence.selectMember')}</p>
                                         </div>
                                     )}
                                 </div>
@@ -520,9 +488,9 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                         <div className="flex items-center justify-between">
                                             <div>
                                                 <p className="text-sm text-gray-700">
-                                                    Showing <span className="font-medium">{evidenceItems.length > 0 ? evidenceCurrentPage * itemsPerPage + 1 : 0}</span> to{' '}
-                                                    <span className="font-medium">{Math.min((evidenceCurrentPage + 1) * itemsPerPage, evidenceTotalElements)}</span> of{' '}
-                                                    <span className="font-medium">{evidenceTotalElements}</span> evidence
+                                                    {t('hostEvidence.showing')} <span className="font-medium">{evidenceItems.length > 0 ? evidenceCurrentPage * itemsPerPage + 1 : 0}</span> {t('hostEvidence.to')}{' '}
+                                                    <span className="font-medium">{Math.min((evidenceCurrentPage + 1) * itemsPerPage, evidenceTotalElements)}</span> {t('hostEvidence.of')}{' '}
+                                                    <span className="font-medium">{evidenceTotalElements}</span> {t('hostEvidence.evidence')}
                                                 </p>
                                             </div>
                                             <nav className="inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
@@ -531,7 +499,7 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                                     disabled={evidenceCurrentPage === 0}
                                                     className={`relative inline-flex items-center rounded-l-md px-2 py-2 ${evidenceCurrentPage === 0 ? 'text-gray-300' : 'text-gray-500 hover:bg-gray-50'}`}
                                                 >
-                                                    <span className="sr-only">Previous</span>
+                                                    <span className="sr-only">{t('previous')}</span>
                                                     <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                                         <path fillRule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clipRule="evenodd" />
                                                     </svg>
@@ -562,7 +530,7 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                                     disabled={evidenceCurrentPage === evidenceTotalPages - 1 || evidenceTotalPages === 0}
                                                     className={`relative inline-flex items-center rounded-r-md px-2 py-2 ${evidenceCurrentPage === evidenceTotalPages - 1 || evidenceTotalPages === 0 ? 'text-gray-300' : 'text-gray-500 hover:bg-gray-50'}`}
                                                 >
-                                                    <span className="sr-only">Next</span>
+                                                    <span className="sr-only">{t('next')}</span>
                                                     <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                                         <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
                                                     </svg>
@@ -578,7 +546,14 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                 {/* Evidence Detail Modal */}
                 {selectedEvidence && (
                     <EvidenceDetailModal
-                        evidence={selectedEvidence}
+                        evidence={{
+                            ...selectedEvidence,
+                            // Ensure modal titles and buttons use translations
+                            modalTitle: t('hostEvidence.evidenceDetails'),
+                            approveButtonText: t('hostEvidence.modal.approve'),
+                            rejectButtonText: t('hostEvidence.modal.reject'),
+                            closeButtonText: t('hostEvidence.modal.close')
+                        }}
                         onClose={handleCloseModal}
                         onAccept={handleAcceptEvidence}
                         onReject={handleRejectEvidence}
@@ -589,4 +564,4 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
     );
 };
 
-export default MemberAndEvidenceManagement;
+export default HostEvidenceManagement;

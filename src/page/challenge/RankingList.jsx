@@ -7,6 +7,7 @@ import {
     useGetTop3ProgressRankingQuery,
     useGetChallengeStarLeaderboardQuery
 } from "../../service/rankingService";
+import { useTranslation } from "react-i18next";
 
 const renderStars = (rating) => {
     const stars = [];
@@ -19,6 +20,7 @@ const renderStars = (rating) => {
 };
 
 const RankingList = () => {
+    const { t } = useTranslation();
     const { id: challengeId } = useParams();
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
@@ -40,7 +42,7 @@ const RankingList = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 w-full mx-auto min-h-[625px]">
             {/* Top 3 Podium */}
             <div className="flex justify-between flex-col bg-white p-6 rounded-lg shadow-md min-h-80">
-                <h2 className="text-xl font-bold text-center mb-4">Top 3 Progress</h2>
+                <h2 className="text-xl font-bold text-center mb-4">{t('rankingList.top3Progress')}</h2>
                 <div className="flex justify-center space-x-6 h-full">
                     {top3.length > 0 ? top3.map((user, i) => (
                         <div key={user.memberId} className="text-center h-full content-end">
@@ -48,22 +50,22 @@ const RankingList = () => {
                                 {user.rank}
                             </div>
                             <p>{user.memberName}</p>
-                            <p className="text-sm text-gray-600">Rank: {user.rank}</p>
+                            <p className="text-sm text-gray-600">{t('rankingList.rank')}: {user.rank}</p>
                         </div>
                     )) : (
-                        <p className="text-center text-gray-500">No ranking data</p>
+                        <p className="text-center text-gray-500">{t('rankingList.noRankingData')}</p>
                     )}
                 </div>
             </div>
 
             {/* Star Leaderboard */}
             <div className="bg-white p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-bold text-center mb-4">Members</h2>
+                <h2 className="text-xl font-bold text-center mb-4">{t('rankingList.members')}</h2>
                 <div className="mb-4 flex items-center border border-gray-300 rounded px-2 py-1">
                     <FaSearch className="text-gray-500 mr-2" />
                     <input
                         type="text"
-                        placeholder="Search user..."
+                        placeholder={t('rankingList.searchPlaceholder')}
                         className="w-full outline-none"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
@@ -72,9 +74,9 @@ const RankingList = () => {
 
                 <div className="space-y-4">
                     {isStarLoading ? (
-                        <p className="text-center">Loading star leaderboard...</p>
+                        <p className="text-center">{t('rankingList.loadingStarLeaderboard')}</p>
                     ) : filtered.length === 0 ? (
-                        <p className="text-center text-gray-500">No members found</p>
+                        <p className="text-center text-gray-500">{t('rankingList.noMembersFound')}</p>
                     ) : (
                         filtered.map((user, i) => (
                             <div key={i} className="flex items-center justify-between bg-gray-50 rounded p-3 shadow-sm">
@@ -82,7 +84,7 @@ const RankingList = () => {
                                     <img src={user.avatar} alt={user.memberName} className="w-12 h-12 rounded-full" />
                                     <div>
                                         <p className="font-semibold">{user.memberName}</p>
-                                        <p className="text-sm text-gray-600">Avg stars: {user.averageStar?.toFixed(2) || 0}</p>
+                                        <p className="text-sm text-gray-600">{t('rankingList.avgStars')}: {user.averageStar?.toFixed(2) || 0}</p>
                                     </div>
                                 </div>
                                 <div className="flex space-x-1">{renderStars(user.averageStar)}</div>

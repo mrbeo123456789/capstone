@@ -28,6 +28,9 @@ const ChallengeList = () => {
     const [message, setMessage] = useState("");
     const [actionError, setActionError] = useState("");
 
+    // Processing state to prevent double submission
+    const [isProcessing, setIsProcessing] = useState(false);
+
     const itemsPerPage = 10;
 
     // Debounce search term to prevent excessive API calls
@@ -58,7 +61,6 @@ const ChallengeList = () => {
         search: debouncedSearchTerm,
         status: filterStatus
     }, {
-        // Skip refetching if these conditions are met
         refetchOnMountOrArgChange: true,
         skip: false
     });
@@ -132,7 +134,7 @@ const ChallengeList = () => {
 
     // Handle modal submit
     const handleModalSubmit = useCallback(async () => {
-        if (!selectedChallengeId || !actionType) return;
+        if (!selectedChallengeId || !actionType || isProcessing) return;
 
         let newStatus;
         let successMessage;
@@ -154,6 +156,8 @@ const ChallengeList = () => {
                 return;
         }
 
+        setIsProcessing(true);
+
         try {
             setActionError("");
 
@@ -163,25 +167,33 @@ const ChallengeList = () => {
                 adminNote: message
             };
 
-            await reviewChallenge(reviewRequest).unwrap();
+            const response = await reviewChallenge(reviewRequest);
 
-            // Close modal first
-            closeModal();
-
-            // Show success toast notification
-            toast.success(successMessage);
-
-            // Refetch data to update the list
-            refetch();
-
+            // Handle success even if it comes with PARSING_ERROR due to non-JSON response
+            if (response.error && response.error.status === 'PARSING_ERROR' && response.error.originalStatus === 200) {
+                // This is actually a success case where the backend returned a plain text response
+                closeModal();
+                toast.success(successMessage);
+                refetch();
+            } else if (response.error) {
+                // Handle actual error
+                const errorMessage = response.error.data?.message || response.error.data || response.error.error || 'Unknown error occurred';
+                setActionError(`Error: ${errorMessage}`);
+                toast.error(`Failed to ${actionType} challenge: ${errorMessage}`);
+            } else {
+                // Normal success case
+                closeModal();
+                toast.success(successMessage);
+                refetch();
+            }
         } catch (error) {
             console.error(`Error ${actionType} challenge:`, error);
-            setActionError(`Error: ${error.data?.message || error.message || 'Unknown error occurred'}`);
-
-            // Show error toast
-            toast.error(`Failed to ${actionType} challenge: ${error.data?.message || error.message || 'Unknown error'}`);
+            setActionError(`Error: ${error.message || 'Unknown error occurred'}`);
+            toast.error(`Failed to ${actionType} challenge: ${error.message || 'Unknown error'}`);
+        } finally {
+            setIsProcessing(false);
         }
-    }, [selectedChallengeId, actionType, message, reviewChallenge, closeModal, refetch]);
+    }, [selectedChallengeId, actionType, message, isProcessing, reviewChallenge, closeModal, refetch]);
 
     // Toggle status dropdown
     const toggleStatusDropdown = useCallback(() => {
@@ -524,6 +536,7 @@ const ChallengeList = () => {
                             <button
                                 className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100"
                                 onClick={closeModal}
+                                disabled={isProcessing}
                             >
                                 Cancel
                             </button>
@@ -534,10 +547,21 @@ const ChallengeList = () => {
                                         : actionType === "rejected" || actionType === "banned"
                                             ? "bg-red-600 hover:bg-red-700"
                                             : "bg-blue-600 hover:bg-blue-700"
-                                }`}
+                                } ${isProcessing ? 'opacity-70 cursor-not-allowed' : ''}`}
                                 onClick={handleModalSubmit}
+                                disabled={isProcessing}
                             >
-                                {actionType === "confirmed" ? "Approve" : actionType === "rejected" ? "Reject" : actionType === "banned" ? "Ban" : "Submit"}
+                                {isProcessing ? (
+                                    <span className="flex items-center justify-center">
+                                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        Processing...
+                                    </span>
+                                ) : (
+                                    actionType === "confirmed" ? "Approve" : actionType === "rejected" ? "Reject" : actionType === "banned" ? "Ban" : "Submit"
+                                )}
                             </button>
                         </div>
                     </div>

@@ -135,6 +135,9 @@
   },
 
   "createChallenge": {
+    "create": "Tạo thử thách",
+    "creating": "Đang tạo thử thách...",
+    "success": "Tạo thử thách thành công!",
     "editTitle": "Chỉnh sửa thử thách",
     "successUpdate": "Cập nhật thử thách thành công!",
     "updating": "Đang cập nhật...",
@@ -144,18 +147,18 @@
     "name": "Tên thử thách",
     "namePlaceholder": "Nhập tên thử thách",
     "summary": "Tóm tắt",
-    "summaryPlaceholder": "Mô tả ngắn về thử thách",
-    "banner": "Ảnh banner (không bắt buộc)",
-    "picture": "Ảnh minh họa thử thách",
-    "pictureNote": "Định dạng chấp nhận: JPG, PNG. Tối đa 2MB.",
-    "clickUpload": "Nhấn hoặc kéo thả tệp để tải lên",
+    "summaryPlaceholder": "Tóm tắt ngắn gọn về thử thách",
+    "banner": "Ảnh bìa (không bắt buộc)",
+    "picture": "Ảnh thử thách",
+    "pictureNote": "Định dạng chấp nhận: JPG, PNG. Dung lượng tối đa: 2MB.",
+    "clickUpload": "Nhấn hoặc kéo tệp vào để tải lên",
     "startDate": "Ngày bắt đầu",
     "endDate": "Ngày kết thúc",
-    "privacy": "Chế độ riêng tư",
+    "privacy": "Chế độ hiển thị",
     "verificationType": {
-      "label": "Hình thức xác minh",
-      "memberReview": "Thành viên chấm chéo",
-      "hostReview": "Host kiểm duyệt"
+      "label": "Cách xác minh",
+      "hostReview": "Chủ thử thách xác minh",
+      "memberReview": "Thành viên xác minh lẫn nhau"
     },
     "participationType": {
       "label": "Hình thức tham gia",
@@ -167,9 +170,10 @@
     "maxParticipants": "Số người tham gia tối đa",
     "description": "Mô tả thử thách",
     "cancel": "Hủy",
-    "validationError": "Vui lòng điền đầy đủ và chính xác các trường bắt buộc.",
-    "fail": "Cập nhật thử thách thất bại: "
+    "validationError": "Vui lòng sửa tất cả lỗi trước khi gửi.",
+    "fail": "Cập nhật thất bại: "
   },
+
   "ProofUpLoads": {
     "loading": "Đang tải dữ liệu",
     "view evidence": "Danh sách bằng chứng",
@@ -240,6 +244,8 @@
   "notification.empty": "Không có thông báo mới.",
 
   "JoinsChallengeDetail": {
+    "reportTab": "Phản hồi & Báo cáo",
+    "groups": "Nhóm",
     "disabledDuringChallenge": "Hành động này bị tắt khi thử thách đã diễn ra hoặc kết thúc.",
     "hostCannotLeave": "Quản lí thử thách không thể rời thử thách",
     "hostCannotReport": "Host không thể báo cáo thử thách của chính mình.",
@@ -337,7 +343,263 @@
     "rulesText": "Quy định chi tiết của thử thách sẽ hiển thị tại đây.",
     "teamRanking": "Bảng xếp hạng đội sẽ hiển thị tại đây.",
     "individualRanking": "Bảng xếp hạng cá nhân sẽ hiển thị tại đây."
-}
+  },
+
+  "forgotPassword": {
+    "title": "Quên mật khẩu?",
+    "subtitle": "Nhập email của bạn để nhận mã OTP.",
+    "email": "Email",
+    "emailPlaceholder": "Nhập địa chỉ email của bạn",
+    "required": "*",
+    "sending": "Đang gửi...",
+    "submit": "Lấy mật khẩu mới",
+    "back": "Quay lại đăng nhập",
+    "errorEmpty": "Vui lòng nhập email.",
+    "success": "Mã OTP đã được gửi đến email của bạn.",
+    "fail": "Đã xảy ra lỗi."
+  },
+
+  "changePassword": {
+    "title": "Đổi mật khẩu",
+    "old": "Mật khẩu hiện tại",
+    "oldPlaceholder": "Nhập mật khẩu hiện tại",
+    "new": "Mật khẩu mới",
+    "newPlaceholder": "Nhập mật khẩu mới",
+    "confirm": "Xác nhận mật khẩu",
+    "confirmPlaceholder": "Nhập lại mật khẩu mới",
+    "submit": "Lưu thay đổi",
+    "forgot": "Quên mật khẩu?",
+    "fail": "Đổi mật khẩu thất bại.",
+    "mismatch": "Mật khẩu xác nhận không khớp!"
+  },
+
+  "ProgressTracking": {
+    "viewExplanation": "Xem giải thích",
+    "daysOfWeek": {
+      "sun": "CN",
+      "mon": "T2",
+      "tue": "T3",
+      "wed": "T4",
+      "thu": "T5",
+      "fri": "T6",
+      "sat": "T7"
+    },
+    "errors": {
+      "pastDeadline": "Đã hết hạn nộp cho ngày đó",
+      "futureDate": "Chưa đến ngày nộp bằng chứng",
+      "cannotSubmit": "Không thể nộp bằng chứng cho ngày này"
+    },
+    "modal": {
+      "title": "Giải thích các trạng thái",
+      "approved": {
+        "title": "Đã nộp và được chấp nhận",
+        "description": "Bằng chứng đã được xác nhận"
+      },
+      "pending": {
+        "title": "Đã nộp, đang chờ duyệt",
+        "description": "Bằng chứng đang được xem xét"
+      },
+      "rejected": {
+        "title": "Đã nộp nhưng bị từ chối",
+        "description": "Bằng chứng không hợp lệ, cần nộp lại"
+      },
+      "missed": {
+        "title": "Chưa nộp (quá hạn)",
+        "description": "Đã hết thời gian nộp cho ngày này"
+      },
+      "today": {
+        "title": "Ngày hôm nay (chưa nộp)",
+        "description": "Nhấp vào để nộp bằng chứng"
+      },
+      "future": {
+        "title": "Ngày trong tương lai",
+        "description": "Chưa đến thời gian nộp"
+      },
+      "close": "Đóng"
+    }
+  },
+
+  "ProofUploads": {
+    "loading": "Đang tải dữ liệu...",
+    "viewEvidence": "Xem các bằng chứng của bạn",
+    "proofOn": "Bằng chứng ngày",
+    "uploaded": "Đã hoàn thành",
+    "noEvidence": "Không có bằng chứng của ngày này",
+    "previous": "Trước",
+    "page": "Trang",
+    "next": "Sau",
+    "fullEvidence": "Bằng chứng đầy đủ",
+    "close": "Đóng"
+  },
+
+  "AboutUs": {
+    "hero": {
+      "title": "Về GoBeyond",
+      "subtitle": "Thay đổi thế giới thông qua những thử thách đầy ý nghĩa",
+      "learnMore": "Tìm hiểu thêm"
+    },
+    "mission": {
+      "title": "Sứ mệnh của chúng tôi",
+      "description": "GoBeyond ra đời với mục tiêu kết nối cộng đồng thông qua những thử thách mang lại giá trị tích cực. Chúng tôi tin rằng những hành động nhỏ, khi được thực hiện bởi nhiều người, có thể tạo nên sự thay đổi lớn cho xã hội và môi trường.",
+      "pillars": {
+        "connect": {
+          "title": "Kết nối",
+          "description": "Xây dựng cộng đồng những người có cùng đam mê và mong muốn tạo nên tác động tích cực"
+        },
+        "challenge": {
+          "title": "Thách thức",
+          "description": "Tạo ra những thử thách có ý nghĩa để thúc đẩy sự thay đổi và phát triển cá nhân"
+        },
+        "impact": {
+          "title": "Tạo tác động",
+          "description": "Chuyển đổi những thử thách thành những hành động cụ thể giúp cải thiện cộng đồng và môi trường"
+        }
+      }
+    },
+    "team": {
+      "title": "Đội ngũ của chúng tôi",
+      "description": "Những con người đam mê và tận tâm đứng sau GoBeyond, luôn nỗ lực không ngừng để mang đến những trải nghiệm tốt nhất cho cộng đồng.",
+      "roles": {
+        "analyst": "Business Analyst",
+        "backend": "Backend Developer",
+        "leader": "Leader",
+        "frontend": "Frontend Developer",
+        "tester": "Tester"
+      }
+    },
+    "values": {
+      "title": "Giá trị cốt lõi",
+      "description": "Những nguyên tắc định hướng mọi quyết định và hành động của chúng tôi",
+      "items": {
+        "responsibility": {
+          "title": "Trách nhiệm xã hội",
+          "description": "Chúng tôi tin vào việc tạo ra tác động tích cực cho cộng đồng và môi trường thông qua mọi hoạt động của mình."
+        },
+        "innovation": {
+          "title": "Đổi mới",
+          "description": "Chúng tôi không ngừng tìm kiếm những cách mới để giải quyết vấn đề và tạo ra giá trị cho người dùng."
+        },
+        "transparency": {
+          "title": "Tính minh bạch",
+          "description": "Chúng tôi xây dựng niềm tin thông qua sự cởi mở, trung thực và rõ ràng trong mọi hoạt động."
+        },
+        "collaboration": {
+          "title": "Cộng tác",
+          "description": "Chúng tôi tin rằng sức mạnh đến từ việc làm việc cùng nhau và học hỏi từ những quan điểm đa dạng."
+        }
+      }
+    },
+    "journey": {
+      "title": "Hành trình của chúng tôi",
+      "description": "Từ ý tưởng ban đầu đến một cộng đồng đang phát triển mạnh mẽ",
+      "milestones": {
+        "beginning": {
+          "title": "Khởi nguồn",
+          "description": "GoBeyond được hình thành từ ý tưởng của một nhóm những người trẻ đam mê về việc tạo ra thay đổi tích cực."
+        },
+        "development": {
+          "title": "Phát triển",
+          "description": "Nền tảng chính thức ra mắt với các tính năng cơ bản. Cộng đồng người dùng đầu tiên được hình thành."
+        },
+        "expansion": {
+          "title": "Mở rộng",
+          "description": "GoBeyond phát triển mạnh mẽ với nhiều tính năng mới và cộng đồng người dùng ngày càng tăng trưởng."
+        }
+      }
+    },
+    "contact": {
+      "title": "Kết nối với chúng tôi",
+      "description": "Chúng tôi luôn sẵn sàng lắng nghe ý kiến và đồng hành cùng bạn trong hành trình tạo nên những thay đổi tích cực",
+      "email": {
+        "title": "Email"
+      },
+      "phone": {
+        "title": "Điện thoại"
+      },
+      "address": {
+        "title": "Địa chỉ",
+        "value": "Hoa Lac Hi-tech Park, km 29, Đại lộ Thăng Long, Hà Nội"
+      },
+      "button": "Liên hệ ngay"
+    }
+  },
+
+  "VideoModal": {
+    "approveMessage": "Tôi chấp nhận video này",
+    "approveSuccess": "Đã chấp nhận thành công!",
+    "approveFail": "Chấp nhận thất bại!",
+    "rejectMessage": "Tôi không chấp nhận video này",
+    "rejectSuccess": "Đã từ chối thành công!",
+    "rejectFail": "Từ chối thất bại!",
+    "browserNotSupported": "Trình duyệt của bạn không hỗ trợ thẻ video.",
+    "rejectButton": "Tôi không chấp nhận video này",
+    "approveButton": "Tôi chấp nhận video này",
+    "reviewSubmitted": "Đã gửi đánh giá thành công!",
+    "previous": "Trước",
+    "next": "Sau"
+  },
+  "VoteOther": {
+    "title": "Đánh giá bằng chứng của người khác",
+    "loading": "Đang tải video...",
+    "noEvidences": "Không còn bằng chứng nào để đánh giá.",
+    "unknownUser": "Người dùng không xác định"
+  },
+  "hostEvidence": {
+    "members": "Thành viên",
+    "searchMembers": "Tìm kiếm thành viên...",
+    "memberName": "Tên thành viên",
+    "joinedAt": "Ngày tham gia",
+    "evidenceCount": "Số bằng chứng",
+    "status": "Trạng thái",
+    "notAvailable": "N/A",
+    "pending": "Đang chờ",
+    "done": "Hoàn thành",
+    "showing": "Hiển thị",
+    "to": "đến",
+    "of": "của",
+    "evidence": "Bằng chứng",
+    "forMember": "của {{name}}",
+    "filtering": "Bộ lọc",
+    "showingAll": "Hiển thị tất cả bằng chứng",
+    "memberStats": "Thống kê bằng chứng của thành viên",
+    "totalEvidence": "Tổng số bằng chứng",
+    "date": "Ngày",
+    "noEvidence": "Không tìm thấy bằng chứng",
+    "showAll": "Hiển thị tất cả bằng chứng",
+    "selectMember": "Chọn thành viên để xem bằng chứng",
+    "unknownUser": "Người dùng không xác định",
+    "noDescription": "Không có mô tả nào được cung cấp.",
+    "challenge": "Thử thách",
+    "memberChallenge": "Thử thách của {{name}}",
+    "evidenceDetails": "Chi tiết bằng chứng",
+    "modal": {
+      "approve": "Tôi chấp nhận bằng chứng này",
+      "reject": "Tôi không chấp nhận bằng chứng này",
+      "close": "Đóng"
+    },
+    "logs": {
+      "acceptEvidence": "Đang chấp nhận bằng chứng có ID: {{id}}",
+      "rejectEvidence": "Đang từ chối bằng chứng có ID: {{id}}"
+    },
+    "status": {
+      "approved": "Đã duyệt",
+      "waiting": "Đang chờ",
+      "rejected": "Đã từ chối"
+    }
+  },
+
+  "rankingList": {
+    "top3Progress": "Top 3 Tiến Độ",
+    "rank": "Xếp hạng",
+    "noRankingData": "Không có dữ liệu xếp hạng",
+    "members": "Thành viên",
+    "searchPlaceholder": "Tìm kiếm người dùng...",
+    "loadingStarLeaderboard": "Đang tải bảng xếp hạng sao...",
+    "noMembersFound": "Không tìm thấy thành viên nào",
+    "avgStars": "Sao trung bình"
+  }
+
+
 
 
 }

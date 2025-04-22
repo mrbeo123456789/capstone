@@ -1,29 +1,40 @@
 import { useState } from "react";
-import { FaPlus, FaCheck } from "react-icons/fa";
+import { FaCheck } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 const ITEMS_PER_PAGE = 12;
 
 const ProofUploads = ({ challenge, evidence }) => {
-    if (!challenge || !evidence) return <p>Đang tải dữ liệu...</p>;
+    const { t } = useTranslation();
+
+    if (!challenge || !evidence) return <p>{t("ProofUploads.loading")}</p>;
     const [selectedProof, setSelectedProof] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
 
-    // Lấy ngày hiện tại và reset time portion để đảm bảo đồng bộ
+    // ✅ correct
+    const startDate = new Date(challenge.startDate);
+    const endDate = new Date(challenge.endDate);
     const today = new Date();
     today.setHours(0, 0, 0, 0); // remove time portion
 
-    // Calculate duration up to today or end date, whichever comes first
-    const startDate = new Date(challenge.startDate);
-    const endDate = new Date(challenge.endDate);
-    const displayEndDate = today < endDate ? today : endDate;
+    // Log dates for debugging
+    console.log('Start date:', startDate.toLocaleDateString());
+    console.log('End date:', endDate.toLocaleDateString());
+    console.log('Today:', today.toLocaleDateString());
+
+    // Calculate duration up to today (inclusive) or end date, whichever comes first
+    // Include today by using setHours(23, 59, 59, 999) to get the end of today
+    const todayEnd = new Date(today);
+    todayEnd.setHours(23, 59, 59, 999);
+    const displayEndDate = todayEnd < endDate ? todayEnd : endDate;
     const duration = Math.floor((displayEndDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
 
     const evidenceMap = {};
     evidence?.forEach((e) => {
-        // Sử dụng format ISO chuẩn để đảm bảo tính nhất quán
+        // Use standard ISO format to ensure consistency
         const parsedDate = new Date(e.submittedAt);
         if (!isNaN(parsedDate)) {
-            // Format ngày thành YYYY-MM-DD để dễ so sánh
+            // Format date to YYYY-MM-DD for easy comparison
             const dateKey = parsedDate.toISOString().split('T')[0];
             if (!evidenceMap[dateKey]) evidenceMap[dateKey] = e;
         }
@@ -45,9 +56,6 @@ const ProofUploads = ({ challenge, evidence }) => {
         currentPage * ITEMS_PER_PAGE
     );
 
-    // Check if there are no proofs
-    const hasNoProofs = evidence?.length === 0;
-
     const handlePrev = () => {
         if (currentPage > 1) setCurrentPage(currentPage - 1);
     };
@@ -56,66 +64,46 @@ const ProofUploads = ({ challenge, evidence }) => {
         if (currentPage < totalPages) setCurrentPage(currentPage + 1);
     };
 
-    // Format ngày hiện tại để hiển thị
-    const formattedToday = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getFullYear()}`;
-
     return (
         <div className="w-full mx-auto p-4">
-            <h2 className="text-xl font-bold mb-4 text-center">Xem các bằng chứng của bạn</h2>
-
-            {/* Thông báo khi không có bằng chứng nào */}
-            {hasNoProofs && (
-                <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 p-4 rounded mb-4">
-                    <p className="font-medium">Bạn chưa có bằng chứng nào. Hãy kiểm tra ngày hôm nay ({formattedToday}) để bắt đầu nộp bằng chứng.</p>
-                </div>
-            )}
+            <h2 className="text-xl font-bold mb-4 text-center">{t("ProofUploads.viewEvidence")}</h2>
 
             <div className="grid sm:grid-cols-6 gap-4 justify-center grid-cols-3">
                 {currentPageDays.map((dayInfo, index) => {
                     const { date, evidence } = dayInfo;
                     const isUploaded = Boolean(evidence);
                     const isVideo = isUploaded && evidence.evidenceUrl?.includes(".mp4");
-                    const isApproved = isUploaded && evidence.status === "APPROVED"; // Kiểm tra nếu đã được chấm
+                    const isApproved = isUploaded && evidence.status === "approved"; // Check if approved
 
-                    // Sử dụng format ISO để so sánh ngày
+                    // Use ISO format for date comparison
                     const dateISO = date.toISOString().split('T')[0];
                     const todayISO = today.toISOString().split('T')[0];
 
                     // Check if date is today or past
-                    const isToday = dateISO === todayISO;
                     const isPast = date < today;
-
-                    // Sửa lại định dạng ngày thành dd/mm/yyyy theo yêu cầu
-                    const dateLabel = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
-
-                    let borderClass = "";
+                    const dateLabel = date.toLocaleDateString(); // Use browser's locale
                     let bgClass = "bg-gray-300";
                     let symbol = null;
 
                     if (isUploaded) {
-                        // Đã nộp
+                        // Submitted
                         if (isApproved) {
-                            // Đã nộp và đã được chấm
+                            // Submitted and approved
                             bgClass = "bg-green-300";
                             symbol = <FaCheck className="text-green-700" />;
                         } else {
-                            // Đã nộp nhưng chưa được chấm
+                            // Submitted but not yet approved
                             bgClass = "bg-green-200";
                             symbol = null;
                         }
                     } else {
-                        // Chưa nộp
-                        if (isPast && !isToday) {
-                            // Ngày trong quá khứ và không phải hôm nay
+                        // Not submitted
+                        if (isPast) {
+                            // Past date (including today)
                             bgClass = "bg-red-200";
                             symbol = "❌";
-                        } else if (isToday) {
-                            // Ngày hôm nay chưa nộp
-                            bgClass = "bg-yellow-200";
-                            symbol = <FaPlus />;
-                            borderClass = "border-2 border-orange-500";
                         } else {
-                            // Ngày trong tương lai
+                            // Future date
                             symbol = null;
                         }
                     }
@@ -124,7 +112,7 @@ const ProofUploads = ({ challenge, evidence }) => {
                         <div key={index} className="flex flex-col items-center">
                             <div className="font-medium">{dateLabel}</div>
                             <div
-                                className={`w-24 sm:w-4/5 h-24 ${bgClass} flex items-center justify-center rounded-lg shadow-md cursor-pointer ${borderClass} relative`}
+                                className={`w-24 sm:w-4/5 h-24 ${bgClass} flex items-center justify-center rounded-lg shadow-md cursor-pointer relative`}
                                 onClick={() => isUploaded && setSelectedProof(evidence)}
                             >
                                 {isUploaded ? (
@@ -138,7 +126,7 @@ const ProofUploads = ({ challenge, evidence }) => {
                                         ) : (
                                             <img
                                                 src={evidence.evidenceUrl}
-                                                alt={`Proof on ${dateLabel}`}
+                                                alt={`${t("ProofUploads.proofOn")} ${dateLabel}`}
                                                 className="w-full h-full object-cover rounded-lg"
                                             />
                                         )}
@@ -155,7 +143,7 @@ const ProofUploads = ({ challenge, evidence }) => {
                                 )}
                             </div>
                             <p className="mt-2 text-sm text-white">
-                                {isUploaded ? "Đã hoàn thành" : "Không có bằng chứng của ngày này"}
+                                {isUploaded ? t("ProofUploads.uploaded") : t("ProofUploads.noEvidence")}
                             </p>
                         </div>
                     );
@@ -169,17 +157,17 @@ const ProofUploads = ({ challenge, evidence }) => {
                     disabled={currentPage === 1}
                     className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50"
                 >
-                    Trước
+                    {t("ProofUploads.previous")}
                 </button>
                 <span className="text-sm font-semibold">
-                    Trang {currentPage} / {totalPages}
+                    {t("ProofUploads.page")} {currentPage} / {totalPages}
                 </span>
                 <button
                     onClick={handleNext}
                     disabled={currentPage === totalPages}
                     className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50"
                 >
-                    Sau
+                    {t("ProofUploads.next")}
                 </button>
             </div>
 
@@ -203,7 +191,7 @@ const ProofUploads = ({ challenge, evidence }) => {
                         ) : (
                             <img
                                 src={selectedProof.evidenceUrl}
-                                alt="Full Evidence"
+                                alt={t("ProofUploads.fullEvidence")}
                                 className="w-full h-auto rounded-lg"
                             />
                         )}
@@ -212,7 +200,7 @@ const ProofUploads = ({ challenge, evidence }) => {
                                 onClick={() => setSelectedProof(null)}
                                 className="text-blue-500 hover:underline"
                             >
-                                Đóng
+                                {t("ProofUploads.close")}
                             </button>
                         </div>
                     </div>

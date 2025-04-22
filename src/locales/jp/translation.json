@@ -155,42 +155,48 @@
     "enterKeyword": "キーワードを入力してください。"
   },
   "createChallenge": {
+    "create": "チャレンジを作成",
+    "creating": "作成中...",
+    "success": "チャレンジが正常に作成されました！",
     "editTitle": "チャレンジを編集",
     "successUpdate": "チャレンジが正常に更新されました！",
     "updating": "更新中...",
-    "update": "更新する",
+    "update": "更新",
     "generalInfo": "基本情報",
     "details": "チャレンジの詳細",
     "name": "チャレンジ名",
-    "namePlaceholder": "チャレンジ名を入力してください",
+    "namePlaceholder": "チャレンジ名を入力",
     "summary": "概要",
     "summaryPlaceholder": "チャレンジの簡単な説明",
-    "banner": "バナー画像（任意）",
+    "banner": "バナー（任意）",
     "picture": "チャレンジ画像",
-    "pictureNote": "対応形式: JPG, PNG。最大2MB。",
-    "clickUpload": "クリックまたはファイルをドラッグしてアップロード",
+    "pictureNote": "対応形式：JPG、PNG。最大サイズ：2MB。",
+    "clickUpload": "クリックまたはドラッグしてアップロード",
     "startDate": "開始日",
     "endDate": "終了日",
-    "privacy": "公開設定",
+    "privacy": "公開範囲",
     "verificationType": {
-      "label": "確認方法",
-      "hostReview": "主催者確認",
-      "memberReview": "メンバー確認"
+      "label": "認証方法",
+      "hostReview": "ホストによる確認",
+      "memberReview": "メンバーによる確認"
     },
     "participationType": {
-      "label": "参加タイプ",
+      "label": "参加形式",
       "individual": "個人",
       "group": "グループ"
     },
-    "challengeType": "チャレンジタイプ",
-    "selectChallengeType": "チャレンジタイプを選択",
-    "maxParticipants": "最大参加者数",
+    "challengeType": "チャレンジの種類",
+    "selectChallengeType": "チャレンジの種類を選択",
+    "maxParticipants": "最大参加人数",
     "description": "チャレンジの説明",
     "cancel": "キャンセル",
-    "validationError": "送信前にすべてのエラーを修正してください。",
+    "validationError": "すべてのエラーを修正してください。",
     "fail": "チャレンジの更新に失敗しました: "
   },
+
   "JoinsChallengeDetail": {
+    "reportTab": "フィードバックと報告",
+    "groups": "グループ",
     "disabledDuringChallenge": "チャレンジ中または終了後はこの操作はできません。",
     "hostCannotLeave": "ホストはチャレンジから退出できません。",
     "hostCannotReport": "ホストは自分のチャレンジを報告できません。",
@@ -320,5 +326,263 @@
     "rulesText": "チャレンジの詳細なルールがここに表示されます。",
     "teamRanking": "チームランキングがここに表示されます。",
     "individualRanking": "個人ランキングがここに表示されます。"
-}
+  },
+  "forgotPassword": {
+    "title": "パスワードをお忘れですか？",
+    "subtitle": "OTPを受け取るためにメールアドレスを入力してください。",
+    "email": "メールアドレス",
+    "emailPlaceholder": "メールアドレスを入力してください",
+    "required": "*",
+    "sending": "送信中...",
+    "submit": "新しいパスワードを取得する",
+    "back": "ログイン画面に戻る",
+    "errorEmpty": "メールアドレスを入力してください。",
+    "success": "OTPをメールに送信しました。",
+    "fail": "エラーが発生しました。"
+  },
+
+  "changePassword": {
+    "title": "パスワードを変更",
+    "old": "現在のパスワード",
+    "oldPlaceholder": "現在のパスワードを入力",
+    "new": "新しいパスワード",
+    "newPlaceholder": "新しいパスワードを入力",
+    "confirm": "新しいパスワードの確認",
+    "confirmPlaceholder": "もう一度入力",
+    "submit": "変更を保存",
+    "forgot": "パスワードを忘れましたか？",
+    "fail": "パスワードの変更に失敗しました。",
+    "mismatch": "パスワードが一致しません！"
+  },
+
+  "ProgressTracking": {
+    "viewExplanation": "説明を表示",
+    "daysOfWeek": {
+      "sun": "日",
+      "mon": "月",
+      "tue": "火",
+      "wed": "水",
+      "thu": "木",
+      "fri": "金",
+      "sat": "土"
+    },
+    "errors": {
+      "pastDeadline": "その日の提出期限は過ぎました",
+      "futureDate": "まだ証拠を提出する時期ではありません",
+      "cannotSubmit": "この日の証拠を提出できません"
+    },
+    "modal": {
+      "title": "ステータスの説明",
+      "approved": {
+        "title": "提出済み・承認済み",
+        "description": "証拠が確認されました"
+      },
+      "pending": {
+        "title": "提出済み・確認待ち",
+        "description": "証拠は現在審査中です"
+      },
+      "rejected": {
+        "title": "提出済み・却下",
+        "description": "証拠が無効です。再提出が必要です"
+      },
+      "missed": {
+        "title": "未提出（期限切れ）",
+        "description": "この日の提出期限が終了しました"
+      },
+      "today": {
+        "title": "今日（未提出）",
+        "description": "クリックして証拠を提出"
+      },
+      "future": {
+        "title": "将来の日付",
+        "description": "まだ提出時期ではありません"
+      },
+      "close": "閉じる"
+    }
+  },
+
+  "ProofUploads": {
+    "loading": "データを読み込み中...",
+    "viewEvidence": "証拠を確認する",
+    "proofOn": "日付",
+    "uploaded": "完了",
+    "noEvidence": "この日の証拠はありません",
+    "previous": "前へ",
+    "page": "ページ",
+    "next": "次へ",
+    "fullEvidence": "証拠の詳細",
+    "close": "閉じる"
+  },
+
+  "AboutUs": {
+    "hero": {
+      "title": "GoBeyondについて",
+      "subtitle": "意義あるチャレンジを通して世界を変える",
+      "learnMore": "詳しく見る"
+    },
+    "mission": {
+      "title": "私たちの使命",
+      "description": "GoBeyondは、前向きな価値をもたらすチャレンジを通じてコミュニティをつなげる目標で誕生しました。私たちは、小さな行動も多くの人々によって行われることで、社会や環境に大きな変化をもたらすことができると信じています。",
+      "pillars": {
+        "connect": {
+          "title": "つながる",
+          "description": "同じ情熱を持ち、前向きな影響を生み出したいと願う人々のコミュニティを構築する"
+        },
+        "challenge": {
+          "title": "挑戦する",
+          "description": "変化と個人の成長を促進する意義あるチャレンジを創り出す"
+        },
+        "impact": {
+          "title": "影響を与える",
+          "description": "チャレンジをコミュニティや環境を改善する具体的な行動に変える"
+        }
+      }
+    },
+    "team": {
+      "title": "私たちのチーム",
+      "description": "GoBeyondを支える情熱あふれるメンバーは、コミュニティに最高の体験を提供するため日々努力しています。",
+      "roles": {
+        "analyst": "ビジネスアナリスト",
+        "backend": "バックエンド開発者",
+        "leader": "リーダー",
+        "frontend": "フロントエンド開発者",
+        "tester": "テスター"
+      }
+    },
+    "values": {
+      "title": "コアバリュー",
+      "description": "私たちのすべての決断と行動を導く原則",
+      "items": {
+        "responsibility": {
+          "title": "社会的責任",
+          "description": "私たちは、すべての活動を通じてコミュニティと環境に前向きな影響を与えることを信じています。"
+        },
+        "innovation": {
+          "title": "革新",
+          "description": "常に問題を解決し、ユーザーに価値を提供する新しい方法を模索しています。"
+        },
+        "transparency": {
+          "title": "透明性",
+          "description": "すべての運営において開放性、誠実さ、明瞭さを通じて信頼を構築します。"
+        },
+        "collaboration": {
+          "title": "協力",
+          "description": "私たちは、共に働き、多様な視点から学ぶことで力が生まれると信じています。"
+        }
+      }
+    },
+    "journey": {
+      "title": "私たちの歩み",
+      "description": "初期のアイデアから成長するコミュニティへ",
+      "milestones": {
+        "beginning": {
+          "title": "始まり",
+          "description": "GoBeyondは、ポジティブな変化を生み出すことに情熱を持つ若者たちのアイデアから形成されました。"
+        },
+        "development": {
+          "title": "開発",
+          "description": "プラットフォームは基本機能を備えて正式に立ち上げられました。最初のユーザーコミュニティが形成されました。"
+        },
+        "expansion": {
+          "title": "拡大",
+          "description": "GoBeyondは多くの新機能と増え続けるユーザーコミュニティで力強く成長しています。"
+        }
+      }
+    },
+    "contact": {
+      "title": "お問い合わせ",
+      "description": "私たちは常にご意見をお聞きする準備があり、前向きな変化を生み出す旅にご一緒します",
+      "email": {
+        "title": "Eメール"
+      },
+      "phone": {
+        "title": "電話番号"
+      },
+      "address": {
+        "title": "住所",
+        "value": "ホアラック・ハイテクパーク、タンロン大通り29km、ハノイ"
+      },
+      "button": "今すぐ連絡する"
+    }
+  },
+  "VideoModal": {
+    "approveMessage": "このビデオを承認します",
+    "approveSuccess": "承認されました！",
+    "approveFail": "承認に失敗しました！",
+    "rejectMessage": "このビデオを承認しません",
+    "rejectSuccess": "却下されました！",
+    "rejectFail": "却下に失敗しました！",
+    "browserNotSupported": "お使いのブラウザはビデオタグをサポートしていません。",
+    "rejectButton": "このビデオを承認しません",
+    "approveButton": "このビデオを承認します",
+    "reviewSubmitted": "レビューが正常に送信されました！",
+    "previous": "前へ",
+    "next": "次へ"
+  },
+  "VoteOther": {
+    "title": "他の参加者の証拠に投票する",
+    "loading": "ビデオを読み込み中...",
+    "noEvidences": "レビューする証拠はありません。",
+    "unknownUser": "不明なユーザー"
+  },
+
+  "hostEvidence": {
+    "members": "メンバー",
+    "searchMembers": "メンバーを検索...",
+    "memberName": "メンバー名",
+    "joinedAt": "参加日",
+    "evidenceCount": "証拠数",
+    "status": "状態",
+    "notAvailable": "なし",
+    "pending": "保留中",
+    "done": "完了",
+    "showing": "表示中",
+    "to": "から",
+    "of": "の",
+    "evidence": "証拠",
+    "forMember": "{{name}}の",
+    "filtering": "フィルター",
+    "showingAll": "すべての証拠を表示",
+    "memberStats": "メンバーの証拠統計",
+    "totalEvidence": "証拠の総数",
+    "date": "日付",
+    "noEvidence": "証拠が見つかりません",
+    "showAll": "すべての証拠を表示",
+    "selectMember": "証拠を表示するメンバーを選択してください",
+    "unknownUser": "不明なユーザー",
+    "noDescription": "説明はありません。",
+    "challenge": "チャレンジ",
+    "memberChallenge": "{{name}}のチャレンジ",
+    "evidenceDetails": "証拠の詳細",
+    "modal": {
+      "approve": "この証拠を承認します",
+      "reject": "この証拠を承認しません",
+      "close": "閉じる"
+    },
+    "logs": {
+      "acceptEvidence": "証拠ID: {{id}} を承認しています",
+      "rejectEvidence": "証拠ID: {{id}} を拒否しています"
+    },
+    "status": {
+      "approved": "承認済み",
+      "waiting": "保留中",
+      "rejected": "拒否"
+    }
+  },
+
+  "rankingList": {
+    "top3Progress": "トップ3の進捗",
+    "rank": "ランク",
+    "noRankingData": "ランキングデータがありません",
+    "members": "メンバー",
+    "searchPlaceholder": "ユーザーを検索...",
+    "loadingStarLeaderboard": "スターリーダーボードを読み込み中...",
+    "noMembersFound": "メンバーが見つかりません",
+    "avgStars": "平均スター"
+  }
+
+
+
+
+
 }

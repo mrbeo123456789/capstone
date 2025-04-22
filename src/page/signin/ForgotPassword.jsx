@@ -1,48 +1,49 @@
 import { useState } from "react";
-import { toast } from "react-toastify"; // Dùng toast từ react-toastify
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { useForgotPasswordMutation } from "../../service/authService.js";
+import { useTranslation } from "react-i18next";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 function ForgotPassword() {
     const [email, setEmail] = useState("");
+    const [showEmail, setShowEmail] = useState(false);
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
 
     const handleForgotPassword = async (e) => {
         e.preventDefault();
         if (!email) {
-            toast.error("Please enter your email.");
+            toast.error(t("forgotPassword.errorEmpty"));
             return;
         }
 
         try {
-            const response = await forgotPassword(email).unwrap(); // unwrap giúp xử lý trực tiếp dữ liệu
-
-            toast.success(response.message || "OTP sent to your email");
+            const response = await forgotPassword(email).unwrap();
+            toast.success(response.message || t("forgotPassword.success"));
             sessionStorage.setItem("otpEmail", email);
             sessionStorage.setItem("otpType", "forgot");
             navigate("/enter-otp");
         } catch (error) {
-            if (error?.status === 404 && error?.data?.message) {
-                toast.error(error.data.message); // Hiển thị lỗi 404 nếu không tìm thấy email
-                return;
-            }
-            toast.error(error?.data?.message || "Something went wrong.");
+            toast.error(error?.data?.message || t("forgotPassword.fail"));
         }
     };
 
     return (
         <div className="relative min-h-screen bg-black">
+            {/* Background */}
             <div
                 className="absolute inset-0 w-full h-screen bg-cover bg-center opacity-50"
                 style={{
-                    backgroundImage: `url(https://firebasestorage.googleapis.com/v0/b/bookstore-f9ac2.appspot.com/o/pexels-bess-hamiti-83687-36487.jpg?alt=media&token=f1fb933e-2fe4-4f6f-a604-7eb7e47314fd)`,
+                    backgroundImage: `url(https://firebasestorage.googleapis.com/v0/b/bookstore-f9ac2.appspot.com/o/pexels-bess-hamiti-83687-36487.jpg?alt=media)`
                 }}
             />
+
             {/* Logo */}
             <div className="absolute top-5 left-5 flex items-end">
                 <img
-                    src="https://firebasestorage.googleapis.com/v0/b/bookstore-f9ac2.appspot.com/o/logo%2Fimage-removebg-preview.png?alt=media&token=f16618d4-686c-4014-a9cc-99b4cf043c86"
+                    src="https://firebasestorage.googleapis.com/v0/b/bookstore-f9ac2.appspot.com/o/logo%2Fimage-removebg-preview.png?alt=media"
                     alt="GoBeyond Logo"
                     className="h-10 rounded-full"
                 />
@@ -51,26 +52,44 @@ function ForgotPassword() {
                     <div className="text-4xl font-bold text-yellow-400">Beyond</div>
                 </div>
             </div>
+
+            {/* Form */}
             <div className="w-full h-screen flex items-center justify-center relative">
                 <div className="bg-white p-8 rounded-lg shadow-lg w-96">
-                    <h2 className="text-2xl font-bold text-center text-red-600">Forgot Password?</h2>
+                    <h2 className="text-2xl font-bold text-center text-red-600">
+                        {t("forgotPassword.title")}
+                    </h2>
                     <p className="text-gray-600 text-sm text-center mb-4">
-                        Enter your email to receive an OTP.
+                        {t("forgotPassword.subtitle")}
                     </p>
                     <form onSubmit={handleForgotPassword} className="space-y-4">
-                        <input
-                            type="email"
-                            placeholder="Enter your email address"
-                            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                        />
+                        <div className="relative">
+                            <label className="block text-sm font-medium text-black mb-1">
+                                {t("forgotPassword.email")}
+                                <span className="text-red-500"> *</span>
+                            </label>
+                            <input
+                                type={showEmail ? "text" : "password"}
+                                placeholder={t("forgotPassword.emailPlaceholder")}
+                                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                            />
+                            <div
+                                className="absolute right-3 top-[38px] cursor-pointer text-gray-500"
+                                onClick={() => setShowEmail(!showEmail)}
+                            >
+                                {showEmail ? <FaEyeSlash /> : <FaEye />}
+                            </div>
+                        </div>
                         <button
                             type="submit"
                             className="w-full bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition"
                             disabled={isLoading}
                         >
-                            {isLoading ? "Sending..." : "Get New Password"}
+                            {isLoading
+                                ? t("forgotPassword.sending")
+                                : t("forgotPassword.submit")}
                         </button>
                     </form>
                     <div className="text-center mt-4">
@@ -78,7 +97,7 @@ function ForgotPassword() {
                             onClick={() => navigate("/login")}
                             className="text-red-500 hover:underline"
                         >
-                            Back to Login
+                            {t("forgotPassword.back")}
                         </button>
                     </div>
                 </div>

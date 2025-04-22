@@ -12,6 +12,7 @@ import {
 } from "../../service/groupService.js";
 import MemberListPopup from "../ui/MemberListPopup.jsx";
 import { useGetCurrentMemberIdQuery } from "../../service/memberService";
+import GroupChallengeHistory from "./GroupChallengeHistory";
 
 const JoinedGroupDetail = () => {
     const { t } = useTranslation();
@@ -29,11 +30,10 @@ const JoinedGroupDetail = () => {
     const [searchKeyword, setSearchKeyword] = useState("");
     const [resetTable, setResetTable] = useState(false);
 
-
-
     const isOwner = group?.currentMemberRole === "OWNER";
     const { data: currentMemberData } = useGetCurrentMemberIdQuery();
     const currentMemberId = currentMemberData;
+
     useEffect(() => {
         if (error?.status === 500 || error?.status === 404) {
             toast.error(t("groupDetail.permissionDenied"));
@@ -173,20 +173,20 @@ const JoinedGroupDetail = () => {
                 </div>
 
                 <div className="shadow-lg rounded-lg w-full mx-auto p-4">
-                    <MemberTable
-                        groupId={groupId}
-                        isHost={isOwner}
-                        onKick={handleKickMember}
-                        resetTable={resetTable}
-                        onResetHandled={() => setResetTable(false)}
-                        searchTerm={searchKeyword}
-                        setSearchTerm={setSearchKeyword}
-                    />
+                    {activeTab === "members" && (
+                        <MemberTable
+                            groupId={groupId}
+                            isHost={isOwner}
+                            onKick={handleKickMember}
+                            resetTable={resetTable}
+                            onResetHandled={() => setResetTable(false)}
+                            searchTerm={searchKeyword}
+                            setSearchTerm={setSearchKeyword}
+                        />
+                    )}
 
                     {activeTab === "challenge" && (
-                        <div className="text-center text-gray-600">
-                            {t("groupDetail.comingSoon")}
-                        </div>
+                        <GroupChallengeHistory groupId={groupId} />
                     )}
                 </div>
             </div>
