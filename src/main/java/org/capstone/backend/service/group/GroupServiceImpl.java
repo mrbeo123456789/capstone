@@ -53,16 +53,19 @@ public class GroupServiceImpl implements GroupService {
         Groups group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy nhóm với id " + groupId));
 
-        // ✅ Check nếu không phải thành viên ACTIVE thì ném lỗi
-        boolean isMember = group.getMembers().stream()
-                .anyMatch(m -> m.getMember().getId().equals(memberId) && m.getStatus() == GroupMemberStatus.ACTIVE);
+        // ✅ Nếu không phải admin (memberId != null), mới cần kiểm tra là thành viên ACTIVE
+        if (memberId != null) {
+            boolean isMember = group.getMembers().stream()
+                    .anyMatch(m -> m.getMember().getId().equals(memberId) && m.getStatus() == GroupMemberStatus.ACTIVE);
 
-        if (!isMember) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không phải là thành viên của nhóm này.");
+            if (!isMember) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không phải là thành viên của nhóm này.");
+            }
         }
 
         return convertToDTO(group, memberId, true);
     }
+
 
 
     private GroupResponse convertToDTO(Groups group, Long memberId, boolean includeMembers) {
