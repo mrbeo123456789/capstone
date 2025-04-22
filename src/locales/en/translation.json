@@ -606,7 +606,15 @@
     "loadingStarLeaderboard": "Loading star leaderboard...",
     "noMembersFound": "No members found",
     "avgStars": "Avg stars"
+  },
+  "challengeStatistic": {
+    "total": "Total Participants",
+    "completed": "Completed",
+    "notCompleted": "Not Completed",
+    "dailyOverview": "Daily progress overview",
+    "completionRate": "Daily completion rate"
   }
+
 
 }
 

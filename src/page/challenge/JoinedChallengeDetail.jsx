@@ -20,8 +20,9 @@ import { useGetMyEvidencesByChallengeQuery } from "../../service/evidenceService
 import ReportChallengeModal from "./modal/ReportChallengeModal.jsx";
 import MemberManagementModal from "./modal/MemberManagementModal.jsx";
 import ChallengeGroupTab from "./ChallengeGroupTab.jsx";
-import EvidenceList from "../admin/list/EvidenceList.jsx";
 import HostEvidenceManagement from "./HostEvidenceManagement.jsx";
+import InviteGroups from "./InviteGroups.jsx";
+import GroupChallengeInvite from "./GroupChallengeInvite.jsx";
 
 const JoinedChallengeDetail = () => {
     const { t } = useTranslation();
@@ -29,6 +30,8 @@ const JoinedChallengeDetail = () => {
     const [showPopup, setShowPopup] = useState(false);
     const [showReportModal, setShowReportModal] = useState(false);
     const [showMemberModal, setShowMemberModal] = useState(false);
+    const [showMemberInvite, setShowMemberInvite] = useState(false);
+    const [showGroupInvite, setShowGroupInvite] = useState(false);
     const navigate = useNavigate();
     const { id } = useParams();
 
@@ -48,7 +51,18 @@ const JoinedChallengeDetail = () => {
 
     const challenge = data;
 
-    const openInviteMember = () => setShowPopup(true);
+    const openInviteMember = () => {
+        if (challenge.participationType === "GROUP") {
+            setShowGroupInvite(true);
+        } else {
+            setShowMemberInvite(true);
+        }
+    };
+    const closeInvite = () => {
+        setShowGroupInvite(false);
+        setShowMemberInvite(false);
+    };
+
     const closeUserDetail = () => setShowPopup(false);
     const openReportModal = () => setShowReportModal(true);
     const closeReportModal = () => setShowReportModal(false);
@@ -80,7 +94,7 @@ const JoinedChallengeDetail = () => {
         { key: "description", label: t("JoinsChallengeDetail.description"), icon: <FaInfoCircle /> },
     ];
 
-// 👉 Thêm tab Report nếu là HOST
+    // 👉 Thêm tab Report nếu là HOST
     if (challenge.role === "HOST") {
         tabItems.push({
             key: "report",
@@ -243,12 +257,13 @@ const JoinedChallengeDetail = () => {
                 {activeTab === "review" && <VoteOther />}
                 {activeTab === "description" && <Description content={challenge} />}
                 {activeTab === "report" && (
-                    <div className="p-4 text-center text-gray-600">
+                    <div className="text-center text-gray-600">
                         {/* Bạn có thể thay bằng component thực sự nếu có */}
                         <HostEvidenceManagement challengeId={challenge.id}/>
                     </div>
                 )}
-                {showPopup && <ChallengeInvitePopup onClose={closeUserDetail} />}
+                {showMemberInvite && <ChallengeInvitePopup onClose={closeInvite} />}
+                {showGroupInvite && <GroupChallengeInvite onClose={closeInvite} />}
                 {showReportModal && <ReportChallengeModal challengeId={challenge.id} onClose={closeReportModal} />}
                 {showMemberModal && (
                     <MemberManagementModal

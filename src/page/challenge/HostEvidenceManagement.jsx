@@ -5,6 +5,7 @@ import { useGetJoinedMembersWithPendingEvidenceQuery } from "../../service/chall
 import { useGetEvidenceCountByStatusQuery, useGetEvidencesForHostQuery } from "../../service/evidenceService.js";
 import EvidenceDetailModal from "../../component/ChallengeDetailModal.jsx";
 import { useTranslation } from "react-i18next";
+import ChallengeStatistic from "./ChallengeStatistic.jsx";
 
 const HostEvidenceManagement = ({ challengeId }) => {
     const { t } = useTranslation();
@@ -203,13 +204,20 @@ const HostEvidenceManagement = ({ challengeId }) => {
     return (
         <div className="flex flex-col">
             <div className="flex-1 flex flex-col overflow-hidden">
-                <div className="container mx-auto flex-grow">
+                <div className="py-2">
+                    <ChallengeStatistic
+                        totalParticipants={25}
+                        completed={15}
+                        notCompleted={10}
+                    />
+                </div>
+                <div className="w-full flex-grow">
                     {isLoading ? (
                         <div className="flex justify-center items-center h-64">
                             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
                         </div>
                     ) : (
-                        <div className="flex flex-col md:flex-row gap-4">
+                        <div className="flex flex-col md:flex-row gap-2">
                             {/* Left panel - Member List */}
                             <div className="w-full md:w-1/2 bg-white rounded-lg shadow overflow-hidden">
                                 <div className="bg-blue-100 px-6 py-3 border-b">

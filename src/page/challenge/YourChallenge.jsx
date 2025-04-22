@@ -50,9 +50,6 @@ const YourChallenge = () => {
         }
     };
 
-
-
-
     const getStatusStyle = (status) => {
         switch (status) {
             case "PENDING":
@@ -101,13 +98,13 @@ const YourChallenge = () => {
                         <NoInvitationsIllustration themeColor={themeColor}/>
                         <p className="font-semibold text-sm mt-2">{t("yourChallenge.noInvitations")}</p>
                     </div>
-
                 ) : (
                     <div className="flex gap-6 overflow-x-auto pb-2">
                         {invitations.map((invite) => (
                             <div
                                 key={invite.id}
                                 className="cursor-pointer min-w-[200px] p-4 border rounded-lg space-y-2 flex-shrink-0 hover:shadow-lg transition"
+                                onClick={() => navigate(`/challenges/detail/${invite.challengeId}`)}
                             >
                                 <p className="text-sm">{invite.inviterInfo} {t("yourChallenge.inviteText")}</p>
                                 <div className="h-24 bg-gray-200 rounded overflow-hidden">
@@ -122,8 +119,8 @@ const YourChallenge = () => {
                                     <button
                                         className="bg-green-600 text-white px-3 py-1 rounded"
                                         onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleRespond(invite.invitationId, invite.invitationType,true);
+                                            e.stopPropagation(); // ✅ ngăn redirect
+                                            handleRespond(invite.invitationId, invite.invitationType, true);
                                         }}
                                     >
                                         {t("yourChallenge.accept")}
@@ -131,8 +128,8 @@ const YourChallenge = () => {
                                     <button
                                         className="border px-3 py-1 rounded"
                                         onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleRespond(invite.invitationId, invite.invitationType,false);
+                                            e.stopPropagation(); // ✅ ngăn redirect
+                                            handleRespond(invite.invitationId, invite.invitationType, false);
                                         }}
                                     >
                                         {t("yourChallenge.decline")}

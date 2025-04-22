@@ -75,6 +75,17 @@ export const invitationService = createApi({
                 method: "GET",
             }),
         }),
+
+        // GET: /api/member/invitations/{challengeId}/search-leaders
+        searchAvailableGroupLeaders: builder.mutation({
+            query: ({ challengeId, keyword }) => ({
+                url: `/member/invitations/${challengeId}/search-leaders`,
+                method: "GET",
+                params: { keyword },
+            }),
+        }),
+
+
     }),
 });
 
@@ -85,4 +96,5 @@ export const {
     useGetMyInvitationsQuery,
     useSearchMembersForChallengeInviteMutation,
     useSuggestMembersQuery,
+    useSearchAvailableGroupLeadersMutation,
 } = invitationService;
