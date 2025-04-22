@@ -1,13 +1,10 @@
 package org.capstone.backend.repository;
 
 import org.capstone.backend.dto.evidence.EvidenceStatusCountDTO;
-import org.capstone.backend.entity.Challenge;
 import org.capstone.backend.entity.Evidence;
-import org.capstone.backend.entity.Member;
 import org.capstone.backend.utils.enums.EvidenceStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -54,11 +51,6 @@ public interface EvidenceRepository extends JpaRepository<Evidence, Long> {
             @Param("end") LocalDateTime end);
 
 
-    @Query("SELECT e FROM Evidence e WHERE e.member.id = :memberId AND e.challenge.id = :challengeId ORDER BY e.submittedAt DESC")
-    Page<Evidence> findByMemberIdAndChallengeId(@Param("memberId") Long memberId,
-                                                @Param("challengeId") Long challengeId,
-                                                Pageable pageable);
-
     @Query("""
     SELECT e FROM Evidence e
     WHERE e.challenge.id = :challengeId
@@ -87,22 +79,7 @@ public interface EvidenceRepository extends JpaRepository<Evidence, Long> {
             Pageable pageable
     );
 
-    /**
-     * Đếm số lượng chứng cứ được nộp của một thành viên (memberId) cho thử thách (challengeId)
-     * trong khoảng thời gian từ 'start' đến 'end'.
-     *
-     * @param memberId    ID của thành viên
-     * @param challengeId ID của thử thách
-     * @param start       Thời điểm bắt đầu (LocalDateTime)
-     * @param end         Thời điểm kết thúc (LocalDateTime)
-     * @return Số lượng chứng cứ đã nộp
-     */
-    long countByMemberIdAndChallengeIdAndSubmittedAtBetween(
-            Long memberId,
-            Long challengeId,
-            LocalDateTime start,
-            LocalDateTime end
-    );
+
     @Query("SELECT e FROM Evidence e " +
             "WHERE e.member.id = :memberId " +
             "AND e.challenge.id = :challengeId " +
@@ -127,6 +104,8 @@ public interface EvidenceRepository extends JpaRepository<Evidence, Long> {
             @Param("challengeId") Long challengeId,
             @Param("memberId") Long memberId
     );
+
+
 }
 
 

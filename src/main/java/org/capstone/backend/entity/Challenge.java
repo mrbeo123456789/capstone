@@ -74,6 +74,13 @@ public class Challenge {
     @Column(name = "created_by", nullable = false, updatable = false)
     private String createdBy;
 
+    @Column(name = "max_groups", nullable = true)
+    private Integer maxGroups;
+
+    /** Số thành viên tối đa mỗi nhóm */
+    @Column(name = "max_members_per_group", nullable = true)
+    private Integer maxMembersPerGroup;
+
     @LastModifiedBy
     @Column(name = "updated_by")
     private String updatedBy;

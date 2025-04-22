@@ -1,12 +1,10 @@
 package org.capstone.backend.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -16,6 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EntityListeners(AuditingEntityListener.class)
 public class EvidenceReport {
 
     @Id
@@ -26,7 +25,7 @@ public class EvidenceReport {
     @JoinColumn(name = "evidence_id", nullable = false)
     private Evidence evidence;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reviewer_id", nullable = false)
     private Member reviewer;
 
@@ -34,23 +33,17 @@ public class EvidenceReport {
 
     private String feedback;
 
-    @Column(name = "reviewed_at", updatable = false)
+    @Column(name = "reviewed_at")
     private LocalDateTime reviewedAt;
 
+    @CreatedDate
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     @Column(name = "updated_by")
     private Long updatedBy;
-
-    @PrePersist
-    protected void onCreate() {
-        this.reviewedAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 }

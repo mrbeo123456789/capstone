@@ -84,12 +84,19 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
         CASE 
             WHEN :memberId IS NULL THEN false
             WHEN EXISTS (
-                SELECT 1 FROM ChallengeMember cm 
-                WHERE cm.challenge.id = c.id AND cm.member.id = :memberId
+                SELECT 1 
+                FROM ChallengeMember cm 
+                WHERE cm.challenge.id = c.id 
+                  AND cm.member.id = :memberId 
+                  AND cm.status = org.capstone.backend.utils.enums.ChallengeMemberStatus.JOINED
             ) THEN true 
             ELSE false 
         END,
-        (SELECT COUNT(cm) FROM ChallengeMember cm WHERE cm.challenge.id = c.id),
+        (SELECT COUNT(cm) 
+         FROM ChallengeMember cm 
+         WHERE cm.challenge.id = c.id
+           AND cm.status = org.capstone.backend.utils.enums.ChallengeMemberStatus.JOINED
+        ),
         DATEDIFF(c.endDate, c.startDate), 
         c.status,                
         c.verificationType,
@@ -97,7 +104,9 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
         (
             SELECT cm.role 
             FROM ChallengeMember cm 
-            WHERE cm.challenge.id = c.id AND cm.member.id = :memberId
+            WHERE cm.challenge.id = c.id 
+              AND cm.member.id = :memberId
+              AND cm.status = org.capstone.backend.utils.enums.ChallengeMemberStatus.JOINED
         )
     )
     FROM Challenge c
@@ -107,6 +116,7 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
             @Param("challengeId") Long challengeId,
             @Param("memberId") Long memberId
     );
+
 
 
     @Query("SELECT c.id FROM Challenge c " +

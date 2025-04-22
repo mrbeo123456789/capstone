@@ -5,12 +5,12 @@ import lombok.Setter;
 
 @Data
 public class TaskChecklistDTO {
-
     private Long challengeId;
     private String challengeName;
-    private boolean isEvidenceSubmitted;
-    private String evidenceStatus;
-    private boolean isEvidenceApproved;
-    private String message;
 
+    private String evidenceStatus;
+
+    private Integer totalReviewAssigned;
+    private Integer reviewCompleted;
 }
+

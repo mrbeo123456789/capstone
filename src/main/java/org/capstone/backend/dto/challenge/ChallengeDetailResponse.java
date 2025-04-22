@@ -23,7 +23,8 @@ public class ChallengeDetailResponse {
     private String picture;
     private String banner;
     private String challengeType;
-    private Integer maxParticipants;    private boolean joined;
+    private Integer maxParticipants;
+    private boolean joined;
     private long participantCount;
     private long duration;
     private ChallengeStatus challengeStatus;

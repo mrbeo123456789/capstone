@@ -3,18 +3,15 @@ package org.capstone.backend.config;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.capstone.backend.entity.Challenge;
+import org.capstone.backend.entity.ChallengeMember;
+import org.capstone.backend.entity.EvidenceReport;
 import org.capstone.backend.entity.GroupChallenge;
 import org.capstone.backend.event.ChallengeResultAnnounceEvent;
 import org.capstone.backend.event.ChallengeStartedEvent;
-import org.capstone.backend.repository.ChallengeMemberRepository;
-import org.capstone.backend.repository.ChallengeRepository;
-import org.capstone.backend.repository.GroupChallengeRepository;
+import org.capstone.backend.repository.*;
 import org.capstone.backend.service.evidence.EvidenceService;
 import org.capstone.backend.service.ranking.RankingService;
-import org.capstone.backend.utils.enums.ChallengeStatus;
-import org.capstone.backend.utils.enums.GroupChallengeStatus;
-import org.capstone.backend.utils.enums.ParticipationType;
-import org.capstone.backend.utils.enums.VerificationType;
+import org.capstone.backend.utils.enums.*;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -37,6 +34,8 @@ public class Schedule {
     private final GroupChallengeRepository groupChallengeRepository;
     private final RankingService rankingService;
     private final ApplicationEventPublisher eventPublisher;
+    private final EvidenceReportRepository evidenceReportRepository;
+    private final EvidenceRepository evidenceRepository;
 
     // ==== 00:00 – Roll UPCOMING → ONGOING & ONGOING → FINISH ====
     @Transactional
@@ -114,25 +113,40 @@ public class Schedule {
                 .forEach(assignmentService::assignPendingReviewersForChallenge);
     }
 
-    // ==== Helper invoked immediately when a challenge finishes ====
+
     @Transactional
     protected void markMemberCompletion(LocalDate today) {
         challengeRepository.findByStatusAndEndDate(ChallengeStatus.FINISH, today)
                 .forEach(ch -> {
-                    var updated = challengeMemberRepository.findByChallenge(ch)
-                            .stream()
-                            .peek(cm -> {
-                                double pct = evidenceService.getApprovedEvidencePercentage(
-                                        cm.getMember().getId(), ch.getId());
-                                cm.setIsCompleted(pct >= 80.0);
-                            })
-                            .toList();
-                    challengeMemberRepository.saveAll(updated);
-                    log.info("Marked member completion for challenge {}", ch.getId());
+                    VerificationType verificationType = ch.getVerificationType();
+                    LocalDate startDate = ch.getStartDate();
+                    LocalDate endDate = ch.getEndDate();
+                    Long challengeId = ch.getId();
+
+                    List<ChallengeMember> members = challengeMemberRepository.findByChallenge(ch);
+
+                    members.forEach(cm -> {
+                        boolean completed = false;
+
+                        if (Boolean.TRUE.equals(cm.getIsParticipate())) {
+                            Long memberId = cm.getMember().getId();
+
+                            double completionRate = verificationType == VerificationType.HOST_REVIEW
+                                    ? evidenceService.getApprovedEvidencePercentage(memberId, challengeId) / 100.0
+                                    : calculateCompletionRate(memberId, challengeId, verificationType, startDate, endDate);
+
+                            completed = completionRate >= 0.8;
+                        }
+
+                        cm.setIsCompleted(completed);
+                    });
+
+                    challengeMemberRepository.saveAll(members);
+                    log.info("✅ Marked isCompleted for challenge {}", ch.getId());
                 });
     }
 
-    // ==== Helper invoked immediately when a challenge finishes ====
+
     @Transactional
     protected void updateGroupChallengeStatuses(LocalDate today) {
         List<GroupChallenge> successList = groupChallengeRepository
@@ -140,29 +154,76 @@ public class Schedule {
                 .stream()
                 .filter(gc -> gc.getChallenge().getParticipationType() == ParticipationType.GROUP)
                 .filter(gc -> {
+                    var challenge = gc.getChallenge();
+                    var verificationType = challenge.getVerificationType();
                     var members = challengeMemberRepository
-                            .findByChallengeAndGroupId(gc.getChallenge(), gc.getGroup().getId());
+                            .findByChallengeAndGroupId(challenge, gc.getGroup().getId());
+
                     if (members.isEmpty()) return false;
 
-                    long days = ChronoUnit.DAYS.between(gc.getChallenge().getStartDate(), today) + 1;
-                    long required = members.size() * days;
+                    LocalDate startDate = challenge.getStartDate();
+                    LocalDate endDate = challenge.getEndDate();
+                    Long challengeId = challenge.getId();
 
-                    long submitted = members.stream()
-                            .mapToLong(m -> evidenceService.getSubmittedEvidenceCount(
-                                    m.getMember().getId(),
-                                    gc.getChallenge().getId(),
-                                    gc.getChallenge().getStartDate(),
-                                    today))
-                            .sum();
+                    double totalCompletionRate = 0.0;
+                    int memberCount = 0;
 
-                    return submitted * 100.0 / required >= 80.0;
+                    for (ChallengeMember cm : members) {
+                        if (!Boolean.TRUE.equals(cm.getIsParticipate())) continue;
+
+                        Long memberId = cm.getMember().getId();
+
+                        double rate = verificationType == VerificationType.HOST_REVIEW
+                                ? evidenceService.getApprovedEvidencePercentage(memberId, challengeId) / 100.0
+                                : calculateCompletionRate(memberId, challengeId, verificationType, startDate, endDate);
+
+                        totalCompletionRate += rate;
+                        memberCount++;
+                    }
+
+                    double avgCompletionRate = memberCount == 0 ? 0.0 : totalCompletionRate / memberCount;
+                    return avgCompletionRate >= 0.8;
                 })
                 .peek(gc -> {
                     gc.setSuccess(true);
-                    log.info("Marked GroupChallenge {} successful", gc.getId());
+                    log.info("✅ Marked GroupChallenge {} successful", gc.getId());
                 })
                 .toList();
 
         groupChallengeRepository.saveAll(successList);
     }
+
+    private double calculateCompletionRate(
+            Long memberId,
+            Long challengeId,
+            VerificationType verificationType,
+            LocalDate startDate,
+            LocalDate endDate
+    ) {
+        long totalDays = ChronoUnit.DAYS.between(startDate, endDate) + 1;
+        int completedDays = 0;
+
+        for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+            boolean hasApprovedEvidence = evidenceRepository
+                    .findByMemberIdAndChallengeIdAndDate(memberId, challengeId, date)
+                    .map(e -> e.getStatus() == EvidenceStatus.APPROVED)
+                    .orElse(false);
+
+            if (verificationType == VerificationType.HOST_REVIEW) {
+                if (hasApprovedEvidence) {
+                    completedDays++;
+                }
+            } else if (verificationType == VerificationType.MEMBER_REVIEW) {
+                List<EvidenceReport> reviews = evidenceReportRepository
+                        .findByReviewerIdAndChallengeIdAndAssignedDate(memberId, challengeId, date);
+                boolean allReviewed = reviews.stream().allMatch(r -> r.getReviewedAt() != null);
+                if (hasApprovedEvidence && allReviewed) {
+                    completedDays++;
+                }
+            }
+        }
+
+        return (double) completedDays / totalDays;
+    }
+
 }

@@ -29,6 +29,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -56,7 +57,7 @@ public class ChallengeServiceImpl implements ChallengeService {
     private final EvidenceVoteRepository evidenceVoteRepository;
     private final GroupChallengeRepository groupChallengeRepository;
     private final GroupRepository groupRepository;
-
+  private  final GroupMemberRepository groupMemberRepository;
     // --- Phương thức hỗ trợ chung ---
 
     /**
@@ -99,17 +100,30 @@ public class ChallengeServiceImpl implements ChallengeService {
 
     // --- Các phương thức hỗ trợ quản lý thành viên của thử thách ---
 
-    protected void addHostAsChallengeMember(Challenge challenge, Member member) {
-        ChallengeMember challengeMember = ChallengeMember.builder()
-                .challenge(challenge)
-                .member(member)
-                .role(ChallengeRole.HOST)
-                .status(ChallengeMemberStatus.JOINED)
-                .groupId(null)
-                .joinBy(member.getId())
-                .createdAt(LocalDateTime.now())
-                .build();
-        challengeMemberRepository.save(challengeMember);
+    protected void addHostAsChallengeMember(Challenge challenge,
+                                            Member member,
+                                            Boolean isParticipate) {
+        // Tìm xem đã có record host trước đó chưa
+        Optional<ChallengeMember> existing = challengeMemberRepository
+                .findHostByChallengeId(challenge.getId());
+        if (existing.isPresent()) {
+            ChallengeMember cm = existing.get();
+            cm.setIsParticipate(isParticipate);
+            cm.setStatus(ChallengeMemberStatus.JOINED);
+            challengeMemberRepository.save(cm);
+        } else {
+            ChallengeMember cm = ChallengeMember.builder()
+                    .challenge(challenge)
+                    .member(member)
+                    .role(ChallengeRole.HOST)
+                    .status(ChallengeMemberStatus.JOINED)
+                    .groupId(null)
+                    .joinBy(member.getId())
+                    .isParticipate(isParticipate)
+                    .createdAt(LocalDateTime.now())
+                    .build();
+            challengeMemberRepository.save(cm);
+        }
     }
 
     protected void addParticipantAsChallengeMember(Challenge challenge, Member member, Long groupId) {
@@ -205,7 +219,8 @@ public class ChallengeServiceImpl implements ChallengeService {
         if (isMember) {
             Member member = memberRepository.findById(memberId)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MEMBER_NOT_FOUND_MSG));
-            addHostAsChallengeMember(challenge, member);
+            // Truyền request.isParticipate để set đúng cờ cho host
+            addHostAsChallengeMember(challenge, member, request.getIsParticipate());
         }
 
         publishAchievementEvent(memberId, AchievementTriggerEvent.TriggerType.CREATE_CHALLENGE);
@@ -308,53 +323,93 @@ public class ChallengeServiceImpl implements ChallengeService {
     @Override
     @Transactional
     public String joinGroupToChallenge(Long groupId, Long challengeId) {
+        // 1. Lấy dữ liệu
         Groups group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, GROUP_NOT_FOUND_MSG));
-        Challenge challenge = getChallenge(challengeId);
+        Challenge challenge = challengeRepository.findById(challengeId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, CHALLENGE_NOT_FOUND_MSG));
 
+        // 2. Chỉ cho join khi thử thách đang UPCOMING
         if (challenge.getStatus() != ChallengeStatus.UPCOMING) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Thử thách hiện không cho phép nhóm tham gia.");
         }
-        if (groupChallengeRepository.existsByGroupAndStatus(group, GroupChallengeStatus.ONGOING)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Nhóm đã tham gia một thử thách.");
+
+        // 3. Kiểm tra số nhóm đã tham gia
+        long joinedGroupCount = groupChallengeRepository
+                .countByChallengeAndStatus(challenge, GroupChallengeStatus.ONGOING);
+        Integer maxGroups = challenge.getMaxGroups();
+        if (maxGroups != null && joinedGroupCount >= maxGroups) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Đã đạt tối đa số nhóm tham gia: " + maxGroups
+            );
         }
 
-        int currentParticipants = challenge.getChallengeMembers().size();
-        List<Member> groupMembers = group.getMembers().stream()
-                .map(GroupMember::getMember)
+        // 4. Lấy thành viên ACTIVE trong nhóm
+        List<Member> members = groupMemberRepository
+                .findMembersByGroupIdAndStatus(groupId, GroupMemberStatus.ACTIVE);
+
+        // 5. Kiểm tra số thành viên trong nhóm
+        Integer maxPerGroup = challenge.getMaxMembersPerGroup();
+        if (maxPerGroup != null && members.size() > maxPerGroup) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Mỗi nhóm tối đa " + maxPerGroup + " thành viên."
+            );
+        }
+
+        // 6. Đảm bảo nhóm chưa từng join thử thách
+        if (groupChallengeRepository
+                .existsByGroupAndChallengeAndStatus(group, challenge, GroupChallengeStatus.ONGOING)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Nhóm đã tham gia thử thách này rồi.");
+        }
+
+        // 7. Kiểm tra từng thành viên xem đã join cá nhân chưa
+        List<String> duplicate = members.stream()
+                .filter(m -> challengeMemberRepository.existsByChallengeAndMember(challenge, m))
+                .map(Member::getFullName)
                 .toList();
-
-        if (currentParticipants + groupMembers.size() > challenge.getMaxParticipants()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Không đủ chỗ cho nhóm.");
+        if (!duplicate.isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Một số thành viên đã tham gia trước: " + String.join(", ", duplicate)
+            );
         }
 
-        List<Member> alreadyJoined = groupMembers.stream()
-                .filter(member -> challengeMemberRepository.existsByChallengeAndMember(challenge, member))
+        // 8. Tạo ChallengeMember cho mỗi thành viên, đánh dấu JOINED và isParticipate = true
+        LocalDateTime now = LocalDateTime.now();
+        List<ChallengeMember> toSave = members.stream()
+                .map(m -> ChallengeMember.builder()
+                        .challenge(challenge)
+                        .member(m)
+                        .role(ChallengeRole.MEMBER)
+                        .status(ChallengeMemberStatus.JOINED)
+                        .joinBy(null)
+                        .groupId(groupId)
+                        .isParticipate(true)
+                        .createdAt(now)
+                        .build())
                 .toList();
-        if (!alreadyJoined.isEmpty()) {
-            String memberNames = alreadyJoined.stream()
-                    .map(Member::getFullName)
-                    .collect(Collectors.joining(", "));
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "Một số thành viên đã tham gia thử thách qua nhóm khác: " + memberNames);
-        }
+        challengeMemberRepository.saveAll(toSave);
 
-        for (Member member : groupMembers) {
-            addParticipantAsChallengeMember(challenge, member, groupId);
-            publishAchievementEvent(member.getId(), AchievementTriggerEvent.TriggerType.JOIN_CHALLENGE);
-        }
-
-        GroupChallenge groupChallenge = GroupChallenge.builder()
+        // 9. Ghi nhận group đã join challenge
+        GroupChallenge gc = GroupChallenge.builder()
                 .group(group)
                 .challenge(challenge)
-                .joinDate(LocalDateTime.now())
                 .status(GroupChallengeStatus.ONGOING)
-                .createdAt(LocalDateTime.now())
+                .joinDate(now)
+                .createdAt(now)
                 .build();
-        groupChallengeRepository.save(groupChallenge);
+        groupChallengeRepository.save(gc);
+
+        // 10. Gửi sự kiện achievement
+        toSave.forEach(cm ->
+                publishAchievementEvent(cm.getMember().getId(), AchievementTriggerEvent.TriggerType.JOIN_CHALLENGE)
+        );
 
         return "Nhóm đã tham gia thử thách thành công.";
     }
+
 
     @Override
     public ChallengeDetailResponse getChallengeDetail(Long challengeId) {
@@ -516,13 +571,29 @@ public class ChallengeServiceImpl implements ChallengeService {
         } else if (bannerUrl != null && !bannerUrl.isBlank()) {
             challenge.setBanner(bannerUrl);
         }
-
+        challengeMemberRepository.findHostByChallengeId(challenge.getId())
+                .ifPresent(cm -> {
+                    cm.setIsParticipate(request.getIsParticipate());
+                    challengeMemberRepository.save(cm);
+                });
         challengeRepository.save(challenge);
         return "Thử thách đã được cập nhật thành công.";
     }
 
 
     private ChallengeResponse convertToResponse(Challenge challenge) {
+        // Lấy giá trị mặc định
+        Integer maxParticipants = null;
+        Integer maxGroups = null;
+        Integer maxMembersPerGroup = null;
+
+        if (challenge.getParticipationType() == ParticipationType.INDIVIDUAL) {
+            maxParticipants = challenge.getMaxParticipants();
+        } else if (challenge.getParticipationType() == ParticipationType.GROUP) {
+            maxGroups = challenge.getMaxGroups();
+            maxMembersPerGroup = challenge.getMaxMembersPerGroup();
+        }
+
         return new ChallengeResponse(
                 challenge.getId(),
                 challenge.getName(),
@@ -530,9 +601,11 @@ public class ChallengeServiceImpl implements ChallengeService {
                 challenge.getPicture(),
                 challenge.getStartDate(),
                 challenge.getEndDate(),
-                challenge.getChallengeType().getName(),        // assuming challengeType is not null
-                challenge.getParticipationType()
+                challenge.getChallengeType().getName(),
+                challenge.getParticipationType(),
+                maxParticipants,
+                maxGroups,
+                maxMembersPerGroup
         );
-    }
 
-}
+}}

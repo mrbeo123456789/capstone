@@ -135,11 +135,11 @@ public class MemberSuggestionService {
             // Xác định lý do gợi ý
             String reason;
             if (interestScore > 0 && locationScore > 0) {
-                reason = "Cùng sở thích và gần địa chỉ";
+                reason = "suggest.reason.both";
             } else if (interestScore > 0) {
-                reason = "Cùng sở thích";
+                reason = "suggest.reason.same_interest";
             } else {
-                reason = "Gần địa chỉ";
+                reason = "suggest.reason.near_location";
             }
 
             // Tổng điểm sắp xếp: có thể điều chỉnh theo trọng số nếu cần (ví dụ: 0.7 * interestScore + 0.3 * (locationScore / 3.0))
@@ -159,7 +159,7 @@ public class MemberSuggestionService {
         // Ở đây ta giả sử MemberSearchResponse đã có constructor:
         // MemberSearchResponse(Long id, String email, String avatar, String fullName, String reason)
         Map<Long, String> memberIdToReason = suggestions.stream()
-                .collect(Collectors.toMap(s -> s.member().getId(), s -> s.reason(), (oldVal, newVal) -> oldVal));
+                .collect(Collectors.toMap(s -> s.member().getId(), MemberSuggestion::reason, (oldVal, newVal) -> oldVal));
 
         return topMembers.stream()
                 .map(m -> new MemberSearchResponse(

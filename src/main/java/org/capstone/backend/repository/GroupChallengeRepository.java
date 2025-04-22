@@ -48,4 +48,21 @@ public interface GroupChallengeRepository extends JpaRepository<GroupChallenge, 
                                                                @Param("date") LocalDate date);
     @Query("SELECT gc FROM GroupChallenge gc WHERE gc.challenge.id = :challengeId")
     List<GroupChallenge> findByChallengeId(@Param("challengeId") Long challengeId);
+    /**
+     * Count the number of groups that have joined a given challenge with a specific status
+     */
+    long countByChallengeAndStatus(Challenge challenge, GroupChallengeStatus status);
+
+    /**
+     * Check if a specific group has joined a challenge with a given status
+     */
+    boolean existsByGroupAndChallengeAndStatus(Groups group, Challenge challenge, GroupChallengeStatus status);
+
+    /**
+     * Find an ongoing group-challenge record for update/lookup
+     */
+    Optional<GroupChallenge> findByGroupAndChallengeAndStatus(Groups group, Challenge challenge, GroupChallengeStatus status);
 }
+
+
+

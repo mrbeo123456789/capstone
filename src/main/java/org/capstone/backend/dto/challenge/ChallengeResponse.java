@@ -20,12 +20,32 @@ public class ChallengeResponse {
     private String challengeTypeName;
     private ParticipationType participationType;
 
-    public ChallengeResponse(Long id, String name, String summary, String picture, ParticipationType participationType) {
+    // Số lượng tối đa thành viên (chỉ dùng khi participationType là INDIVIDUAL)
+    private Integer maxParticipants;
+
+    // Số lượng tối đa nhóm (chỉ dùng khi participationType là GROUP)
+    private Integer maxGroups;
+
+    // Số lượng tối đa thành viên mỗi nhóm (chỉ dùng khi participationType là GROUP)
+    private Integer maxMembersPerGroup;
+
+    /**
+     * Constructor gọn cho các trường cơ bản và tham số mới
+     */
+
+
+    /**
+     * Giữ lại constructor cũ nếu chỉ cần thông tin cơ bản
+     */
+    public ChallengeResponse(Long id,
+                             String name,
+                             String summary,
+                             String picture,
+                             ParticipationType participationType) {
         this.id = id;
         this.name = name;
         this.summary = summary;
         this.picture = picture;
         this.participationType = participationType;
     }
-
 }

@@ -120,13 +120,28 @@ public interface ChallengeMemberRepository extends JpaRepository<ChallengeMember
             Pageable pageable
     );
 
-    @Query("SELECT cm FROM ChallengeMember cm " +
-            "WHERE cm.member.id = :memberId " +
-            "AND cm.challenge.status = 'ONGOING' " +
-            "AND :date BETWEEN cm.challenge.startDate AND cm.challenge.endDate")
-    List<ChallengeMember> findOngoingChallengesForMemberOnDate(
+    @Query("""
+    SELECT cm FROM ChallengeMember cm
+    WHERE cm.member.id = :memberId
+      AND cm.isParticipate = true
+      AND cm.challenge.startDate <= :date
+      AND cm.challenge.endDate >= :date
+""")
+    List<ChallengeMember> findAllChallengesForMemberOnDate(
             @Param("memberId") Long memberId,
             @Param("date") LocalDate date);
 
+
+    @Query("""
+    SELECT cm FROM ChallengeMember cm
+    WHERE cm.member.id = :memberId
+      AND cm.isParticipate = true
+      AND cm.challenge.status = 'ONGOING'
+      AND cm.challenge.startDate <= :date
+      AND cm.challenge.endDate >= :date
+""")
+    List<ChallengeMember> findOngoingChallengesForMemberOnDate(
+            @Param("memberId") Long memberId,
+            @Param("date") LocalDate date);
 
 }

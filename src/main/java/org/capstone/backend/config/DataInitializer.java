@@ -66,11 +66,11 @@ public class DataInitializer implements CommandLineRunner {
     public void run(String... args) {
         seedAccountsAndMembers();
         seedChallengeTypes();
-       // seedInterests();
+        seedInterests();
       // seedChallenges();
-      //  seedChallengeMembers();
-    //   seedGroups();              // Seed cho Groups nếu chưa có dữ liệu
-      //  seedGroupChallenges();     // Seed cho GroupChallenge
+        //seedChallengeMembers();
+       //seedGroups();              // Seed cho Groups nếu chưa có dữ liệu
+       // seedGroupChallenges();     // Seed cho GroupChallenge
      //  seedTestEvidenceAndReview();
         System.out.println("✅ Data seeding completed successfully.");
     }

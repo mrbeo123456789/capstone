@@ -30,10 +30,10 @@ public interface EvidenceService {
     List<EvidenceToReviewDTO> getMySubmittedEvidencesByChallenge(Long challengeId);
     void assignPendingReviewersForChallenge(Long challengeId);
     double getApprovedEvidencePercentage(Long memberId, Long challengeId);
-    Page<EvidenceToReviewDTO> getEvidenceByMemberAndChallenge(Long memberId, Long challengeId, Pageable pageable);
-    List<TaskChecklistDTO> getTasksForDate(LocalDate date);    long getSubmittedEvidenceCount(Long memberId, Long challengeId, LocalDate startDate, LocalDate today);
+    List<TaskChecklistDTO> getTasksForDate(LocalDate date);
      List<EvidenceStatusCountDTO> countEvidenceByStatusForHost(
             Long challengeId,
             Long memberId
     );
+
 }

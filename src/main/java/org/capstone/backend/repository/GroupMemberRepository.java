@@ -70,6 +70,12 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
         AND gc.status IN (:pendingStatus, :ongoingStatus)
     )
     AND (gm.member.account.email LIKE %:keyword% OR gm.member.fullName LIKE %:keyword%)
+    AND (
+        SELECT COUNT(gm2)
+        FROM GroupMember gm2
+        WHERE gm2.group = g
+        AND gm2.status = :groupMemberStatus
+    ) >= 2
     ORDER BY gm.member.fullName ASC
 """)
     List<MemberSearchResponse> searchAvailableGroupLeaders(
@@ -82,6 +88,7 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
             @Param("currentMemberId") Long currentMemberId,
             Pageable pageable
     );
+
     @Query("""
     SELECT gm.group
     FROM GroupMember gm

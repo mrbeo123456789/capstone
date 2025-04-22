@@ -24,6 +24,7 @@ import org.capstone.backend.service.auth.AuthService;
 import org.capstone.backend.utils.enums.ChallengeMemberStatus;
 import org.capstone.backend.utils.enums.ChallengeRole;
 import org.capstone.backend.utils.enums.EvidenceStatus;
+import org.capstone.backend.utils.enums.VerificationType;
 import org.capstone.backend.utils.sendmail.FixedGmailService;
 import org.capstone.backend.utils.upload.FirebaseUpload;
 import org.springframework.context.ApplicationEventPublisher;
@@ -470,94 +471,55 @@ public class EvidenceServiceImpl implements EvidenceService {
         return (approved * 100.0) / total;
     }
 
-    /**
-     * Lấy danh sách bằng chứng của một member trong một thử thách với phân trang.
-     *
-     * @param memberId    ID của member
-     * @param challengeId ID của thử thách
-     * @param pageable    thông tin phân trang
-     * @return trang chứa các EvidenceToReviewDTO
-     */
-    @Override
-    public Page<EvidenceToReviewDTO> getEvidenceByMemberAndChallenge(Long memberId, Long challengeId, Pageable pageable) {
-        return evidenceRepository.findByMemberIdAndChallengeId(memberId, challengeId, pageable)
-                .map(e -> new EvidenceToReviewDTO(
-                        e.getId(),
-                        e.getMember().getId(),
-                        e.getMember().getFullName(),
-                        e.getEvidenceUrl(),
-                        e.getStatus(),
-                        false,
-                        e.getSubmittedAt()
-                ));
-    }
+
+
 
     @Override
     public List<TaskChecklistDTO> getTasksForDate(LocalDate date) {
         Long memberId = authService.getMemberIdFromAuthentication();
 
-        // Lấy danh sách challenge đang ONGOING tại ngày đó
-        List<ChallengeMember> challengeMembers =
-                challengeMemberRepository.findOngoingChallengesForMemberOnDate(memberId, date);
 
-        List<TaskChecklistDTO> taskList = challengeMembers.stream()
+        boolean isTodayOrFuture = !date.isBefore(LocalDate.now());
+
+        List<ChallengeMember> challengeMembers = isTodayOrFuture
+                ? challengeMemberRepository.findOngoingChallengesForMemberOnDate(memberId, date)
+                : challengeMemberRepository.findAllChallengesForMemberOnDate(memberId, date);
+
+        return challengeMembers.stream()
                 .map(cm -> {
                     Challenge challenge = cm.getChallenge();
-
-                    // Lấy evidence đúng ngày
-                    Optional<Evidence> evidenceOpt =
-                            evidenceRepository.findByMemberIdAndChallengeIdAndDate(memberId, challenge.getId(), date);
+                    Long challengeId = challenge.getId();
 
                     TaskChecklistDTO taskDTO = new TaskChecklistDTO();
-                    taskDTO.setChallengeId(challenge.getId());
+                    taskDTO.setChallengeId(challengeId);
                     taskDTO.setChallengeName(challenge.getName());
 
-                    if (evidenceOpt.isEmpty()) {
-                        taskDTO.setEvidenceSubmitted(false);
-                        taskDTO.setMessage("evidence.not_submitted");
-                    } else {
-                        Evidence evidence = evidenceOpt.get();
-                        taskDTO.setEvidenceSubmitted(true);
-                        taskDTO.setEvidenceStatus(evidence.getStatus().toString());
+                    // Lấy evidence cá nhân theo ngày
+                    evidenceRepository.findByMemberIdAndChallengeIdAndDate(memberId, challengeId, date)
+                            .ifPresent(evidence -> {
+                                if (evidence.getStatus() != null) {
+                                    taskDTO.setEvidenceStatus(evidence.getStatus().toString());
+                                }
+                            });
 
-                        if (evidence.getStatus() == EvidenceStatus.APPROVED) {
-                            taskDTO.setMessage("evidence.approved");
-                        } else {
-                            taskDTO.setMessage("evidence.pending");
-                        }
+                    // Nếu là MEMBER_REVIEW thì thêm phần review checklist
+                    if (challenge.getVerificationType() == VerificationType.MEMBER_REVIEW) {
+                        List<EvidenceReport> reports =
+                                evidenceReportRepository.findByReviewerIdAndChallengeIdAndAssignedDate(memberId, challengeId, date);
+
+                        int reviewed = (int) reports.stream().filter(r -> r.getReviewedAt() != null).count();
+                        taskDTO.setTotalReviewAssigned(reports.size());
+                        taskDTO.setReviewCompleted(reviewed);
                     }
 
                     return taskDTO;
                 })
                 .collect(Collectors.toList());
-
-        // Trả về thông báo nếu không có thử thách nào
-        if (taskList.isEmpty()) {
-            TaskChecklistDTO noTaskDTO = new TaskChecklistDTO();
-            noTaskDTO.setMessage("task.none_for_day");
-            taskList.add(noTaskDTO);
-        }
-
-        return taskList;
     }
 
 
-    /**
-     * Đếm số lượng chứng cứ được nộp bởi thành viên cho thử thách từ ngày startDate đến today.
-     *
-     * @param memberId    ID của thành viên
-     * @param challengeId ID của thử thách
-     * @param startDate   Ngày bắt đầu tính
-     * @param today       Ngày hiện tại
-     * @return số lượng chứng cứ đã nộp
-     */
-    @Override
-    public long getSubmittedEvidenceCount(Long memberId, Long challengeId, LocalDate startDate, LocalDate today) {
-        LocalDateTime startDateTime = startDate.atStartOfDay();
-        LocalDateTime endDateTime = today.atTime(LocalTime.MAX);
-        return evidenceRepository.countByMemberIdAndChallengeIdAndSubmittedAtBetween(
-                memberId, challengeId, startDateTime, endDateTime);
-    }
+
+
     public List<EvidenceStatusCountDTO> countEvidenceByStatusForHost(
             Long challengeId,
             Long memberId
@@ -567,6 +529,5 @@ public class EvidenceServiceImpl implements EvidenceService {
                 challengeId, memberId
         );
     }
-
 
 }
