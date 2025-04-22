@@ -85,6 +85,26 @@ export const evidenceService = createApi({
                 params: { challengeId, memberId },
             }),
         }),
+
+        getTasksForDate: builder.query({
+            query: (date) => {
+                // If date is not provided, the backend will use current date
+                const params = {};
+                if (date) {
+                    // Ensure date is in ISO format (YYYY-MM-DD)
+                    if (date instanceof Date) {
+                        params.date = date.toISOString().split('T')[0];
+                    } else {
+                        params.date = date;
+                    }
+                }
+                return {
+                    url: "/evidences/tasks",
+                    method: "GET",
+                    params,
+                };
+            },
+        }),
     }),
 });
 
@@ -95,5 +115,6 @@ export const {
     useGetEvidencesToReviewQuery,
     useGetMyEvidencesByChallengeQuery,
     useGetEvidencesForHostQuery,
-    useGetEvidenceCountByStatusQuery
+    useGetEvidenceCountByStatusQuery,
+    useGetTasksForDateQuery
 } = evidenceService;

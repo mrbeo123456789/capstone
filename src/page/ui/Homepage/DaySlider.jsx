@@ -49,7 +49,7 @@ const DaySlider = () => {
         <div className="bg-white p-4 shadow-lg w-full text-center h-full rounded-2xl">
             {/* Header */}
             <div className="flex justify-between px-4 mb-4">
-                <h2 className="text-xl font-semibold">Hoje</h2>
+                <h2 className="text-xl font-semibold">Today</h2>
                 <div className="space-x-4 text-xl">
                     <button>🔍</button>
                     <button>☰</button>
@@ -103,7 +103,8 @@ const DaySlider = () => {
 
             </div>
             <div className="md:col-span-1 lg:col-span-2 overflow-y-scroll">
-                <ChallengeItemList/>
+                {/* Pass the selectedDate to ChallengeItemList */}
+                <ChallengeItemList selectedDate={selectedDate} />
             </div>
         </div>
     );
