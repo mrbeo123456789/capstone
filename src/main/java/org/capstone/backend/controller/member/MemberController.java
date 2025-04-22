@@ -1,6 +1,7 @@
 package org.capstone.backend.controller.member;
 
 import org.capstone.backend.dto.member.ChangePasswordRequest;
+import org.capstone.backend.dto.member.MemberStatisticDTO;
 import org.capstone.backend.dto.member.UserProfileRequest;
 import org.capstone.backend.dto.member.UserProfileResponse;
 import org.capstone.backend.service.auth.AuthService;
@@ -41,9 +42,15 @@ private final AuthService authService;
         memberService.changePassword(request);
         return ResponseEntity.ok("Password changed successfully!");
     }
+
     @GetMapping("/me")
     public Long getCurrentMemberId() {
         return authService.getMemberIdFromAuthentication();
+    }
+
+    @GetMapping("/statistics")
+    public ResponseEntity<MemberStatisticDTO> getStatistics() {
+        return ResponseEntity.ok(memberService.getMemberStatistics());
     }
 
 }

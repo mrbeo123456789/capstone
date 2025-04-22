@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.capstone.backend.utils.enums.ChallengeRole;
 import org.capstone.backend.utils.enums.ChallengeStatus;
+import org.capstone.backend.utils.enums.ParticipationType;
+
 @Data
 @AllArgsConstructor
 public class MyChallengeResponse {
@@ -14,4 +16,5 @@ public class MyChallengeResponse {
     private ChallengeRole role;
     private Long remainingDays;         // nếu UPCOMING hoặc ONGOING
     private Double averageVotes;   // Vai trò của user trong thử thách
+    private ParticipationType participationType;
 }

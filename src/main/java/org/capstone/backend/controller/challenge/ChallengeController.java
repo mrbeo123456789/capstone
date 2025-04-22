@@ -153,5 +153,11 @@ public class ChallengeController {
         return ResponseEntity.ok(resultMessage);
     }
 
+    @GetMapping("/completed")
+    public ResponseEntity<List<ChallengeSummaryDTO>> getCompletedChallengesForCurrentMember() {
+        return ResponseEntity.ok(challengeService.getCompletedChallenges());
+    }
+
+
 
 }

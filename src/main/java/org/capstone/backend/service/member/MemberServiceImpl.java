@@ -1,6 +1,7 @@
 package org.capstone.backend.service.member;
 
 import org.capstone.backend.dto.member.ChangePasswordRequest;
+import org.capstone.backend.dto.member.MemberStatisticDTO;
 import org.capstone.backend.dto.member.UserProfileRequest;
 import org.capstone.backend.dto.member.UserProfileResponse;
 import org.capstone.backend.entity.Account;
@@ -135,4 +136,11 @@ public class MemberServiceImpl implements MemberService {
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         accountRepository.save(user);
     }
+
+    @Override
+    public MemberStatisticDTO getMemberStatistics() {
+        Long memberId = authService.getMemberIdFromAuthentication();
+        return memberRepository.getMemberStatistics(memberId);
+    }
+
 }

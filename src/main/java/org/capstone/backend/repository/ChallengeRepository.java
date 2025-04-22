@@ -55,7 +55,7 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
 
     @Query("""
        SELECT new org.capstone.backend.dto.challenge.MyChallengeBaseResponse(
-           c.id, c.name, c.picture, c.status, cm.role, c.startDate, c.endDate
+           c.id, c.name, c.picture, c.status, cm.role, c.startDate, c.endDate, c.participationType
        )
        FROM ChallengeMember cm
        JOIN cm.challenge c

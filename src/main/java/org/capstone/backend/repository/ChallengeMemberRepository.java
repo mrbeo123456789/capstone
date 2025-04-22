@@ -131,6 +131,15 @@ public interface ChallengeMemberRepository extends JpaRepository<ChallengeMember
             @Param("memberId") Long memberId,
             @Param("date") LocalDate date);
 
+    @Query("""
+    SELECT cm FROM ChallengeMember cm
+    WHERE cm.member.id = :memberId
+    AND cm.challenge.status = 'FINISH'
+    ORDER BY cm.challenge.endDate DESC
+    """)
+    List<ChallengeMember> findFinishedChallengesByMemberIdOrderByChallengeEndDateDesc(@Param("memberId") Long memberId);
+
+
 
     @Query("""
     SELECT cm FROM ChallengeMember cm

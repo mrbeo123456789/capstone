@@ -51,6 +51,7 @@ public class ChallengeServiceImpl implements ChallengeService {
     private final MemberRepository memberRepository;
     private final ChallengeTypeRepository challengeTypeRepository;
     private final ChallengeMemberRepository challengeMemberRepository;
+    private final ChallengeStarRatingRepository challengeStarRatingRepository;
     private final FirebaseUpload firebaseUpload;
     private final AuthService authService;
     private final ApplicationEventPublisher eventPublisher;
@@ -315,7 +316,8 @@ public class ChallengeServiceImpl implements ChallengeService {
                     c.getStatus(),
                     c.getRole(),
                     remainingDays,
-                    avgVotes
+                    avgVotes,
+                    c.getParticipationType()
             );
         }).collect(Collectors.toList());
     }
@@ -579,6 +581,32 @@ public class ChallengeServiceImpl implements ChallengeService {
         challengeRepository.save(challenge);
         return "Thử thách đã được cập nhật thành công.";
     }
+
+    @Override
+    public List<ChallengeSummaryDTO> getCompletedChallenges() {
+        Long memberId = authService.getMemberIdFromAuthentication();
+
+        List<ChallengeMember> completed = challengeMemberRepository
+                .findFinishedChallengesByMemberIdOrderByChallengeEndDateDesc(memberId);
+
+        return completed.stream()
+                .map(cm -> {
+                    Challenge challenge = cm.getChallenge();
+                    Double avgRating = challengeStarRatingRepository.findAverageStarByChallengeId(challenge.getId());
+
+                    return new ChallengeSummaryDTO(
+                            challenge.getId(),
+                            challenge.getName(),
+                            challenge.getBanner(),
+                            challenge.getPicture(),
+                            cm.getRole().name(), // assuming enum Role
+                            avgRating != null ? avgRating : 0.0
+                    );
+                })
+                .collect(Collectors.toList());
+    }
+
+
 
 
     private ChallengeResponse convertToResponse(Challenge challenge) {
