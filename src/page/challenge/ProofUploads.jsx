@@ -6,10 +6,10 @@ const ITEMS_PER_PAGE = 12;
 
 const ProofUploads = ({ challenge, evidence }) => {
     const { t } = useTranslation();
-
-    if (!challenge || !evidence) return <p>{t("ProofUploads.loading")}</p>;
     const [selectedProof, setSelectedProof] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
+
+    if (!challenge || !evidence) return <p>{t("ProofUploads.loading")}</p>;
 
     // ✅ correct
     const startDate = new Date(challenge.startDate);

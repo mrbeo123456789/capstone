@@ -126,26 +126,55 @@ const CreateChallenge = () => {
                         </div>
                         <div className="w-full mt-6">
                             <label className="text-sm font-medium">{t("createChallenge.banner")}</label>
-                            <label htmlFor="banner-upload" className="relative group cursor-pointer">
-                                <div
-                                    className="w-full h-40 flex items-center justify-center border-2 border-dashed rounded-lg bg-gray-50">
-                                    {bannerPreview ?
-                                        <img src={bannerPreview} className="w-full h-full object-cover rounded-lg"/> : (
-                                            <div className="text-center text-gray-400">
-                                                <IoCloudUploadOutline className="text-3xl mx-auto mb-2"/>
-                                                <p className="text-sm">{t("createChallenge.clickUpload")}</p>
-                                            </div>
-                                        )}
-                                </div>
-                            </label>
-                            <input id="banner-upload" type="file" className="hidden" onChange={(e) => {
-                                const file = e.target.files[0];
-                                if (file) {
-                                    setBannerPreview(URL.createObjectURL(file));
-                                    setValue("banner", file, {shouldValidate: true});
-                                }
-                            }}/>
+                            <div className="relative w-full h-40 border-2 border-dashed rounded-lg bg-gray-50">
+                                {bannerPreview ? (
+                                    <>
+                                        <img
+                                            src={bannerPreview}
+                                            className="w-full h-full object-cover rounded-lg"
+                                            alt="Banner Preview"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                e.preventDefault(); // ✅ quan trọng
+                                                setBannerPreview(null);
+                                                setValue("banner", null, {shouldValidate: true});
+                                            }}
+                                            className="absolute top-1 right-1 text-white bg-black/50 hover:bg-black/80 rounded-full p-1 z-10"
+                                            title="Remove banner"
+                                        >
+                                            <FaWindowClose className="text-lg"/>
+                                        </button>
+                                    </>
+                                ) : (
+                                    <label
+                                        htmlFor="banner-upload"
+                                        className="w-full h-full flex items-center justify-center cursor-pointer text-center text-gray-400"
+                                    >
+                                        <div>
+                                            <IoCloudUploadOutline className="text-3xl mx-auto mb-2"/>
+                                            <p className="text-sm">{t("createChallenge.clickUpload")}</p>
+                                        </div>
+                                    </label>
+                                )}
+                                <input
+                                    id="banner-upload"
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                        const file = e.target.files[0];
+                                        if (file) {
+                                            setBannerPreview(URL.createObjectURL(file));
+                                            setValue("banner", file, {shouldValidate: true});
+                                        }
+                                    }}
+                                />
+                            </div>
                         </div>
+
                     </div>
                     <label htmlFor="dropzone-file" className="relative group cursor-pointer md:m-2">
                         <label className="text-sm font-medium">{t("createChallenge.picture")}</label><span
