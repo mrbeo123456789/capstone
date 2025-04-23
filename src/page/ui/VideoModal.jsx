@@ -3,11 +3,27 @@ import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import { useReviewEvidenceMutation } from "../../service/evidenceService";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
+import Rating from "react-rating";
+import { FaStar, FaRegStar, FaStarHalfAlt } from "react-icons/fa";
+import {useVoteEvidenceMutation} from "../../service/evidenceVoteService.js";
 
-const VideoModal = ({ show, onClose, videoSrc, onPrevious, onNext, uploader, evidenceId }) => {
+const VideoModal = ({
+                        show,
+                        onClose,
+                        videoSrc,
+                        onPrevious,
+                        onNext,
+                        uploader,
+                        evidenceId,
+                        isLastEvidence // ✅ new prop
+                    }) => {
     const { t } = useTranslation();
     const [reviewEvidence] = useReviewEvidenceMutation();
     const [isReviewed, setIsReviewed] = useState(false);
+    const [rating, setRating] = useState(0);
+    const [isReviewingReject, setIsReviewingReject] = useState(false);
+    const [feedbackText, setFeedbackText] = useState("");
+    const [voteEvidence] = useVoteEvidenceMutation();
 
     if (!show) return null;
 
@@ -16,25 +32,39 @@ const VideoModal = ({ show, onClose, videoSrc, onPrevious, onNext, uploader, evi
         if (isReviewed) return;
 
         try {
+            // ✅ First, approve the evidence
             await reviewEvidence({
                 evidenceId: evidenceId,
                 isApproved: true,
                 feedback: t("VideoModal.approveMessage")
-            }).unwrap();
+            });
+
+            // ✅ Then, vote on the evidence
+            await voteEvidence({
+                evidenceId: evidenceId,
+                score: Math.round((rating || 5) * 10), // default to 5 if user forgets to select
+            });
 
             toast.success(t("VideoModal.approveSuccess"));
             setIsReviewed(true);
-
-            // Add this evidence ID to localStorage to track it's been reviewed
-            const reviewedKey = `reviewedEvidences-${evidenceId.split('-')[0]}`;
+            console.log("Approved");
+            // ✅ Local tracking
+            const reviewedKey = `reviewedEvidences-${evidenceId}`; // 🔧 simplified
             const savedReviewed = JSON.parse(localStorage.getItem(reviewedKey) || "[]");
             if (!savedReviewed.includes(evidenceId)) {
                 localStorage.setItem(reviewedKey, JSON.stringify([...savedReviewed, evidenceId]));
             }
 
-            // Move to next video automatically after a short delay
+            console.log("NExt video or close");
+
+            // ✅ Next video
             setTimeout(() => {
-                onNext();
+                if (isLastEvidence) {
+                    onClose();         // ✅ close modal
+                    window.location.reload(); // ✅ trigger full reload (or use context/event if smarter reload preferred)
+                } else {
+                    onNext();          // ✅ continue to next
+                }
             }, 1000);
         } catch (error) {
             toast.error(t("VideoModal.approveFail"));
@@ -43,27 +73,24 @@ const VideoModal = ({ show, onClose, videoSrc, onPrevious, onNext, uploader, evi
     };
 
     // Handle rejecting the video
-    const handleReject = async () => {
+    const handleRejectSubmit = async () => {
         if (isReviewed) return;
 
         try {
             await reviewEvidence({
                 evidenceId: evidenceId,
                 isApproved: false,
-                feedback: t("VideoModal.rejectMessage")
+                feedback: feedbackText || t("VideoModal.rejectMessage")
             }).unwrap();
 
             toast.success(t("VideoModal.rejectSuccess"));
             setIsReviewed(true);
-
-            // Add this evidence ID to localStorage to track it's been reviewed
             const reviewedKey = `reviewedEvidences-${evidenceId.split('-')[0]}`;
             const savedReviewed = JSON.parse(localStorage.getItem(reviewedKey) || "[]");
             if (!savedReviewed.includes(evidenceId)) {
                 localStorage.setItem(reviewedKey, JSON.stringify([...savedReviewed, evidenceId]));
             }
 
-            // Move to next video automatically after a short delay
             setTimeout(() => {
                 onNext();
             }, 1000);
@@ -75,7 +102,7 @@ const VideoModal = ({ show, onClose, videoSrc, onPrevious, onNext, uploader, evi
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg relative flex flex-col h-[90%] w-[80%] overflow-hidden">
+            <div className="bg-white rounded-lg relative flex flex-col sm:flex-row h-[90%] w-[80%] overflow-hidden">
                 {/* Close Button */}
                 <button
                     className="absolute top-2 right-4 text-gray-300 text-3xl hover:text-white"
@@ -93,22 +120,68 @@ const VideoModal = ({ show, onClose, videoSrc, onPrevious, onNext, uploader, evi
 
                 {/* Action Buttons - Hide if already reviewed */}
                 {!isReviewed && (
-                    <div className="flex justify-center gap-4 p-4 bg-gray-100">
-                        <button
-                            className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-lg"
-                            onClick={handleReject}
-                        >
-                            <FaTimesCircle className="text-2xl" />
-                            {t("VideoModal.rejectButton")}
-                        </button>
+                    <div className="flex flex-col bg-gray-400 overflow-y-scroll sm:overflow-y-hidden">
+                        {/* Rating */}
+                        <div className="flex flex-col items-center gap-2 p-2">
+                            <p className="text-sm font-medium text-gray-700">{t("VideoModal.ratePerformance")}</p>
+                            <Rating
+                                initialRating={rating}
+                                onChange={setRating}
+                                emptySymbol={<FaRegStar className="text-yellow-400 text-5xl sm:text-6xl" />}
+                                fullSymbol={<FaStar className="text-yellow-400 text-5xl sm:text-6xl" />}
+                                placeholderSymbol={<FaStarHalfAlt className="text-yellow-400 text-5xl sm:text-6xl" />}
+                                fractions={2}
+                            />
+                        </div>
+                        {/* If reviewing rejection, show textarea */}
+                        {isReviewingReject ? (
+                            <div className="w-full flex flex-col items-center gap-2">
+            <textarea
+                className="w-full p-2 border border-gray-300 rounded resize-none"
+                placeholder={t("VideoModal.enterRejectionReason")}
+                rows={3}
+                value={feedbackText}
+                onChange={(e) => setFeedbackText(e.target.value)}
+            />
+                                <div className="flex gap-4">
+                                    <button
+                                        className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded"
+                                        onClick={() => {
+                                            setIsReviewingReject(false);
+                                            setFeedbackText("");
+                                        }}
+                                    >
+                                        {t("VideoModal.cancel")}
+                                    </button>
+                                    <button
+                                        className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
+                                        onClick={handleRejectSubmit}
+                                    >
+                                        {t("VideoModal.sendFeedback")}
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="flex justify-center gap-4 mt-2">
+                                <button
+                                    className={`flex items-center gap-2 font-bold py-3 px-6 rounded-lg ${isReviewingReject ? "bg-red-300 cursor-not-allowed" : "bg-red-500 hover:bg-red-600 text-white"}`}
+                                    onClick={() => setIsReviewingReject(true)}
+                                    disabled={isReviewingReject}
+                                >
+                                    <FaTimesCircle className="text-2xl" />
+                                    {t("VideoModal.rejectButton")}
+                                </button>
+                                <button
+                                    className={`flex items-center gap-2 font-bold py-3 px-6 rounded-lg ${isReviewingReject || !rating ? "bg-green-300 cursor-not-allowed" : "bg-green-500 hover:bg-green-600 text-white"}`}
+                                    onClick={handleApprove}
+                                    disabled={isReviewingReject || !rating}
+                                >
+                                    <FaCheckCircle className="text-2xl"/>
+                                    {t("VideoModal.approveButton")}
+                                </button>
 
-                        <button
-                            className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg"
-                            onClick={handleApprove}
-                        >
-                            <FaCheckCircle className="text-2xl" />
-                            {t("VideoModal.approveButton")}
-                        </button>
+                            </div>
+                        )}
                     </div>
                 )}
 
@@ -116,7 +189,7 @@ const VideoModal = ({ show, onClose, videoSrc, onPrevious, onNext, uploader, evi
                 {isReviewed && (
                     <div className="flex justify-center p-4 bg-gray-100">
                         <div className="text-green-600 font-bold text-lg">
-                            {t("VideoModal.reviewSubmitted")}
+                        {t("VideoModal.reviewSubmitted")}
                         </div>
                     </div>
                 )}

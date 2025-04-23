@@ -10,6 +10,7 @@ import {invitationService} from "../service/invitationService.js";
 import {guestService} from "../service/guestService.js";
 import {notificationService} from "../service/notficaitionService.js";
 import {rankingService} from "../service/rankingService.js";
+import {evidenceVoteService} from "../service/evidenceVoteService.js";
 export const store = configureStore({
     reducer: {
         [authService.reducerPath]: authService.reducer,
@@ -18,6 +19,7 @@ export const store = configureStore({
         [adminUserService.reducerPath]: adminUserService.reducer,
         [challengeService.reducerPath]: challengeService.reducer,
         [evidenceService.reducerPath]: evidenceService.reducer,
+        [evidenceVoteService.reducerPath]: evidenceVoteService.reducer,
         [interestService.reducerPath]: interestService.reducer,
         [invitationService.reducerPath]: invitationService.reducer,
         [guestService.reducerPath]: guestService.reducer,
@@ -33,6 +35,7 @@ export const store = configureStore({
             .concat(memberService.middleware)
             .concat(challengeService.middleware)
             .concat(evidenceService.middleware)
+            .concat(evidenceVoteService.middleware)
             .concat(interestService.middleware)
             .concat(invitationService.middleware)
             .concat(guestService.middleware)
