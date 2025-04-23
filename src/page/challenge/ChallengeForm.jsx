@@ -12,7 +12,7 @@ import { useTranslation } from "react-i18next";
 
 const CreateChallenge = () => {
     const { t } = useTranslation();
-    const [createChallenge, { isLoading }] = useCreateChallengeMutation();
+    const [createChallenge, { isLoading , error}] = useCreateChallengeMutation();
     const { data: challengeTypes } = useGetChallengeTypesQuery();
     const navigate = useNavigate();
     const [preview, setPreview] = useState("");
@@ -64,6 +64,13 @@ const CreateChallenge = () => {
             startDate: formatDate(data.startDate),
             endDate: formatDate(data.endDate)
         };
+        if (participationType === "GROUP") {
+            processed.maxGroups = parseInt(data.maxParticipants); // ✅ map correctly for GROUP
+            processed.maxMembersPerGroup = parseInt(data.maxMembersPerGroup);
+        } else {
+            // For INDIVIDUAL keep maxParticipants as is
+            processed.maxParticipants = parseInt(data.maxParticipants);
+        }
         Object.keys(processed).forEach((key) => {
             if ((key === "picture" || key === "banner") && processed[key]) {
                 formData.append(key, processed[key]);
@@ -80,7 +87,7 @@ const CreateChallenge = () => {
                 reset();
                 setPreview(null);
                 navigate("/challenges/joins");
-            } catch (err) {
+            } catch (error) {
                 toast.error(t("createChallenge.fail") + (err?.data?.message || "Unknown error"));
             }
         }
@@ -220,18 +227,41 @@ const CreateChallenge = () => {
                             <p className="text-red-600">{errors.endDate?.message}</p>
                         </div>
                         <div>
-                            <label className="text-sm font-medium">{t("createChallenge.privacy")}</label>
-                            <select {...register("privacy")} className="w-full p-2 border rounded-md">
-                                <option value="PUBLIC">{t("public")}</option>
-                                <option value="PRIVATE">{t("private")}</option>
-                            </select>
-                        </div><div>
-                            <label className="text-sm font-medium">{t("createChallenge.isParticipate")}</label>
-                            <select {...register("isParticipate")} className="w-full p-2 border rounded-md">
-                                <option value="TRUE">{t("join")}</option>
-                                <option value="FALSE">{t("not join")}</option>
-                            </select>
+                            <label className="text-sm font-medium block mb-1">{t("createChallenge.privacy")}</label>
+                            <div className="flex gap-4">
+                                <label className="flex items-center gap-2">
+                                    <input
+                                        type="radio"
+                                        value="PUBLIC"
+                                        {...register("privacy")}
+                                        defaultChecked
+                                    />
+                                    {t("public")}
+                                </label>
+                                <label className="flex items-center gap-2">
+                                    <input
+                                        type="radio"
+                                        value="PRIVATE"
+                                        {...register("privacy")}
+                                    />
+                                    {t("private")}
+                                </label>
+                            </div>
                         </div>
+
+                        <div>
+                            <label
+                                className="text-sm font-medium block mb-1">{t("createChallenge.isParticipate")}</label>
+                            <label className="flex items-center gap-2">
+                                <input
+                                    type="checkbox"
+                                    defaultChecked
+                                    {...register("isParticipate")}
+                                />
+                                {t("createChallenge.joinCheckbox")}
+                            </label>
+                        </div>
+
                         <div>
                             <label className="text-sm font-medium">{t("createChallenge.verificationType.label")}</label>
                             <select {...register("verificationType")} className="w-full p-2 border rounded-md">
@@ -270,7 +300,8 @@ const CreateChallenge = () => {
                         </div>
                         {participationType === "INDIVIDUAL" && (
                             <div>
-                                <label className="text-sm font-medium">{t("createChallenge.maxParticipants")}</label><span
+                                <label
+                                    className="text-sm font-medium">{t("createChallenge.maxParticipants")}</label><span
                                 className="text-red-500">*</span>
                                 <input
                                     type="number"
@@ -294,7 +325,8 @@ const CreateChallenge = () => {
                                     <p className="text-red-600">{errors.maxParticipants?.message}</p>
                                 </div>
                                 <div>
-                                    <label className="text-sm font-medium">{t("createChallenge.maxMembersPerGroup")}</label><span
+                                    <label
+                                        className="text-sm font-medium">{t("createChallenge.maxMembersPerGroup")}</label><span
                                     className="text-red-500">*</span>
                                     <input
                                         type="number"

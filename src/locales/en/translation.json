@@ -202,7 +202,8 @@
     "description": "Challenge Description",
     "cancel": "Cancel",
     "validationError": "Please correct all errors before submitting.",
-    "fail": "Failed to update challenge: "
+    "fail": "Failed to update challenge: ",
+    "joinCheckbox": "Join this challenge yourself?"
   },
 
   "ProofUploads": {

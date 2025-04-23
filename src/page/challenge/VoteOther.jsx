@@ -118,6 +118,7 @@ const VoteOther = () => {
                     }}
                     uploader={evidencesToReview[activeIndex]?.uploaderName || t("VoteOther.unknownUser")}
                     evidenceId={evidencesToReview[activeIndex]?.evidenceId}
+                    isLastEvidence
                 />
             )}
         </div>
