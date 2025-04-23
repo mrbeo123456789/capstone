@@ -13,8 +13,10 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOrigins(
                         "http://localhost:5173",
                         "https://astonishing-sopapillas-c79bae.netlify.app",
-                        "https://capstonecuong.loca.lt"
+                        "https://capstonecuong.loca.lt",
+                        "https://gobeyond.top"
                 )
+
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);

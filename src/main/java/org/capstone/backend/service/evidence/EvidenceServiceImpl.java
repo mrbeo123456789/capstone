@@ -481,6 +481,7 @@ public class EvidenceServiceImpl implements EvidenceService {
 
         boolean isTodayOrFuture = !date.isBefore(LocalDate.now());
 
+
         List<ChallengeMember> challengeMembers = isTodayOrFuture
                 ? challengeMemberRepository.findOngoingChallengesForMemberOnDate(memberId, date)
                 : challengeMemberRepository.findAllChallengesForMemberOnDate(memberId, date);
@@ -493,10 +494,10 @@ public class EvidenceServiceImpl implements EvidenceService {
                     TaskChecklistDTO taskDTO = new TaskChecklistDTO();
                     taskDTO.setChallengeId(challengeId);
                     taskDTO.setChallengeName(challenge.getName());
-
                     // Lấy evidence cá nhân theo ngày
                     evidenceRepository.findByMemberIdAndChallengeIdAndDate(memberId, challengeId, date)
                             .ifPresent(evidence -> {
+                                System.out.println("📄 Found evidence with status: " + evidence.getStatus());
                                 if (evidence.getStatus() != null) {
                                     taskDTO.setEvidenceStatus(evidence.getStatus().toString());
                                 }
@@ -508,6 +509,8 @@ public class EvidenceServiceImpl implements EvidenceService {
                                 evidenceReportRepository.findByReviewerIdAndChallengeIdAndAssignedDate(memberId, challengeId, date);
 
                         int reviewed = (int) reports.stream().filter(r -> r.getReviewedAt() != null).count();
+                        System.out.println("📝 Total review assigned: " + reports.size() + ", Reviewed: " + reviewed);
+
                         taskDTO.setTotalReviewAssigned(reports.size());
                         taskDTO.setReviewCompleted(reviewed);
                     }
@@ -516,6 +519,7 @@ public class EvidenceServiceImpl implements EvidenceService {
                 })
                 .collect(Collectors.toList());
     }
+
 
 
 

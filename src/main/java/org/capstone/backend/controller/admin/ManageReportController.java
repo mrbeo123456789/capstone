@@ -1,6 +1,7 @@
 package org.capstone.backend.controller.admin;
 
 import lombok.RequiredArgsConstructor;
+import org.capstone.backend.dto.challenge.ChallengeReportCountDTO;
 import org.capstone.backend.dto.report.ChallengeReportResponseDTO;
 import org.capstone.backend.service.report.ChallengeReportService;
 import org.capstone.backend.utils.enums.ReportStatus;
@@ -8,6 +9,8 @@ import org.capstone.backend.utils.enums.ReportType;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/reports")
@@ -33,5 +36,9 @@ public class ManageReportController {
     ) {
         challengeReportService.updateReportStatus(reportId, ReportStatus.valueOf(status));
         return ResponseEntity.ok("Report status updated.");
+    }
+    @GetMapping("/report-counts")
+    public ResponseEntity<List<ChallengeReportCountDTO>> getAdminReportCounts() {
+        return ResponseEntity.ok(challengeReportService.getReportCountsByChallenge());
     }
 }

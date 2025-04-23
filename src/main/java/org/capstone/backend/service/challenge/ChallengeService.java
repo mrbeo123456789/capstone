@@ -7,11 +7,13 @@ import org.capstone.backend.entity.ChallengeType;
 import org.capstone.backend.utils.enums.ChallengeRole;
 import org.capstone.backend.utils.enums.ChallengeStatus;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 public interface ChallengeService {
+    AdminDashboardSummaryDTO getAdminDashboardSummary();
     String createChallenge(ChallengeRequest request, MultipartFile picture, MultipartFile banner);
     List<ChallengeType> getAllTypes();
     String reviewChallenge(ReviewChallengeRequest request);
@@ -30,4 +32,6 @@ public interface ChallengeService {
     Page<ChallengeResponse> getUpcomingApprovedChallenges(int page, int size);
     String updateChallenge(Long challengeId, ChallengeRequest request, MultipartFile picture, MultipartFile banner, String pictureUrl, String bannerUrl);
     List<ChallengeSummaryDTO> getCompletedChallenges();
+    Page<ChallengeDashboardDTO> getAdminChallengeTable(String keyword, ChallengeStatus status, Pageable pageable);
+    List<ChallengeParticipationChartDTO> getAdminChallengeParticipationChart();
 }

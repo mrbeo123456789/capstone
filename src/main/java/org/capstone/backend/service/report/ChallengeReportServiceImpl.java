@@ -1,6 +1,7 @@
 package org.capstone.backend.service.report;
 
 import lombok.RequiredArgsConstructor;
+import org.capstone.backend.dto.challenge.ChallengeReportCountDTO;
 import org.capstone.backend.dto.report.ChallengeReportRequestDTO;
 import org.capstone.backend.dto.report.ChallengeReportResponseDTO;
 import org.capstone.backend.entity.Challenge;
@@ -19,6 +20,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -71,5 +75,14 @@ public class ChallengeReportServiceImpl implements ChallengeReportService {
                         new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy báo cáo.")
                 );
         report.setStatus(newStatus);
+    }
+@Override
+    public List<ChallengeReportCountDTO> getReportCountsByChallenge() {
+        String creator = "admin";
+
+        List<Object[]> result = challengeRepository. countReportsOfAdminChallenges(creator);
+        return result.stream()
+                .map(obj -> new ChallengeReportCountDTO((String) obj[0], (Long) obj[1]))
+                .collect(Collectors.toList());
     }
 }

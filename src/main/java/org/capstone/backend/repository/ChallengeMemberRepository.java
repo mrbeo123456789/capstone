@@ -152,5 +152,8 @@ public interface ChallengeMemberRepository extends JpaRepository<ChallengeMember
     List<ChallengeMember> findOngoingChallengesForMemberOnDate(
             @Param("memberId") Long memberId,
             @Param("date") LocalDate date);
-
+    @Query("SELECT COUNT(cm) " +
+            "FROM ChallengeMember cm " +
+            "WHERE cm.isParticipate = true AND cm.challenge.createdBy = :creator")
+    Long countParticipantsByAdminChallenges(@Param("creator") String creator);
 }

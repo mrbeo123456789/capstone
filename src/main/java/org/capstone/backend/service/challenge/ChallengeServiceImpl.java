@@ -13,10 +13,7 @@ import org.capstone.backend.service.auth.AuthService;
 import org.capstone.backend.utils.enums.*;
 import org.capstone.backend.utils.upload.FirebaseUpload;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -636,4 +633,50 @@ public class ChallengeServiceImpl implements ChallengeService {
                 maxMembersPerGroup
         );
 
-}}
+}
+
+
+
+    public AdminDashboardSummaryDTO getAdminDashboardSummary() {
+        String creator = "admin";
+
+        int totalCreated = challengeRepository.countByCreatedBy(creator);
+        Long activeChallenges = challengeRepository.countByCreatedByAndStatus(creator, ChallengeStatus.ONGOING);
+        Long totalParticipants = challengeMemberRepository.countParticipantsByAdminChallenges(creator);
+
+        return AdminDashboardSummaryDTO.builder()
+                .totalCreated((long) totalCreated)
+                .activeChallenges(activeChallenges)
+                .totalParticipants(totalParticipants)
+                .build();
+    }
+
+
+    public Page<ChallengeDashboardDTO> getAdminChallengeTable(String keyword, ChallengeStatus status, Pageable pageable) {
+        List<Object[]> raw = challengeRepository.findDashboardChallengesRaw("admin", keyword, status);
+
+        List<ChallengeDashboardDTO> dtos = raw.stream()
+                .map(obj -> ChallengeDashboardDTO.builder()
+                        .name((String) obj[0])
+                        .category((String) obj[1])
+                        .members((Long) obj[2])  // Có thể chính xác hơn nếu cần dùng filter riêng
+                        .reportCount((Long) obj[3])
+                        .status(obj[4].toString())
+                        .build())
+                .toList();
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), dtos.size());
+        return new PageImpl<>(dtos.subList(start, end), pageable, dtos.size());
+    }
+@Override
+    public List<ChallengeParticipationChartDTO> getAdminChallengeParticipationChart() {
+        ChallengeMemberStatus joined = ChallengeMemberStatus.JOINED;
+
+        List<Object[]> raw = challengeRepository.countActiveParticipantsPerAdminChallenge("admin", joined);
+
+        return raw.stream()
+                .map(obj -> new ChallengeParticipationChartDTO((String) obj[0], (Long) obj[1]))
+                .collect(Collectors.toList());
+    }
+}
