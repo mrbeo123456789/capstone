@@ -160,7 +160,7 @@ const YourChallenge = () => {
 
             {/* Filter Tabs */}
             <div className="flex gap-4">
-                {["All", "host", "cohost", "member"].map((tab) => (
+                {["All", "host", "co_host", "member"].map((tab) => (
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}

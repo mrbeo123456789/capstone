@@ -453,6 +453,9 @@
     "create": "Create a challenge",
     "search": "Search",
     "filter": "Filter",
+    "filterAll": "All",
+    "filterPersonal": "Personal",
+    "filterGroup": "Group",
     "invitations": "Invitations",
     "loadingInvitations": "Loading invitations...",
     "noInvitations": "You have no challenge invites",
@@ -465,7 +468,7 @@
     "tabs": {
       "all": "All",
       "host": "Host",
-      "cohost": "Cohost",
+      "co_host": "Cohost",
       "member": "Member"
     },
     "joinedChallenges": "Joined Challenges",

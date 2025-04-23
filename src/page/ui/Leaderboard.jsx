@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Star, Search, User, Users, Trophy } from 'lucide-react';
 import { useTranslation } from "react-i18next";
-import { Link } from 'react-router-dom';
-import Header from "./Header.jsx";
-import Sidebar from "./SideBar.jsx";
+import Achievement from "../member/Achievement.jsx"; // Import Achievement component
 
 const GlobalLeaderboard = () => {
     const { t } = useTranslation();
@@ -63,28 +61,11 @@ const GlobalLeaderboard = () => {
         { id: 25, name: 'Your Team', members: 7, score: 2800, avatar: '/api/placeholder/100/100', rank: 25, isCurrentUser: true },
     ];
 
-    // Mock data for achievements
-    const achievements = [
-        { id: 1, name: 'First Steps', description: 'Complete your first challenge', icon: '🏆', earnedDate: '2023-08-15', earnedBy: 7500 },
-        { id: 2, name: 'Problem Solver', description: 'Complete 10 challenges', icon: '🧩', earnedDate: '2023-09-02', earnedBy: 4200 },
-        { id: 3, name: 'Code Warrior', description: 'Complete 25 challenges', icon: '⚔️', earnedDate: '2023-10-18', earnedBy: 2100 },
-        { id: 4, name: 'Bug Hunter', description: 'Find and report 5 bugs', icon: '🐞', earnedDate: '2023-11-05', earnedBy: 1850 },
-        { id: 5, name: 'Algorithm Master', description: 'Optimize a solution to be 50% faster', icon: '⚡', earnedDate: '2023-12-10', earnedBy: 1240 },
-        { id: 6, name: 'Team Player', description: 'Complete 5 team challenges', icon: '👥', earnedDate: '2024-01-22', earnedBy: 980 },
-        { id: 7, name: 'Early Bird', description: 'Submit a solution within 1 hour of a challenge release', icon: '🐦', earnedDate: '2024-02-14', earnedBy: 720 },
-        { id: 8, name: 'Global Contributor', description: 'Have your solution selected as exemplary', icon: '🌍', earnedDate: '2024-03-03', earnedBy: 410 },
-        { id: 9, name: 'Night Owl', description: 'Submit a solution between 12 AM and 4 AM', icon: '🦉', earnedDate: null, earnedBy: 2700 },
-        { id: 10, name: 'Perfect Score', description: 'Achieve 100% in a challenge', icon: '💯', earnedDate: null, earnedBy: 1650 },
-        { id: 11, name: 'Speed Demon', description: 'Complete a challenge in under 15 minutes', icon: '🔥', earnedDate: null, earnedBy: 980 },
-        { id: 12, name: 'Consistent Contributor', description: 'Submit solutions for 7 consecutive days', icon: '📅', earnedDate: null, earnedBy: 630 },
-    ];
-
     // State management
     const [users, setUsers] = useState(individualUsers);
     const [displayUsers, setDisplayUsers] = useState([]);
     const [groups, setGroups] = useState(groupRankings);
     const [displayGroups, setDisplayGroups] = useState([]);
-    const [userAchievements, setUserAchievements] = useState(achievements);
 
     const totalIndividualPages = Math.ceil(users.length / usersPerPage);
     const totalGroupPages = Math.ceil(groups.length / usersPerPage);
@@ -151,8 +132,6 @@ const GlobalLeaderboard = () => {
             setUsers(individualUsers);
         } else if (activeTab === 'group') {
             setGroups(groupRankings);
-        } else if (activeTab === 'achievement') {
-            setUserAchievements(achievements);
         }
     }, [activeTab]);
 
@@ -253,13 +232,6 @@ const GlobalLeaderboard = () => {
     while (top3.length < 3) {
         top3.push(null); // Fill with nulls if we don't have enough top entries
     }
-
-    // Format earned date for achievements
-    const formatDate = (dateString) => {
-        if (!dateString) return '';
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-    };
 
     return (
         <div className="min-h-screen">
@@ -517,31 +489,7 @@ const GlobalLeaderboard = () => {
 
                 {/* Achievements Tab Content */}
                 {activeTab === 'achievement' && (
-                    <div className="bg-blue-900 bg-opacity-20 p-6 rounded-xl">
-                        <h2 className="text-2xl font-bold mb-6 text-center text-blue-300">{t('leaderboard.achievements')}</h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
-                            {userAchievements.map((achievement) => (
-                                <div
-                                    key={achievement.id}
-                                    className={`p-4 rounded-lg text-center ${
-                                        achievement.earnedDate ? 'bg-blue-800 bg-opacity-50' : 'bg-blue-900 bg-opacity-30'
-                                    }`}
-                                >
-                                    <div className="text-3xl mb-2">{achievement.icon}</div>
-                                    <h3 className="font-bold mb-1">{achievement.name}</h3>
-                                    <p className="text-sm text-gray-300 mb-2">{achievement.description}</p>
-                                    {achievement.earnedDate ? (
-                                        <div className="text-green-400 text-sm">{formatDate(achievement.earnedDate)}</div>
-                                    ) : (
-                                        <div className="text-gray-400 text-sm">{t('leaderboard.notEarned')}</div>
-                                    )}
-                                    <div className="mt-2 text-xs text-blue-300">
-                                        {achievement.earnedBy} {t('leaderboard.usersEarned')}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+                    <Achievement />
                 )}
             </div>
         </div>

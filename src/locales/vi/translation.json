@@ -302,7 +302,7 @@
     "tabs": {
       "all": "Tất cả",
       "host": "Chủ trì",
-      "cohost": "Phụ trách",
+      "co_host": "Phụ trách",
       "member": "Thành viên"
     },
     "joinedChallenges": "Thử thách đã tham gia",

@@ -10,10 +10,13 @@ import {
     FaClipboardCheck,
     FaTasks,
     FaCheck,
-    FaClock
+    FaClock,
+    FaUpload,
+    FaStar
 } from "react-icons/fa";
 import { BsThreeDots } from "react-icons/bs";
 import { useGetTasksForDateQuery } from "../../../service/evidenceService.js"; // Adjust path as needed
+import { useNavigate } from "react-router-dom";
 
 // Map for icons based on challenge name keywords
 const getIconForChallenge = (challengeName) => {
@@ -64,11 +67,17 @@ const getStatusText = (evidenceStatus) => {
 };
 
 const ChallengeItemList = ({ selectedDate }) => {
+    const navigate = useNavigate();
+
     // Convert the selectedDate (dayjs object) to ISO format string (YYYY-MM-DD)
     const dateString = selectedDate ? selectedDate.format("YYYY-MM-DD") : undefined;
 
     // Fetch tasks for the selected date
     const { data: tasks, isLoading, error } = useGetTasksForDateQuery(dateString);
+
+    const handleChallengeClick = (challengeId) => {
+        navigate(`/challenges/detail/${challengeId}`);
+    };
 
     if (isLoading) {
         return (
@@ -94,50 +103,92 @@ const ChallengeItemList = ({ selectedDate }) => {
         );
     }
 
+    // Create separate notifications for submissions and reviews
+    const notifications = [];
+
+    // Process each task and create separate notifications
+    tasks.forEach(task => {
+        // Create submission notification if applicable
+        if (!task.evidenceStatus || task.evidenceStatus !== "COMPLETED") {
+            notifications.push({
+                ...task,
+                notificationType: "submission",
+                statusText: getStatusText(task.evidenceStatus)
+            });
+        }
+
+        // Create review notification if there are reviews to do
+        if (task.totalReviewAssigned > 0) {
+            notifications.push({
+                ...task,
+                notificationType: "review",
+                reviewsRemaining: task.totalReviewAssigned - task.reviewCompleted
+            });
+        }
+    });
+
     return (
         <div className="w-full max-w-md mx-auto space-y-3 mt-6">
-            {tasks.map((item, idx) => (
+            {notifications.map((item, idx) => (
                 <div
-                    key={idx}
-                    className="flex items-center justify-between bg-white rounded-xl shadow-sm px-4 py-3"
+                    key={`${item.challengeId}-${item.notificationType}-${idx}`}
+                    className="flex items-center justify-between bg-white rounded-xl shadow-sm px-4 py-3 cursor-pointer hover:shadow-md transition-shadow"
+                    onClick={() => handleChallengeClick(item.challengeId)}
                 >
                     {/* Left section: Icon */}
                     <div className="flex items-center space-x-4">
                         <div className="bg-gray-100 text-xl p-3 rounded-full text-white"
                              style={{
-                                 backgroundColor: item.evidenceStatus === "COMPLETED" ? "#7756d6" : "#ef5da8",
+                                 backgroundColor: item.notificationType === "review" ? "#7756d6" : "#ef5da8",
                              }}
                         >
-                            {getIconForChallenge(item.challengeName)}
+                            {item.notificationType === "review"
+                                ? <FaStar />
+                                : getIconForChallenge(item.challengeName)}
                         </div>
                         {/* Title & Meta */}
                         <div className="text-left">
                             <p className="text-sm font-semibold text-gray-900">{item.challengeName}</p>
                             <div className="text-xs text-gray-500 flex flex-wrap gap-x-2">
-                                {item.totalReviewAssigned > 0 && (
-                                    <span>
-                                        <FaCheck className="inline mr-1" />
-                                        {item.reviewCompleted}/{item.totalReviewAssigned} Reviews
+                                {item.notificationType === "submission" && (
+                                    <span className="flex items-center">
+                                        <FaUpload className="inline mr-1" />
+                                        Submit challenge
+                                        <span className={getStatusColor(item.evidenceStatus) + " ml-1"}>
+                                            {item.statusText}
+                                        </span>
                                     </span>
                                 )}
-                                <span className={getStatusColor(item.evidenceStatus)}>
-                                    {getStatusText(item.evidenceStatus)}
-                                </span>
+                                {item.notificationType === "review" && (
+                                    <span className="flex items-center">
+                                        <FaCheck className="inline mr-1" />
+                                        Review submissions: {item.reviewCompleted}/{item.totalReviewAssigned}
+                                    </span>
+                                )}
                             </div>
                         </div>
                     </div>
 
                     {/* Right section: Status */}
-                    {item.evidenceStatus === "COMPLETED" ? (
-                        <div className="text-green-500 text-xl">✔️</div>
-                    ) : item.evidenceStatus === "IN_REVIEW" ? (
-                        <div className="text-yellow-500 text-xl">
-                            <FaClock />
-                        </div>
+                    {item.notificationType === "submission" ? (
+                        item.evidenceStatus === "COMPLETED" ? (
+                            <div className="text-green-500 text-xl">✔️</div>
+                        ) : item.evidenceStatus === "IN_REVIEW" ? (
+                            <div className="text-yellow-500 text-xl">
+                                <FaClock />
+                            </div>
+                        ) : (
+                            <div className="text-gray-400 text-xl">
+                                <BsThreeDots />
+                            </div>
+                        )
                     ) : (
-                        <div className="text-gray-400 text-xl">
-                            <BsThreeDots />
-                        </div>
+                        // For review type
+                        item.reviewCompleted >= item.totalReviewAssigned ? (
+                            <div className="text-green-500 text-xl">✔️</div>
+                        ) : (
+                            <div className="text-blue-500 text-xl">{item.reviewsRemaining}</div>
+                        )
                     )}
                 </div>
             ))}

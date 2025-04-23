@@ -295,7 +295,7 @@
     "tabs": {
       "all": "すべて",
       "host": "ホスト",
-      "cohost": "共同ホスト",
+      "co_host": "共同ホスト",
       "member": "メンバー"
     },
     "joinedChallenges": "参加中のチャレンジ",
