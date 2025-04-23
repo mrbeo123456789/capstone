@@ -105,6 +105,20 @@ public interface EvidenceRepository extends JpaRepository<Evidence, Long> {
             @Param("memberId") Long memberId
     );
 
+    @Query("SELECT COUNT(e) FROM Evidence e WHERE e.challenge.id = :challengeId")
+    int countAllEvidence(@Param("challengeId") Long challengeId);
+
+    @Query("SELECT COUNT(e) FROM Evidence e WHERE e.challenge.id = :challengeId AND e.status = 'APPROVED'")
+    int countApprovedEvidence(@Param("challengeId") Long challengeId);
+
+    @Query("SELECT COUNT(e) FROM Evidence e WHERE e.challenge.id = :challengeId AND e.status = 'PENDING'")
+    int countPendingEvidence(@Param("challengeId") Long challengeId);
+
+    @Query("SELECT COUNT(e) FROM Evidence e WHERE e.challenge.id = :challengeId AND e.status = 'REJECTED'")
+    int countRejectedEvidence(@Param("challengeId") Long challengeId);
+
+    @Query("SELECT COUNT(e) FROM Evidence e WHERE e.challenge.id = :challengeId AND DATE(e.submittedAt) = CURRENT_DATE")
+    int countEvidenceToday(@Param("challengeId") Long challengeId);
 
 }
 

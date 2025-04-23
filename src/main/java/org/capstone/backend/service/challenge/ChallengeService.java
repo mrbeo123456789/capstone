@@ -30,4 +30,6 @@ public interface ChallengeService {
     Page<ChallengeResponse> getUpcomingApprovedChallenges(int page, int size);
     String updateChallenge(Long challengeId, ChallengeRequest request, MultipartFile picture, MultipartFile banner, String pictureUrl, String bannerUrl);
     List<ChallengeSummaryDTO> getCompletedChallenges();
+
+    ChallengeStatisticDTO getChallengeStatistics(Long challengeId);
 }

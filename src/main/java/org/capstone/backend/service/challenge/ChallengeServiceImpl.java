@@ -56,9 +56,11 @@ public class ChallengeServiceImpl implements ChallengeService {
     private final AuthService authService;
     private final ApplicationEventPublisher eventPublisher;
     private final EvidenceVoteRepository evidenceVoteRepository;
+    private final EvidenceRepository evidenceRepository;
+    private final EvidenceReportRepository evidenceReportRepository;
     private final GroupChallengeRepository groupChallengeRepository;
     private final GroupRepository groupRepository;
-  private  final GroupMemberRepository groupMemberRepository;
+    private  final GroupMemberRepository groupMemberRepository;
     // --- Phương thức hỗ trợ chung ---
 
     /**
@@ -607,7 +609,47 @@ public class ChallengeServiceImpl implements ChallengeService {
     }
 
 
+    @Override
+    public ChallengeStatisticDTO getChallengeStatistics(Long challengeId) {
+        Challenge challenge = challengeRepository.findById(challengeId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Challenge not found"));
 
+        int totalParticipants = challengeRepository.countParticipants(challengeId);
+        Long totalGroups = groupChallengeRepository
+                .countByChallengeAndStatus(challenge, GroupChallengeStatus.ONGOING);;
+
+        int totalEvidence = evidenceRepository.countAllEvidence(challengeId);
+        int approvedEvidence = evidenceRepository.countApprovedEvidence(challengeId);
+        int pendingEvidence = evidenceRepository.countPendingEvidence(challengeId);
+        int rejectedEvidence = evidenceRepository.countRejectedEvidence(challengeId);
+
+        int evidenceToday = evidenceRepository.countEvidenceToday(challengeId);
+        int reviewToday = evidenceReportRepository.countPendingReviews(challengeId);
+
+//        int totalVotes = evidenceVoteRepository.countVotesByChallengeId(challengeId); // assume this method exists
+//        Double averageRating = challengeStarRatingRepository.findAverageStar(challengeId);
+//        int totalRatings = challengeStarRatingRepository.countRatings(challengeId);
+
+        // Placeholder logic for participation/completion rate (can be refined)
+        double participationRate = totalParticipants > 0 ? (double) totalEvidence / totalParticipants : 0.0;
+        double completionRate = 0.0; // if needed, calculate based on full attendance logic
+
+        return new ChallengeStatisticDTO(
+                challengeId,
+                challenge.getName(),
+                totalParticipants,
+                totalGroups,
+                totalEvidence,
+                approvedEvidence,
+                pendingEvidence,
+                rejectedEvidence,
+                participationRate,
+                completionRate,
+                LocalDate.now(),
+                evidenceToday,
+                reviewToday
+        );
+    }
 
     private ChallengeResponse convertToResponse(Challenge challenge) {
         // Lấy giá trị mặc định

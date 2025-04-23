@@ -158,6 +158,9 @@ public class ChallengeController {
         return ResponseEntity.ok(challengeService.getCompletedChallenges());
     }
 
-
+    @GetMapping("/{challengeId}/statistics")
+    public ResponseEntity<ChallengeStatisticDTO> getChallengeStatistics(@PathVariable Long challengeId) {
+        return ResponseEntity.ok(challengeService.getChallengeStatistics(challengeId));
+    }
 
 }

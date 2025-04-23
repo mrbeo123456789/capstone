@@ -31,6 +31,8 @@ public interface EvidenceReportRepository extends JpaRepository<EvidenceReport, 
             @Param("assignedDate") LocalDate assignedDate
     );
 
+    @Query("SELECT COUNT(er) FROM EvidenceReport er WHERE er.evidence.challenge.id = :challengeId AND er.isApproved IS NULL")
+    int countPendingReviews(@Param("challengeId") Long challengeId);
 
 
 }

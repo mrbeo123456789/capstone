@@ -159,4 +159,7 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
     );
     List<Challenge> findByStatus(ChallengeStatus status);
 
+    @Query("SELECT COUNT(cm) FROM ChallengeMember cm WHERE cm.challenge.id = :challengeId")
+    int countParticipants(@Param("challengeId") Long challengeId);
+
 }
