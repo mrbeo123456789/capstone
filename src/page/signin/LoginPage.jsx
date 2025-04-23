@@ -87,7 +87,7 @@ export default function Login() {
     };
 
     const loginWithGoogle = () => {
-        window.location.href = "http://localhost:8080/oauth2/authorization/google";
+        window.location.href = "https://api.gobeyond.top/oauth2/authorization/google";
     };
 
     const handleForgotPassword = () => navigate("/forgotPassword");
