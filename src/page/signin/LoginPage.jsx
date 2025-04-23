@@ -3,19 +3,20 @@ import { useNavigate } from "react-router-dom";
 import { useLoginMutation } from "../../service/authService.js";
 import { useGetMyProfileQuery } from "../../service/memberService.js";
 import google_icon from "../../assets/google-icon.png";
-import background from "../../assets/login1.png";
 import { toast } from "react-toastify";
-import {decode} from "jsonwebtoken-esm";
+import { decode } from "jsonwebtoken-esm";
+import { useTranslation } from "react-i18next"; // Import hook dịch
 
 export default function Login() {
+    const { t } = useTranslation(); // Sử dụng hook dịch
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [tokenReady, setTokenReady] = useState(false); // ✅
+    const [tokenReady, setTokenReady] = useState(false);
 
     const [login] = useLoginMutation();
-    const { data: userData } = useGetMyProfileQuery(undefined, { skip: !tokenReady }); // ✅
+    const { data: userData } = useGetMyProfileQuery(undefined, { skip: !tokenReady });
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -36,11 +37,11 @@ export default function Login() {
         setError(null);
 
         if (!username.trim()) {
-            setError("Username cannot be empty");
+            setError(t("auth.login.errors.emptyUsername"));
             return;
         }
         if (password.length < 6) {
-            setError("Password must be at least 6 characters long");
+            setError(t("auth.login.errors.shortPassword"));
             return;
         }
 
@@ -60,9 +61,9 @@ export default function Login() {
 
                     console.log("Decoded role:", role);
 
-                    setTokenReady(true); // ✅ Trigger profile fetching
+                    setTokenReady(true);
 
-                    toast.success("Đăng nhập thành công!", { autoClose: 1500 });
+                    toast.success(t("profileUpdated"), { autoClose: 1500 });
 
                     setTimeout(() => {
                         if (role.toUpperCase() === "ADMIN") {
@@ -72,19 +73,19 @@ export default function Login() {
                         }
                     }, 100);
                 } else {
-                    setError("Invalid token received.");
+                    setError(t("auth.login.errors.invalidToken"));
                 }
             } else {
-                setError("Unexpected response from server");
+                setError(t("auth.login.errors.unexpectedResponse"));
             }
         } catch (err) {
             console.error("Login Error:", err);
             if (err?.data?.error) {
                 setError(err.data.error);
             } else if (err.status === 401) {
-                setError("Incorrect credentials");
+                setError(t("auth.login.errors.incorrectCredentials"));
             } else {
-                setError("Login failed. Please try again.");
+                setError(t("auth.login.errors.loginFailed"));
             }
         } finally {
             setLoading(false);
@@ -121,13 +122,13 @@ export default function Login() {
             {/* Login Form */}
             <div className="relative flex items-center justify-center h-screen">
                 <div className="w-full max-w-md bg-black bg-opacity-80 p-8 rounded-lg">
-                    <h2 className="text-2xl font-bold text-white text-center mb-6">Đăng nhập</h2>
+                    <h2 className="text-2xl font-bold text-white text-center mb-6">{t("auth.login.title")}</h2>
 
                     <form onSubmit={handleLogin} className="space-y-4">
                         {/* Username */}
                         <input
                             type="text"
-                            placeholder="Tên đăng nhập"
+                            placeholder={t("auth.login.username")}
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             className="w-full p-3 bg-gray-800 text-white border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
@@ -136,7 +137,7 @@ export default function Login() {
                         {/* Password */}
                         <input
                             type="password"
-                            placeholder="Mật khẩu"
+                            placeholder={t("auth.login.password")}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             className="w-full p-3 bg-gray-800 text-white border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
@@ -151,13 +152,13 @@ export default function Login() {
                             disabled={loading}
                             className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-md transition duration-200"
                         >
-                            {loading ? "Đang đăng nhập..." : "Đăng nhập →"}
+                            {loading ? t("auth.login.loggingIn") : t("auth.login.loginButton")}
                         </button>
 
                         {/* Divider */}
                         <div className="flex items-center justify-center my-4">
                             <div className="w-1/3 border-b border-gray-500"></div>
-                            <span className="mx-2 text-gray-400 text-sm">HOẶC</span>
+                            <span className="mx-2 text-gray-400 text-sm">{t("auth.login.or")}</span>
                             <div className="w-1/3 border-b border-gray-500"></div>
                         </div>
 
@@ -168,7 +169,7 @@ export default function Login() {
                             className="w-full flex items-center justify-center bg-white text-black font-medium py-3 rounded-md border border-gray-400 hover:bg-gray-100 transition"
                         >
                             <img src={google_icon} alt="Google" className="h-5 w-5 mr-2" />
-                            Đăng nhập bằng Google
+                            {t("auth.login.googleLogin")}
                         </button>
 
                         {/* Forgot Password */}
@@ -178,16 +179,16 @@ export default function Login() {
                                 onClick={handleForgotPassword}
                                 className="text-sm text-blue-500 hover:underline"
                             >
-                                Quên mật khẩu?
+                                {t("auth.login.forgotPassword")}
                             </button>
                         </div>
 
                         {/* Register */}
                         <div className="text-center text-gray-400 text-sm">
                             <p>
-                                Bạn mới sử dụng GoBeyond?{" "}
+                                {t("auth.login.newUser")}{" "}
                                 <button onClick={handleRegister} className="text-white hover:underline">
-                                    Đăng ký ngay
+                                    {t("auth.login.registerNow")}
                                 </button>
                             </p>
                         </div>
