@@ -17,6 +17,7 @@ const CreateChallenge = () => {
     const navigate = useNavigate();
     const [preview, setPreview] = useState("");
     const [bannerPreview, setBannerPreview] = useState("");
+    const [participationType, setParticipationType] = useState("INDIVIDUAL");
 
     const today = new Date();
     const tomorrow = new Date();
@@ -59,6 +60,7 @@ const CreateChallenge = () => {
             ...data,
             maxParticipants: parseInt(data.maxParticipants),
             challengeTypeId: parseInt(data.challengeTypeId),
+            isParticipate: String(data.isParticipate).toUpperCase() === "TRUE",
             startDate: formatDate(data.startDate),
             endDate: formatDate(data.endDate)
         };
@@ -126,26 +128,55 @@ const CreateChallenge = () => {
                         </div>
                         <div className="w-full mt-6">
                             <label className="text-sm font-medium">{t("createChallenge.banner")}</label>
-                            <label htmlFor="banner-upload" className="relative group cursor-pointer">
-                                <div
-                                    className="w-full h-40 flex items-center justify-center border-2 border-dashed rounded-lg bg-gray-50">
-                                    {bannerPreview ?
-                                        <img src={bannerPreview} className="w-full h-full object-cover rounded-lg"/> : (
-                                            <div className="text-center text-gray-400">
-                                                <IoCloudUploadOutline className="text-3xl mx-auto mb-2"/>
-                                                <p className="text-sm">{t("createChallenge.clickUpload")}</p>
-                                            </div>
-                                        )}
-                                </div>
-                            </label>
-                            <input id="banner-upload" type="file" className="hidden" onChange={(e) => {
-                                const file = e.target.files[0];
-                                if (file) {
-                                    setBannerPreview(URL.createObjectURL(file));
-                                    setValue("banner", file, {shouldValidate: true});
-                                }
-                            }}/>
+                            <div className="relative w-full h-40 border-2 border-dashed rounded-lg bg-gray-50">
+                                {bannerPreview ? (
+                                    <>
+                                        <img
+                                            src={bannerPreview}
+                                            className="w-full h-full object-cover rounded-lg"
+                                            alt="Banner Preview"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                e.preventDefault(); // ✅ quan trọng
+                                                setBannerPreview(null);
+                                                setValue("banner", null, {shouldValidate: true});
+                                            }}
+                                            className="absolute top-1 right-1 text-white bg-black/50 hover:bg-black/80 rounded-full p-1 z-10"
+                                            title="Remove banner"
+                                        >
+                                            <FaWindowClose className="text-lg"/>
+                                        </button>
+                                    </>
+                                ) : (
+                                    <label
+                                        htmlFor="banner-upload"
+                                        className="w-full h-full flex items-center justify-center cursor-pointer text-center text-gray-400"
+                                    >
+                                        <div>
+                                            <IoCloudUploadOutline className="text-3xl mx-auto mb-2"/>
+                                            <p className="text-sm">{t("createChallenge.clickUpload")}</p>
+                                        </div>
+                                    </label>
+                                )}
+                                <input
+                                    id="banner-upload"
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                        const file = e.target.files[0];
+                                        if (file) {
+                                            setBannerPreview(URL.createObjectURL(file));
+                                            setValue("banner", file, {shouldValidate: true});
+                                        }
+                                    }}
+                                />
+                            </div>
                         </div>
+
                     </div>
                     <label htmlFor="dropzone-file" className="relative group cursor-pointer md:m-2">
                         <label className="text-sm font-medium">{t("createChallenge.picture")}</label><span
@@ -194,6 +225,12 @@ const CreateChallenge = () => {
                                 <option value="PUBLIC">{t("public")}</option>
                                 <option value="PRIVATE">{t("private")}</option>
                             </select>
+                        </div><div>
+                            <label className="text-sm font-medium">{t("createChallenge.isParticipate")}</label>
+                            <select {...register("isParticipate")} className="w-full p-2 border rounded-md">
+                                <option value="TRUE">{t("join")}</option>
+                                <option value="FALSE">{t("not join")}</option>
+                            </select>
                         </div>
                         <div>
                             <label className="text-sm font-medium">{t("createChallenge.verificationType.label")}</label>
@@ -207,10 +244,18 @@ const CreateChallenge = () => {
                             <label className="text-sm font-medium">
                                 {t("createChallenge.participationType.label")}
                             </label>
-                            <select {...register("participationType")} className="w-full p-2 border rounded-md">
+                            <select
+                                {...register("participationType")}
+                                onChange={(e) => {
+                                    setParticipationType(e.target.value);
+                                    setValue("participationType", e.target.value, {shouldValidate: true});
+                                }}
+                                className="w-full p-2 border rounded-md"
+                            >
                                 <option value="INDIVIDUAL">{t("createChallenge.participationType.individual")}</option>
                                 <option value="GROUP">{t("createChallenge.participationType.group")}</option>
                             </select>
+
                         </div>
                         <div>
                             <label className="text-sm font-medium">{t("createChallenge.challengeType")}</label>
@@ -223,13 +268,29 @@ const CreateChallenge = () => {
                             </select>
                             <p className="text-red-600">{errors.challengeTypeId?.message}</p>
                         </div>
-                        <div>
-                            <label className="text-sm font-medium">{t("createChallenge.maxParticipants")}</label><span
-                            className="text-red-500">*</span>
-                            <input type="number" {...register("maxParticipants")}
-                                   className="w-full p-2 border rounded-md"/>
-                            <p className="text-red-600">{errors.maxParticipants?.message}</p>
-                        </div>
+                        {participationType === "INDIVIDUAL" ? (
+                            <div>
+                                <label className="text-sm font-medium">{t("createChallenge.maxParticipants")}</label><span
+                                className="text-red-500">*</span>
+                                <input
+                                    type="number"
+                                    {...register("maxParticipants")}
+                                    className="w-full p-2 border rounded-md"
+                                />
+                                <p className="text-red-600">{errors.maxParticipants?.message}</p>
+                            </div>
+                        ) : (
+                            <div>
+                                <label className="text-sm font-medium">{t("createChallenge.maxMembersPerGroup")}</label><span
+                                className="text-red-500">*</span>
+                                <input
+                                    type="number"
+                                    {...register("maxMembersPerGroup")}
+                                    className="w-full p-2 border rounded-md"
+                                />
+                                <p className="text-red-600">{errors.maxMembersPerGroup?.message}</p>
+                            </div>
+                        )}
                     </div>
 
                     <div>

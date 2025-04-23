@@ -136,6 +136,7 @@
 
   "createChallenge": {
     "create": "Tạo thử thách",
+    "isParticipate": "Có tham gia hay không",
     "creating": "Đang tạo thử thách...",
     "success": "Tạo thử thách thành công!",
     "editTitle": "Chỉnh sửa thử thách",
@@ -164,6 +165,10 @@
       "label": "Hình thức tham gia",
       "individual": "Cá nhân",
       "group": "Nhóm"
+    },
+    "isParticipate": {
+      "join": "Tham gia",
+      "not join": "Không tham gia"
     },
     "challengeType": "Loại thử thách",
     "selectChallengeType": "Chọn loại thử thách",
@@ -597,9 +602,76 @@
     "loadingStarLeaderboard": "Đang tải bảng xếp hạng sao...",
     "noMembersFound": "Không tìm thấy thành viên nào",
     "avgStars": "Sao trung bình"
+  },
+  "leaderboard": {
+    "individual": "Cá nhân",
+    "group": "Nhóm",
+    "achievements": "Thành tựu",
+    "searchPlaceholder": "Tìm kiếm người dùng...",
+    "myRank": "Xếp hạng của tôi",
+    "myGroupRank": "Xếp hạng nhóm của tôi",
+    "user": "Người dùng",
+    "group": "Nhóm",
+    "members": "Thành viên",
+    "score": "Điểm số",
+    "noUsersFound": "Không tìm thấy người dùng khớp với \"{searchTerm}\"",
+    "noGroupsFound": "Không tìm thấy nhóm khớp với \"{searchTerm}\"",
+    "previous": "Trước",
+    "next": "Tiếp",
+    "achievementsTitle": "Thành tựu của bạn",
+    "usersEarned": "người dùng đã đạt được",
+    "earned": "Đạt được vào",
+    "notEarned": "Chưa đạt được",
+    "yourProgress": "Tiến độ của bạn",
+    "achievementsCompleted": "Thành tựu đã hoàn thành",
+    "completionRate": "Tỷ lệ hoàn thành",
+    "overallProgress": "Tiến độ tổng thể",
+    "copyright": "Bản quyền © {year}",
+    "page": "Trang",
+    "of": "/"
+  },
+  "auth": {
+    "login": {
+      "title": "Đăng nhập",
+      "username": "Tên đăng nhập",
+      "password": "Mật khẩu",
+      "loginButton": "Đăng nhập →",
+      "loggingIn": "Đang đăng nhập...",
+      "or": "HOẶC",
+      "googleLogin": "Đăng nhập bằng Google",
+      "forgotPassword": "Quên mật khẩu?",
+      "newUser": "Bạn mới sử dụng GoBeyond?",
+      "registerNow": "Đăng ký ngay",
+      "errors": {
+        "emptyUsername": "Username cannot be empty",
+        "shortPassword": "Password must be at least 6 characters long",
+        "invalidToken": "Invalid token received.",
+        "unexpectedResponse": "Unexpected response from server",
+        "incorrectCredentials": "Incorrect credentials",
+        "loginFailed": "Login failed. Please try again."
+      }
+    },
+    "register": {
+      "title": "Đăng ký tài khoản",
+      "email": "Email",
+      "username": "Tên đăng nhập",
+      "password": "Mật khẩu",
+      "confirmPassword": "Xác nhận mật khẩu",
+      "registerButton": "Đăng ký",
+      "registering": "Đang đăng ký...",
+      "haveAccount": "Đã có tài khoản?",
+      "loginNow": "Đăng nhập ngay",
+      "errors": {
+        "emptyEmail": "Email không được để trống.",
+        "invalidEmail": "Email phải có đuôi '@'.",
+        "emptyUsername": "Tên đăng nhập không được để trống.",
+        "emptyPassword": "Mật khẩu không được để trống.",
+        "shortPassword": "Mật khẩu ít nhất 6 ký tự.",
+        "passwordMismatch": "Mật khẩu xác nhận không khớp.",
+        "registerFailed": "Đăng ký thất bại. Vui lòng thử lại."
+      },
+      "success": "Đăng ký thành công!"
+    }
   }
-
-
-
 
 }

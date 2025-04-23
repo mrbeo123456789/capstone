@@ -134,6 +134,10 @@ export const challengeService = createApi({
             },
             providesTags: ["Challenge"]
         }),
+        getCompletedChallenges: builder.query({
+            query: () => "/challenges/completed", // 👈 your backend endpoint
+            providesTags: ["Challenge"],
+        }),
     }),
 });
 
@@ -155,5 +159,6 @@ export const {
     useCancelChallengeMutation,
     useKickMemberFromChallengeMutation,
     useGetJoinedMembersWithPendingEvidenceQuery,
+    useLazyGetCompletedChallengesQuery ,
 } = challengeService;
 

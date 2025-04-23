@@ -191,6 +191,10 @@
       "individual": "Individual",
       "group": "Group"
     },
+    "isParticipate": {
+      "join": "Join",
+      "not join": "Not join"
+    },
     "challengeType": "Challenge Type",
     "selectChallengeType": "Select challenge type",
     "maxParticipants": "Maximum Participants",
@@ -369,6 +373,49 @@
     "kickedFromChallenge.title": "You were removed from the challenge",
     "kickedFromChallenge.content": "You were removed from the challenge '{{challengeName}}' by the admin.",
     "empty": "No new notifications."
+  },
+  "auth": {
+    "login": {
+      "title": "Login",
+      "username": "Username",
+      "password": "Password",
+      "loginButton": "Login →",
+      "loggingIn": "Logging in...",
+      "or": "OR",
+      "googleLogin": "Login with Google",
+      "forgotPassword": "Forgot password?",
+      "newUser": "New to GoBeyond?",
+      "registerNow": "Register now",
+      "errors": {
+        "emptyUsername": "Username cannot be empty",
+        "shortPassword": "Password must be at least 6 characters long",
+        "invalidToken": "Invalid token received",
+        "unexpectedResponse": "Unexpected response from server",
+        "incorrectCredentials": "Incorrect credentials",
+        "loginFailed": "Login failed. Please try again."
+      }
+    },
+    "register": {
+      "title": "Register Account",
+      "email": "Email",
+      "username": "Username",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "registerButton": "Register",
+      "registering": "Registering...",
+      "haveAccount": "Already have an account?",
+      "loginNow": "Login now",
+      "errors": {
+        "emptyEmail": "Email cannot be empty.",
+        "invalidEmail": "Email must include '@'.",
+        "emptyUsername": "Username cannot be empty.",
+        "emptyPassword": "Password cannot be empty.",
+        "shortPassword": "Password must be at least 6 characters.",
+        "passwordMismatch": "Confirmation password doesn't match.",
+        "registerFailed": "Registration failed. Please try again."
+      },
+      "success": "Registration successful!"
+    }
   },
 
   "JoinsChallengeDetail": {
@@ -737,6 +784,32 @@
     "notCompleted": "Not Completed",
     "dailyOverview": "Daily progress overview",
     "completionRate": "Daily completion rate"
+  },
+  "leaderboard": {
+    "individual": "Individual",
+    "group": "Group",
+    "achievements": "Achievements",
+    "searchPlaceholder": "Search users...",
+    "myRank": "My Rank",
+    "myGroupRank": "My Group Rank",
+    "user": "User",
+    "members": "Members",
+    "score": "Score",
+    "noUsersFound": "No users found matching \"{searchTerm}\"",
+    "noGroupsFound": "No groups found matching \"{searchTerm}\"",
+    "previous": "Previous",
+    "next": "Next",
+    "achievementsTitle": "Your Achievements",
+    "usersEarned": "users earned this",
+    "earned": "Earned on",
+    "notEarned": "Not yet earned",
+    "yourProgress": "Your Progress",
+    "achievementsCompleted": "Achievements Completed",
+    "completionRate": "Completion Rate",
+    "overallProgress": "Overall Progress",
+    "copyright": "Copyright © {year}",
+    "page": "Page",
+    "of": "/"
   }
 
 

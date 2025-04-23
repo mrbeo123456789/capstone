@@ -579,10 +579,80 @@
     "loadingStarLeaderboard": "スターリーダーボードを読み込み中...",
     "noMembersFound": "メンバーが見つかりません",
     "avgStars": "平均スター"
+  },
+  "leaderboard": {
+    "individual": "個人",
+    "group": "グループ",
+    "achievements": "実績",
+    "searchPlaceholder": "ユーザーを検索...",
+    "myRank": "自分のランク",
+    "myGroupRank": "自分のグループランク",
+    "user": "ユーザー",
+    "members": "メンバー",
+    "score": "スコア",
+    "noUsersFound": "\"{searchTerm}\"に一致するユーザーが見つかりません",
+    "noGroupsFound": "\"{searchTerm}\"に一致するグループが見つかりません",
+    "previous": "前へ",
+    "next": "次へ",
+    "achievementsTitle": "あなたの実績",
+    "usersEarned": "人が獲得",
+    "earned": "獲得日",
+    "notEarned": "未獲得",
+    "yourProgress": "進捗状況",
+    "achievementsCompleted": "達成した実績",
+    "completionRate": "達成率",
+    "overallProgress": "全体の進捗",
+    "copyright": "著作権 © {year}",
+    "page": "ページ",
+    "of": "の"
+  },
+
+  "auth": {
+  "login": {
+    "title": "ログイン",
+    "username": "ユーザー名",
+    "password": "パスワード",
+    "loginButton": "ログイン →",
+    "loggingIn": "ログイン中...",
+    "or": "または",
+    "googleLogin": "Googleでログイン",
+    "forgotPassword": "パスワードをお忘れですか？",
+    "newUser": "GoBeyondは初めてですか？",
+    "registerNow": "今すぐ登録",
+    "errors": {
+      "emptyUsername": "ユーザー名を入力してください",
+      "shortPassword": "パスワードは6文字以上である必要があります",
+      "invalidToken": "無効なトークンを受信しました",
+      "unexpectedResponse": "サーバーから予期しない応答がありました",
+      "incorrectCredentials": "認証情報が正しくありません",
+      "loginFailed": "ログインに失敗しました。もう一度お試しください。"
+    }
+  },
+  "register": {
+    "title": "アカウント登録",
+    "email": "メールアドレス",
+    "username": "ユーザー名",
+    "password": "パスワード",
+    "confirmPassword": "パスワード確認",
+    "registerButton": "登録する",
+    "registering": "登録中...",
+    "haveAccount": "すでにアカウントをお持ちですか？",
+    "loginNow": "今すぐログイン",
+    "errors": {
+      "emptyEmail": "メールアドレスを入力してください。",
+      "invalidEmail": "メールアドレスには「@」が必要です。",
+      "emptyUsername": "ユーザー名を入力してください。",
+      "emptyPassword": "パスワードを入力してください。",
+      "shortPassword": "パスワードは6文字以上必要です。",
+      "passwordMismatch": "確認用パスワードが一致しません。",
+      "registerFailed": "登録に失敗しました。もう一度お試しください。"
+    },
+    "success": "登録が完了しました！"
   }
 
-
-
-
-
+  }
 }
+
+
+
+

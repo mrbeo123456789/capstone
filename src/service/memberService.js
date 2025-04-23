@@ -63,6 +63,13 @@ export const memberService = createApi({
             query: () => "/member/me",
             providesTags: ["Member"],
         }),
+// API lấy thống kê của thành viên hiện tại
+        getMyStatistics: builder.query({
+            query: () => "/member/statistics",
+            providesTags: ["Member"],
+        }),
+
+
     }),
 
 });
@@ -74,4 +81,5 @@ export const {
     useGetMyProfileQuery,
     useUpdateMemberMutation ,
     useChangePasswordMutation,
+    useGetMyStatisticsQuery,
 } = memberService;
