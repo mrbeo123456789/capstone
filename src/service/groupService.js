@@ -95,6 +95,13 @@ export const groupService = createApi({
                 params: { keyword, page, size },
             }),
         }),
+        getGroupChallengeHistory: builder.query({
+            query: ({ groupId, status = "", page = 0 }) => ({
+               url: `/groups/${groupId}/challenge-history`,
+               params: { status, page },
+            }),
+         providesTags: ["Group"],
+       }),
     }),
 });
 
@@ -111,4 +118,5 @@ export const {
     useKickMemberMutation,
     useLeaveGroupMutation,
     useGetGroupRankingQuery,
+    useGetGroupChallengeHistoryQuery,
 } = groupService;

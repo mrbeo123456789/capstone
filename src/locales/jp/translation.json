@@ -116,8 +116,10 @@
     "disbandSuccess": "グループが解散されました。",
     "disbandFailed": "グループの解散に失敗しました。もう一度お試しください。",
     "kickSuccess": "メンバーをグループから削除しました",
-    "kickFailed": "メンバーを削除できませんでした。もう一度お試しください。"
-  },
+    "kickFailed": "メンバーを削除できませんでした。もう一度お試しください。",
+    "confirmDelete": "グループ削除の確認",
+    "deleteWarning": "本当にこのグループを削除してよろしいですか？この操作は取り消せず、チャレンジやメンバー関係を含むすべてのグループデータが永久に削除されます。"
+},
   "yourGroup": {
     "createGroup": "グループを作成",
     "searchPlaceholder": "グループを検索",
@@ -669,6 +671,36 @@
       "registerFailed": "登録に失敗しました。もう一度お試しください。"
     }
 
+  },
+  "challenges": {
+    "groupHistory": "グループチャレンジ履歴",
+    "name": "チャレンジ名",
+    "period": "期間",
+    "participants": "参加者",
+    "status": "ステータス",
+    "actions": "アクション",
+    "viewDetails": "詳細を見る",
+    "noHistory": "チャレンジ履歴がありません",
+    "searchPlaceholder": "チャレンジを検索...",
+    "filter": {
+      "allStatuses": "すべてのステータス"
+    },
+    "status": {
+      "completed": "完了",
+      "inProgress": "進行中",
+      "failed": "失敗"
+    },
+    "success": "成功率"
+  },
+  "pagination": {
+    "showing": "表示中",
+    "to": "から",
+    "of": "の",
+    "results": "結果",
+    "previous": "前へ",
+    "next": "次へ",
+    "first": "最初",
+    "last": "最後"
   }
 
 }

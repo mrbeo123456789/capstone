@@ -27,9 +27,31 @@ export const rankingService = createApi({
             providesTags: ["Ranking"],
         }),
         getGlobalRanking: builder.query({
-            query: ({ page = 0, size = 10 }) => ({
-                url: `/rankings/global`,
-                params: { page, size },
+                query: ({ page = 0, size = 10, keyword = "" }) => ({
+               url: `/rankings/global`,
+               params: { page, size, keyword },
+             }),
+        providesTags: ["Ranking"],
+       }),
+        getTop3Progress: builder.query({
+            query: (challengeId) => `/rankings/${challengeId}/group-top3-progress`,
+            providesTags: ["Ranking"],
+        }),
+        // 2. Top 3 group theo tiến độ của 1 challenge
+        getTop3GroupProgress: builder.query({
+            query: (challengeId) => `/rankings/${challengeId}/group-top3-progress`,
+            providesTags: ["Ranking"],
+        }),
+        // 3. Lấy xếp hạng cá nhân của user hiện tại
+        getMyRanking: builder.query({
+            query: () => `/rankings/global/me`,
+            providesTags: ["Ranking"],
+        }),
+        // 4. Lấy xếp hạng toàn cục của các nhóm (phân trang + search)
+        getGlobalGroupRanking: builder.query({
+            query: ({ keyword = "", page = 0 }) => ({
+                url: `/rankings/ranking/groups/global`,
+                params: { keyword, page },
             }),
             providesTags: ["Ranking"],
         }),
@@ -40,4 +62,8 @@ export const {
     useGetTop3ProgressRankingQuery,
     useGetChallengeStarLeaderboardQuery,
     useGetGlobalRankingQuery,
+    useGetTop3ProgressQuery,
+    useGetTop3GroupProgressQuery,
+    useGetMyRankingQuery,
+    useGetGlobalGroupRankingQuery,
 } = rankingService;

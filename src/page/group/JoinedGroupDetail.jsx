@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import MemberTable from "./MemberTable";
-import { FaUsers, FaFire } from "react-icons/fa";
+import { FaUsers, FaFire, FaExclamationTriangle } from "react-icons/fa";
 import {
     useDeleteGroupMutation,
     useGetGroupDetailQuery,
@@ -13,6 +13,36 @@ import {
 import MemberListPopup from "../ui/MemberListPopup.jsx";
 import { useGetCurrentMemberIdQuery } from "../../service/memberService";
 import GroupChallengeHistory from "./GroupChallengeHistory";
+
+const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message }) => {
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+                <div className="flex items-center text-red-600 mb-4">
+                    <FaExclamationTriangle className="text-2xl mr-2" />
+                    <h3 className="text-lg font-semibold">{title}</h3>
+                </div>
+                <p className="text-gray-700 mb-6">{message}</p>
+                <div className="flex justify-end space-x-3">
+                    <button
+                        onClick={onClose}
+                        className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition-colors"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={onConfirm}
+                        className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+                    >
+                        Confirm
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 const JoinedGroupDetail = () => {
     const { t } = useTranslation();
@@ -29,6 +59,7 @@ const JoinedGroupDetail = () => {
     const [showPopup, setShowPopup] = useState(false);
     const [searchKeyword, setSearchKeyword] = useState("");
     const [resetTable, setResetTable] = useState(false);
+    const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
     const isOwner = group?.currentMemberRole === "OWNER";
     const { data: currentMemberData } = useGetCurrentMemberIdQuery();
@@ -51,13 +82,24 @@ const JoinedGroupDetail = () => {
         }
     };
 
+    const openDeleteConfirmation = () => {
+        setShowDeleteConfirmation(true);
+        setMenuOpen(false); // Close the menu when opening the confirmation modal
+    };
+
+    const closeDeleteConfirmation = () => {
+        setShowDeleteConfirmation(false);
+    };
+
     const handleDisbandGroup = async () => {
         try {
             const res = await deleteGroup(groupId);
             toast.success(res?.data || t("groupDetail.disbandSuccess"));
+            setShowDeleteConfirmation(false);
             setTimeout(() => navigate("/groups/joins"), 1500);
         } catch (err) {
             toast.error(err?.data?.message || t("groupDetail.disbandFailed"));
+            setShowDeleteConfirmation(false);
         }
     };
 
@@ -129,7 +171,7 @@ const JoinedGroupDetail = () => {
                                                 </button>
                                             )}
                                             {isOwner && (
-                                                <button onClick={handleDisbandGroup} className="w-full text-left px-4 py-2 text-sm hover:bg-red-100 text-red-600 font-semibold">
+                                                <button onClick={openDeleteConfirmation} className="w-full text-left px-4 py-2 text-sm hover:bg-red-100 text-red-600 font-semibold">
                                                     {t("groupDetail.disbandGroup")}
                                                 </button>
                                             )}
@@ -193,6 +235,15 @@ const JoinedGroupDetail = () => {
 
             {/* Invite Popup */}
             {showPopup && <MemberListPopup onClose={closeInvitePopup} />}
+
+            {/* Delete Confirmation Modal */}
+            <ConfirmationModal
+                isOpen={showDeleteConfirmation}
+                onClose={closeDeleteConfirmation}
+                onConfirm={handleDisbandGroup}
+                title={t("groupDetail.confirmDelete")}
+                message={t("groupDetail.deleteWarning")}
+            />
         </div>
     );
 };

@@ -2,131 +2,52 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { FaCalendarAlt, FaTrophy, FaUsers, FaCheckCircle, FaClock, FaTimesCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-
-// Mock data for challenges
-const mockChallenges = [
-    {
-        id: "ch-001",
-        name: "30 Days of Exercise",
-        description: "Complete a daily exercise routine for 30 consecutive days",
-        startDate: "2025-03-01T00:00:00.000Z",
-        endDate: "2025-03-31T23:59:59.999Z",
-        status: "COMPLETED",
-        participantCount: 15,
-        successRate: 78
-    },
-    {
-        id: "ch-002",
-        name: "Water Drinking Challenge",
-        description: "Drink 2 liters of water every day for 2 weeks",
-        startDate: "2025-03-15T00:00:00.000Z",
-        endDate: "2025-03-29T23:59:59.999Z",
-        status: "COMPLETED",
-        participantCount: 23,
-        successRate: 91
-    },
-    {
-        id: "ch-003",
-        name: "Meditation Marathon",
-        description: "Meditate for at least 10 minutes daily for a month",
-        startDate: "2025-04-01T00:00:00.000Z",
-        endDate: "2025-04-30T23:59:59.999Z",
-        status: "IN_PROGRESS",
-        participantCount: 18,
-        successRate: 65
-    },
-    {
-        id: "ch-004",
-        name: "No Sugar Week",
-        description: "Avoid all added sugars for one full week",
-        startDate: "2025-02-15T00:00:00.000Z",
-        endDate: "2025-02-22T23:59:59.999Z",
-        status: "COMPLETED",
-        participantCount: 12,
-        successRate: 42
-    },
-    {
-        id: "ch-005",
-        name: "5K Preparation",
-        description: "Training program to prepare for a 5K run",
-        startDate: "2025-02-01T00:00:00.000Z",
-        endDate: "2025-03-15T23:59:59.999Z",
-        status: "FAILED",
-        participantCount: 8,
-        successRate: 25
-    },
-    {
-        id: "ch-006",
-        name: "Daily Reading",
-        description: "Read at least 20 pages every day for a month",
-        startDate: "2025-01-01T00:00:00.000Z",
-        endDate: "2025-01-31T23:59:59.999Z",
-        status: "COMPLETED",
-        participantCount: 17,
-        successRate: 82
-    },
-    {
-        id: "ch-007",
-        name: "Healthy Cooking Challenge",
-        description: "Cook a healthy homemade meal every day for two weeks",
-        startDate: "2025-04-10T00:00:00.000Z",
-        endDate: "2025-04-24T23:59:59.999Z",
-        status: "IN_PROGRESS",
-        participantCount: 14,
-        successRate: 79
-    }
-];
+import { useGetGroupChallengeHistoryQuery } from "../../service/groupService.js"; // Adjust import path as needed
 
 const GroupChallengeHistory = ({ groupId }) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const [currentPage, setCurrentPage] = useState(1);
+    const [currentPage, setCurrentPage] = useState(0); // API uses 0-indexed pages
     const [pageSize, setPageSize] = useState(5);
-    const [statusFilter, setStatusFilter] = useState("all");
+    const [statusFilter, setStatusFilter] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
-    const [isLoading, setIsLoading] = useState(true);
 
-    // Simulated data loading
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setIsLoading(false);
-        }, 800);
-
-        return () => clearTimeout(timer);
-    }, []);
-
-    // Filter challenges based on search term and status
-    const filteredChallenges = mockChallenges.filter(challenge => {
-        const matchesSearch = searchTerm === "" ||
-            challenge.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            challenge.description.toLowerCase().includes(searchTerm.toLowerCase());
-
-        const matchesStatus = statusFilter === "all" || challenge.status === statusFilter;
-
-        return matchesSearch && matchesStatus;
+    // Fetch data from API
+    const { data: challengeHistory, isLoading, isFetching } = useGetGroupChallengeHistoryQuery({
+        groupId,
+        status: statusFilter,
+        page: currentPage
     });
 
-    // Paginate the filtered challenges
-    const paginatedChallenges = filteredChallenges.slice(
-        (currentPage - 1) * pageSize,
-        currentPage * pageSize
-    );
+    const challenges = challengeHistory?.content || [];
+    const totalPages = challengeHistory?.totalPages || 0;
+    const totalElements = challengeHistory?.totalElements || 0;
 
-    // Reset to first page when filters change
+    // Filter challenges based on search term
+    const filteredChallenges = challenges.filter(challenge => {
+        return searchTerm === "" ||
+            challenge.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            challenge.description.toLowerCase().includes(searchTerm.toLowerCase());
+    });
+
+    // Reset to first page when status filter changes
     useEffect(() => {
-        setCurrentPage(1);
-    }, [statusFilter, searchTerm, pageSize]);
+        setCurrentPage(0);
+    }, [statusFilter]);
 
+    // Local search doesn't trigger refetch, just filters current results
     const handleSearchChange = (e) => {
         setSearchTerm(e.target.value);
     };
 
+    // Status filter change triggers API refetch
     const handleStatusFilterChange = (e) => {
         setStatusFilter(e.target.value);
     };
 
+    // Page change triggers API refetch
     const handlePageChange = (newPage) => {
-        setCurrentPage(newPage);
+        setCurrentPage(newPage - 1); // Convert to 0-indexed
     };
 
     const getStatusBadge = (status) => {
@@ -134,32 +55,32 @@ const GroupChallengeHistory = ({ groupId }) => {
             case "COMPLETED":
                 return (
                     <span className="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800 flex items-center">
-            <FaCheckCircle className="mr-1" /> {t("challenges.status.completed", "Completed")}
-          </span>
+                        <FaCheckCircle className="mr-1" /> {t("challenges.status.completed")}
+                    </span>
                 );
             case "IN_PROGRESS":
                 return (
                     <span className="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800 flex items-center">
-            <FaClock className="mr-1" /> {t("challenges.status.inProgress", "In Progress")}
-          </span>
+                        <FaClock className="mr-1" /> {t("challenges.status.inProgress")}
+                    </span>
                 );
             case "FAILED":
                 return (
                     <span className="px-2 py-1 rounded-full text-xs bg-red-100 text-red-800 flex items-center">
-            <FaTimesCircle className="mr-1" /> {t("challenges.status.failed", "Failed")}
-          </span>
+                        <FaTimesCircle className="mr-1" /> {t("challenges.status.failed")}
+                    </span>
                 );
             default:
                 return (
                     <span className="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-800">
-            {status}
-          </span>
+                        {status}
+                    </span>
                 );
         }
     };
 
     const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString("vi-VN", {
+        return new Date(dateString).toLocaleDateString(undefined, {
             year: "numeric",
             month: "2-digit",
             day: "2-digit"
@@ -174,19 +95,20 @@ const GroupChallengeHistory = ({ groupId }) => {
         );
     }
 
-    const totalPages = Math.ceil(filteredChallenges.length / pageSize);
+    const displayedChallenges = filteredChallenges;
+    const displayedCurrentPage = currentPage + 1; // Convert to 1-indexed for display
 
     return (
         <div className="bg-white rounded-lg shadow-md">
             <div className="p-4 border-b">
-                <h3 className="text-lg font-semibold">{t("challenges.groupHistory", "Group Challenge History")}</h3>
+                <h3 className="text-lg font-semibold">{t("challenges.groupHistory")}</h3>
 
                 {/* Filters and Search */}
                 <div className="flex flex-col md:flex-row gap-4 mt-3">
                     <div className="flex-1">
                         <input
                             type="text"
-                            placeholder={t("challenges.searchPlaceholder", "Search challenges...")}
+                            placeholder={t("challenges.searchPlaceholder")}
                             className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300"
                             value={searchTerm}
                             onChange={handleSearchChange}
@@ -198,40 +120,40 @@ const GroupChallengeHistory = ({ groupId }) => {
                             value={statusFilter}
                             onChange={handleStatusFilterChange}
                         >
-                            <option value="all">{t("challenges.filter.allStatuses", "All Statuses")}</option>
-                            <option value="COMPLETED">{t("challenges.status.completed", "Completed")}</option>
-                            <option value="IN_PROGRESS">{t("challenges.status.inProgress", "In Progress")}</option>
-                            <option value="FAILED">{t("challenges.status.failed", "Failed")}</option>
+                            <option value="">{t("challenges.filter.allStatuses")}</option>
+                            <option value="COMPLETED">{t("challenges.status.completed")}</option>
+                            <option value="IN_PROGRESS">{t("challenges.status.inProgress")}</option>
+                            <option value="FAILED">{t("challenges.status.failed")}</option>
                         </select>
                     </div>
                 </div>
             </div>
 
             {/* Challenge List */}
-            {paginatedChallenges.length > 0 ? (
+            {displayedChallenges.length > 0 ? (
                 <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
                         <tr>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                {t("challenges.name", "Challenge Name")}
+                                {t("challenges.name")}
                             </th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                {t("challenges.period", "Period")}
+                                {t("challenges.period")}
                             </th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                {t("challenges.participants", "Participants")}
+                                {t("challenges.participants")}
                             </th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                {t("challenges.status", "Status")}
+                                {t("challenges.status")}
                             </th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                {t("challenges.actions", "Actions")}
+                                {t("challenges.actions")}
                             </th>
                         </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                        {paginatedChallenges.map((challenge) => (
+                        {displayedChallenges.map((challenge) => (
                             <tr key={challenge.id} className="hover:bg-gray-50">
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="flex items-center">
@@ -262,8 +184,8 @@ const GroupChallengeHistory = ({ groupId }) => {
                                         <FaUsers className="mr-2 text-gray-400" />
                                         {challenge.participantCount || 0}
                                         <span className="ml-2 text-xs text-gray-500">
-                        ({challenge.successRate}% success)
-                      </span>
+                                            ({challenge.successRate}% {t("challenges.success")})
+                                        </span>
                                     </div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
@@ -274,7 +196,7 @@ const GroupChallengeHistory = ({ groupId }) => {
                                         onClick={() => navigate(`/challenges/${challenge.id}`)}
                                         className="text-orange-600 hover:text-orange-900 mr-3"
                                     >
-                                        {t("challenges.viewDetails", "View Details")}
+                                        {t("challenges.viewDetails")}
                                     </button>
                                 </td>
                             </tr>
@@ -285,7 +207,7 @@ const GroupChallengeHistory = ({ groupId }) => {
             ) : (
                 <div className="text-center py-8 text-gray-500">
                     <FaTrophy className="mx-auto text-4xl text-gray-300 mb-2" />
-                    <p>{t("challenges.noHistory", "No challenge history found")}</p>
+                    <p>{t("challenges.noHistory")}</p>
                 </div>
             )}
 
@@ -294,60 +216,60 @@ const GroupChallengeHistory = ({ groupId }) => {
                 <div className="px-6 py-3 flex items-center justify-between border-t">
                     <div className="flex-1 flex justify-between sm:hidden">
                         <button
-                            onClick={() => handlePageChange(currentPage - 1)}
-                            disabled={currentPage === 1}
+                            onClick={() => handlePageChange(displayedCurrentPage - 1)}
+                            disabled={displayedCurrentPage === 1}
                             className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
-                                currentPage === 1
+                                displayedCurrentPage === 1
                                     ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                                     : "bg-white text-gray-700 hover:bg-gray-50"
                             }`}
                         >
-                            {t("pagination.previous", "Previous")}
+                            {t("pagination.previous")}
                         </button>
                         <button
-                            onClick={() => handlePageChange(currentPage + 1)}
-                            disabled={currentPage === totalPages}
+                            onClick={() => handlePageChange(displayedCurrentPage + 1)}
+                            disabled={displayedCurrentPage === totalPages}
                             className={`ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
-                                currentPage === totalPages
+                                displayedCurrentPage === totalPages
                                     ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                                     : "bg-white text-gray-700 hover:bg-gray-50"
                             }`}
                         >
-                            {t("pagination.next", "Next")}
+                            {t("pagination.next")}
                         </button>
                     </div>
                     <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                         <div>
                             <p className="text-sm text-gray-700">
-                                {t("pagination.showing", "Showing")} <span className="font-medium">{(currentPage - 1) * pageSize + 1}</span>{" "}
-                                {t("pagination.to", "to")}{" "}
+                                {t("pagination.showing")} <span className="font-medium">{Math.min(1, totalElements)}</span>{" "}
+                                {t("pagination.to")}{" "}
                                 <span className="font-medium">
-                  {Math.min(currentPage * pageSize, filteredChallenges.length)}
-                </span>{" "}
-                                {t("pagination.of", "of")} <span className="font-medium">{filteredChallenges.length}</span>{" "}
-                                {t("pagination.results", "results")}
+                                    {Math.min(pageSize, totalElements)}
+                                </span>{" "}
+                                {t("pagination.of")} <span className="font-medium">{totalElements}</span>{" "}
+                                {t("pagination.results")}
                             </p>
                         </div>
                         <div>
                             <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
                                 <button
                                     onClick={() => handlePageChange(1)}
-                                    disabled={currentPage === 1}
+                                    disabled={displayedCurrentPage === 1}
                                     className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${
-                                        currentPage === 1 ? "text-gray-300" : "text-gray-500 hover:bg-gray-50"
+                                        displayedCurrentPage === 1 ? "text-gray-300" : "text-gray-500 hover:bg-gray-50"
                                     }`}
                                 >
-                                    <span className="sr-only">{t("pagination.first", "First")}</span>
+                                    <span className="sr-only">{t("pagination.first")}</span>
                                     <span>&laquo;</span>
                                 </button>
                                 <button
-                                    onClick={() => handlePageChange(currentPage - 1)}
-                                    disabled={currentPage === 1}
+                                    onClick={() => handlePageChange(displayedCurrentPage - 1)}
+                                    disabled={displayedCurrentPage === 1}
                                     className={`relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium ${
-                                        currentPage === 1 ? "text-gray-300" : "text-gray-500 hover:bg-gray-50"
+                                        displayedCurrentPage === 1 ? "text-gray-300" : "text-gray-500 hover:bg-gray-50"
                                     }`}
                                 >
-                                    <span className="sr-only">{t("pagination.previous", "Previous")}</span>
+                                    <span className="sr-only">{t("pagination.previous")}</span>
                                     <span>&lsaquo;</span>
                                 </button>
 
@@ -356,12 +278,12 @@ const GroupChallengeHistory = ({ groupId }) => {
                                     let pageNumber;
                                     if (totalPages <= 5) {
                                         pageNumber = index + 1;
-                                    } else if (currentPage <= 3) {
+                                    } else if (displayedCurrentPage <= 3) {
                                         pageNumber = index + 1;
-                                    } else if (currentPage >= totalPages - 2) {
+                                    } else if (displayedCurrentPage >= totalPages - 2) {
                                         pageNumber = totalPages - 4 + index;
                                     } else {
-                                        pageNumber = currentPage - 2 + index;
+                                        pageNumber = displayedCurrentPage - 2 + index;
                                     }
 
                                     return (
@@ -369,7 +291,7 @@ const GroupChallengeHistory = ({ groupId }) => {
                                             key={pageNumber}
                                             onClick={() => handlePageChange(pageNumber)}
                                             className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                                                currentPage === pageNumber
+                                                displayedCurrentPage === pageNumber
                                                     ? "z-10 bg-orange-50 border-orange-500 text-orange-600"
                                                     : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
                                             }`}
@@ -380,27 +302,27 @@ const GroupChallengeHistory = ({ groupId }) => {
                                 })}
 
                                 <button
-                                    onClick={() => handlePageChange(currentPage + 1)}
-                                    disabled={currentPage === totalPages}
+                                    onClick={() => handlePageChange(displayedCurrentPage + 1)}
+                                    disabled={displayedCurrentPage === totalPages}
                                     className={`relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium ${
-                                        currentPage === totalPages
+                                        displayedCurrentPage === totalPages
                                             ? "text-gray-300"
                                             : "text-gray-500 hover:bg-gray-50"
                                     }`}
                                 >
-                                    <span className="sr-only">{t("pagination.next", "Next")}</span>
+                                    <span className="sr-only">{t("pagination.next")}</span>
                                     <span>&rsaquo;</span>
                                 </button>
                                 <button
                                     onClick={() => handlePageChange(totalPages)}
-                                    disabled={currentPage === totalPages}
+                                    disabled={displayedCurrentPage === totalPages}
                                     className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${
-                                        currentPage === totalPages
+                                        displayedCurrentPage === totalPages
                                             ? "text-gray-300"
                                             : "text-gray-500 hover:bg-gray-50"
                                     }`}
                                 >
-                                    <span className="sr-only">{t("pagination.last", "Last")}</span>
+                                    <span className="sr-only">{t("pagination.last")}</span>
                                     <span>&raquo;</span>
                                 </button>
                             </nav>

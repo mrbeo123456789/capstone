@@ -89,7 +89,7 @@ const GroupDetailModal = ({ groupId, onClose, onDisbandSuccess }) => {
                         <div className="md:ml-6 text-center md:text-left">
                             <h3 className="text-2xl font-bold text-gray-800">{group.name}</h3>
                             <span className="inline-block px-3 py-1 rounded-full text-sm font-medium mt-2 bg-blue-100 text-blue-800">
-                                {group.currentParticipants || 0}/{group.maxParticipants || 0} Members
+                                {group.currentParticipants || 0} Members
                             </span>
                         </div>
                     </div>
@@ -119,7 +119,7 @@ const GroupDetailModal = ({ groupId, onClose, onDisbandSuccess }) => {
                                 </svg>
                                 <span className="text-sm font-medium">Current member count</span>
                             </div>
-                            <div className="text-gray-800 pl-6">{group.currentParticipants} / {group.maxParticipants}</div>
+                            <div className="text-gray-800 pl-6">{group.currentParticipants}</div>
                         </div>
                         <div className="bg-blue-50 p-3 rounded-lg">
                             <div className="flex items-center mb-1 text-blue-700">

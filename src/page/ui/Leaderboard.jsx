@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Star, Search, User, Users, Trophy } from 'lucide-react';
 import { useTranslation } from "react-i18next";
-import Achievement from "../member/Achievement.jsx"; // Import Achievement component
+import Achievement from "../member/Achievement.jsx";
+import {
+    useGetGlobalRankingQuery,
+    useGetMyRankingQuery,
+    useGetGlobalGroupRankingQuery
+} from "../../service/rankingService.js";
 
 const GlobalLeaderboard = () => {
     const { t } = useTranslation();
@@ -9,68 +14,88 @@ const GlobalLeaderboard = () => {
     // Tab state
     const [activeTab, setActiveTab] = useState('individual');
 
-    // State management for individual tab
+    // State management
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
-    const [showUserRank, setShowUserRank] = useState(false);
     const usersPerPage = 10;
 
-    // Mock data for individual rankings
-    const individualUsers = [
-        { id: 1, name: 'Eiden', username: '@username', score: 2430, avatar: '/api/placeholder/100/100', rank: 1 },
-        { id: 2, name: 'Jackson', username: '@username', score: 1847, avatar: '/api/placeholder/100/100', rank: 2 },
-        { id: 3, name: 'Emma Aria', username: '@username', score: 1674, avatar: '/api/placeholder/100/100', rank: 3 },
-        { id: 4, name: 'Sebastian', username: '@username', score: 1300, avatar: '/api/placeholder/100/100', rank: 4 },
-        { id: 5, name: 'Oliver', username: '@username', score: 1124, avatar: '/api/placeholder/100/100', rank: 5 },
-        { id: 6, name: 'Sophia', username: '@username', score: 1120, avatar: '/api/placeholder/100/100', rank: 6 },
-        { id: 7, name: 'Lucas', username: '@username', score: 1080, avatar: '/api/placeholder/100/100', rank: 7 },
-        { id: 8, name: 'Isabella', username: '@username', score: 1040, avatar: '/api/placeholder/100/100', rank: 8 },
-        { id: 9, name: 'William', username: '@username', score: 990, avatar: '/api/placeholder/100/100', rank: 9 },
-        { id: 10, name: 'Mia', username: '@username', score: 950, avatar: '/api/placeholder/100/100', rank: 10 },
-        { id: 11, name: 'James', username: '@username', score: 920, avatar: '/api/placeholder/100/100', rank: 11 },
-        { id: 12, name: 'Charlotte', username: '@username', score: 900, avatar: '/api/placeholder/100/100', rank: 12 },
-        { id: 13, name: 'Benjamin', username: '@username', score: 899, avatar: '/api/placeholder/100/100', rank: 13 },
-        { id: 14, name: 'Amelia', username: '@username', score: 890, avatar: '/api/placeholder/100/100', rank: 14 },
-        { id: 15, name: 'Elijah', username: '@username', score: 885, avatar: '/api/placeholder/100/100', rank: 15 },
-        { id: 16, name: 'Harper', username: '@username', score: 880, avatar: '/api/placeholder/100/100', rank: 16 },
-        { id: 17, name: 'Henry', username: '@username', score: 875, avatar: '/api/placeholder/100/100', rank: 17 },
-        { id: 18, name: 'Evelyn', username: '@username', score: 870, avatar: '/api/placeholder/100/100', rank: 18 },
-        { id: 19, name: 'Alexander', username: '@username', score: 865, avatar: '/api/placeholder/100/100', rank: 19 },
-        { id: 20, name: 'Abigail', username: '@username', score: 860, avatar: '/api/placeholder/100/100', rank: 20 },
-        { id: 21, name: 'Michael', username: '@username', score: 855, avatar: '/api/placeholder/100/100', rank: 21 },
-        { id: 22, name: 'Elizabeth', username: '@username', score: 850, avatar: '/api/placeholder/100/100', rank: 22 },
-        { id: 103, name: 'You', username: '@username', score: 799, avatar: '/api/placeholder/100/100', rank: 103, isCurrentUser: true },
-        { id: 104, name: 'David', username: '@username', score: 649, avatar: '/api/placeholder/100/100', rank: 104 },
-        { id: 105, name: 'Grace', username: '@username', score: 640, avatar: '/api/placeholder/100/100', rank: 105 }
-    ];
+    // State for API pagination
+    const [individualPage, setIndividualPage] = useState(0);
+    const [groupPage, setGroupPage] = useState(0);
+    const [groupKeyword, setGroupKeyword] = useState("");
+    const [individualKeyword, setIndividualKeyword] = useState("");
 
-    // Mock data for group rankings
-    const groupRankings = [
-        { id: 1, name: 'Team Avengers', members: 12, score: 8750, avatar: '/api/placeholder/100/100', rank: 1 },
-        { id: 2, name: 'Tech Titans', members: 8, score: 7200, avatar: '/api/placeholder/100/100', rank: 2 },
-        { id: 3, name: 'Digital Nomads', members: 15, score: 6450, avatar: '/api/placeholder/100/100', rank: 3 },
-        { id: 4, name: 'Code Crushers', members: 10, score: 5800, avatar: '/api/placeholder/100/100', rank: 4 },
-        { id: 5, name: 'Pixel Pioneers', members: 7, score: 5200, avatar: '/api/placeholder/100/100', rank: 5 },
-        { id: 6, name: 'Data Dragons', members: 9, score: 4950, avatar: '/api/placeholder/100/100', rank: 6 },
-        { id: 7, name: 'Quantum Quokkas', members: 11, score: 4700, avatar: '/api/placeholder/100/100', rank: 7 },
-        { id: 8, name: 'Binary Beasts', members: 6, score: 4350, avatar: '/api/placeholder/100/100', rank: 8 },
-        { id: 9, name: 'Cloud Champions', members: 14, score: 4100, avatar: '/api/placeholder/100/100', rank: 9 },
-        { id: 10, name: 'Neural Networks', members: 8, score: 3850, avatar: '/api/placeholder/100/100', rank: 10 },
-        { id: 11, name: 'Cyber Sentinels', members: 12, score: 3600, avatar: '/api/placeholder/100/100', rank: 11 },
-        { id: 12, name: 'Algorithm Aces', members: 9, score: 3450, avatar: '/api/placeholder/100/100', rank: 12 },
-        { id: 25, name: 'Your Team', members: 7, score: 2800, avatar: '/api/placeholder/100/100', rank: 25, isCurrentUser: true },
-    ];
+    // Process individual and group ranking data
+    const [users, setUsers] = useState([]);
+    const [groups, setGroups] = useState([]);
+    const [totalIndividualPages, setTotalIndividualPages] = useState(1);
+    const [totalGroupPages, setTotalGroupPages] = useState(1);
+    const [top3Items, setTop3Items] = useState([null, null, null]);
 
-    // State management
-    const [users, setUsers] = useState(individualUsers);
-    const [displayUsers, setDisplayUsers] = useState([]);
-    const [groups, setGroups] = useState(groupRankings);
-    const [displayGroups, setDisplayGroups] = useState([]);
+    // Fetch data from APIs
+    const {
+        data: globalRankingData,
+        isLoading: isLoadingIndividual,
+        error: individualError
+    } = useGetGlobalRankingQuery({
+        page: individualPage,
+        size: usersPerPage,
+        keyword: individualKeyword
+    });
 
-    const totalIndividualPages = Math.ceil(users.length / usersPerPage);
-    const totalGroupPages = Math.ceil(groups.length / usersPerPage);
-    const currentUser = users.find(user => user.isCurrentUser);
-    const currentGroup = groups.find(group => group.isCurrentUser);
+    // Fetch global group rankings
+    const {
+        data: globalGroupRankingData,
+        isLoading: isLoadingGroupRanking,
+        error: groupRankingError
+    } = useGetGlobalGroupRankingQuery({
+        keyword: groupKeyword,
+        page: groupPage
+    });
+
+    // Fetch current user's ranking
+    const {
+        data: myRankingData,
+        isLoading: isLoadingMyRanking
+    } = useGetMyRankingQuery();
+
+    // Process individual ranking data when it arrives
+    useEffect(() => {
+        if (globalRankingData) {
+            // Process API response to match our component's data structure
+            const processedUsers = globalRankingData.content.map((user, index) => ({
+                id: user.id,
+                name: user.name || user.username,
+                username: `@${user.username}`,
+                score: user.score,
+                avatar: user.avatar || '/api/placeholder/100/100',
+                rank: user.rank || index + 1 + (individualPage * usersPerPage),
+                isCurrentUser: user.isCurrentUser || false
+            }));
+
+            setUsers(processedUsers);
+            setTotalIndividualPages(globalRankingData.totalPages || 1);
+        }
+    }, [globalRankingData, individualPage]);
+
+    // Process group ranking data when it arrives
+    useEffect(() => {
+        if (globalGroupRankingData) {
+            // Process API response to match our component's data structure
+            const processedGroups = globalGroupRankingData.content.map((group, index) => ({
+                id: group.id,
+                name: group.name,
+                members: group.memberCount || 0,
+                score: group.score,
+                avatar: group.avatar || '/api/placeholder/100/100',
+                rank: group.rank || index + 1 + (groupPage * usersPerPage),
+                isCurrentUser: group.isCurrentGroup || false
+            }));
+
+            setGroups(processedGroups);
+            setTotalGroupPages(globalGroupRankingData.totalPages || 1);
+        }
+    }, [globalGroupRankingData, groupPage]);
 
     // Handle search input change
     const handleSearch = (e) => {
@@ -78,47 +103,30 @@ const GlobalLeaderboard = () => {
         setSearchTerm(term);
 
         if (activeTab === 'individual') {
-            if (term) {
-                const filtered = individualUsers.filter(user =>
-                    user.name.toLowerCase().includes(term) ||
-                    user.username.toLowerCase().includes(term)
-                );
-                setUsers(filtered);
-                setCurrentPage(1);
-            } else {
-                setUsers(individualUsers);
-            }
+            // Reset pagination when searching
+            setIndividualKeyword(term);
+            setIndividualPage(0);
+            setCurrentPage(1);
+            // API handles the search filter
         } else if (activeTab === 'group') {
-            if (term) {
-                const filtered = groupRankings.filter(group =>
-                    group.name.toLowerCase().includes(term)
-                );
-                setGroups(filtered);
-                setCurrentPage(1);
-            } else {
-                setGroups(groupRankings);
-            }
+            // Reset pagination when searching
+            setGroupKeyword(term);
+            setGroupPage(0);
+            setCurrentPage(1);
+            // API handles the search filter
         }
     };
 
-    // Go to current user's page or group's page
+    // Go to my rank when API is available
     const goToMyRank = () => {
-        if (activeTab === 'individual' && currentUser) {
-            // Calculate which page the current user is on
-            const userPage = Math.ceil(currentUser.rank / usersPerPage);
-            setCurrentPage(userPage);
-            setShowUserRank(true);
-            // Reset search term as we're navigating based on rank
-            setSearchTerm('');
-            setUsers(individualUsers);
-        } else if (activeTab === 'group' && currentGroup) {
-            // Calculate which page the current group is on
-            const groupPage = Math.ceil(currentGroup.rank / usersPerPage);
-            setCurrentPage(groupPage);
-            setShowUserRank(true);
-            // Reset search term as we're navigating based on rank
-            setSearchTerm('');
-            setGroups(groupRankings);
+        if (myRankingData && !isLoadingMyRanking) {
+            const rank = myRankingData.rank;
+            const apiPage = Math.floor((rank - 1) / usersPerPage);
+            setIndividualPage(apiPage);
+            setCurrentPage(apiPage + 1); // currentPage is 1-indexed for UI
+        } else {
+            // API not available yet
+            alert(t('leaderboard.rankFeatureNotAvailable'));
         }
     };
 
@@ -127,87 +135,51 @@ const GlobalLeaderboard = () => {
         // Reset pagination and search when switching tabs
         setCurrentPage(1);
         setSearchTerm('');
-
-        if (activeTab === 'individual') {
-            setUsers(individualUsers);
-        } else if (activeTab === 'group') {
-            setGroups(groupRankings);
-        }
+        setIndividualPage(0);
+        setGroupPage(0);
+        setGroupKeyword('');
+        setIndividualKeyword('');
     }, [activeTab]);
 
-    // Pagination logic for individual tab
+    // Handle API page fetching when current page changes
     useEffect(() => {
         if (activeTab === 'individual') {
-            // Get top 3 users for the top podium
-            const top3 = individualUsers.filter(user => user.rank <= 3);
-
-            // Get current users for the page
-            const indexOfLastUser = currentPage * usersPerPage;
-            const indexOfFirstUser = indexOfLastUser - usersPerPage;
-
-            // If showing user rank, make sure to include the current user's section
-            if (showUserRank && currentUser) {
-                const userPage = Math.ceil(currentUser.rank / usersPerPage);
-
-                if (userPage === currentPage) {
-                    // Just show the regular page that includes the user
-                    const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
-                    setDisplayUsers([...top3, ...currentUsers]);
-                } else {
-                    // We're on a different page, so we need to add the user's context
-                    const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
-
-                    // Get users around the current user for context
-                    const userIndex = users.findIndex(user => user.isCurrentUser);
-                    const contextStart = Math.max(0, userIndex - 1);
-                    const contextEnd = Math.min(users.length, userIndex + 2);
-                    const userContext = users.slice(contextStart, contextEnd);
-
-                    setDisplayUsers([...top3, ...currentUsers, ...userContext]);
-                }
-            } else {
-                // Regular pagination without focusing on user rank
-                const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
-                setDisplayUsers([...top3, ...currentUsers]);
-            }
+            // Convert UI page (1-indexed) to API page (0-indexed)
+            setIndividualPage(currentPage - 1);
         } else if (activeTab === 'group') {
-            // Similar logic for groups
-            const top3 = groupRankings.filter(group => group.rank <= 3);
+            // Convert UI page (1-indexed) to API page (0-indexed)
+            setGroupPage(currentPage - 1);
+        }
+    }, [currentPage, activeTab]);
 
-            // Get current groups for the page
-            const indexOfLastGroup = currentPage * usersPerPage;
-            const indexOfFirstGroup = indexOfLastGroup - usersPerPage;
+    // Update top 3 items based on active tab
+    useEffect(() => {
+        let newTop3 = [null, null, null]; // Start with default empty array
 
-            // If showing user rank, make sure to include the current group's section
-            if (showUserRank && currentGroup) {
-                const groupPage = Math.ceil(currentGroup.rank / usersPerPage);
+        if (activeTab === 'individual') {
+            // Use the first 3 users from global ranking
+            const topUsers = users
+                .filter(user => user.rank <= 3)
+                .sort((a, b) => a.rank - b.rank);
 
-                if (groupPage === currentPage) {
-                    // Just show the regular page that includes the group
-                    const currentGroups = groups.slice(indexOfFirstGroup, indexOfLastGroup);
-                    setDisplayGroups([...top3, ...currentGroups]);
-                } else {
-                    // We're on a different page, so we need to add the group's context
-                    const currentGroups = groups.slice(indexOfFirstGroup, indexOfLastGroup);
+            // Add available users to the new top3 array
+            topUsers.forEach((user, idx) => {
+                if (idx < 3) newTop3[idx] = user;
+            });
+        } else if (activeTab === 'group') {
+            // Use the first 3 groups from global ranking
+            const topGroups = groups
+                .filter(group => group.rank <= 3)
+                .sort((a, b) => a.rank - b.rank);
 
-                    // Get groups around the current group for context
-                    const groupIndex = groups.findIndex(group => group.isCurrentUser);
-                    const contextStart = Math.max(0, groupIndex - 1);
-                    const contextEnd = Math.min(groups.length, groupIndex + 2);
-                    const groupContext = groups.slice(contextStart, contextEnd);
-
-                    setDisplayGroups([...top3, ...currentGroups, ...groupContext]);
-                }
-            } else {
-                // Regular pagination without focusing on group rank
-                const currentGroups = groups.slice(indexOfFirstGroup, indexOfLastGroup);
-                setDisplayGroups([...top3, ...currentGroups]);
-            }
+            // Add available groups to the new top3 array
+            topGroups.forEach((group, idx) => {
+                if (idx < 3) newTop3[idx] = group;
+            });
         }
 
-        // Reset showUserRank after applying it once
-        if (showUserRank) setShowUserRank(false);
-    }, [currentPage, users, groups, showUserRank, activeTab]);
+        setTop3Items(newTop3);
+    }, [activeTab, users, groups]);
 
     // Pagination controls
     const paginate = (pageNumber) => {
@@ -216,22 +188,6 @@ const GlobalLeaderboard = () => {
             setCurrentPage(pageNumber);
         }
     };
-
-    // Get top 3 for podium display based on active tab
-    const getTop3 = () => {
-        if (activeTab === 'individual') {
-            return individualUsers.filter(user => user.rank <= 3).sort((a, b) => a.rank - b.rank);
-        } else if (activeTab === 'group') {
-            return groupRankings.filter(group => group.rank <= 3).sort((a, b) => a.rank - b.rank);
-        }
-        return [];
-    };
-
-    const top3 = getTop3();
-    // Make sure we have exactly 3 items in correct order
-    while (top3.length < 3) {
-        top3.push(null); // Fill with nulls if we don't have enough top entries
-    }
 
     return (
         <div className="min-h-screen">
@@ -281,69 +237,78 @@ const GlobalLeaderboard = () => {
                             <div className="bg-white bg-opacity-20 p-6 rounded-xl mb-6">
                                 <h2 className="text-2xl font-bold mb-6 text-center text-blue-300">Top 3</h2>
 
-                                {/* First Place */}
-                                {top3[0] && (
-                                    <div className="flex flex-col items-center mb-8 relative">
-                                        <div className="absolute -top-5 left-1/2 transform -translate-x-1/2">
-                                            <svg className="w-12 h-12 text-yellow-400" viewBox="0 0 100 100">
-                                                <path fill="currentColor" d="M50 0 L65 35 L100 35 L70 55 L80 90 L50 70 L20 90 L30 55 L0 35 L35 35 Z" />
-                                            </svg>
-                                        </div>
-                                        <div className="rounded-full overflow-hidden border-4 border-yellow-400 w-28 h-28 mb-2 bg-orange-500">
-                                            <img src={top3[0]?.avatar} alt={top3[0]?.name} className="w-full h-full object-cover bg-yellow-900" />
-                                        </div>
-                                        <div className="bg-yellow-900 rounded-full w-8 h-8 flex items-center justify-center mb-1">
-                                            <span className="font-bold">1</span>
-                                        </div>
-                                        <p className="font-bold text-xl">{top3[0]?.name}</p>
-                                        <p className="text-yellow-400 text-3xl font-bold">{top3[0]?.score}</p>
-                                        {activeTab === 'individual' ? (
-                                            <p className="text-gray-400 text-sm">{top3[0]?.username}</p>
-                                        ) : (
-                                            <p className="text-gray-400 text-sm">{top3[0]?.members} members</p>
-                                        )}
+                                {(isLoadingIndividual && activeTab === 'individual') ||
+                                (isLoadingGroupRanking && activeTab === 'group') ? (
+                                    <div className="flex justify-center items-center p-8">
+                                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
                                     </div>
+                                ) : (
+                                    <>
+                                        {/* First Place */}
+                                        {top3Items[0] && (
+                                            <div className="flex flex-col items-center mb-8 relative">
+                                                <div className="absolute -top-5 left-1/2 transform -translate-x-1/2">
+                                                    <svg className="w-12 h-12 text-yellow-400" viewBox="0 0 100 100">
+                                                        <path fill="currentColor" d="M50 0 L65 35 L100 35 L70 55 L80 90 L50 70 L20 90 L30 55 L0 35 L35 35 Z" />
+                                                    </svg>
+                                                </div>
+                                                <div className="rounded-full overflow-hidden border-4 border-yellow-400 w-28 h-28 mb-2 bg-orange-500">
+                                                    <img src={top3Items[0]?.avatar} alt={top3Items[0]?.name} className="w-full h-full object-cover bg-yellow-900" />
+                                                </div>
+                                                <div className="bg-yellow-900 rounded-full w-8 h-8 flex items-center justify-center mb-1">
+                                                    <span className="font-bold">1</span>
+                                                </div>
+                                                <p className="font-bold text-xl">{top3Items[0]?.name}</p>
+                                                <p className="text-yellow-400 text-3xl font-bold">{top3Items[0]?.score}</p>
+                                                {activeTab === 'individual' ? (
+                                                    <p className="text-gray-400 text-sm">{top3Items[0]?.username}</p>
+                                                ) : (
+                                                    <p className="text-gray-400 text-sm">{top3Items[0]?.members} members</p>
+                                                )}
+                                            </div>
+                                        )}
+
+                                        <div className="flex justify-center">
+                                            {/* Second Place */}
+                                            {top3Items[1] && (
+                                                <div className="flex flex-col items-center mx-4">
+                                                    <div className="rounded-full overflow-hidden border-4 border-blue-400 w-20 h-20 mb-2 bg-blue-500">
+                                                        <img src={top3Items[1]?.avatar} alt={top3Items[1]?.name} className="w-full h-full object-cover bg-blue-900" />
+                                                    </div>
+                                                    <div className="bg-blue-900 rounded-full w-7 h-7 flex items-center justify-center mb-1">
+                                                        <span className="font-bold">2</span>
+                                                    </div>
+                                                    <p className="font-bold text-lg">{top3Items[1]?.name}</p>
+                                                    <p className="text-blue-400 text-2xl font-bold">{top3Items[1]?.score}</p>
+                                                    {activeTab === 'individual' ? (
+                                                        <p className="text-gray-400 text-sm">{top3Items[1]?.username}</p>
+                                                    ) : (
+                                                        <p className="text-gray-400 text-sm">{top3Items[1]?.members} members</p>
+                                                    )}
+                                                </div>
+                                            )}
+
+                                            {/* Third Place */}
+                                            {top3Items[2] && (
+                                                <div className="flex flex-col items-center mx-4">
+                                                    <div className="rounded-full overflow-hidden border-4 border-green-400 w-20 h-20 mb-2 bg-green-600">
+                                                        <img src={top3Items[2]?.avatar} alt={top3Items[2]?.name} className="w-full h-full object-cover bg-green-900" />
+                                                    </div>
+                                                    <div className="bg-green-900 rounded-full w-7 h-7 flex items-center justify-center mb-1">
+                                                        <span className="font-bold">3</span>
+                                                    </div>
+                                                    <p className="font-bold text-lg">{top3Items[2]?.name}</p>
+                                                    <p className="text-green-400 text-2xl font-bold">{top3Items[2]?.score}</p>
+                                                    {activeTab === 'individual' ? (
+                                                        <p className="text-gray-400 text-sm">{top3Items[2]?.username}</p>
+                                                    ) : (
+                                                        <p className="text-gray-400 text-sm">{top3Items[2]?.members} members</p>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </>
                                 )}
-
-                                <div className="flex justify-center">
-                                    {/* Second Place */}
-                                    {top3[1] && (
-                                        <div className="flex flex-col items-center mx-4">
-                                            <div className="rounded-full overflow-hidden border-4 border-blue-400 w-20 h-20 mb-2 bg-blue-500">
-                                                <img src={top3[1]?.avatar} alt={top3[1]?.name} className="w-full h-full object-cover bg-blue-900" />
-                                            </div>
-                                            <div className="bg-blue-900 rounded-full w-7 h-7 flex items-center justify-center mb-1">
-                                                <span className="font-bold">2</span>
-                                            </div>
-                                            <p className="font-bold text-lg">{top3[1]?.name}</p>
-                                            <p className="text-blue-400 text-2xl font-bold">{top3[1]?.score}</p>
-                                            {activeTab === 'individual' ? (
-                                                <p className="text-gray-400 text-sm">{top3[1]?.username}</p>
-                                            ) : (
-                                                <p className="text-gray-400 text-sm">{top3[1]?.members} members</p>
-                                            )}
-                                        </div>
-                                    )}
-
-                                    {/* Third Place */}
-                                    {top3[2] && (
-                                        <div className="flex flex-col items-center mx-4">
-                                            <div className="rounded-full overflow-hidden border-4 border-green-400 w-20 h-20 mb-2 bg-green-600">
-                                                <img src={top3[2]?.avatar} alt={top3[2]?.name} className="w-full h-full object-cover bg-green-900" />
-                                            </div>
-                                            <div className="bg-green-900 rounded-full w-7 h-7 flex items-center justify-center mb-1">
-                                                <span className="font-bold">3</span>
-                                            </div>
-                                            <p className="font-bold text-lg">{top3[2]?.name}</p>
-                                            <p className="text-green-400 text-2xl font-bold">{top3[2]?.score}</p>
-                                            {activeTab === 'individual' ? (
-                                                <p className="text-gray-400 text-sm">{top3[2]?.username}</p>
-                                            ) : (
-                                                <p className="text-gray-400 text-sm">{top3[2]?.members} members</p>
-                                            )}
-                                        </div>
-                                    )}
-                                </div>
                             </div>
                         </div>
 
@@ -363,17 +328,23 @@ const GlobalLeaderboard = () => {
                                         className="w-full py-2 pl-10 pr-4 bg-blue-900 bg-opacity-50 rounded-lg border border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     />
                                 </div>
-                                <button
-                                    onClick={goToMyRank}
-                                    className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg flex items-center gap-2 transition-colors"
-                                >
-                                    {activeTab === 'individual' ? <User size={18} /> : <Users size={18} />}
-                                    {activeTab === 'individual' ? t('leaderboard.myRank') : t('leaderboard.myGroupRank')}
-                                </button>
+                                {/* Only show "My Rank" button in individual tab */}
+                                {activeTab === 'individual' && (
+                                    <button
+                                        onClick={goToMyRank}
+                                        className={`bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg flex items-center gap-2 transition-colors ${
+                                            isLoadingMyRanking || !myRankingData ? 'opacity-50 cursor-not-allowed' : ''
+                                        }`}
+                                        disabled={isLoadingMyRanking || !myRankingData}
+                                    >
+                                        <User size={18} />
+                                        {t('leaderboard.myRank')}
+                                    </button>
+                                )}
                             </div>
 
                             {/* Rest of Leaderboard */}
-                            <div className="mb-6 bg-black bg-opacity-20 ">
+                            <div className="mb-6 bg-black bg-opacity-20">
                                 {/* Column Headers */}
                                 <div className="flex items-center w-full p-3 border-b border-blue-800 bg-blue-900 bg-opacity-40 font-semibold text-amber-50">
                                     <div className="w-12 text-center">#</div>
@@ -384,74 +355,101 @@ const GlobalLeaderboard = () => {
 
                                 {/* User/Group Rows - Paginated */}
                                 {activeTab === 'individual' ? (
-                                    users.slice((currentPage - 1) * usersPerPage, currentPage * usersPerPage).map((user) => (
-                                        <div
-                                            key={user.id}
-                                            className={`flex items-center w-full p-3 border-b border-blue-900 text-amber-50 ${user.isCurrentUser ? 'bg-blue-900 bg-opacity-30' : ''}`}
-                                        >
-                                            {/* User rank */}
-                                            <div className="w-12 text-center font-bold text-lg">
-                                                {user.isCurrentUser && (
-                                                    <Star className="inline-block text-yellow-400 mr-1" size={16} />
-                                                )}
-                                                {user.rank}
-                                            </div>
-
-                                            {/* User avatar and info */}
-                                            <div className="flex items-center flex-1">
-                                                <div className="w-10 h-10 rounded-full overflow-hidden mr-3 border border-gray-600">
-                                                    <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
-                                                </div>
-                                                <div>
-                                                    <div className="font-semibold">{user.name}</div>
-                                                    <div className="text-gray-400 text-sm">{user.username}</div>
-                                                </div>
-                                            </div>
-
-                                            {/* Score */}
-                                            <div className={`text-right font-bold text-xl ${user.isCurrentUser ? 'text-yellow-300' : 'text-white'}`}>
-                                                {user.score}
-                                            </div>
+                                    isLoadingIndividual ? (
+                                        <div className="flex justify-center items-center p-8">
+                                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
                                         </div>
-                                    ))
+                                    ) : individualError ? (
+                                        <div className="text-center p-8 text-red-400">
+                                            Failed to load rankings. Please try again.
+                                        </div>
+                                    ) : users.length === 0 ? (
+                                        <div className="text-center p-8 text-gray-400">
+                                            No user rankings found.
+                                        </div>
+                                    ) : (
+                                        users.map((user) => (
+                                            <div
+                                                key={user.id}
+                                                className={`flex items-center w-full p-3 border-b border-blue-900 text-amber-50 ${user.isCurrentUser ? 'bg-blue-900 bg-opacity-30' : ''}`}
+                                            >
+                                                {/* User rank */}
+                                                <div className="w-12 text-center font-bold text-lg">
+                                                    {user.isCurrentUser && (
+                                                        <Star className="inline-block text-yellow-400 mr-1" size={16} />
+                                                    )}
+                                                    {user.rank}
+                                                </div>
+
+                                                {/* User avatar and info */}
+                                                <div className="flex items-center flex-1">
+                                                    <div className="w-10 h-10 rounded-full overflow-hidden mr-3 border border-gray-600">
+                                                        <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                                                    </div>
+                                                    <div>
+                                                        <div className="font-semibold">{user.name}</div>
+                                                        <div className="text-gray-400 text-sm">{user.username}</div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Score */}
+                                                <div className={`text-right font-bold text-xl ${user.isCurrentUser ? 'text-yellow-300' : 'text-white'}`}>
+                                                    {user.score}
+                                                </div>
+                                            </div>
+                                        ))
+                                    )
                                 ) : (
-                                    groups.slice((currentPage - 1) * usersPerPage, currentPage * usersPerPage).map((group) => (
-                                        <div
-                                            key={group.id}
-                                            className={`flex items-center w-full p-3 border-b border-blue-900 text-amber-50 ${group.isCurrentUser ? 'bg-blue-900 bg-opacity-30' : ''}`}
-                                        >
-                                            {/* Group rank */}
-                                            <div className="w-12 text-center font-bold text-lg">
-                                                {group.isCurrentUser && (
-                                                    <Star className="inline-block text-yellow-400 mr-1" size={16} />
-                                                )}
-                                                {group.rank}
-                                            </div>
-
-                                            {/* Group avatar and info */}
-                                            <div className="flex items-center flex-1">
-                                                <div className="w-10 h-10 rounded-full overflow-hidden mr-3 border border-gray-600">
-                                                    <img src={group.avatar} alt={group.name} className="w-full h-full object-cover" />
-                                                </div>
-                                                <div>
-                                                    <div className="font-semibold">{group.name}</div>
-                                                </div>
-                                            </div>
-
-                                            {/* Members count */}
-                                            <div className="w-32 text-center mr-4">
-                                                <span className="bg-blue-800 px-2 py-1 rounded-full text-xs text-gray-400">
-                                                    {group.members} {t('leaderboard.members')}
-                                                </span>
-                                            </div>
-
-
-                                            {/* Score */}
-                                            <div className="w-32 text-right font-bold text-xl ${group.isCurrentUser ? 'text-yellow-300' : 'text-white'}">
-                                                {group.score}
-                                            </div>
+                                    isLoadingGroupRanking ? (
+                                        <div className="flex justify-center items-center p-8">
+                                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
                                         </div>
-                                    ))
+                                    ) : groupRankingError ? (
+                                        <div className="text-center p-8 text-red-400">
+                                            Failed to load group rankings. Please try again.
+                                        </div>
+                                    ) : groups.length === 0 ? (
+                                        <div className="text-center p-8 text-gray-400">
+                                            No group rankings found.
+                                        </div>
+                                    ) : (
+                                        groups.map((group) => (
+                                            <div
+                                                key={group.id}
+                                                className={`flex items-center w-full p-3 border-b border-blue-900 text-amber-50 ${group.isCurrentUser ? 'bg-blue-900 bg-opacity-30' : ''}`}
+                                            >
+                                                {/* Group rank */}
+                                                <div className="w-12 text-center font-bold text-lg">
+                                                    {group.isCurrentUser && (
+                                                        <Star className="inline-block text-yellow-400 mr-1" size={16} />
+                                                    )}
+                                                    {group.rank}
+                                                </div>
+
+                                                {/* Group avatar and info */}
+                                                <div className="flex items-center flex-1">
+                                                    <div className="w-10 h-10 rounded-full overflow-hidden mr-3 border border-gray-600">
+                                                        <img src={group.avatar} alt={group.name} className="w-full h-full object-cover" />
+                                                    </div>
+                                                    <div>
+                                                        <div className="font-semibold">{group.name}</div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Members count */}
+                                                <div className="w-32 text-center mr-4">
+                                                    <span className="bg-blue-800 px-2 py-1 rounded-full text-xs text-gray-400">
+                                                        {group.members} {t('leaderboard.members')}
+                                                    </span>
+                                                </div>
+
+                                                {/* Score */}
+                                                <div className="w-32 text-right font-bold text-xl">
+                                                    {group.score}
+                                                </div>
+                                            </div>
+                                        ))
+                                    )
                                 )}
                             </div>
 

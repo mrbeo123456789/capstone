@@ -113,7 +113,9 @@
     "disbandSuccess": "Đã giải tán nhóm.",
     "disbandFailed": "Giải tán nhóm thất bại. Vui lòng thử lại.",
     "kickSuccess": "Đã loại thành viên khỏi nhóm",
-    "kickFailed": "Không thể loại thành viên. Vui lòng thử lại."
+    "kickFailed": "Không thể loại thành viên. Vui lòng thử lại.",
+    "confirmDelete": "Xác nhận xóa nhóm",
+    "deleteWarning": "Bạn có chắc chắn muốn xóa nhóm này không? Hành động này không thể hoàn tác và toàn bộ dữ liệu của nhóm, bao gồm các thử thách và mối quan hệ thành viên, sẽ bị xóa vĩnh viễn."
   },
   "groupInvite": {
     "title": "Mời vào nhóm",
@@ -670,8 +672,37 @@
         "passwordMismatch": "Mật khẩu xác nhận không khớp.",
         "registerFailed": "Đăng ký thất bại. Vui lòng thử lại."
       }
-
-    }
+    },
+  "challenges": {
+    "groupHistory": "Lịch sử thử thách nhóm",
+    "name": "Tên thử thách",
+    "period": "Thời gian",
+    "participants": "Người tham gia",
+    "status": "Trạng thái",
+    "actions": "Hành động",
+    "viewDetails": "Xem chi tiết",
+    "noHistory": "Không tìm thấy lịch sử thử thách",
+    "searchPlaceholder": "Tìm kiếm thử thách...",
+    "filter": {
+      "allStatuses": "Tất cả trạng thái"
+    },
+    "status": {
+      "completed": "Hoàn thành",
+      "inProgress": "Đang tiến hành",
+      "failed": "Thất bại"
+    },
+    "success": "thành công"
+  },
+  "pagination": {
+    "showing": "Hiển thị",
+    "to": "đến",
+    "of": "của",
+    "results": "kết quả",
+    "previous": "Trước",
+    "next": "Tiếp",
+    "first": "Đầu tiên",
+    "last": "Cuối cùng"
+  }
   }
 
 
