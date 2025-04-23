@@ -41,13 +41,14 @@ const YourGroup = () => {
     };
 
     const filteredGroups = (groupsData || []).filter(group => {
+        const role = group.currentMemberRole?.toLowerCase();
+
         const matchRole =
             activeTab === "All" ||
-            (activeTab === "leader" && (group.currentMemberRole === "HOST" || group.currentMemberRole === "COHOST")) ||
-            (activeTab === "member" && group.currentMemberRole === "MEMBER");
+            (activeTab === "OWNER" && role === "owner") ||
+            (activeTab === "MEMBER" && role === "member");
 
-        const matchSearch =
-            group.name.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchSearch = group.name.toLowerCase().includes(searchTerm.toLowerCase());
 
         return matchRole && matchSearch;
     });
@@ -71,11 +72,13 @@ const YourGroup = () => {
                     {t("yourGroup.invitations")} ({invitationsData.length})
                 </h2>
                 {isInvitationsLoading ? (
-                    <div className="h-52 flex items-center justify-center border border-dashed rounded-lg bg-gray-50 text-gray-500">
+                    <div
+                        className="h-52 flex items-center justify-center border border-dashed rounded-lg bg-gray-50 text-gray-500">
                         <p>{t("yourGroup.loadingInvitations")}</p>
                     </div>
                 ) : invitationsData.length === 0 ? (
-                    <div className="h-52 flex items-center justify-center border border-dashed rounded-lg bg-gray-50 text-gray-500">
+                    <div
+                        className="h-52 flex items-center justify-center border border-dashed rounded-lg bg-gray-50 text-gray-500">
                         <p className="font-semibold">{t("yourGroup.noInvitations")}</p>
                     </div>
                 ) : (
@@ -86,7 +89,7 @@ const YourGroup = () => {
                                 onClick={() => navigate(`/groups/detail/${invite.id}`)}
                                 className="cursor-pointer min-w-[200px] p-4 border rounded-lg space-y-2 flex-shrink-0 hover:shadow-lg transition">
                                 <p className="text-sm">
-                                    {t("yourGroup.inviteLine", { name: invite.invitedBy})}
+                                    {t("yourGroup.inviteLine", {name: invite.invitedBy})}
                                 </p>
                                 <div className="h-24 bg-gray-200 rounded">
                                     <img
@@ -124,34 +127,39 @@ const YourGroup = () => {
 
             {/* Tabs lọc vai trò */}
             <div className="flex gap-4">
-                {["All", "leader", "member"].map((tab) => (
+                {[
+                    { value: "All", labelKey: "All" },
+                    { value: "OWNER", labelKey: "leader" },
+                    { value: "MEMBER", labelKey: "member" },
+                ].map(({ value, labelKey }) => (
                     <button
-                        key={tab}
-                        onClick={() => setActiveTab(tab)}
-                        className={`px-4 py-2 rounded-lg ${activeTab === tab ? "bg-blue-600 text-white" : "border"}`}
+                        key={value}
+                        onClick={() => setActiveTab(value)}
+                        className={`px-4 py-2 rounded-lg ${activeTab === value ? "bg-blue-600 text-white" : "border"}`}
                     >
-                        {t(`yourGroup.tabs.${tab}`)}
+                        {t(`yourGroup.tabs.${labelKey}`)}
                     </button>
                 ))}
             </div>
 
             {/* Danh sách nhóm + ô tìm kiếm */}
             <div>
-                <div className="flex justify-between items-center mb-4">
+                <div className="flex items-center justify-between gap-4 flex-wrap mb-4">
                     <h2 className="text-lg font-semibold">{t("yourGroup.yourGroups")}</h2>
                     <input
                         type="text"
                         placeholder={t("yourGroup.searchPlaceholder")}
-                        className="border rounded-lg px-3 py-2 w-48"
+                        className="border rounded-lg px-3 py-2 min-w-[200px] max-w-xs"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
 
+
                 {filteredGroups?.length === 0 ? (
                     <div
                         className="h-52 flex items-center justify-center border border-dashed rounded-lg bg-gray-50 text-gray-500">
-                    <p className="font-semibold">{t("yourGroup.noGroups")}</p>
+                        <p className="font-semibold">{t("yourGroup.noGroups")}</p>
                     </div>
                 ) : (
                     <div className="flex gap-4 overflow-x-auto pb-2">

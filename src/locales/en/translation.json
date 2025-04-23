@@ -57,7 +57,9 @@
     "title": "Invite to Challenge",
     "inviteMembers": "Invite Members",
     "inviteGroups": "Invite Groups",
-    "suggestedTitle": "Suggested members to invite"
+    "suggestedTitle": "Suggested members to invite",
+    "noResults": "No results found.",
+    "searchLeaderPlaceholder": "Enter group leader's name..."
   },
 
   "sidebar": {
@@ -209,61 +211,62 @@
     "viewEvidence": "View your evidence",
     "proofOn": "Proof on",
     "uploaded": "Completed",
-    "noEvidence": "No evidence for this day",
-  "notification": {
-    "challengeStatusUpdated.title" : "Your challenge status have been updated",
-    "challengeStatusUpdated.content" : "|{{challengeName}}| has been updated to active",
+    "noEvidence": "No evidence for this day"},
 
-    "challengeResult.title": "Challenge Result: Completed",
-    "challengeResult.content": "You have successfully completed the challenge '{{challengeName}}'! Check out your achievement now!",
+    "notification.challengeResult.title": "Challenge Result: Completed",
+    "notification.challengeResult.content": "You have successfully completed the challenge '{{challengeName}}'! Check out your achievement now!",
 
-    "groupChallengeResult.title": "Group Challenge Result: Completed",
-    "groupChallengeResult.content": "Your group '{{groupName}}' has completed the challenge '{{challengeName}}'! View your group achievement now!",
+    "notification.groupChallengeResult.title": "Group Challenge Result: Completed",
+    "notification.groupChallengeResult.content": "Your group '{{groupName}}' has completed the challenge '{{challengeName}}'! View your group achievement now!",
 
-    "challengeRoleUpdated.title": "Challenge Role Updated",
-    "challengeRoleUpdated.content": "Your role in the challenge '{{challengeName}}' has been updated to: {{role}}",
+    "notification.challengeRoleUpdated.title": "Challenge Role Updated",
+    "notification.challengeRoleUpdated.content": "Your role in the challenge '{{challengeName}}' has been updated to: {{role}}",
 
-    "challengeStarted.title": "The challenge '{{challengeName}}' has started!",
-    "challengeStarted.content": "Get ready to conquer the challenge '{{challengeName}}' with GoBeyond!",
+    "notification.challengeStatusUpdated.title": "Your challenge status has been updated",
+    "notification.challengeStatusUpdated.content": "The challenge '{{challengeName}}' has been updated and now has status '{{status}}'",
 
-    "evidence.approved.title": "Proof on {{day}} approved",
-    "evidence.approved.content": "Your proof submitted on {{day}} in the challenge '{{challengeName}}' has been approved. Keep it up!",
+    "notification.challengeStarted.title": "The challenge '{{challengeName}}' has started!",
+    "notification.challengeStarted.content": "Get ready to conquer the challenge '{{challengeName}}' with GoBeyond!",
 
-    "evidence.rejected.title": "Proof on {{day}} rejected",
-    "evidence.rejected.content": "Your proof submitted on {{day}} in the challenge '{{challengeName}}' was rejected. Please check feedback and resubmit if needed.",
+    "notification.evidence.approved.title": "Proof on {{day}} approved",
+    "notification.evidence.approved.content": "Your proof submitted on {{day}} in the challenge '{{challengeName}}' has been approved. Keep it up!",
 
-    "invite.challenge.title": "Challenge Invitation",
-    "invite.challenge.content": "{{inviterName}} has invited you to join the challenge '{{challengeName}}'.",
+    "notification.evidence.rejected.title": "Proof on {{day}} rejected",
+    "notification.evidence.rejected.content": "Your proof submitted on {{day}} in the challenge '{{challengeName}}' was rejected. Please check feedback and resubmit if needed.",
 
-    "invite.group.title": "Group Invitation",
-    "invite.group.content": "{{inviterName}} has invited you to join the group '{{groupName}}'.",
+    "notification.invite.challenge.title": "Challenge Invitation",
+    "notification.invite.challenge.content": "{{inviterName}} has invited you to join the challenge '{{challengeName}}'.",
 
-    "invite.kickGroup.title": "You were removed from the group",
-    "invite.kickGroup.content": "You were removed from the group '{{groupName}}' by the admin.",
+    "notification.invite.group.title": "Group Invitation",
+    "notification.invite.group.content": "{{inviterName}} has invited you to join the group '{{groupName}}'.",
 
-    "invite.groupInvitation.title": "Group Invitation",
-    "invite.groupInvitation.content": "You have been invited to join the group '{{groupName}}'.",
+    "notification.invite.kickGroup.title": "You were removed from the group",
+    "notification.invite.kickGroup.content": "You were removed from the group '{{groupName}}' by the admin.",
 
-    "groupDisbanded.title": "Group Disbanded",
-    "groupDisbanded.content": "The group '{{groupName}}' has been disbanded.",
+    "notification.invite.groupInvitation.title": "Group Invitation",
+    "notification.invite.groupInvitation.content": "You have been invited to join the group '{{groupName}}'.",
 
-    "challengeInvitation.title": "You have a new invitation",
-    "challengeInvitation.content": "You have been invited to join the challenge '{{challengeName}}'.",
+    "notification.groupDisbanded.title": "Group Disbanded",
+    "notification.groupDisbanded.content": "The group '{{groupName}}' has been disbanded.",
 
-    "leaderChallengeInvitation.title": "You have a new invitation",
-    "leaderChallengeInvitation.content": "You have been invited to lead a group in the challenge '{{challengeName}}'.",
+    "notification.challengeInvitation.title": "You have a new invitation",
+    "notification.challengeInvitation.content": "You have been invited to join the challenge '{{challengeName}}'.",
 
-    "groupJoinChallenge.title": "Your group has joined a challenge!",
-    "groupJoinChallenge.content": "The group '{{groupName}}' has joined the challenge '{{challengeName}}'.",
+    "notification.leaderChallengeInvitation.title": "You have a new invitation",
+    "notification.leaderChallengeInvitation.content": "You have been invited to lead a group in the challenge '{{challengeName}}'.",
 
-    "challengeCancelled.title": "Challenge Cancelled",
-    "challengeCancelled.content": "The challenge '{{challengeName}}' was cancelled by the admin or host.",
+    "notification.groupJoinChallenge.title": "Your group has joined a challenge!",
+    "notification.groupJoinChallenge.content": "The group '{{groupName}}' has joined the challenge '{{challengeName}}'.",
 
-    "kickedFromChallenge.title": "You were removed from the challenge",
-    "kickedFromChallenge.content": "You were removed from the challenge '{{challengeName}}' by the admin.",
-    "empty": "No new notifications."
-  },
-  "ProofUpLoads": {
+    "notification.challengeCancelled.title": "Challenge Cancelled",
+    "notification.challengeCancelled.content": "The challenge '{{challengeName}}' was cancelled by the admin or host.",
+
+    "notification.kickedFromChallenge.title": "You were removed from the challenge",
+    "notification.kickedFromChallenge.content": "You were removed from the challenge '{{challengeName}}' by the admin.",
+
+    "notification.empty": "No new notifications.",
+
+    "ProofUpLoads": {
     "loading": "Loading data",
     "view evidence": "View all evidences",
     "has no proof": "You don't have any proof yet!",
@@ -321,80 +324,33 @@
       "close": "Close"
     }
   },
-  "notification": {
-    "challengeStatusUpdated.title" : "Your challenge status have been updated",
-    "challengeStatusUpdated.content" : "|{{challengeName}}| has been updated to active",
-
-    "challengeResult.title": "Challenge Result: Completed",
-    "challengeResult.content": "You have successfully completed the challenge '{{challengeName}}'! Check out your achievement now!",
-
-    "groupChallengeResult.title": "Group Challenge Result: Completed",
-    "groupChallengeResult.content": "Your group '{{groupName}}' has completed the challenge '{{challengeName}}'! View your group achievement now!",
-
-    "challengeRoleUpdated.title": "Challenge Role Updated",
-    "challengeRoleUpdated.content": "Your role in the challenge '{{challengeName}}' has been updated to: {{role}}",
-
-    "challengeStarted.title": "The challenge '{{challengeName}}' has started!",
-    "challengeStarted.content": "Get ready to conquer the challenge '{{challengeName}}' with GoBeyond!",
-
-    "evidence.approved.title": "Proof on {{day}} approved",
-    "evidence.approved.content": "Your proof submitted on {{day}} in the challenge '{{challengeName}}' has been approved. Keep it up!",
-
-    "evidence.rejected.title": "Proof on {{day}} rejected",
-    "evidence.rejected.content": "Your proof submitted on {{day}} in the challenge '{{challengeName}}' was rejected. Please check feedback and resubmit if needed.",
-
-    "invite.challenge.title": "Challenge Invitation",
-    "invite.challenge.content": "{{inviterName}} has invited you to join the challenge '{{challengeName}}'.",
-
-    "invite.group.title": "Group Invitation",
-    "invite.group.content": "{{inviterName}} has invited you to join the group '{{groupName}}'.",
-
-    "invite.kickGroup.title": "You were removed from the group",
-    "invite.kickGroup.content": "You were removed from the group '{{groupName}}' by the admin.",
-
-    "invite.groupInvitation.title": "Group Invitation",
-    "invite.groupInvitation.content": "You have been invited to join the group '{{groupName}}'.",
-
-    "groupDisbanded.title": "Group Disbanded",
-    "groupDisbanded.content": "The group '{{groupName}}' has been disbanded.",
-
-    "challengeInvitation.title": "You have a new invitation",
-    "challengeInvitation.content": "You have been invited to join the challenge '{{challengeName}}'.",
-
-    "leaderChallengeInvitation.title": "You have a new invitation",
-    "leaderChallengeInvitation.content": "You have been invited to lead a group in the challenge '{{challengeName}}'.",
-
-    "groupJoinChallenge.title": "Your group has joined a challenge!",
-    "groupJoinChallenge.content": "The group '{{groupName}}' has joined the challenge '{{challengeName}}'.",
-
-    "challengeCancelled.title": "Challenge Cancelled",
-    "challengeCancelled.content": "The challenge '{{challengeName}}' was cancelled by the admin or host.",
-
-    "kickedFromChallenge.title": "You were removed from the challenge",
-    "kickedFromChallenge.content": "You were removed from the challenge '{{challengeName}}' by the admin.",
-    "empty": "No new notifications."
-  },
-  "auth": {
-    "login": {
-      "title": "Login",
-      "username": "Username",
-      "password": "Password",
-      "loginButton": "Login →",
-      "loggingIn": "Logging in...",
-      "or": "OR",
-      "googleLogin": "Login with Google",
-      "forgotPassword": "Forgot password?",
-      "newUser": "New to GoBeyond?",
-      "registerNow": "Register now",
-      "errors": {
-        "emptyUsername": "Username cannot be empty",
-        "shortPassword": "Password must be at least 6 characters long",
-        "invalidToken": "Invalid token received",
-        "unexpectedResponse": "Unexpected response from server",
-        "incorrectCredentials": "Incorrect credentials",
-        "loginFailed": "Login failed. Please try again."
+    "auth": {
+      "login": {
+        "title": "Login",
+        "username": "Username",
+        "password": "Password",
+        "loginButton": "Login →",
+        "loggingIn": "Logging in...",
+        "or": "OR",
+        "googleLogin": "Login with Google",
+        "forgotPassword": "Forgot password?",
+        "newUser": "New to GoBeyond?",
+        "registerNow": "Register now",
+        "success": "Login successful!",
+        "errors": {
+          "emptyUsername": "Please enter your username",
+          "passwordTooShort": "Password must be at least 6 characters",
+          "ACCOUNT_NOT_FOUND": "Account not found",
+          "ACCOUNT_NOT_VERIFIED": "Account is not verified. Please check your email",
+          "ACCOUNT_BANNED": "This account has been banned",
+          "USER_NOT_FOUND": "User not found",
+          "INVALID_PASSWORD": "Incorrect password",
+          "invalidToken": "Invalid token",
+          "loginFailed": "Login failed. Please try again"
+        }
       }
     },
+
     "register": {
       "title": "Register Account",
       "email": "Email",
@@ -413,10 +369,9 @@
         "shortPassword": "Password must be at least 6 characters.",
         "passwordMismatch": "Confirmation password doesn't match.",
         "registerFailed": "Registration failed. Please try again."
-      },
-      "success": "Registration successful!"
-    }
-  },
+      }
+
+    },
 
   "JoinsChallengeDetail": {
     "reportTab": "Feedback & Reports",
@@ -443,6 +398,8 @@
     "title": "Challenge",
     "reportTitle": "Report Challenge",
     "reportType": "Type of report",
+    "shareSuccess": "Link copied to clipboard!",
+    "shareFailed": "Failed to copy link.",
     "type": {
       "inappropriate": "Inappropriate content",
       "spam": "Spam",
@@ -454,35 +411,7 @@
     "submit": "Submit Report",
     "cancel": "Cancel"
   },
-  "yourChallenge": {
-    "create": "Create a challenge",
-    "search": "Search",
-    "filter": "Filter",
-    "invitations": "Invitations",
-    "loadingInvitations": "Loading invitations...",
-    "noInvitations": "You have no challenge invites",
-    "accept": "Accept",
-    "decline": "Decline",
-    "accepted": "Invitation accepted!",
-    "declined": "Invitation declined!",
-    "failedResponse": "Failed to respond. Try again.",
-    "inviteText": "invites you to:",
-    "tabs": {
-      "all": "All",
-      "host": "Host",
-      "cohost": "Cohost",
-      "member": "Member"
-    },
-    "joinedChallenges": "Joined Challenges",
-    "loadingChallenges": "Loading challenges...",
-    "noJoined": "You haven't joined any challenge",
-    "status": {
-      "approved": "Approved",
-      "pending": "Pending",
-      "rejected": "Rejected",
-      "canceled": "Canceled"
-    }
-  },
+
   "members": "members",
   "inviteGroups": "Invite Groups",
   "searchPlaceholder": "Search group name...",
@@ -517,7 +446,6 @@
     "rulesText": "Detailed challenge rules will be displayed here.",
     "teamRanking": "Team ranking will be displayed here.",
     "individualRanking": "Individual ranking will be displayed here."
-  },
   },
   "yourChallenge": {
     "create": "Create a challenge",

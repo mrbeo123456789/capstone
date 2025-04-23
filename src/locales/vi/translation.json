@@ -7,7 +7,6 @@
     "news": "Tin tức",
     "logout": "Đăng xuất"
   },
-
   "profileUpdated": "Cập nhật hồ sơ thành công!",
   "updateFailed": "Cập nhật hồ sơ thất bại.",
   "removed": "Đã loại bỏ",
@@ -40,7 +39,6 @@
   "updating": "Đang cập nhật...",
   "updateProfile": "Cập nhật hồ sơ",
   "selectChallengeType": "Chọn kiểu thử thách",
-
   "challengeInvite": {
     "memberList": "Danh sách thành viên",
     "searchPlaceholder": "Tìm kiếm theo tên hoặc email...",
@@ -50,13 +48,15 @@
     "previous": "Trước",
     "next": "Sau",
     "page": "Trang",
+    "searchLeaderPlaceholder": "Nhập tên trưởng nhóm...",
     "suggestedTitle": "Gợi ý mời tham gia",
     "selectAtLeastOne": "Vui lòng chọn ít nhất một thành viên.",
     "inviteSuccess": "Gửi lời mời thành công!",
     "inviteFailed": "Gửi lời mời thất bại.",
+    "title": "Mời tham gia thử thách",
+    "noResults": "Không tìm thấy kết quả nào.",
     "searchFailed": "Tìm kiếm thất bại."
   },
-
   "sidebar": {
     "myChallenge": "Thử thách của tôi",
     "myGroup": "Nhóm của tôi",
@@ -65,14 +65,12 @@
     "achievement": "Thành tựu",
     "statistics": "Thống kê"
   },
-
   "invitePermission": {
     "select": "Chọn quyền mời",
     "everyone": "Mọi người đều có thể mời",
     "noOne": "Không ai có thể mời",
     "sameGroup": "Chỉ thành viên cùng nhóm mới được mời"
   },
-
   "groupForm": {
     "title": "Thông tin nhóm",
     "groupName": "Tên nhóm",
@@ -117,7 +115,6 @@
     "kickSuccess": "Đã loại thành viên khỏi nhóm",
     "kickFailed": "Không thể loại thành viên. Vui lòng thử lại."
   },
-
   "groupInvite": {
     "title": "Mời vào nhóm",
     "searchPlaceholder": "Tìm theo tên hoặc email...",
@@ -133,7 +130,6 @@
     "searchFailed": "Tìm kiếm thất bại.",
     "enterKeyword": "Vui lòng nhập từ khóa."
   },
-
   "createChallenge": {
     "create": "Tạo thử thách",
     "isParticipate": "Có tham gia hay không",
@@ -178,7 +174,6 @@
     "validationError": "Vui lòng sửa tất cả lỗi trước khi gửi.",
     "fail": "Cập nhật thất bại: "
   },
-
   "ProofUpLoads": {
     "loading": "Đang tải dữ liệu",
     "view evidence": "Danh sách bằng chứng",
@@ -189,7 +184,6 @@
     "page": "/",
     "next": "Sau"
   },
-
   "yourGroup": {
     "createGroup": "Tạo nhóm",
     "searchPlaceholder": "Tìm kiếm nhóm",
@@ -213,7 +207,6 @@
     "errorGroups": "Không thể tải danh sách nhóm.",
     "members": "thành viên"
   },
-
   "notification.challengeResult.title": "Kết quả thử thách: Hoàn thành",
   "notification.challengeResult.content": "Bạn đã hoàn thành thử thách '{{challengeName}}'! Kiểm tra thành tích của bạn nhé!",
   "notification.groupChallengeResult.title": "Kết quả thử thách nhóm: Hoàn thành",
@@ -247,7 +240,8 @@
   "notification.kickedFromChallenge.title": "Bạn đã bị kick khỏi thử thách",
   "notification.kickedFromChallenge.content": "Bạn đã bị quản trị viên xóa khỏi thử thách '{{challengeName}}'.",
   "notification.empty": "Không có thông báo mới.",
-
+  "notification.challengeStatusUpdated.title": "Trạng thái thử thách của bạn đã được cập nhật",
+  "notification.challengeStatusUpdated.content": "Thử thách '{{challengeName}}' đã được cập nhật và hiện có trạng thái '{{status}}'",
   "JoinsChallengeDetail": {
     "reportTab": "Phản hồi & Báo cáo",
     "groups": "Nhóm",
@@ -297,6 +291,11 @@
     "declined": "Đã từ chối lời mời!",
     "failedResponse": "Phản hồi thất bại. Vui lòng thử lại.",
     "inviteText": "đã mời bạn tham gia:",
+    "filterAll": "Tất cả lời mời",
+    "filterPersonal": "Lời mời cá nhân",
+    "filterGroup": "Lời mời nhóm",
+    "shareSuccess": "Đã sao chép liên kết!",
+    "shareFailed": "Không thể sao chép liên kết.",
     "tabs": {
       "all": "Tất cả",
       "host": "Chủ trì",
@@ -313,7 +312,6 @@
       "canceled": "Đã hủy"
     }
   },
-
   "member": "thành viên",
   "inviteGroups": "Mời nhóm",
   "searchPlaceholder": "Tìm kiếm tên nhóm...",
@@ -327,7 +325,6 @@
   "selectWarning": "Vui lòng chọn ít nhất một nhóm.",
   "success": "Mời nhóm thành công!",
   "searchPlaceholderGroup": "Nhập tên nhóm...",
-
   "ChallengeDetail": {
     "joinedStatus": "Đã tham gia",
     "joining": "Đang tham gia...",
@@ -349,7 +346,6 @@
     "teamRanking": "Bảng xếp hạng đội sẽ hiển thị tại đây.",
     "individualRanking": "Bảng xếp hạng cá nhân sẽ hiển thị tại đây."
   },
-
   "forgotPassword": {
     "title": "Quên mật khẩu?",
     "subtitle": "Nhập email của bạn để nhận mã OTP.",
@@ -363,7 +359,6 @@
     "success": "Mã OTP đã được gửi đến email của bạn.",
     "fail": "Đã xảy ra lỗi."
   },
-
   "changePassword": {
     "title": "Đổi mật khẩu",
     "old": "Mật khẩu hiện tại",
@@ -377,7 +372,6 @@
     "fail": "Đổi mật khẩu thất bại.",
     "mismatch": "Mật khẩu xác nhận không khớp!"
   },
-
   "ProgressTracking": {
     "viewExplanation": "Xem giải thích",
     "daysOfWeek": {
@@ -423,7 +417,6 @@
       "close": "Đóng"
     }
   },
-
   "ProofUploads": {
     "loading": "Đang tải dữ liệu...",
     "viewEvidence": "Xem các bằng chứng của bạn",
@@ -436,7 +429,6 @@
     "fullEvidence": "Bằng chứng đầy đủ",
     "close": "Đóng"
   },
-
   "AboutUs": {
     "hero": {
       "title": "Về GoBeyond",
@@ -528,7 +520,6 @@
       "button": "Liên hệ ngay"
     }
   },
-
   "VideoModal": {
     "approveMessage": "Tôi chấp nhận video này",
     "approveSuccess": "Đã chấp nhận thành công!",
@@ -592,7 +583,6 @@
       "rejected": "Đã từ chối"
     }
   },
-
   "rankingList": {
     "top3Progress": "Top 3 Tiến Độ",
     "rank": "Xếp hạng",
@@ -605,7 +595,6 @@
   },
   "leaderboard": {
     "individual": "Cá nhân",
-    "group": "Nhóm",
     "achievements": "Thành tựu",
     "searchPlaceholder": "Tìm kiếm người dùng...",
     "myRank": "Xếp hạng của tôi",
@@ -642,16 +631,24 @@
       "forgotPassword": "Quên mật khẩu?",
       "newUser": "Bạn mới sử dụng GoBeyond?",
       "registerNow": "Đăng ký ngay",
+      "success": "Đăng nhập thành công!",
       "errors": {
-        "emptyUsername": "Username cannot be empty",
-        "shortPassword": "Password must be at least 6 characters long",
-        "invalidToken": "Invalid token received.",
-        "unexpectedResponse": "Unexpected response from server",
-        "incorrectCredentials": "Incorrect credentials",
-        "loginFailed": "Login failed. Please try again."
+        "emptyUsername": "Vui lòng nhập tên đăng nhập",
+        "shortPassword": "Mật khẩu phải có ít nhất 6 ký tự",
+        "invalidToken": "Token không hợp lệ",
+        "unexpectedResponse": "Phản hồi không hợp lệ từ máy chủ",
+        "incorrectCredentials": "Tên đăng nhập hoặc mật khẩu không đúng",
+        "loginFailed": "Đăng nhập thất bại. Vui lòng thử lại.",
+        "ACCOUNT_NOT_VERIFIED": "Tài khoản chưa được xác thực. Vui lòng nhập mã OTP",
+        "ACCOUNT_NOT_FOUND": "Tài khoản không tồn tại",
+        "WRONG_PASSWORD": "Mật khẩu không đúng",
+        "INVALID_PASSWORD": "Mật khẩu không đúng",
+        "ACCOUNT_BANNED": "Tài khoản của bạn đã bị khóa",
+        "USER_NOT_FOUND": "Không tìm thấy tài khoản"
       }
-    },
-    "register": {
+    }
+  },
+  "register": {
       "title": "Đăng ký tài khoản",
       "email": "Email",
       "username": "Tên đăng nhập",
@@ -669,9 +666,10 @@
         "shortPassword": "Mật khẩu ít nhất 6 ký tự.",
         "passwordMismatch": "Mật khẩu xác nhận không khớp.",
         "registerFailed": "Đăng ký thất bại. Vui lòng thử lại."
-      },
-      "success": "Đăng ký thành công!"
+      }
+
     }
   }
 
-}
+
+

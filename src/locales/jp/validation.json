@@ -29,6 +29,8 @@
   },
   "group": {
     "nameRequired": "グループ名は必須です！",
-    "privacyRequired": "プライバシー設定は必須です！"
+    "descriptionRequired": "説明は必須です！",
+    "pictureRequired": "グループの画像は必須です！"
   }
+
 }

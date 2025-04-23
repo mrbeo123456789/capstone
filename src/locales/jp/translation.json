@@ -41,6 +41,7 @@
   "selectChallengeType": "チャレンジタイプを選択",
   "challengeInvite": {
     "memberList": "メンバーリスト",
+    "searchLeaderPlaceholder": "グループリーダー名を入力してください...",
     "searchPlaceholder": "名前またはメールアドレスで検索...",
     "search": "検索",
     "close": "閉じる",
@@ -54,6 +55,7 @@
     "searchFailed": "メンバーの検索に失敗しました。",
     "title": "チャレンジへの招待",
     "inviteMembers": "メンバーを招待",
+    "noResults": "結果が見つかりませんでした。",
     "inviteGroups": "グループを招待",
     "suggestedTitle": "招待のおすすめメンバー"
   },
@@ -263,7 +265,9 @@
     "challengeCancelled.content": "チャレンジ「{{challengeName}}」は管理者またはホストによってキャンセルされました。",
     "kickedFromChallenge.title": "チャレンジから削除されました",
     "kickedFromChallenge.content": "あなたはチャレンジ「{{challengeName}}」から管理者により削除されました。",
-    "empty": "新しい通知はありません。"
+    "empty": "新しい通知はありません。",
+    "challengeStatusUpdated.title": "チャレンジのステータスが更新されました",
+    "notification.challengeStatusUpdated.content": "チャレンジ「{{challengeName}}」のステータスが「{{status}}」に更新されました"
   },
   "yourChallenge": {
     "create": "チャレンジを作成",
@@ -278,6 +282,11 @@
     "declined": "招待を辞退しました！",
     "failedResponse": "応答に失敗しました。もう一度お試しください。",
     "inviteText": "があなたを招待しました：",
+    "filterAll": "すべての招待",
+    "filterPersonal": "個人の招待",
+    "filterGroup": "グループの招待",
+    "shareSuccess": "リンクをコピーしました！",
+    "shareFailed": "リンクのコピーに失敗しました。",
     "tabs": {
       "all": "すべて",
       "host": "ホスト",
@@ -608,24 +617,31 @@
   },
 
   "auth": {
-  "login": {
-    "title": "ログイン",
-    "username": "ユーザー名",
-    "password": "パスワード",
-    "loginButton": "ログイン →",
-    "loggingIn": "ログイン中...",
-    "or": "または",
-    "googleLogin": "Googleでログイン",
-    "forgotPassword": "パスワードをお忘れですか？",
-    "newUser": "GoBeyondは初めてですか？",
-    "registerNow": "今すぐ登録",
-    "errors": {
-      "emptyUsername": "ユーザー名を入力してください",
-      "shortPassword": "パスワードは6文字以上である必要があります",
-      "invalidToken": "無効なトークンを受信しました",
-      "unexpectedResponse": "サーバーから予期しない応答がありました",
-      "incorrectCredentials": "認証情報が正しくありません",
-      "loginFailed": "ログインに失敗しました。もう一度お試しください。"
+    "login": {
+      "title": "ログイン",
+      "username": "ユーザー名",
+      "password": "パスワード",
+      "loginButton": "ログイン →",
+      "loggingIn": "ログイン中...",
+      "or": "または",
+      "googleLogin": "Googleでログイン",
+      "forgotPassword": "パスワードをお忘れですか？",
+      "newUser": "GoBeyondは初めてですか？",
+      "registerNow": "今すぐ登録",
+      "success": "ログインに成功しました！",
+      "errors": {
+        "emptyUsername": "ユーザー名を入力してください",
+        "shortPassword": "パスワードは6文字以上である必要があります",
+        "invalidToken": "無効なトークンを受信しました",
+        "unexpectedResponse": "サーバーから予期しない応答がありました",
+        "incorrectCredentials": "認証情報が正しくありません",
+        "loginFailed": "ログインに失敗しました。もう一度お試しください。",
+        "ACCOUNT_NOT_FOUND": "アカウントが見つかりません",
+        "ACCOUNT_NOT_VERIFIED": "アカウントがまだ認証されていません。メールを確認してください",
+        "ACCOUNT_BANNED": "このアカウントは停止されています",
+        "INVALID_PASSWORD": "パスワードが間違っています",
+        "USER_NOT_FOUND": "ユーザーが見つかりません"
+      }
     }
   },
   "register": {
@@ -646,11 +662,10 @@
       "shortPassword": "パスワードは6文字以上必要です。",
       "passwordMismatch": "確認用パスワードが一致しません。",
       "registerFailed": "登録に失敗しました。もう一度お試しください。"
-    },
-    "success": "登録が完了しました！"
-  }
+    }
 
   }
+
 }
 
 

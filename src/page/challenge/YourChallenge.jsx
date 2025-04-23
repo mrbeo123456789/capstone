@@ -10,6 +10,8 @@ const YourChallenge = () => {
     const navigate = useNavigate();
     const { t } = useTranslation();
     const [activeTab, setActiveTab] = useState("All");
+    const [filterType, setFilterType] = useState("ALL");
+    const [searchTerm, setSearchTerm] = useState("");
 
     const [getMyChallenges, { data: joinedChallenges = [], isLoading }] = useGetMyChallengesMutation();
     const {
@@ -50,6 +52,9 @@ const YourChallenge = () => {
         }
     };
 
+
+
+
     const getStatusStyle = (status) => {
         switch (status) {
             case "PENDING":
@@ -66,6 +71,16 @@ const YourChallenge = () => {
         }
     };
 
+    const filteredChallenges = joinedChallenges.filter(challenge =>
+        challenge.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const filteredInvitations = invitations.filter(invite => {
+        if (filterType === "PERSONAL") return invite.invitationType === "PERSONAL";
+        if (filterType === "GROUP") return invite.invitationType === "GROUP";
+        return true;
+    });
+
     return (
         <div className="p-6 space-y-6 bg-white rounded-lg shadow-lg overflow-hidden">
             {/* Top Actions */}
@@ -76,31 +91,33 @@ const YourChallenge = () => {
                 >
                     {t("yourChallenge.create")}
                 </button>
-
-                <div className="flex gap-2 items-center">
-                    <input
-                        type="text"
-                        placeholder={t("yourChallenge.search")}
-                        className="border rounded-lg px-3 py-2 w-48"
-                    />
-                    <button className="border px-3 py-2 rounded-lg">{t("yourChallenge.filter")} ▼</button>
-                </div>
             </div>
 
             {/* Invitations */}
             <div className="border rounded-lg p-4 space-y-4">
-                <h2 className="text-lg font-semibold">{t("yourChallenge.invitations")} ({invitations.length})</h2>
+                <div className="flex justify-between items-center">
+                    <h2 className="text-lg font-semibold">{t("yourChallenge.invitations")} ({filteredInvitations.length})</h2>
+                    <select
+                        value={filterType}
+                        onChange={(e) => setFilterType(e.target.value)}
+                        className="border px-3 py-2 rounded-lg text-sm"
+                    >
+                        <option value="ALL">{t("yourChallenge.filterAll")}</option>
+                        <option value="PERSONAL">{t("yourChallenge.filterPersonal")}</option>
+                        <option value="GROUP">{t("yourChallenge.filterGroup")}</option>
+                    </select>
+                </div>
                 {isInvitationsLoading ? (
                     <p>{t("yourChallenge.loadingInvitations")}</p>
-                ) : invitations.length === 0 ? (
-                    <div
-                        className="h-52 w-full flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-lg bg-gray-50 text-gray-500 text-center">
-                        <NoInvitationsIllustration themeColor={themeColor}/>
+                ) : filteredInvitations.length === 0 ? (
+                    <div className="h-52 w-full flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-lg bg-gray-50 text-gray-500 text-center">
+                        <NoInvitationsIllustration themeColor={themeColor} />
                         <p className="font-semibold text-sm mt-2">{t("yourChallenge.noInvitations")}</p>
                     </div>
+
                 ) : (
                     <div className="flex gap-6 overflow-x-auto pb-2">
-                        {invitations.map((invite) => (
+                        {filteredInvitations.map((invite) => (
                             <div
                                 key={invite.id}
                                 className="cursor-pointer min-w-[200px] p-4 border rounded-lg space-y-2 flex-shrink-0 hover:shadow-lg transition"
@@ -119,7 +136,7 @@ const YourChallenge = () => {
                                     <button
                                         className="bg-green-600 text-white px-3 py-1 rounded"
                                         onClick={(e) => {
-                                            e.stopPropagation(); // ✅ ngăn redirect
+                                            e.stopPropagation();
                                             handleRespond(invite.invitationId, invite.invitationType, true);
                                         }}
                                     >
@@ -128,7 +145,7 @@ const YourChallenge = () => {
                                     <button
                                         className="border px-3 py-1 rounded"
                                         onClick={(e) => {
-                                            e.stopPropagation(); // ✅ ngăn redirect
+                                            e.stopPropagation();
                                             handleRespond(invite.invitationId, invite.invitationType, false);
                                         }}
                                     >
@@ -156,18 +173,25 @@ const YourChallenge = () => {
 
             {/* Joined Challenges */}
             <div>
-                <h2 className="text-lg font-semibold mb-4">{t("yourChallenge.joinedChallenges")}</h2>
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-lg font-semibold">{t("yourChallenge.joinedChallenges")}</h2>
+                    <input
+                        type="text"
+                        placeholder={t("yourChallenge.search")}
+                        className="border rounded-lg px-3 py-2 w-48"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
                 {isLoading ? (
                     <p>{t("yourChallenge.loadingChallenges")}</p>
-                ) : joinedChallenges.length === 0 ? (
+                ) : filteredChallenges.length === 0 ? (
                     <div className="h-52 w-full flex items-center justify-center border border-dashed border-gray-300 rounded-lg bg-gray-50 text-gray-500 text-center">
-                        <div>
-                            <p className="font-semibold">{t("yourChallenge.noJoined")}</p>
-                        </div>
+                        <p className="font-semibold">{t("yourChallenge.noJoined")}</p>
                     </div>
                 ) : (
                     <div className="flex gap-4 overflow-x-auto pb-2">
-                        {joinedChallenges.map((challenge) => (
+                        {filteredChallenges.map((challenge) => (
                             <div
                                 key={challenge.id}
                                 onClick={() => navigate(`/challenges/joins/detail/${challenge.id}`)}
@@ -215,7 +239,7 @@ const YourChallenge = () => {
                                 </div>
 
                                 {(() => {
-                                    const {text, bg, textColor} = getStatusStyle(challenge.status);
+                                    const { text, bg, textColor } = getStatusStyle(challenge.status);
                                     return (
                                         <div className={`${bg} ${textColor} text-xs px-2 py-1 rounded mb-1 flex items-end`}>
                                             {text}

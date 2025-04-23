@@ -29,6 +29,9 @@
   },
   "group": {
     "nameRequired": "Tên nhóm là bắt buộc!",
-    "privacyRequired": "Cài đặt quyền riêng tư là bắt buộc!"
+    "descriptionRequired": "Mô tả là bắt buộc!",
+    "pictureRequired": "Ảnh nhóm là bắt buộc!"
   }
+
+
 }

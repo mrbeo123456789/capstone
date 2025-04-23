@@ -131,7 +131,24 @@ export const loginValidation = yup.object({
 });
 
 // ✅ Group Schema
-export const groupValidation = yup.object({
-    name: yup.string().required("Group name is required!"),
-    description: yup.string().nullable(),
+
+
+export const groupValidation = yup.object().shape({
+    name: yup
+        .string()
+        .required(() => i18n.t("group.nameRequired", { ns: "validation" })),
+
+    description: yup
+        .string()
+        .required(() => i18n.t("group.descriptionRequired", { ns: "validation" })),
+
+    picture: yup
+        .mixed()
+        .test("required-image", function (value) {
+            const { isEditing } = this?.options?.context || {};
+            const isValid = isEditing || value instanceof File;
+            return isValid || this.createError({
+                message: i18n.t("group.pictureRequired", { ns: "validation" }),
+            });
+        }),
 });

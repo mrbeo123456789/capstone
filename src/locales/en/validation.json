@@ -29,6 +29,8 @@
   },
   "group": {
     "nameRequired": "Group name is required!",
-    "privacyRequired": "Privacy setting is required!"
+    "descriptionRequired": "Description is required!",
+    "pictureRequired": "Group picture is required!"
   }
+
 }

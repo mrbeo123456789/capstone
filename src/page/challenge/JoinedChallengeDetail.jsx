@@ -69,6 +69,13 @@ const JoinedChallengeDetail = () => {
     const openMemberModal = () => setShowMemberModal(true);
     const closeMemberModal = () => setShowMemberModal(false);
 
+    const handleShare = () => {
+        const url = window.location.href;
+        navigator.clipboard.writeText(url)
+            .then(() => toast.success(t("JoinsChallengeDetail.shareSuccess")))
+            .catch(() => toast.error(t("JoinsChallengeDetail.shareFailed")));
+    };
+
     const handleLeave = async () => {
         try {
             await leaveChallenge(challenge.id).unwrap();
@@ -171,14 +178,14 @@ const JoinedChallengeDetail = () => {
                                                         : "text-red-500 hover:text-red-700"
                                                 }`}
                                             >
-                                                <FaSignOutAlt />
+                                                <FaSignOutAlt/>
                                             </button>
 
 
                                             {/* Share Button */}
                                             <button
                                                 title={t("JoinsChallengeDetail.share")}
-                                                onClick={() => console.log("Share")}
+                                                onClick={handleShare}
                                                 className="text-blue-500 hover:text-blue-700 text-xl"
                                             >
                                                 <FaShareAlt/>
@@ -199,7 +206,7 @@ const JoinedChallengeDetail = () => {
                                                         : "text-red-500 hover:text-red-700"
                                                 }`}
                                             >
-                                                <FaFlag />
+                                                <FaFlag/>
                                             </button>
                                         </>
                                     );
@@ -264,6 +271,13 @@ const JoinedChallengeDetail = () => {
                 )}
                 {showMemberInvite && <ChallengeInvitePopup onClose={closeInvite} />}
                 {showGroupInvite && <GroupChallengeInvite onClose={closeInvite} />}
+                {showPopup && (
+                    <ChallengeInvitePopup
+                        onClose={closeUserDetail}
+                        challengeId={challenge.id}
+                        participationType={challenge.participationType} // ✅ truyền vào đây
+                    />
+                )}
                 {showReportModal && <ReportChallengeModal challengeId={challenge.id} onClose={closeReportModal} />}
                 {showMemberModal && (
                     <MemberManagementModal

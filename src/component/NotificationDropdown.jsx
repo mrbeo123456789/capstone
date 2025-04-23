@@ -77,7 +77,7 @@ export const NotificationDropdown = () => {
                                     }`}
                                 >
                                     <strong className="block text-sm font-medium">
-                                        {t(item.title, item.data)}
+                                        {t(item.title, item.params)}
                                     </strong>
                                     <p className="text-xs text-gray-600">
                                         {t(item.content, item.params)}

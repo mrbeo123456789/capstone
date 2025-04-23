@@ -69,7 +69,7 @@ function ForgotPassword() {
                                 <span className="text-red-500"> *</span>
                             </label>
                             <input
-                                type={showEmail ? "text" : "password"}
+                                type="email"
                                 placeholder={t("forgotPassword.emailPlaceholder")}
                                 className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                                 value={email}
@@ -79,7 +79,7 @@ function ForgotPassword() {
                                 className="absolute right-3 top-[38px] cursor-pointer text-gray-500"
                                 onClick={() => setShowEmail(!showEmail)}
                             >
-                                {showEmail ? <FaEyeSlash /> : <FaEye />}
+                                {showEmail ? <FaEyeSlash/> : <FaEye/>}
                             </div>
                         </div>
                         <button

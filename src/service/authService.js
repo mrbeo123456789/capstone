@@ -109,7 +109,6 @@ export const authService = createApi({
         // Thêm mutation để gửi OTP xác nhận tài khoản
         sendOtpToVerifyAccount: builder.mutation({
             query: (email) => {
-                console.log("📨 sendOtpToVerifyAccount API CALLED with:", email);
                 return {
                     url: "/auth/verify-account",
                     method: "POST",

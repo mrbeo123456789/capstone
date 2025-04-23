@@ -28,8 +28,8 @@ const GroupForm = () => {
         reset,
         formState: { errors },
     } = useForm({
-        mode: "all",
         resolver: yupResolver(groupValidation),
+        context: { isEditing }, // 👈 Truyền context ở đây
     });
 
     const [createGroup, { isLoading }] = useCreateGroupMutation();
@@ -119,20 +119,18 @@ const GroupForm = () => {
                                     className="w-full text-black p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                                     placeholder={t("groupForm.groupNamePlaceholder")}
                                 />
-                                <p className="text-red-500">{errors.name?.message}</p>
                             </div>
 
                             {/* Description */}
                             <div className="w-full mb-4">
                                 <label className="text-sm font-medium text-black">
-                                    {t("groupForm.description")}
+                                    {t("groupForm.description")} <span className="text-red-500">*</span>
                                 </label>
                                 <textarea
                                     {...register("description")}
                                     className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                                     placeholder={t("groupForm.descriptionPlaceholder")}
                                 />
-                                <p className="text-red-500">{errors.description?.message}</p>
                             </div>
                         </div>
 
@@ -166,7 +164,6 @@ const GroupForm = () => {
                                         <span className="text-white font-semibold">{t("groupForm.changePicture")}</span>
                                     </div>
                                 )}
-                                <p className="text-red-500">{errors.picture?.message}</p>
                             </div>
                         </label>
                         <input
@@ -183,9 +180,16 @@ const GroupForm = () => {
                     <div className="flex justify-center gap-6 mt-6">
                         <button
                             type="button"
-                            onClick={handleSubmit(onSubmit)}
                             className="bg-red-600 px-6 py-2 rounded text-white hover:bg-red-700"
                             disabled={isLoading || isUpdating}
+                            onClick={() =>
+                                handleSubmit(onSubmit, (formErrors) => {
+                                    const firstError = Object.values(formErrors)?.[0];
+                                    if (firstError?.message) {
+                                        toast.error(firstError.message);
+                                    }
+                                })()
+                            }
                         >
                             {isEditing
                                 ? isUpdating
@@ -196,16 +200,19 @@ const GroupForm = () => {
                                     : t("groupForm.createButton")}
                         </button>
 
+
                         <button
                             type="button"
                             className="bg-gray-500 px-6 py-2 rounded text-white hover:bg-gray-600"
                             onClick={() => {
                                 reset();
                                 setPreview("");
+                                navigate(isEditing ? `/groups/joins/${groupId}` : "/groups/joins");
                             }}
                         >
                             {t("groupForm.cancelButton")}
                         </button>
+
                     </div>
                 </div>
             </div>

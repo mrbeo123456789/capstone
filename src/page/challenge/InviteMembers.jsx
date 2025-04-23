@@ -1,27 +1,36 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
 import {
     useSearchMembersForChallengeInviteMutation,
     useSendInvitationMutation,
-    useSuggestMembersQuery
+    useSuggestMembersQuery,
+    useSearchAvailableGroupLeadersMutation,
 } from "../../service/invitationService.js";
 
-const InviteMembers = ({ onClose }) => {
+const InviteMembers = ({ onClose, participationType }) => {
     const PAGE_SIZE = 4;
-    const { id: challengeId } = useParams(); // Challenge ID from URL
+    const { id: challengeId } = useParams();
     const { t } = useTranslation();
 
+    const [membersData, setMembersData] = useState([]);
     const [selected, setSelected] = useState([]);
     const [searchKeyword, setSearchKeyword] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
 
-    const [searchMembers, { data: members = [], isLoading: isFetching }] = useSearchMembersForChallengeInviteMutation();
+    const [searchMembers] = useSearchMembersForChallengeInviteMutation();
+    const [searchGroupLeaders] = useSearchAvailableGroupLeadersMutation();
     const { data: suggestedMembers = [], isLoading } = useSuggestMembersQuery(challengeId);
     const [sendInvitation] = useSendInvitationMutation();
 
-    const paginatedMembers = (members || []).slice(
+    useEffect(() => {
+        if (suggestedMembers?.length) {
+            setMembersData(suggestedMembers);
+        }
+    }, [suggestedMembers]);
+
+    const paginatedMembers = membersData.slice(
         (currentPage - 1) * PAGE_SIZE,
         currentPage * PAGE_SIZE
     );
@@ -37,9 +46,11 @@ const InviteMembers = ({ onClose }) => {
             toast.warn(t("challengeInvite.selectAtLeastOne"));
             return;
         }
+
         try {
-            const res = await sendInvitation({ challengeId, memberIds: selected, type: "MEMBER" }).unwrap();
-            toast.info(res.message || t("challengeInvite.inviteSuccess"));
+            const inviteType = participationType === "GROUP" ? "LEADER" : "MEMBER";
+            await sendInvitation({ challengeId, memberIds: selected, type: inviteType }).unwrap();
+            toast.success(t("challengeInvite.inviteSuccess"));
             onClose();
         } catch (err) {
             const message = err?.data?.message || err?.data || "Something went wrong.";
@@ -48,23 +59,38 @@ const InviteMembers = ({ onClose }) => {
         }
     };
 
-
-    const handleSearch = () => {
+    const handleSearch = async () => {
         if (!searchKeyword.trim()) {
             toast.warn(t("challengeInvite.searchPlaceholder"));
             return;
         }
-        searchMembers({ challengeid: challengeId, keyword: searchKeyword });
-        setCurrentPage(1);
+
+        try {
+            setCurrentPage(1);
+            if (participationType === "GROUP") {
+                const result = await searchGroupLeaders({ challengeId, keyword: searchKeyword }).unwrap();
+                setMembersData(result);
+            } else {
+                const result = await searchMembers({ challengeid: challengeId, keyword: searchKeyword }).unwrap();
+                setMembersData(result);
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error(t("challengeInvite.searchFailed"));
+        }
     };
 
     return (
         <div className="p-4">
-            {/* Search Bar */}
+            {/* Search */}
             <div className="mb-4">
                 <input
                     type="text"
-                    placeholder={t('challengeInvite.searchPlaceholder')}
+                    placeholder={
+                        participationType === "GROUP"
+                            ? t("challengeInvite.searchLeaderPlaceholder")
+                            : t("challengeInvite.searchPlaceholder")
+                    }
                     value={searchKeyword}
                     onChange={(e) => setSearchKeyword(e.target.value)}
                     className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400"
@@ -74,17 +100,17 @@ const InviteMembers = ({ onClose }) => {
                         onClick={handleSearch}
                         className="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600"
                     >
-                        {t('challengeInvite.search')}
+                        {t("challengeInvite.search")}
                     </button>
                 </div>
             </div>
 
-            {/* Member List */}
+            {/* Members */}
             <div className="px-4 max-h-[400px] overflow-y-auto">
-                {isFetching ? (
+                {isLoading ? (
                     <p>Loading...</p>
-                ) : members.length === 0 ? (
-                    <p className="text-gray-500">{t('challengeInvite.noResults')}</p>
+                ) : membersData.length === 0 ? (
+                    <p className="text-gray-500">{t("challengeInvite.noResults")}</p>
                 ) : (
                     paginatedMembers.map((member) => (
                         <div
@@ -93,8 +119,11 @@ const InviteMembers = ({ onClose }) => {
                         >
                             <div className="flex items-center space-x-4">
                                 <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-orange-300">
-                                    <img src={member?.avatar}
-                                         alt={member.name} className="w-full h-full object-cover" />
+                                    <img
+                                        src={member?.avatar}
+                                        alt={member.name}
+                                        className="w-full h-full object-cover"
+                                    />
                                 </div>
                                 <div>
                                     <p className="font-semibold text-gray-800">{member.name}</p>
@@ -119,15 +148,21 @@ const InviteMembers = ({ onClose }) => {
                     className="px-4 py-1 bg-gray-300 rounded hover:bg-gray-400"
                     disabled={currentPage === 1}
                 >
-                    {t('challengeInvite.previous')}
+                    {t("challengeInvite.previous")}
                 </button>
-                <span className="text-gray-700">{t('challengeInvite.page')} {currentPage}</span>
+                <span className="text-gray-700">
+                    {t("challengeInvite.page")} {currentPage}
+                </span>
                 <button
-                    onClick={() => setCurrentPage((prev) => (prev * PAGE_SIZE < members.length ? prev + 1 : prev))}
+                    onClick={() =>
+                        setCurrentPage((prev) =>
+                            prev * PAGE_SIZE < membersData.length ? prev + 1 : prev
+                        )
+                    }
                     className="px-4 py-1 bg-gray-300 rounded hover:bg-gray-400"
-                    disabled={currentPage * PAGE_SIZE >= members.length}
+                    disabled={currentPage * PAGE_SIZE >= membersData.length}
                 >
-                    {t('challengeInvite.next')}
+                    {t("challengeInvite.next")}
                 </button>
             </div>
 
@@ -137,13 +172,13 @@ const InviteMembers = ({ onClose }) => {
                     onClick={onClose}
                     className="px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
                 >
-                    {t('challengeInvite.close')}
+                    {t("challengeInvite.close")}
                 </button>
                 <button
                     onClick={handleInvite}
                     className="px-4 py-2 rounded-md bg-orange-500 text-white hover:bg-orange-600"
                 >
-                    {t('challengeInvite.invite')} ({selected.length})
+                    {t("challengeInvite.invite")} ({selected.length})
                 </button>
             </div>
         </div>
