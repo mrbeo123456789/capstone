@@ -138,6 +138,10 @@ export const challengeService = createApi({
             query: () => "/challenges/completed", // 👈 your backend endpoint
             providesTags: ["Challenge"],
         }),
+        getChallengeStatistics: builder.query({
+            query: (challengeId) => `/challenges/${challengeId}/statistics`,
+            providesTags: ["Challenge"],
+        }),
     }),
 });
 
@@ -160,5 +164,6 @@ export const {
     useKickMemberFromChallengeMutation,
     useGetJoinedMembersWithPendingEvidenceQuery,
     useLazyGetCompletedChallengesQuery ,
+    useGetChallengeStatisticsQuery,
 } = challengeService;
 

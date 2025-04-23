@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Search, ThumbsUp, ThumbsDown, HourglassIcon } from 'lucide-react';
 import { ClockIcon, CheckCircleIcon } from "lucide-react";
-import { useGetJoinedMembersWithPendingEvidenceQuery } from "../../service/challengeService.js";
+import {
+    useGetChallengeStatisticsQuery,
+    useGetJoinedMembersWithPendingEvidenceQuery
+} from "../../service/challengeService.js";
 import { useGetEvidenceCountByStatusQuery, useGetEvidencesForHostQuery } from "../../service/evidenceService.js";
 import EvidenceDetailModal from "../../component/ChallengeDetailModal.jsx";
 import { useTranslation } from "react-i18next";
@@ -104,6 +107,9 @@ const HostEvidenceManagement = ({ challengeId }) => {
         { skip: !selectedMember }
     );
 
+    const { data, } = useGetChallengeStatisticsQuery(challengeId);
+
+
     const handleStatusFilterChange = (status) => {
         setStatusFilter(status);
         setEvidencePage(0);
@@ -200,15 +206,24 @@ const HostEvidenceManagement = ({ challengeId }) => {
     const prevEvidencePage = () => setEvidencePage(prev => Math.max(prev - 1, 0));
 
     const isLoading = isLoadingMembers || isFetchingMembers;
-
+    if (isLoading || !data) return <p>Loading statistics...</p>;
     return (
         <div className="flex flex-col">
             <div className="flex-1 flex flex-col overflow-hidden">
                 <div className="py-2">
                     <ChallengeStatistic
-                        totalParticipants={25}
-                        completed={15}
-                        notCompleted={10}
+                        challengeName={data.challengeName}
+                        totalParticipants={data.totalParticipants}
+                        totalGroups={data.totalGroups}
+                        totalEvidenceSubmitted={data.totalEvidenceSubmitted}
+                        approvedEvidence={data.approvedEvidence}
+                        pendingEvidence={data.pendingEvidence}
+                        rejectedEvidence={data.rejectedEvidence}
+                        participationRate={data.participationRate}
+                        completionRate={data.completionRate}
+                        evidenceSubmittedToday={data.evidenceSubmittedToday}
+                        pendingReviewToday={data.pendingReviewToday}
+                        today={data.today}
                     />
                 </div>
                 <div className="w-full flex-grow">

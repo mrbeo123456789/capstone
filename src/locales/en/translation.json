@@ -534,19 +534,21 @@
   },
 
   "VideoModal": {
-    "approveMessage": "I approve this video",
-    "approveSuccess": "Approved successfully!",
-    "approveFail": "Failed to approve!",
-    "rejectMessage": "I don't approve this video",
-    "rejectSuccess": "Rejected successfully!",
-    "rejectFail": "Failed to reject!",
-    "browserNotSupported": "Your browser does not support the video tag.",
-    "rejectButton": "I don't approve this video",
-    "approveButton": "I approve this video",
+    "ratePerformance": "Rate Performance",
+    "rejectButton": "Disapprove",
+    "approveButton": "Approve",
+    "cancel": "Cancel",
+    "sendFeedback": "Submit Feedback",
+    "enterRejectionReason": "Why are you disapproving this?",
     "reviewSubmitted": "Review submitted successfully!",
-    "previous": "Previous",
-    "next": "Next"
+    "approveMessage": "Good performance!",
+    "rejectMessage": "Needs improvement.",
+    "approveSuccess": "Evidence approved!",
+    "rejectSuccess": "Feedback submitted!",
+    "approveFail": "Failed to approve evidence.",
+    "rejectFail": "Failed to submit rejection."
   },
+
   "VoteOther": {
     "title": "Vote for Others' Proof",
     "loading": "Loading videos...",
@@ -640,7 +642,6 @@
     "page": "Page",
     "of": "/"
   }
-
 
 }
 
