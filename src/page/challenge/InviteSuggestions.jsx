@@ -63,7 +63,7 @@ const InviteSuggestions = ({ onClose }) => {
                             </div>
                             <div>
                                 <p className="font-semibold text-gray-800">{member?.name}</p>
-                                <p className="text-gray-600 text-sm">{member?.reason}</p>
+                                <p className="text-gray-600 text-sm">{t(member?.reason)}</p>
                             </div>
                         </div>
                         <input

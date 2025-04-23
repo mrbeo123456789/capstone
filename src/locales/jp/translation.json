@@ -269,7 +269,12 @@
     "challengeStatusUpdated.title": "チャレンジのステータスが更新されました",
     "notification.challengeStatusUpdated.content": "チャレンジ「{{challengeName}}」のステータスが「{{status}}」に更新されました"
   },
-  "yourChallenge": {
+
+  "suggest.reason.both": "共通の興味があり、近くにいます",
+  "suggest.reason.same_interest": "共通の興味があります",
+  "suggest.reason.near_location": "近くにいます",
+
+"yourChallenge": {
     "create": "チャレンジを作成",
     "search": "検索",
     "filter": "フィルター",

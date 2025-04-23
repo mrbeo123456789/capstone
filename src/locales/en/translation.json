@@ -700,6 +700,9 @@
     }
   },
 
+  "suggest.reason.both": "Shares your interest and is nearby",
+  "suggest.reason.same_interest": "Shares your interest",
+  "suggest.reason.near_location": "Is nearby your location",
   "rankingList": {
     "top3Progress": "Top 3 Progress",
     "rank": "Rank",
