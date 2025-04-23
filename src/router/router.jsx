@@ -39,7 +39,7 @@ import ChallengeStatistics from "../page/admin/detailmodal/challengeStatistic.js
 const router = createBrowserRouter([
     { path: "/", element: <Navigate to="/homepage" /> },
     { path: "*", element: <NotFoundPage /> },
-
+    { path: "create", element: <ChallengeForm /> },
     // Public layout for non-authenticated pages
     {
         path: "/",

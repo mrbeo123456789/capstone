@@ -163,6 +163,7 @@
   "createChallenge": {
     "create": "Create Challenge",
     "creating": "Creating Challenge",
+    "maxMembersPerGroup": "Số người trong 1 nhóm",
     "success": "Challenge created successfully!",
     "editTitle": "Edit Challenge",
     "successUpdate": "Challenge updated successfully!",

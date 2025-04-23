@@ -137,6 +137,9 @@
   "createChallenge": {
     "create": "Tạo thử thách",
     "isParticipate": "Có tham gia hay không",
+    "maxMembersPerGroup": "Số người trong 1 nhóm",
+    "maxParticipants": "Số người tham gia tối đa",
+    "maxGroups": "Số nhóm tham gia tối đa",
     "creating": "Đang tạo thử thách...",
     "success": "Tạo thử thách thành công!",
     "editTitle": "Chỉnh sửa thử thách",
@@ -166,10 +169,10 @@
       "individual": "Cá nhân",
       "group": "Nhóm"
     },
-    "isParticipate": {
+
       "join": "Tham gia",
-      "not join": "Không tham gia"
-    },
+      "not join": "Không tham gia",
+
     "challengeType": "Loại thử thách",
     "selectChallengeType": "Chọn loại thử thách",
     "maxParticipants": "Số người tham gia tối đa",

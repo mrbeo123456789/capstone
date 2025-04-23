@@ -268,7 +268,7 @@ const CreateChallenge = () => {
                             </select>
                             <p className="text-red-600">{errors.challengeTypeId?.message}</p>
                         </div>
-                        {participationType === "INDIVIDUAL" ? (
+                        {participationType === "INDIVIDUAL" && (
                             <div>
                                 <label className="text-sm font-medium">{t("createChallenge.maxParticipants")}</label><span
                                 className="text-red-500">*</span>
@@ -279,17 +279,31 @@ const CreateChallenge = () => {
                                 />
                                 <p className="text-red-600">{errors.maxParticipants?.message}</p>
                             </div>
-                        ) : (
-                            <div>
-                                <label className="text-sm font-medium">{t("createChallenge.maxMembersPerGroup")}</label><span
-                                className="text-red-500">*</span>
-                                <input
-                                    type="number"
-                                    {...register("maxMembersPerGroup")}
-                                    className="w-full p-2 border rounded-md"
-                                />
-                                <p className="text-red-600">{errors.maxMembersPerGroup?.message}</p>
-                            </div>
+                        )}
+
+                        {participationType === "GROUP" && (
+                            <>
+                                <div>
+                                    <label className="text-sm font-medium">{t("createChallenge.maxGroups")}</label><span
+                                    className="text-red-500">*</span>
+                                    <input
+                                        type="number"
+                                        {...register("maxParticipants")}
+                                        className="w-full p-2 border rounded-md"
+                                    />
+                                    <p className="text-red-600">{errors.maxParticipants?.message}</p>
+                                </div>
+                                <div>
+                                    <label className="text-sm font-medium">{t("createChallenge.maxMembersPerGroup")}</label><span
+                                    className="text-red-500">*</span>
+                                    <input
+                                        type="number"
+                                        {...register("maxMembersPerGroup")}
+                                        className="w-full p-2 border rounded-md"
+                                    />
+                                    <p className="text-red-600">{errors.maxMembersPerGroup?.message}</p>
+                                </div>
+                            </>
                         )}
                     </div>
 
