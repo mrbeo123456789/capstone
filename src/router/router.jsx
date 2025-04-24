@@ -31,44 +31,52 @@ import ReportDetail from "../page/admin/detailmodal/ReportDetail.jsx";
 import {AdminRoute, MemberRoute} from "./ProtectRouter.jsx";
 import Statistics from "../page/member/Statistics.jsx";
 import Achievement from "../page/member/Achievement.jsx";
-
+import CreateChallenge from "../page/admin/detailmodal/CreateChallenge.jsx";
+import Settings from "../page/admin/list/Settings.jsx";
+import Leaderboard from "../page/ui/Leaderboard.jsx";
+import ChallengeEdit from "../page/challenge/ChallengeEdit.jsx";
+import ChallengeStatistics from "../page/admin/detailmodal/challengeStatistic.jsx";
 const router = createBrowserRouter([
-    { path: "/", element: <Navigate to="/homepage" /> },
+    { path: "/", element: <Navigate to="/challenges" /> },
     { path: "*", element: <NotFoundPage /> },
-
+    { path: "create", element: <ChallengeForm /> },
     // Public layout for non-authenticated pages
     {
         path: "/",
         element: <Layout />, // ✅ Layout wraps all main pages
         children: [
-            { path: "homepage", element: <HomePage /> },
+            { path: "homepage", element: <MemberRoute><HomePage /></MemberRoute> },
             { path: "aboutus", element: <AboutUsPage /> },
             { path: "profile", element: <MemberRoute><MemberProfile /></MemberRoute> },
             { path: "statistics", element: <MemberRoute><Statistics /></MemberRoute> },
             { path: "achievement", element: <MemberRoute><Achievement /></MemberRoute> },
             { path: "password", element: <MemberRoute><ChangePassword /></MemberRoute> },
+            { path: "ranking", element: <MemberRoute><Leaderboard/></MemberRoute>},
+            { path: "challenges/detail/:id", element: <ChallengeDetail /> },
+            { path: "challenges", element: <ChallengePage /> },
             {
                 path: "challenges",
                 element: <MemberRoute><Outlet /></MemberRoute>,
                 children: [
-                    { index: true, element: <ChallengePage /> },
                     { path: "joins", element: <YourChallenge /> },
                     { path: "create", element: <ChallengeForm /> },
-                    { path: "detail/:id", element: <ChallengeDetail /> },
-                    { path: "joins/detail/:id", element: <JoinedChallengeDetail /> }
+                    { path: "joins/detail/:id", element: <JoinedChallengeDetail /> },
+                    { path: "edit/:id", element: <ChallengeEdit/>}
                 ]
             },
             {
                 path: "groups",
                 element: <MemberRoute><Outlet /></MemberRoute>,
                 children: [
-                    { path: "create", element: <GroupForm /> },
-                    { path: "joins", element: <YourGroup /> },
-                    { path: "joins/:id", element: <GroupUsers /> }
+                    { path: "create", element: <GroupForm /> },     // Tạo mới nhóm
+                    { path: "joins", element: <YourGroup /> },      // Danh sách nhóm đã tham gia
+                    { path: "joins/:id", element: <GroupUsers /> }, // Chi tiết nhóm đã tham gia
+                    { path: ":id/edit", element: <GroupForm /> }
                 ]
-            },
+            }
         ]
     },
+
 
     // Standalone auth pages (outside layout)
     { path: "/login", element: <LoginPage /> },
@@ -77,7 +85,6 @@ const router = createBrowserRouter([
     { path: "/enter-otp", element: <EnterOTP /> },
     { path: "/reset-password", element: <ResetPassword /> },
     { path: "/auth/callback", element: <AuthCallBack /> },
-    { path: "/home", element: <Home /> },
 
     // Admin-only layout
     {
@@ -85,19 +92,22 @@ const router = createBrowserRouter([
         element: <AdminRoute><Outlet /></AdminRoute>,
         children: [
             { path: "dashboard", element: <AdminDashboard /> },
-            { path: "userlist", element: <UserList /> },
-            { path: "evidencelist", element: <ChallengeEvidencePage /> },
+            { path: "usermanagement", element: <UserList /> },
+            { path: "evidencemanagement", element: <ChallengeEvidencePage /> },
+            {path: "settings", element: <Settings /> },
             {
-                path: "reports",
+                path: "reports/*",
+                element: <ReportList />,
                 children: [
-                    { index: true, element: <ReportList /> },
+                    // { index: true, element: <ReportList /> },
                     { path: ":reportId/detail", element: <ReportDetail /> }
                 ]
             },
-            { path: "reportdetail", element: <ReportDetail /> },
-            { path: "grouplist", element: <GroupList /> },
-            { path: "challengelist", element: <ChallengeList /> },
-            { path: "challenge/:id/detail", element: <AdminChallengeDetail /> }
+            { path: "groupmanagement", element: <GroupList /> },
+            { path: "challengemanagement", element: <ChallengeList /> },
+            { path: "challenge/create", element: <CreateChallenge /> },
+            { path: "challenge/statistics", element: <ChallengeStatistics /> },
+            { path: "/adminchallenge/:id/detail", element: <AdminChallengeDetail /> }
         ]
     }
 ]);

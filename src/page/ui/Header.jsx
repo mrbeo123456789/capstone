@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { IoGlobeOutline } from "react-icons/io5";
 import { FiLogOut } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
-import NotificationDropdown from "../../component/NotificationDropdown.jsx";
+import {NotificationDropdown} from "../../component/NotificationDropdown.jsx";
 import { Link } from "react-router-dom";
 
 const Header = ({ toggleSidebar }) => {
@@ -44,7 +44,7 @@ const Header = ({ toggleSidebar }) => {
                         <span className="block w-6 h-1 bg-orange-400"></span>
                         <span className="block w-6 h-1 bg-orange-400"></span>
                     </button>
-                    <Link to="/homepage" className="flex items-center space-x-2">
+                    <Link to="/dashboard" className="flex items-center space-x-2">
                         <img
                             src="https://firebasestorage.googleapis.com/v0/b/bookstore-f9ac2.appspot.com/o/logo%2Fimage-removebg-preview.png?alt=media&token=f16618d4-686c-4014-a9cc-99b4cf043c86"
                             alt="GoBeyond"

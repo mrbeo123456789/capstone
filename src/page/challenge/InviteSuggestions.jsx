@@ -4,6 +4,7 @@ import { useSuggestMembersQuery } from "../../service/invitationService.js";
 import { IoPersonAdd } from "react-icons/io5";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
+import { useSendInvitationMutation } from "../../service/invitationService";
 
 const InviteSuggestions = ({ onClose }) => {
     const { t } = useTranslation();
@@ -18,16 +19,27 @@ const InviteSuggestions = ({ onClose }) => {
             setSelected([...selected, id]);
         }
     };
+    const [sendInvitation] = useSendInvitationMutation();
 
     const handleInvite = async () => {
         if (selected.length === 0) {
             toast.warn(t("challengeInvite.selectAtLeastOne"));
             return;
         }
-        // Here you should call your invite API if needed
-        toast.success(`${t("challengeInvite.inviteSuccess")} (${selected.length})`);
-        onClose();
+        try {
+            await sendInvitation({
+                challengeId,
+                memberIds: selected,
+                type: "MEMBER"
+            });
+            toast.success(`${t("challengeInvite.inviteSuccess")} (${selected.length})`);
+            onClose();
+        } catch (err) {
+            console.error("Failed to send invitations:", err);
+            toast.error(t("challengeInvite.inviteFailed"));
+        }
     };
+
 
     if (isLoading) return <div className="p-4">Loading suggestions...</div>;
     if (error) return <div className="p-4 text-red-500">Error loading suggestions</div>;
@@ -51,7 +63,7 @@ const InviteSuggestions = ({ onClose }) => {
                             </div>
                             <div>
                                 <p className="font-semibold text-gray-800">{member?.name}</p>
-                                <p className="text-gray-600 text-sm">{member?.reason}</p>
+                                <p className="text-gray-600 text-sm">{t(member?.reason)}</p>
                             </div>
                         </div>
                         <input

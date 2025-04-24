@@ -1,13 +1,6 @@
 import { useState } from "react";
 import { FaStar, FaStarHalfAlt, FaRegStar, FaSearch } from "react-icons/fa";
-
-const rankings = [
-    { rank: 1, name: "Nam", image: "https://randomuser.me/api/portraits/men/1.jpg", rating: 5, votes: 100, progress: "20/20" },
-    { rank: 2, name: "Nguyễn Duy Anh", image: "https://randomuser.me/api/portraits/men/2.jpg", rating: 4.75, votes: 95, progress: "20/20" },
-    { rank: 3, name: "Lê Văn Duy", image: "https://randomuser.me/api/portraits/men/3.jpg", rating: 4.2, votes: 80, progress: "19/20" },
-    { rank: 4, name: "Đinh Nam", image: "https://randomuser.me/api/portraits/men/4.jpg", rating: 4.1, votes: 70, progress: "19/20" },
-    { rank: 5, name: "User Name", image: "https://randomuser.me/api/portraits/women/5.jpg", rating: 3.5, votes: 60, progress: "18/20" },
-];
+import {useGetGlobalRankingQuery} from "../../../service/rankingService.js";
 
 const renderStars = (rating) => {
     const stars = [];
@@ -22,40 +15,58 @@ const renderStars = (rating) => {
 const TopRankingList = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
+    const pageSize = 5;
 
-    const usersPerPage = 4;
-    const filtered = rankings.filter(user => user.name.toLowerCase().includes(searchTerm.toLowerCase()));
-    const totalPages = Math.ceil(filtered.length / usersPerPage);
-    const currentUsers = filtered.slice((currentPage - 1) * usersPerPage, currentPage * usersPerPage);
+    const { data, isLoading, isError } = useGetGlobalRankingQuery({ page: currentPage - 1, size: pageSize });
+    const totalPages = data?.totalPages || 1;
+
+    const filteredUsers = (data?.content || []).filter(user =>
+        user.memberName?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     return (
         <div className="bg-white p-3 rounded-lg shadow-md h-[410px]">
-            <div className="flex items-center border border-gray-300 rounded px-2 py-1">
+            <div className="flex items-center border border-gray-300 rounded px-2 py-1 mb-3">
                 <FaSearch className="text-gray-500 mr-2" />
                 <input
                     type="text"
-                    placeholder="Search user..."
+                    placeholder="Tìm kiếm người dùng..."
                     className="w-full outline-none"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
             </div>
-            <div>
-                {currentUsers.map((user, i) => (
-                    <div key={i} className="flex items-center justify-between bg-gray-50 rounded shadow-sm h-[80px] overflow-hidden">
-                        <div className="flex items-center space-x-3">
-                            <img src={user.image} alt={user.name} className="w-12 h-12 rounded-full" />
-                            <div>
-                                <p className="font-semibold">{user.name}</p>
-                                <p className="text-sm text-gray-600">Avg stars: {user.rating}</p>
-                                <p className="text-xs text-gray-500">Stars: {user.votes}</p>
+
+            {isLoading ? (
+                <p className="text-center text-sm">Đang tải bảng xếp hạng...</p>
+            ) : isError ? (
+                <p className="text-center text-sm text-red-500">Lỗi khi tải dữ liệu.</p>
+            ) : filteredUsers.length === 0 ? (
+                <p className="text-center text-sm text-gray-500">Không tìm thấy người dùng.</p>
+            ) : (
+                <div className="space-y-3">
+                    {filteredUsers.map((user, i) => (
+                        <div key={user.memberId || i} className="flex items-center justify-between bg-gray-50 rounded shadow-sm p-2 h-[80px] overflow-hidden">
+                            <div className="flex items-center space-x-3">
+                                <img
+                                    src={user.avatar || "/default-avatar.png"}
+                                    alt={user.memberName}
+                                    className="w-12 h-12 rounded-full object-cover"
+                                    onError={(e) => { e.target.onerror = null; e.target.src = "/default-avatar.png"; }}
+                                />
+                                <div>
+                                    <p className="font-semibold">{user.memberName}</p>
+                                    <p className="text-sm text-gray-600">Đánh giá: {user.averageStar?.toFixed(2)}</p>
+                                    <div className="flex space-x-1">{renderStars(user.averageStar || 0)}</div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                ))}
-            </div>
+                    ))}
+                </div>
+            )}
+
             {/* Pagination */}
-            <div className="flex justify-center space-x-1">
+            <div className="flex justify-center mt-4 space-x-1">
                 {Array.from({ length: totalPages }, (_, i) => (
                     <button
                         key={i}
@@ -66,7 +77,10 @@ const TopRankingList = () => {
                     </button>
                 ))}
                 {currentPage < totalPages && (
-                    <button onClick={() => setCurrentPage(currentPage + 1)} className="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded">
+                    <button
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        className="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded"
+                    >
                         &gt;
                     </button>
                 )}

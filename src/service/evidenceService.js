@@ -66,14 +66,43 @@ export const evidenceService = createApi({
         }),
 
         getEvidencesForHost: builder.query({
-            query: ({ challengeId, memberId, status, page = 0, size = 10 } = {}) => {
-                const params = new URLSearchParams();
-                params.append("challengeId", challengeId);
-                if (memberId) params.append("memberId", memberId);
-                if (status) params.append("status", status);
-                params.append("page", page);
-                params.append("size", size);
-                return `/host/evidences?${params.toString()}`;
+            query: ({ challengeId, memberId, status, page = 0, size = 10 }) => {
+                // Build params matching backend @GetMapping("/host/evidences")
+                const params = { challengeId, page, size };
+                if (memberId != null) params.memberId = memberId;
+                if (status) params.status = status;
+                return {
+                    url: "/evidences/host/evidences",
+                    method: "GET",
+                    params,
+                };
+            },
+        }),
+        getEvidenceCountByStatus: builder.query({
+            query: ({ challengeId, memberId }) => ({
+                url: "/evidences/count",
+                method: "GET",
+                params: { challengeId, memberId },
+            }),
+        }),
+
+        getTasksForDate: builder.query({
+            query: (date) => {
+                // If date is not provided, the backend will use current date
+                const params = {};
+                if (date) {
+                    // Ensure date is in ISO format (YYYY-MM-DD)
+                    if (date instanceof Date) {
+                        params.date = date.toISOString().split('T')[0];
+                    } else {
+                        params.date = date;
+                    }
+                }
+                return {
+                    url: "/evidences/tasks",
+                    method: "GET",
+                    params,
+                };
             },
         }),
     }),
@@ -86,4 +115,6 @@ export const {
     useGetEvidencesToReviewQuery,
     useGetMyEvidencesByChallengeQuery,
     useGetEvidencesForHostQuery,
+    useGetEvidenceCountByStatusQuery,
+    useGetTasksForDateQuery
 } = evidenceService;

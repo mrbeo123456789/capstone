@@ -59,13 +59,27 @@ export const memberService = createApi({
                 return { message: response };
             },
         }),
+        getCurrentMemberId: builder.query({
+            query: () => "/member/me",
+            providesTags: ["Member"],
+        }),
+// API lấy thống kê của thành viên hiện tại
+        getMyStatistics: builder.query({
+            query: () => "/member/statistics",
+            providesTags: ["Member"],
+        }),
+
+
     }),
+
 });
 
 export const {
+    useGetCurrentMemberIdQuery,
     useGetMembersQuery,
     useGetMemberByIdQuery,
     useGetMyProfileQuery,
     useUpdateMemberMutation ,
     useChangePasswordMutation,
+    useGetMyStatisticsQuery,
 } = memberService;

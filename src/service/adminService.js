@@ -122,18 +122,26 @@ export const adminUserService = createApi({
         }),
         getGrowth: builder.query({
             query: ({ range = 'MONTH' } = {}) => `admin/dashboard/growth?range=${encodeURIComponent(range)}`,
-            providesTags: ['Dashboard'],
+            providesTags: ['Admin'],
         }),
 
         reviewChallenge: builder.mutation({
-            query: (reviewRequest) => {
-                console.log("Reviewing Challenge:", reviewRequest);
-                return {
-                    url: `/admin/challenges/review`,
-                    method: "POST",
-                    body: reviewRequest,
-                };
-            },
+            query: (reviewData) => ({
+                url: '/admin/challenges/review',  // Fixed URL path
+                method: 'POST',
+                body: reviewData,
+                responseHandler: async (response) => {
+                    // First try to get response as JSON
+                    try {
+                        const data = await response.json();
+                        return data;
+                    } catch (error) {
+                        // If JSON parsing fails, get response as text
+                        const text = await response.text();
+                        return { message: text, success: response.ok };
+                    }
+                }
+            }),
             invalidatesTags: ["Admin"],
         }),
 

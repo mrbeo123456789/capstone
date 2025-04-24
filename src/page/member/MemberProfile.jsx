@@ -64,7 +64,7 @@ function MemberProfile() {
             setValue("district", userData.district || "");
             setValue("ward", userData.ward || "");
             setValue("invitePermission", userData.invitePermission || "");
-            setValue("dateOfBirth", formatDate(userData.dateOfBirth));
+            setValue("dateOfBirth", userData.dateOfBirth);
             setPreview(userData.avatar || "");
             setSelectedProvince(userData.province || "");
             setSelectedDistrict(userData.district || "");
@@ -281,7 +281,7 @@ function MemberProfile() {
                             {/* Gender */}
                             <div>
                                 <label className="text-sm font-medium text-black block">{t('gender')}
-                                    <span className="text-red-500">*</span>
+                                    {/*<span className="text-red-500">*</span>*/}
                                 </label>
                                 <select {...register("gender")} defaultValue={user?.gender || ""}
                                         className="w-full sm:w-1/2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">

@@ -14,7 +14,6 @@ export const invitationService = createApi({
         },
     }),
     endpoints: (builder) => ({
-        // POST: /api/member/invitations/send/personal
         sendInvitation: builder.mutation({
             query: (payload) => ({
                 url: "/member/invitations/send/personal",
@@ -26,7 +25,6 @@ export const invitationService = createApi({
             }),
         }),
 
-        // POST: /api/member/invitations/send/group
         sendGroupInvitation: builder.mutation({
             query: (payload) => ({
                 url: "/member/invitations/send/group",
@@ -38,15 +36,14 @@ export const invitationService = createApi({
             }),
         }),
 
-        // POST: /api/member/invitations/respond/{invitationId}?accept=true
         respondInvitation: builder.mutation({
-            query: ({ invitationId, accept }) => ({
-                url: `/member/invitations/respond/${invitationId}?accept=${accept}`,
+            query: ({ invitationId, invitationType, accept }) => ({
+                url: `/member/invitations/respond`,
                 method: "POST",
+                body: { invitationId, invitationType, accept },
             }),
         }),
 
-        // GET: /api/member/invitations/member
         getMyInvitations: builder.query({
             query: () => ({
                 url: "/member/invitations/member",
@@ -54,22 +51,29 @@ export const invitationService = createApi({
             }),
         }),
 
-        // POST: /api/member/invitations/search
         searchMembersForChallengeInvite: builder.mutation({
             query: (payload) => ({
                 url: `/member/invitations/search`,
                 method: "POST",
-                body: payload, // { challengeid: ..., keyword: ... }
+                body: payload,
                 headers: {
                     "Content-Type": "application/json",
                 },
             }),
         }),
 
-        // GET: /api/member/invitations/suggest/{challengeId}
         suggestMembers: builder.query({
             query: (challengeId) => ({
                 url: `/member/invitations/suggest/${challengeId}`,
+                method: "GET",
+            }),
+        }),
+
+        // ✅ Đặt đúng chỗ ở đây
+        searchAvailableGroupLeaders: builder.mutation({
+            query: ({ challengeId, keyword }) => ({
+                url: `/member/invitations/${challengeId}/search-leaders`,
+                params: { keyword },
                 method: "GET",
             }),
         }),
@@ -83,4 +87,5 @@ export const {
     useGetMyInvitationsQuery,
     useSearchMembersForChallengeInviteMutation,
     useSuggestMembersQuery,
+    useSearchAvailableGroupLeadersMutation,
 } = invitationService;

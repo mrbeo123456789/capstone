@@ -1,0 +1,36 @@
+{
+  "candidate": {
+    "fullNameRequired": "氏名は必須です！",
+    "dobRequired": "生年月日は必須です！",
+    "dobInvalid": "16歳以上である必要があります！",
+    "genderRequired": "性別は必須です！"
+  },
+  "challenge": {
+    "nameRequired": "チャレンジ名は必須です！",
+    "nameMin": "チャレンジ名は最低3文字必要です",
+    "startDateRequired": "開始日は必須です",
+    "startDateMin": "開始日は今日以降である必要があります",
+    "endDateRequired": "終了日は必須です",
+    "endDateAfterStart": "終了日は開始日より後でなければなりません",
+    "maxParticipantsType": "参加者数は数値である必要があります",
+    "maxParticipantsPositive": "参加者数は0より大きい必要があります",
+    "maxParticipantsInteger": "参加者数は整数である必要があります",
+    "descriptionRequired": "説明は必須です",
+    "descriptionMin": "説明は10文字以上必要です",
+    "pictureRequired": "画像は必須です",
+    "pictureSize": "画像サイズは50MB以下にしてください",
+    "pictureType": "対応していないファイル形式です",
+    "challengeTypeRequired": "チャレンジタイプは必須です"
+  },
+  "login": {
+    "usernameRequired": "ユーザー名は必須です！",
+    "passwordRequired": "パスワードは必須です！",
+    "passwordMin": "パスワードは8文字以上である必要があります！"
+  },
+  "group": {
+    "nameRequired": "グループ名は必須です！",
+    "descriptionRequired": "説明は必須です！",
+    "pictureRequired": "グループの画像は必須です！"
+  }
+
+}

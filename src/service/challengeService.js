@@ -10,14 +10,13 @@ export const challengeService = createApi({
             if (token) {
                 headers.set("Authorization", `Bearer ${token}`);
             }
-            // ✅ Only set Content-Type for JSON requests, NOT for FormData
-            if (endpoint !== "createChallenge") {
+            if (endpoint !== "createChallenge" && endpoint !== "updateChallenge") {
                 headers.set("Content-Type", "application/json");
             }
             return headers;
         },
     }),
-    tagTypes: ["Challenge", "ChallengeTypes"], // Add tag type for types if needed
+    tagTypes: ["Challenge", "ChallengeTypes"],
     endpoints: (builder) => ({
         getChallenges: builder.query({
             query: () => "/challenges",
@@ -32,10 +31,10 @@ export const challengeService = createApi({
             invalidatesTags: ["Challenge"],
         }),
         updateChallenge: builder.mutation({
-            query: ({ id, ...patch }) => ({
-                url: `/challenges/${id}`,
+            query: ({ id, formData }) => ({
+                url: `/challenges/${id}/update`,
                 method: "PUT",
-                body: patch,
+                body: formData,
             }),
             invalidatesTags: ["Challenge"],
         }),
@@ -48,11 +47,18 @@ export const challengeService = createApi({
         }),
         getChallengeTypes: builder.query({
             query: () => "/challenges/challenge-types",
-            providesTags: ["ChallengeTypes"], // Optional
+            providesTags: ["ChallengeTypes"],
         }),
         getApprovedChallenges: builder.query({
             query: ({ page = 0, size = 10 } = {}) => ({
                 url: `/challenges/approved`,
+                params: { page, size },
+            }),
+            providesTags: ["Challenge"],
+        }),
+        getUpcomingApprovedChallenges: builder.query({
+            query: ({ page = 0, size = 10 } = {}) => ({
+                url: `/challenges/public/upcoming`,
                 params: { page, size },
             }),
             providesTags: ["Challenge"],
@@ -62,9 +68,7 @@ export const challengeService = createApi({
                 url: `/challenges/join`,
                 method: "POST",
                 body: challengeId,
-                headers: {
-                    "Content-Type": "application/json", // Vì bạn gửi Long đơn giản
-                },
+                headers: { "Content-Type": "application/json" },
             }),
             invalidatesTags: ["Challenge"],
         }),
@@ -78,6 +82,46 @@ export const challengeService = createApi({
         getChallengeDetail: builder.query({
             query: (challengeId) => `/challenges/${challengeId}/detail`,
         }),
+        reportChallenge: builder.mutation({
+            query: (payload) => ({
+                url: "/challenges/report",
+                method: "POST",
+                body: payload,
+                headers: {
+                    "Content-Type": "application/json", // ✅ Ensure JSON format
+                },
+            }),
+        }),
+        toggleCoHost: builder.mutation({
+            query: ({ challengeId, memberId }) => ({
+                url: `/challenges/${challengeId}/change-roles/${memberId}`,
+                method: "PUT",
+            }),
+        }),
+        joinGroupToChallenge: builder.mutation({
+            query: ({ groupId, challengeId }) => ({
+                url: `/challenges/${groupId}/join-challenge/${challengeId}`,
+                method: "POST",
+            }),
+        }),
+        leaveChallenge: builder.mutation({
+            query: (challengeId) => ({
+                url: `/challenges/${challengeId}/leave`,
+                method: "POST",
+            }),
+        }),
+        cancelChallenge: builder.mutation({
+            query: (challengeId) => ({
+                url: `/challenges/${challengeId}/cancel`,
+                method: "POST",
+            }),
+        }),
+        kickMemberFromChallenge: builder.mutation({
+            query: ({ challengeId, targetMemberId }) => ({
+                url: `/challenges/${challengeId}/kick/${targetMemberId}`,
+                method: "DELETE",
+            }),
+        }),
         getJoinedMembersWithPendingEvidence: builder.query({
             query: ({ challengeId, keyword = "", page = 0, size = 10 } = {}) => {
                 const params = new URLSearchParams();
@@ -86,9 +130,17 @@ export const challengeService = createApi({
                 }
                 params.append("page", page);
                 params.append("size", size);
-                return `/challenges/${challengeId}/members?${params.toString()}`;
+                return `challenges/${challengeId}/members?${params.toString()}`;
             },
             providesTags: ["Challenge"]
+        }),
+        getCompletedChallenges: builder.query({
+            query: () => "/challenges/completed", // 👈 your backend endpoint
+            providesTags: ["Challenge"],
+        }),
+        getChallengeStatistics: builder.query({
+            query: (challengeId) => `/challenges/${challengeId}/statistics`,
+            providesTags: ["Challenge"],
         }),
     }),
 });
@@ -98,11 +150,20 @@ export const {
     useCreateChallengeMutation,
     useUpdateChallengeMutation,
     useDeleteChallengeMutation,
-    useGetChallengeTypesQuery, // <- Add this
-    useGetApprovedChallengesQuery, // <--- Add this
-    useJoinChallengeMutation, // <--- Add this!
+    useGetChallengeTypesQuery,
+    useGetApprovedChallengesQuery,
+    useGetUpcomingApprovedChallengesQuery,
+    useJoinChallengeMutation,
     useGetMyChallengesMutation,
-    useGetChallengeDetailQuery, // ✅ Thêm dòng này
+    useGetChallengeDetailQuery,
+    useReportChallengeMutation,
+    useToggleCoHostMutation,
+    useJoinGroupToChallengeMutation,
+    useLeaveChallengeMutation,
+    useCancelChallengeMutation,
+    useKickMemberFromChallengeMutation,
     useGetJoinedMembersWithPendingEvidenceQuery,
+    useLazyGetCompletedChallengesQuery ,
+    useGetChallengeStatisticsQuery,
 } = challengeService;
 

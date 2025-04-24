@@ -3,7 +3,7 @@ import { IoCloudUploadOutline } from "react-icons/io5";
 import { useUploadEvidenceMutation } from "../../service/evidenceService.js";
 import { toast } from "react-toastify"; // ✅
 
-const MediaUpload = ({ date, onClose, challengeId }) => {
+const MediaUpload = ({ date, onClose, challengeId, onUploadSuccess }) => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [preview, setPreview] = useState(null);
     const fileInputRef = useRef(null);
@@ -31,12 +31,22 @@ const MediaUpload = ({ date, onClose, challengeId }) => {
     const handleSubmit = async () => {
         if (!selectedFile) return;
 
+        // Check if file size exceeds 100MB (100 * 1024 * 1024 bytes)
+        const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB in bytes
+        if (selectedFile.size > MAX_FILE_SIZE) {
+            toast.error("❌ File của bạn đã quá 100MB, vui lòng chọn file với dung lượng nhỏ hơn");
+            return;
+        }
+
         try {
             await uploadEvidence({ file: selectedFile, challengeId }).unwrap();
             toast.success("✅ Nộp bằng chứng thành công!");
             setSelectedFile(null);
             setPreview(null);
             onClose();
+            setTimeout(() => {
+                if (onUploadSuccess) onUploadSuccess();
+            }, 300);
         } catch (err) {
             console.error(err);
             const errorMessage =
@@ -46,6 +56,7 @@ const MediaUpload = ({ date, onClose, challengeId }) => {
             toast.error(errorMessage);
         }
     };
+
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -109,7 +120,7 @@ const MediaUpload = ({ date, onClose, challengeId }) => {
                         onClick={() => fileInputRef.current.click()}
                         className="text-sm text-blue-600 underline hover:text-blue-800"
                     >
-                        Change File
+                        Thay đổi file
                     </button>
                     <button
                         className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
@@ -119,14 +130,14 @@ const MediaUpload = ({ date, onClose, challengeId }) => {
                             onClose();
                         }}
                     >
-                        Cancel
+                        Hủy
                     </button>
                     <button
                         className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
                         onClick={handleSubmit}
                         disabled={!selectedFile || isLoading}
                     >
-                        {isLoading ? "Uploading..." : "Submit"}
+                        {isLoading ? "Đang nộp bằng chứng..." : "Gửi"}
                     </button>
                 </div>
             </div>

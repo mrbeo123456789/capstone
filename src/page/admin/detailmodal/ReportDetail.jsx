@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Sidebar from "../../navbar/AdminNavbar.jsx";
-import {  useUpdateReportStatusMutation } from "../../../service/adminService.js";
+import {  useUpdateReportStatusMutation, useReviewChallengeMutation } from "../../../service/adminService.js";
 import {  useGetChallengeDetailQuery,} from "../../../service/challengeService.js";
-import { ArrowLeft, Check, X } from "lucide-react";
+import { ArrowLeft, Check, X, Ban } from "lucide-react";
 
 const ReportDetail = ({ reportData }) => {
     const { reportId } = useParams();
@@ -12,13 +12,14 @@ const ReportDetail = ({ reportData }) => {
 
     // Use the reportData passed as props instead of fetching it
     const report = reportData;
-
+    console.log(report);
     // Fetch challenge details if report is loaded
     const { data: challengeData, isLoading: isLoadingChallenge, isError: isChallengeError } =
         useGetChallengeDetailQuery(report?.challengeId, { skip: !report?.challengeId });
-
+    console.log(challengeData)
     // Mutation for updating report status
     const [updateReportStatus, { isLoading: isUpdating }] = useUpdateReportStatusMutation();
+    const [reviewChallenge, { isLoading: isReviewing }] = useReviewChallengeMutation();
 
     // Handle approve report
     const handleApprove = async () => {
@@ -48,13 +49,63 @@ const ReportDetail = ({ reportData }) => {
         }
     };
 
-    // Format date from backend (array format)
-    const formatBackendDateArray = (dateArray) => {
-        if (!Array.isArray(dateArray) || dateArray.length < 3) return "Invalid date";
-        const [year, month, day] = dateArray;
-        const dd = day < 10 ? `0${day}` : day;
-        const mm = month < 10 ? `0${month}` : month;
-        return `${dd}/${mm}/${year}`;
+    // Handle ban challenge
+    const handleBanChallenge = async () => {
+        if (window.confirm("Are you sure you want to ban this challenge?")) {
+            try {
+                await reviewChallenge({
+                    challengeId: report.challengeId,
+                    status: "BANNED",
+                    reason: "Violation of community guidelines"
+                }).unwrap();
+
+                // Approve the report as well
+                await updateReportStatus({
+                    reportId: reportId,
+                    status: "APPROVED"
+                }).unwrap();
+
+                alert("Challenge has been banned successfully");
+                navigate('/admin/reports');
+            } catch (error) {
+                console.error("Failed to ban challenge:", error);
+                alert("Failed to ban challenge");
+            }
+        }
+    };
+
+    // Hàm định dạng ngày từ dữ liệu backend
+    const formatDate = (dateValue) => {
+        if (!dateValue) return "Invalid date";
+
+        let dateObj;
+
+        // Xử lý trường hợp dữ liệu là mảng (kiểu cũ)
+        if (Array.isArray(dateValue) && dateValue.length >= 3) {
+            const [year, month, day] = dateValue;
+            dateObj = new Date(year, month - 1, day);
+        }
+        // Xử lý trường hợp dữ liệu là timestamp hoặc chuỗi ngày tháng
+        else {
+            try {
+                dateObj = new Date(dateValue);
+            } catch (error) {
+                console.error("Error parsing date:", error);
+                return "Invalid date";
+            }
+        }
+
+        // Kiểm tra xem dateObj có phải là ngày hợp lệ không
+        if (isNaN(dateObj.getTime())) {
+            return "Invalid date";
+        }
+
+        // Format thành dd/mm/yyyy
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const year = dateObj.getFullYear();
+
+        return `${day}/${month}/${year}`;
     };
 
     // Return to reports list
@@ -67,7 +118,7 @@ const ReportDetail = ({ reportData }) => {
     const isError = !report || isChallengeError;
 
     return (
-        <div className="bg-red-50 min-h-screen flex flex-col">
+        <div className="bg-blue-50 min-h-screen flex flex-col">
             <div className="flex flex-1 overflow-hidden relative">
                 <div className={`transition-all duration-300 ${sidebarCollapsed ? 'w-16' : 'w-64'} flex-shrink-0`}>
                     <Sidebar
@@ -76,17 +127,17 @@ const ReportDetail = ({ reportData }) => {
                     />
                 </div>
                 <div className="flex-1 overflow-auto p-4">
-                    <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-orange-100 h-full flex flex-col">
+                    <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-blue-100 h-full flex flex-col">
                         {/* Header */}
-                        <div className="p-4 border-b border-orange-100 bg-gradient-to-r from-orange-50 to-yellow-50 flex justify-between items-center">
+                        <div className="p-4 border-b border-blue-100 bg-gradient-to-r from-blue-50 to-yellow-50 flex justify-between items-center">
                             <div className="flex items-center">
                                 <button
                                     onClick={goBack}
-                                    className="mr-4 p-2 rounded-md hover:bg-orange-100 transition-colors"
+                                    className="mr-4 p-2 rounded-md hover:bg-blue-100 transition-colors"
                                 >
                                     <ArrowLeft size={20} />
                                 </button>
-                                <h1 className="text-2xl font-bold text-orange-700">Report Details #{reportId}</h1>
+                                <h1 className="text-2xl font-bold text-blue-700">Report Details Of {report.challengeName}</h1>
                             </div>
 
                             {report && report.status === "PENDING" && (
@@ -94,7 +145,7 @@ const ReportDetail = ({ reportData }) => {
                                     <button
                                         onClick={handleReject}
                                         className="px-4 py-2 bg-white border border-red-500 text-red-500 rounded-md hover:bg-red-50 transition-colors disabled:opacity-50"
-                                        disabled={isUpdating}
+                                        disabled={isUpdating || isReviewing}
                                     >
                                         <div className="flex items-center space-x-2">
                                             <X size={16} />
@@ -104,7 +155,7 @@ const ReportDetail = ({ reportData }) => {
                                     <button
                                         onClick={handleApprove}
                                         className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors disabled:opacity-50"
-                                        disabled={isUpdating}
+                                        disabled={isUpdating || isReviewing}
                                     >
                                         <div className="flex items-center space-x-2">
                                             <Check size={16} />
@@ -119,7 +170,7 @@ const ReportDetail = ({ reportData }) => {
                         <div className="flex-1 overflow-y-auto p-6">
                             {isLoading ? (
                                 <div className="flex justify-center items-center h-64">
-                                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+                                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
                                 </div>
                             ) : isError ? (
                                 <div className="flex justify-center items-center h-64 text-red-500">
@@ -128,8 +179,8 @@ const ReportDetail = ({ reportData }) => {
                             ) : (
                                 <div className="space-y-8">
                                     {/* Report Information */}
-                                    <div className="bg-orange-50 p-6 rounded-lg">
-                                        <h3 className="text-lg font-semibold mb-4 text-orange-700">Report Information</h3>
+                                    <div className="bg-blue-50 p-6 rounded-lg">
+                                        <h3 className="text-lg font-semibold mb-4 text-blue-700">Report Information</h3>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <div>
                                                 <p className="text-gray-500 text-sm">ID</p>
@@ -143,7 +194,7 @@ const ReportDetail = ({ reportData }) => {
                                                         : report?.reportType === "INAPPROPRIATE_CONTENT"
                                                             ? "bg-red-100 text-red-700"
                                                             : report?.reportType === "RULE_VIOLATION"
-                                                                ? "bg-orange-100 text-orange-700"
+                                                                ? "bg-blue-100 text-blue-700"
                                                                 : report?.reportType === "OFFENSIVE_BEHAVIOR"
                                                                     ? "bg-purple-100 text-purple-700"
                                                                     : "bg-gray-100 text-gray-700"
@@ -173,16 +224,16 @@ const ReportDetail = ({ reportData }) => {
                                             </div>
                                             <div>
                                                 <p className="text-gray-500 text-sm">Created Date</p>
-                                                <p className="font-medium">{formatBackendDateArray(report?.createdAt)}</p>
+                                                <p className="font-medium">{formatDate(report?.createdAt)}</p>
                                             </div>
                                             <div className="md:col-span-2">
                                                 <p className="text-gray-500 text-sm">Report Content</p>
-                                                <p className="mt-2 bg-white p-4 rounded border border-orange-100">{report?.content || "No content provided"}</p>
+                                                <p className="mt-2 bg-white p-4 rounded border border-blue-100">{report?.content || "No content provided"}</p>
                                             </div>
                                             {report?.reporter && (
                                                 <div className="md:col-span-2">
                                                     <p className="text-gray-500 text-sm">Reported By</p>
-                                                    <div className="mt-2 bg-white p-4 rounded border border-orange-100">
+                                                    <div className="mt-2 bg-white p-4 rounded border border-blue-100">
                                                         <div className="flex items-center">
                                                             {report.reporter.avatar && (
                                                                 <img
@@ -205,7 +256,23 @@ const ReportDetail = ({ reportData }) => {
                                     {/* Challenge Information */}
                                     {challengeData ? (
                                         <div className="bg-blue-50 p-6 rounded-lg">
-                                            <h3 className="text-lg font-semibold mb-4 text-blue-700">Reported Challenge Information</h3>
+                                            <div className="flex justify-between items-center mb-4">
+                                                <h3 className="text-lg font-semibold text-blue-700">Reported Challenge Information</h3>
+
+                                                {report && report.status === "PENDING" && (
+                                                    <button
+                                                        onClick={handleBanChallenge}
+                                                        className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors disabled:opacity-50"
+                                                        disabled={isUpdating || isReviewing}
+                                                    >
+                                                        <div className="flex items-center space-x-2">
+                                                            <Ban size={16} />
+                                                            <span>Ban Challenge</span>
+                                                        </div>
+                                                    </button>
+                                                )}
+                                            </div>
+
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                                 <div>
                                                     <p className="text-gray-500 text-sm">Challenge ID</p>
@@ -216,21 +283,14 @@ const ReportDetail = ({ reportData }) => {
                                                     <p className="font-medium">{challengeData.name}</p>
                                                 </div>
                                                 <div>
-                                                    <p className="text-gray-500 text-sm">Created By</p>
-                                                    <div className="mt-2 flex items-center">
-                                                        {challengeData.creator?.avatar && (
-                                                            <img
-                                                                src={challengeData.creator.avatar}
-                                                                alt={challengeData.creator.name}
-                                                                className="w-8 h-8 rounded-full mr-2"
-                                                            />
-                                                        )}
-                                                        <span className="font-medium">{challengeData.creator?.name || "Unknown"}</span>
+                                                    <p className="text-gray-500 text-sm">Challenge Type</p>
+                                                    <div className="mt-2">
+                                                        <span className="font-medium">{challengeData.challengeType || "Unknown"}</span>
                                                     </div>
                                                 </div>
                                                 <div>
                                                     <p className="text-gray-500 text-sm">Created Date</p>
-                                                    <p className="font-medium">{formatBackendDateArray(challengeData.createdAt)}</p>
+                                                    <p className="font-medium">{formatDate(challengeData.createdAt)}</p>
                                                 </div>
                                                 <div className="md:col-span-2">
                                                     <p className="text-gray-500 text-sm">Description</p>
@@ -239,15 +299,17 @@ const ReportDetail = ({ reportData }) => {
                                                 <div>
                                                     <p className="text-gray-500 text-sm">Status</p>
                                                     <span className={`px-3 py-1 rounded-full text-sm font-medium inline-block mt-1 ${
-                                                        challengeData.status === "ACTIVE"
+                                                        challengeData.challengeStatus === "ACTIVE"
                                                             ? "bg-green-100 text-green-700"
-                                                            : challengeData.status === "INACTIVE"
+                                                            : challengeData.challengeStatus === "INACTIVE"
                                                                 ? "bg-gray-100 text-gray-700"
-                                                                : challengeData.status === "REPORTED"
+                                                                : challengeData.challengeStatus === "REPORTED"
                                                                     ? "bg-red-100 text-red-700"
-                                                                    : "bg-blue-100 text-blue-700"
+                                                                    : challengeData.challengeStatus === "BANNED"
+                                                                        ? "bg-black bg-opacity-80 text-white"
+                                                                        : "bg-blue-100 text-blue-700"
                                                     }`}>
-                                                        {challengeData.status}
+                                                        {challengeData.challengeStatus}
                                                     </span>
                                                 </div>
                                                 <div>

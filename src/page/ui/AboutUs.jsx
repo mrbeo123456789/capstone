@@ -1,8 +1,11 @@
 import React from "react";
 import { ChevronDown, Home } from "lucide-react";
 import Header from "./Header.jsx";
+import { useTranslation } from "react-i18next";
 
 const AboutUsPage = () => {
+    const { t } = useTranslation();
+
     const scrollToSection = (id) => {
         document.getElementById(id).scrollIntoView({ behavior: "smooth" });
     };
@@ -18,15 +21,15 @@ const AboutUsPage = () => {
             <div className="relative bg-gradient-to-r from-orange-600 via-red-500 to-yellow-500 text-white">
                 <div className="container mx-auto px-4 py-20 md:py-32">
                     <div className="max-w-3xl mx-auto text-center">
-                        <h1 className="text-4xl md:text-5xl font-bold mb-6">Về GoBeyond</h1>
+                        <h1 className="text-4xl md:text-5xl font-bold mb-6">{t("AboutUs.hero.title")}</h1>
                         <p className="text-lg md:text-xl mb-8">
-                            Thay đổi thế giới thông qua những thử thách đầy ý nghĩa
+                            {t("AboutUs.hero.subtitle")}
                         </p>
                         <button
                             onClick={() => scrollToSection("mission")}
                             className="flex items-center mx-auto bg-white text-red-600 px-6 py-3 rounded-full font-medium hover:bg-orange-100 transition-colors"
                         >
-                            Tìm hiểu thêm
+                            {t("AboutUs.hero.learnMore")}
                             <ChevronDown className="ml-2 h-5 w-5" />
                         </button>
                     </div>
@@ -38,10 +41,9 @@ const AboutUsPage = () => {
             <div id="mission" className="container mx-auto px-4 py-16">
                 <div className="max-w-4xl mx-auto">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-4xl font-bold text-orange-600 mb-6">Sứ mệnh của chúng tôi</h2>
+                        <h2 className="text-3xl md:text-4xl font-bold text-orange-600 mb-6">{t("AboutUs.mission.title")}</h2>
                         <p className="text-lg text-gray-700 leading-relaxed">
-                            GoBeyond ra đời với mục tiêu kết nối cộng đồng thông qua những thử thách mang lại giá trị tích cực.
-                            Chúng tôi tin rằng những hành động nhỏ, khi được thực hiện bởi nhiều người, có thể tạo nên sự thay đổi lớn cho xã hội và môi trường.
+                            {t("AboutUs.mission.description")}
                         </p>
                     </div>
 
@@ -50,9 +52,9 @@ const AboutUsPage = () => {
                             <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 text-2xl font-bold mb-4 mx-auto">
                                 1
                             </div>
-                            <h3 className="text-xl font-semibold text-orange-600 mb-3 text-center">Kết nối</h3>
+                            <h3 className="text-xl font-semibold text-orange-600 mb-3 text-center">{t("AboutUs.mission.pillars.connect.title")}</h3>
                             <p className="text-gray-600 text-center">
-                                Xây dựng cộng đồng những người có cùng đam mê và mong muốn tạo nên tác động tích cực
+                                {t("AboutUs.mission.pillars.connect.description")}
                             </p>
                         </div>
 
@@ -60,9 +62,9 @@ const AboutUsPage = () => {
                             <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 text-2xl font-bold mb-4 mx-auto">
                                 2
                             </div>
-                            <h3 className="text-xl font-semibold text-orange-600 mb-3 text-center">Thách thức</h3>
+                            <h3 className="text-xl font-semibold text-orange-600 mb-3 text-center">{t("AboutUs.mission.pillars.challenge.title")}</h3>
                             <p className="text-gray-600 text-center">
-                                Tạo ra những thử thách có ý nghĩa để thúc đẩy sự thay đổi và phát triển cá nhân
+                                {t("AboutUs.mission.pillars.challenge.description")}
                             </p>
                         </div>
 
@@ -70,9 +72,9 @@ const AboutUsPage = () => {
                             <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 text-2xl font-bold mb-4 mx-auto">
                                 3
                             </div>
-                            <h3 className="text-xl font-semibold text-orange-600 mb-3 text-center">Tạo tác động</h3>
+                            <h3 className="text-xl font-semibold text-orange-600 mb-3 text-center">{t("AboutUs.mission.pillars.impact.title")}</h3>
                             <p className="text-gray-600 text-center">
-                                Chuyển đổi những thử thách thành những hành động cụ thể giúp cải thiện cộng đồng và môi trường
+                                {t("AboutUs.mission.pillars.impact.description")}
                             </p>
                         </div>
                     </div>
@@ -83,21 +85,22 @@ const AboutUsPage = () => {
             <div className="bg-gradient-to-r from-orange-100 to-yellow-100 py-16">
                 <div className="container mx-auto px-4">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-4xl font-bold text-orange-600 mb-6">Đội ngũ của chúng tôi</h2>
+                        <h2 className="text-3xl md:text-4xl font-bold text-orange-600 mb-6">{t("AboutUs.team.title")}</h2>
                         <p className="text-lg text-gray-700 max-w-3xl mx-auto">
-                            Những con người đam mê và tận tâm đứng sau GoBeyond, luôn nỗ lực không ngừng để mang đến những trải nghiệm tốt nhất cho cộng đồng.
+                            {t("AboutUs.team.description")}
                         </p>
                     </div>
 
-                    <div className="grid md:grid-cols-4 gap-8">
+                    <div className="grid md:grid-cols-5 gap-6">
                         {[
-                            { name: "Nguyễn Văn A", role: "Nhà sáng lập & CEO", image: "/api/placeholder/300/300" },
-                            { name: "Trần Thị B", role: "Giám đốc Marketing", image: "/api/placeholder/300/300" },
-                            { name: "Lê Văn C", role: "Giám đốc Công nghệ", image: "/api/placeholder/300/300" },
-                            { name: "Phạm Thị D", role: "Quản lý Cộng đồng", image: "/api/placeholder/300/300" }
+                            { name: "Nguyễn Đình Anh Đức", role: t("AboutUs.team.roles.analyst"), image: "/api/placeholder/300/300" },
+                            { name: "Lương Thanh Cường", role: t("AboutUs.team.roles.backend"), image: "/api/placeholder/300/300" },
+                            { name: "Lê Văn Duy", role: t("AboutUs.team.roles.leader"), image: "/api/placeholder/300/300" },
+                            { name: "Nguyễn Xuân Khánh", role: t("AboutUs.team.roles.frontend"), image: "/api/placeholder/300/300" },
+                            { name: "Trần Khang Minh", role: t("AboutUs.team.roles.tester"), image: "/api/placeholder/300/300" }
                         ].map((member, index) => (
                             <div key={index} className="bg-white rounded-xl shadow-md overflow-hidden group">
-                                <div className="relative h-64 overflow-hidden">
+                                <div className="relative h-56 overflow-hidden">
                                     <img
                                         src={member.image}
                                         alt={member.name}
@@ -139,18 +142,18 @@ const AboutUsPage = () => {
             <div className="container mx-auto px-4 py-16">
                 <div className="max-w-4xl mx-auto">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-4xl font-bold text-orange-600 mb-6">Giá trị cốt lõi</h2>
+                        <h2 className="text-3xl md:text-4xl font-bold text-orange-600 mb-6">{t("AboutUs.values.title")}</h2>
                         <p className="text-lg text-gray-700 leading-relaxed">
-                            Những nguyên tắc định hướng mọi quyết định và hành động của chúng tôi
+                            {t("AboutUs.values.description")}
                         </p>
                     </div>
 
                     <div className="grid md:grid-cols-2 gap-8">
                         {[
-                            { title: "Trách nhiệm xã hội", description: "Chúng tôi tin vào việc tạo ra tác động tích cực cho cộng đồng và môi trường thông qua mọi hoạt động của mình." },
-                            { title: "Đổi mới", description: "Chúng tôi không ngừng tìm kiếm những cách mới để giải quyết vấn đề và tạo ra giá trị cho người dùng." },
-                            { title: "Tính minh bạch", description: "Chúng tôi xây dựng niềm tin thông qua sự cởi mở, trung thực và rõ ràng trong mọi hoạt động." },
-                            { title: "Cộng tác", description: "Chúng tôi tin rằng sức mạnh đến từ việc làm việc cùng nhau và học hỏi từ những quan điểm đa dạng." }
+                            { title: t("AboutUs.values.items.responsibility.title"), description: t("AboutUs.values.items.responsibility.description") },
+                            { title: t("AboutUs.values.items.innovation.title"), description: t("AboutUs.values.items.innovation.description") },
+                            { title: t("AboutUs.values.items.transparency.title"), description: t("AboutUs.values.items.transparency.description") },
+                            { title: t("AboutUs.values.items.collaboration.title"), description: t("AboutUs.values.items.collaboration.description") }
                         ].map((value, index) => (
                             <div key={index} className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
                                 <div className="flex items-center mb-4">
@@ -170,18 +173,18 @@ const AboutUsPage = () => {
             <div className="bg-gradient-to-r from-orange-100 to-yellow-100 py-16">
                 <div className="container mx-auto px-4">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-4xl font-bold text-orange-600 mb-6">Hành trình của chúng tôi</h2>
+                        <h2 className="text-3xl md:text-4xl font-bold text-orange-600 mb-6">{t("AboutUs.journey.title")}</h2>
                         <p className="text-lg text-gray-700 max-w-3xl mx-auto">
-                            Từ ý tưởng ban đầu đến một cộng đồng đang phát triển mạnh mẽ
+                            {t("AboutUs.journey.description")}
                         </p>
                     </div>
 
                     <div className="max-w-4xl mx-auto">
                         <div className="space-y-12">
                             {[
-                                { year: "2023", title: "Khởi nguồn", description: "GoBeyond được hình thành từ ý tưởng của một nhóm những người trẻ đam mê về việc tạo ra thay đổi tích cực." },
-                                { year: "2024", title: "Phát triển", description: "Nền tảng chính thức ra mắt với các tính năng cơ bản. Cộng đồng người dùng đầu tiên được hình thành." },
-                                { year: "2025", title: "Mở rộng", description: "GoBeyond phát triển mạnh mẽ với nhiều tính năng mới và cộng đồng người dùng ngày càng tăng trưởng." }
+                                { year: "2023", title: t("AboutUs.journey.milestones.beginning.title"), description: t("AboutUs.journey.milestones.beginning.description") },
+                                { year: "2024", title: t("AboutUs.journey.milestones.development.title"), description: t("AboutUs.journey.milestones.development.description") },
+                                { year: "2025", title: t("AboutUs.journey.milestones.expansion.title"), description: t("AboutUs.journey.milestones.expansion.description") }
                             ].map((milestone, index) => (
                                 <div key={index} className="flex">
                                     <div className="flex flex-col items-center mr-6">
@@ -204,9 +207,9 @@ const AboutUsPage = () => {
             {/* Contact Section */}
             <div className="container mx-auto px-4 py-16">
                 <div className="max-w-4xl mx-auto text-center">
-                    <h2 className="text-3xl md:text-4xl font-bold text-orange-600 mb-6">Kết nối với chúng tôi</h2>
+                    <h2 className="text-3xl md:text-4xl font-bold text-orange-600 mb-6">{t("AboutUs.contact.title")}</h2>
                     <p className="text-lg text-gray-700 mb-8">
-                        Chúng tôi luôn sẵn sàng lắng nghe ý kiến và đồng hành cùng bạn trong hành trình tạo nên những thay đổi tích cực
+                        {t("AboutUs.contact.description")}
                     </p>
                     <div className="bg-white p-8 rounded-xl shadow-md">
                         <div className="grid md:grid-cols-3 gap-6 mb-8 text-left">
@@ -216,7 +219,7 @@ const AboutUsPage = () => {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                     </svg>
                                 </div>
-                                <h3 className="font-semibold text-gray-800 mb-2 text-center">Email</h3>
+                                <h3 className="font-semibold text-gray-800 mb-2 text-center">{t("AboutUs.contact.email.title")}</h3>
                                 <p className="text-gray-600 text-center">fusep490g4@gmail.com</p>
                             </div>
                             <div className="flex flex-col items-center p-4">
@@ -225,7 +228,7 @@ const AboutUsPage = () => {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                                     </svg>
                                 </div>
-                                <h3 className="font-semibold text-gray-800 mb-2 text-center">Điện thoại</h3>
+                                <h3 className="font-semibold text-gray-800 mb-2 text-center">{t("AboutUs.contact.phone.title")}</h3>
                                 <p className="text-gray-600 text-center">+84 93 4388662</p>
                             </div>
                             <div className="flex flex-col items-center p-4">
@@ -235,19 +238,19 @@ const AboutUsPage = () => {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                     </svg>
                                 </div>
-                                <h3 className="font-semibold text-gray-800 mb-2 text-center">Địa chỉ</h3>
-                                <p className="text-gray-600 text-center">Hoa Lac Hi-tech Park, km 29, Đại lộ, Thăng Long, Hà Nội</p>
+                                <h3 className="font-semibold text-gray-800 mb-2 text-center">{t("AboutUs.contact.address.title")}</h3>
+                                <p className="text-gray-600 text-center">{t("AboutUs.contact.address.value")}</p>
                             </div>
                         </div>
                         <button className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-8 py-4 rounded-full font-medium hover:from-orange-600 hover:to-red-600 transition-colors">
-                            Liên hệ ngay
+                            {t("AboutUs.contact.button")}
                         </button>
                     </div>
                 </div>
             </div>
 
             {/* Custom CSS for wave effect */}
-            <style jsx>{`
+            <style>{`
                 .clip-path-wave {
                     clip-path: polygon(
                             0% 0%,
