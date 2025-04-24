@@ -10,9 +10,12 @@ const Header = ({ toggleSidebar }) => {
     const navigate = useNavigate();
     const { t, i18n } = useTranslation();
     const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false);
+    const [authChanged, setAuthChanged] = useState(0); // Used to force re-render when auth changes
     const [avatarUrl, setAvatarUrl] = useState("");
+    const token = localStorage.getItem("jwt_token");
 
     const menuItems = [
+        { href: "/homepage", title: t('menu.homepage'), text: t('menu.homepage') },
         { href: "/aboutus", title: t('menu.about'), text: t('menu.about') },
         { href: "/challenges", title: t('menu.challenges'), text: t('menu.challenges') },
         { href: "/ranking", title: t('menu.leaderboard'), text: t('menu.leaderboard') },
@@ -26,13 +29,17 @@ const Header = ({ toggleSidebar }) => {
 
     const handleLogout = () => {
         localStorage.clear();
+        setAuthChanged(prev => prev + 1); // 👈 trigger re-render
         navigate("/login");
     };
 
     useEffect(() => {
         const avatarFromStorage = localStorage.getItem("avatar");
-        setAvatarUrl(avatarFromStorage || "https://firebasestorage.googleapis.com/v0/b/bookstore-f9ac2.appspot.com/o/avatar%2Fillustration-of-human-icon-user-symbol-icon-modern-design-on-blank-background-free-vector.jpg?alt=media&token=f5c7e08a-9e7d-467f-8eff-3c321824edcd"); // fallback if missing
-    }, []);
+        setAvatarUrl(
+            avatarFromStorage ||
+            "https://firebasestorage.googleapis.com/v0/b/bookstore-f9ac2.appspot.com/o/avatar%2Fillustration-of-human-icon-user-symbol-icon-modern-design-on-blank-background-free-vector.jpg?alt=media&token=f5c7e08a-9e7d-467f-8eff-3c321824edcd"
+        );
+    }, [authChanged]); // 👈 re-trigger on auth change
 
     return (
         <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-white/10 shadow-lg border-b border-white/20 h-20 flex items-center px-4">
@@ -44,7 +51,7 @@ const Header = ({ toggleSidebar }) => {
                         <span className="block w-6 h-1 bg-orange-400"></span>
                         <span className="block w-6 h-1 bg-orange-400"></span>
                     </button>
-                    <Link to="/dashboard" className="flex items-center space-x-2">
+                    <Link to="/homepage" className="flex items-center space-x-2">
                         <img
                             src="https://firebasestorage.googleapis.com/v0/b/bookstore-f9ac2.appspot.com/o/logo%2Fimage-removebg-preview.png?alt=media&token=f16618d4-686c-4014-a9cc-99b4cf043c86"
                             alt="GoBeyond"
@@ -108,21 +115,38 @@ const Header = ({ toggleSidebar }) => {
                     {/* Notification Dropdown */}
                     <NotificationDropdown />
 
-                    {/* Avatar */}
-                    <img
-                        src={avatarUrl}
-                        alt="User Avatar"
-                        className="w-10 h-10 rounded-full border-2 border-white object-cover hidden sm:block"
-                    />
 
-                    {/* Logout Button */}
-                    <button
-                        onClick={handleLogout}
-                        className="flex items-center space-x-2 text-white hover:text-red-200 transition font-medium"
-                    >
-                        <FiLogOut className="text-xl" />
-                        <span className="hidden sm:block">{t('menu.logout')}</span>
-                    </button>
+
+                    {/* Login/Logout Button */}
+                    {token ? (
+                        <div className="flex flex-row gap-3">
+                            {/* Avatar */}
+                            <img
+                                src={avatarUrl}
+                                alt="User Avatar"
+                                className="w-10 h-10 rounded-full border-2 border-white object-cover hidden sm:block"
+                            />
+                            <button
+                                onClick={handleLogout}
+                                className="flex items-center space-x-2 text-white hover:text-red-200 transition font-medium"
+                            >
+                                <FiLogOut className="text-xl" />
+                                <span className="hidden sm:block">{t('menu.logout')}</span>
+                            </button>
+                        </div>
+                    ) : (
+                        <button
+                            onClick={() => {
+                                navigate("/login");
+                                setAuthChanged(prev => prev + 1); // 👈 trigger re-render on login nav
+                            }}
+                            className="flex items-center space-x-2 text-white hover:text-green-300 transition font-medium"
+                        >
+                            <FiLogOut className="text-xl rotate-180" />
+                            <span className="hidden sm:block">{t('menu.login')}</span>
+                        </button>
+                    )}
+
                 </div>
             </div>
         </header>

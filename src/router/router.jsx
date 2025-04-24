@@ -37,7 +37,7 @@ import Leaderboard from "../page/ui/Leaderboard.jsx";
 import ChallengeEdit from "../page/challenge/ChallengeEdit.jsx";
 import ChallengeStatistics from "../page/admin/detailmodal/challengeStatistic.jsx";
 const router = createBrowserRouter([
-    { path: "/", element: <Navigate to="/challenges" /> },
+    { path: "/", element: <Navigate to="/homepage" /> },
     { path: "*", element: <NotFoundPage /> },
     { path: "create", element: <ChallengeForm /> },
     // Public layout for non-authenticated pages
@@ -45,7 +45,7 @@ const router = createBrowserRouter([
         path: "/",
         element: <Layout />, // ✅ Layout wraps all main pages
         children: [
-            { path: "homepage", element: <MemberRoute><HomePage /></MemberRoute> },
+            { path: "homepage", element: <HomePage/> },
             { path: "aboutus", element: <AboutUsPage /> },
             { path: "profile", element: <MemberRoute><MemberProfile /></MemberRoute> },
             { path: "statistics", element: <MemberRoute><Statistics /></MemberRoute> },
