@@ -36,7 +36,12 @@ const JoinedChallengeDetail = () => {
     const { id } = useParams();
 
     const { data, isLoading, error } = useGetChallengeDetailQuery(id);
-    const { data: evidenceData, isEvidenceLoading } = useGetMyEvidencesByChallengeQuery(id);
+    const {
+        data: evidenceData,
+        isLoading: isEvidenceLoading,
+        refetch: refetchEvidence // 👈 Destructure refetch
+    } = useGetMyEvidencesByChallengeQuery(id);
+
     const [leaveChallenge] = useLeaveChallengeMutation();
 
     useEffect(() => {
@@ -219,7 +224,14 @@ const JoinedChallengeDetail = () => {
                             className="text-orange-500 font-semibold">{challenge?.challengeType}</span>
                         </p>
                         <div>
-                            <ProgressTracking challenge={challenge} evidence={evidenceData}/>
+                            <ProgressTracking
+                                challenge={challenge}
+                                evidence={evidenceData}
+                                onUploadSuccess={() => {
+                                    setActiveTab("review");     // ✅ Switch to "review" tab
+                                    refetchEvidence();                  // ✅ Refetch the evidence data
+                                }}
+                            />
                         </div>
                     </div>
                     <div className="bg-gray-200 flex items-center justify-center rounded-lg md:w-2/5">

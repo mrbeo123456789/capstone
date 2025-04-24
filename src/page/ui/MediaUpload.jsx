@@ -3,7 +3,7 @@ import { IoCloudUploadOutline } from "react-icons/io5";
 import { useUploadEvidenceMutation } from "../../service/evidenceService.js";
 import { toast } from "react-toastify"; // ✅
 
-const MediaUpload = ({ date, onClose, challengeId }) => {
+const MediaUpload = ({ date, onClose, challengeId, onUploadSuccess }) => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [preview, setPreview] = useState(null);
     const fileInputRef = useRef(null);
@@ -45,7 +45,7 @@ const MediaUpload = ({ date, onClose, challengeId }) => {
             setPreview(null);
             onClose();
             setTimeout(() => {
-                window.location.reload(); // ✅ Refresh the page
+                if (onUploadSuccess) onUploadSuccess();
             }, 300);
         } catch (err) {
             console.error(err);
