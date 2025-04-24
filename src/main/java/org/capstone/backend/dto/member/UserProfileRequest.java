@@ -20,7 +20,7 @@ public class UserProfileRequest {
 //        @Size(max = 50, message = "Last name cannot exceed 50 characters")
 //        private String lastName;
 
-        @Pattern(regexp = "MALE|FEMALE|OTHER", message = "Gender must be Male, Female, or Other")
+  //      @Pattern(regexp = "MALE|FEMALE|OTHER", message = "Gender must be Male, Female, or Other")
         private String gender;
 
 //        @NotBlank(message = "Phone number cannot be empty")
