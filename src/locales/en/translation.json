@@ -253,6 +253,37 @@
   "notification.kickedFromChallenge.title": "You were removed from the challenge",
   "notification.kickedFromChallenge.content": "You were removed from the challenge '{{challengeName}}' by the admin.",
   "notification.empty": "No new notifications.",
+  "ChallengeDetail": {
+    "joinedStatus": "Joined",
+    "joining": "Joining...",
+    "joinButton": "Join Challenge",
+    "joinSuccess": "Successfully joined the challenge!",
+    "joinFail": "Failed to join the challenge.",
+    "category": "Category",
+    "participation": "Participation",
+    "verification": "Verification",
+    "totalParticipants": "TOTAL PARTICIPANTS",
+    "peopleJoined": "people have joined",
+    "tab": {
+      "info": "Information",
+      "rules": "Rules",
+      "team": "Team Ranking",
+      "individual": "Individual Ranking"
+    },
+    "teamRanking": "Team ranking will be displayed here.",
+    "individualRanking": "Individual ranking will be displayed here.",
+    "notAvailable": "N/A",
+    "ended": "Challenge ended",
+    "alreadyStarted": "Challenge already started",
+    "participationType": {
+      "individual": "Individual",
+      "group": "Group"
+    },
+    "verificationType": {
+      "hostReview": "Host Review",
+      "memberReview": "Member Review"
+    }
+  },
   "ProofUpLoads": {
     "loading": "Loading data",
     "view evidence": "View all evidences",
@@ -334,28 +365,29 @@
         "invalidToken": "Invalid token",
         "loginFailed": "Login failed. Please try again"
       }
+    },
+    "register": {
+      "title": "Register",
+      "email": "Email",
+      "username": "Username",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "registerButton": "Register",
+      "registering": "Registering...",
+      "haveAccount": "Already have an account?",
+      "loginNow": "Login now",
+      "errors": {
+        "emptyEmail": "Email cannot be empty.",
+        "invalidEmail": "Email must include '@'.",
+        "emptyUsername": "Username cannot be empty.",
+        "emptyPassword": "Password cannot be empty.",
+        "shortPassword": "Password must be at least 6 characters.",
+        "passwordMismatch": "Confirmation password doesn't match.",
+        "registerFailed": "Registration failed. Please try again."
+      }
     }
   },
-  "register": {
-    "title": "Register Account",
-    "email": "Email",
-    "username": "Username",
-    "password": "Password",
-    "confirmPassword": "Confirm Password",
-    "registerButton": "Register",
-    "registering": "Registering...",
-    "haveAccount": "Already have an account?",
-    "loginNow": "Login now",
-    "errors": {
-      "emptyEmail": "Email cannot be empty.",
-      "invalidEmail": "Email must include '@'.",
-      "emptyUsername": "Username cannot be empty.",
-      "emptyPassword": "Password cannot be empty.",
-      "shortPassword": "Password must be at least 6 characters.",
-      "passwordMismatch": "Confirmation password doesn't match.",
-      "registerFailed": "Registration failed. Please try again."
-    }
-  },
+
   "JoinsChallengeDetail": {
     "reportTab": "Feedback & Reports",
     "groups": "Groups",
@@ -407,27 +439,7 @@
   "selectWarning": "Please select at least one group.",
   "success": "Groups invited successfully!",
   "searchPlaceholderGroup": "Enter group name...",
-  "ChallengeDetail": {
-    "joinedStatus": "Joined",
-    "joining": "Joining...",
-    "joinButton": "Join Challenge",
-    "joinSuccess": "Successfully joined the challenge!",
-    "joinFail": "Failed to join the challenge.",
-    "category": "Category",
-    "participation": "Participation",
-    "verification": "Verification",
-    "totalParticipants": "TOTAL PARTICIPANTS",
-    "peopleJoined": "people have joined",
-    "tab": {
-      "info": "Information",
-      "rules": "Rules",
-      "team": "Team Ranking",
-      "individual": "Individual Ranking"
-    },
-    "rulesText": "Detailed challenge rules will be displayed here.",
-    "teamRanking": "Team ranking will be displayed here.",
-    "individualRanking": "Individual ranking will be displayed here."
-  },
+
   "yourChallenge": {
     "create": "Create a challenge",
     "search": "Search",
@@ -472,27 +484,7 @@
     "selectWarning": "Please select at least one group.",
     "success": "Groups invited successfully!",
     "searchPlaceholderGroup": "Enter group name...",
-    "ChallengeDetail": {
-      "joinedStatus": "Joined",
-      "joining": "Joining...",
-      "joinButton": "Join Challenge",
-      "joinSuccess": "Successfully joined the challenge!",
-      "joinFail": "Failed to join the challenge.",
-      "category": "Category",
-      "participation": "Participation",
-      "verification": "Verification",
-      "totalParticipants": "TOTAL PARTICIPANTS",
-      "peopleJoined": "people have joined",
-      "tab": {
-        "info": "Information",
-        "rules": "Rules",
-        "team": "Team Ranking",
-        "individual": "Individual Ranking"
-      },
-      "rulesText": "Detailed challenge rules will be displayed here.",
-      "teamRanking": "Team ranking will be displayed here.",
-      "individualRanking": "Individual ranking will be displayed here."
-    },
+
     "forgotPassword": {
       "title": "Forgot Password?",
       "subtitle": "Enter your email to receive an OTP.",

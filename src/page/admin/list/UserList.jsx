@@ -234,7 +234,7 @@ const UserList = () => {
                                             <FaTimesCircle className="text-red-500 mr-2" />
                                         )}
                                         <span className={`font-medium ${userData.status?.toLowerCase() === "active" ? "text-green-600" : "text-red-600"}`}>
-                                {userData.status?.toLowerCase() === "active" ? "active" : "inactive"}
+                                {userData.status?.toLowerCase() === "active" ? "ACTIVE" : "INACTIVE"}
                             </span>
                                     </div>
 
@@ -259,16 +259,6 @@ const UserList = () => {
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    {/* Footer with just Close button */}
-                    <div className="bg-gray-50 px-6 py-4 flex justify-end items-center border-t border-gray-200">
-                        <button
-                            onClick={onClose}
-                            className="px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
-                        >
-                            Close
-                        </button>
                     </div>
                 </div>
             </div>
@@ -372,15 +362,15 @@ const UserList = () => {
                                                     </td>
                                                     <td className="p-4 hidden md:table-cell text-gray-600">{user.email}</td>
                                                     <td className="p-4">
-                                                        {user.status.toLowerCase() === "banned" ? (
+                                                        {user.status.toLowerCase() === "inactive" ? (
                                                             <div className="flex items-center text-red-500">
                                                                 <FaTimesCircle className="mr-2" />
-                                                                <span className="text-sm font-medium">inactive</span>
+                                                                <span className="text-sm font-medium">INACTIVE</span>
                                                             </div>
                                                         ) : (
                                                             <div className="flex items-center text-green-500">
                                                                 <FaCheckCircle className="mr-2" />
-                                                                <span className="text-sm font-medium">active</span>
+                                                                <span className="text-sm font-medium">ACTIVE</span>
                                                             </div>
                                                         )}
                                                     </td>

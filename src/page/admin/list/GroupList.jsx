@@ -11,6 +11,12 @@ const GroupList = () => {
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [selectedGroupId, setSelectedGroupId] = useState(null);
     const [showPopup, setShowPopup] = useState(false);
+    // Add confirmation modal state
+    const [showConfirmation, setShowConfirmation] = useState(false);
+    const [groupToDelete, setGroupToDelete] = useState(null);
+    // Add toast notification state
+    const [toast, setToast] = useState({ show: false, message: "", type: "" });
+
     const itemsPerPage = 10;
 
     // Sử dụng query danh sách nhóm từ adminService
@@ -28,6 +34,14 @@ const GroupList = () => {
     // Mutation delete group
     const [deleteGroup, { isLoading: isDeleting }] = useDeleteGroupMutation();
 
+    // Show toast notification
+    const showToast = (message, type = "success") => {
+        setToast({ show: true, message, type });
+        setTimeout(() => {
+            setToast({ show: false, message: "", type: "" });
+        }, 3000);
+    };
+
     // Hàm mở modal chi tiết nhóm
     const openGroupDetail = (group) => {
         setSelectedGroupId(group.id);
@@ -40,17 +54,57 @@ const GroupList = () => {
         setSelectedGroupId(null);
     };
 
-    // Hàm xử lý delete nhóm trực tiếp ở danh sách
-    const handleDelete = async (groupId) => {
-        if (window.confirm("Are you sure you want to permanently delete this group?")) {
-            try {
-                const result = await deleteGroup(groupId).unwrap();
-                alert("Group deleted successfully!");
+    // Mở confirmation modal để xác nhận xóa
+    const confirmDelete = (group) => {
+        setGroupToDelete(group);
+        setShowConfirmation(true);
+    };
+
+    // Hàm xử lý delete nhóm sau khi xác nhận
+    const handleConfirmDelete = async () => {
+        if (!groupToDelete) return;
+
+        try {
+            const response = await deleteGroup(groupToDelete.id).unwrap();
+
+            // Check if response contains the Vietnamese success message
+            const isSuccess =
+                response === "Nhóm đã được giải tán." ||
+                response?.data === "Nhóm đã được giải tán." ||
+                response?.data?.message === "Nhóm đã được giải tán." ||
+                response?.message === "Nhóm đã được giải tán.";
+
+            if (isSuccess || response?.status === 200) {
+                showToast("Group disbanded successfully!");
                 refetchGroups();
-            } catch (error) {
-                console.error("Error deleting group:", error);
-                alert("Failed to delete group.");
+                setShowConfirmation(false);
+                setGroupToDelete(null);
+                return;
             }
+
+            // Handle unexpected success response format
+            console.log("API Response:", response);
+            showToast("Group disbanded successfully!");
+            refetchGroups();
+            setShowConfirmation(false);
+            setGroupToDelete(null);
+
+        } catch (error) {
+            console.error("Error disbanding group:", error);
+
+            // Check if the error actually contains a success message (sometimes APIs return errors with success data)
+            if (error?.data === "Nhóm đã được giải tán." ||
+                error?.message === "Nhóm đã được giải tán." ||
+                (typeof error === 'string' && error.includes("Nhóm đã được giải tán"))) {
+
+                showToast("Group disbanded successfully!");
+                refetchGroups();
+            } else {
+                showToast("Failed to disband group.", "error");
+            }
+
+            setShowConfirmation(false);
+            setGroupToDelete(null);
         }
     };
 
@@ -115,6 +169,68 @@ const GroupList = () => {
                 </div>
                 <div className="flex-1 overflow-auto p-4">
                     <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-blue-100 h-full flex flex-col">
+                        {/* Toast notification */}
+                        {toast.show && (
+                            <div className={`fixed top-4 right-4 px-4 py-2 rounded-md shadow-xl z-50 flex items-center ${
+                                toast.type === "error" ? "bg-red-500 text-white" : "bg-green-500 text-white"
+                            } animate-fadeIn`}>
+                                {toast.type === "error" ? (
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                                    </svg>
+                                ) : (
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                    </svg>
+                                )}
+                                {toast.message}
+                            </div>
+                        )}
+
+                        {/* Confirmation Modal */}
+                        {showConfirmation && groupToDelete && (
+                            <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+                                <div className="bg-white rounded-lg p-6 max-w-md w-full animate-fadeIn shadow-2xl">
+                                    <div className="text-center mb-6">
+                                        <div className="bg-red-100 w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-4">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                            </svg>
+                                        </div>
+                                        <h3 className="text-xl font-bold text-gray-800">Confirm Group Disbanding</h3>
+                                        <p className="text-gray-600 mt-2">
+                                            Are you sure you want to disband the group "{groupToDelete.name}"? This action cannot be undone.
+                                        </p>
+                                    </div>
+                                    <div className="flex space-x-3 justify-center">
+                                        <button
+                                            onClick={() => setShowConfirmation(false)}
+                                            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md text-gray-800 font-medium transition-colors"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            onClick={handleConfirmDelete}
+                                            className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-md text-white font-medium transition-colors"
+                                            disabled={isDeleting}
+                                        >
+                                            {isDeleting ? (
+                                                <span className="flex items-center">
+                                                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                    </svg>
+                                                    Processing...
+                                                </span>
+                                            ) : (
+                                                "Yes, Disband Group"
+                                            )}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         {/* Thanh tìm kiếm */}
                         <div className="p-4 border-b border-blue-100 bg-gradient-to-r from-blue-50 to-yellow-50">
                             <div className="flex flex-col md:flex-row gap-4">
@@ -194,7 +310,7 @@ const GroupList = () => {
                                                         </button>
                                                         <button
                                                             className="p-2 bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition-colors"
-                                                            onClick={() => handleDelete(group.id)}
+                                                            onClick={() => confirmDelete(group)}
                                                             disabled={isDeleting}
                                                         >
                                                             <Trash size={18} />

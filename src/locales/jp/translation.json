@@ -333,13 +333,13 @@
   "ChallengeDetail": {
     "joinedStatus": "参加済み",
     "joining": "参加中...",
-    "joinButton": "チャレンジに参加する",
-    "joinSuccess": "チャレンジへの参加が成功しました！",
-    "joinFail": "チャレンジに参加できませんでした。",
+    "joinButton": "チャレンジに参加",
+    "joinSuccess": "チャレンジに参加しました！",
+    "joinFail": "チャレンジへの参加に失敗しました。",
     "category": "カテゴリー",
-    "participation": "参加形式",
+    "participation": "参加タイプ",
     "verification": "検証方法",
-    "totalParticipants": "参加者合計",
+    "totalParticipants": "総参加者数",
     "peopleJoined": "人が参加しました",
     "tab": {
       "info": "情報",
@@ -347,10 +347,21 @@
       "team": "チームランキング",
       "individual": "個人ランキング"
     },
-    "rulesText": "チャレンジの詳細なルールがここに表示されます。",
-    "teamRanking": "チームランキングがここに表示されます。",
-    "individualRanking": "個人ランキングがここに表示されます。"
+    "teamRanking": "チームランキングはここに表示されます。",
+    "individualRanking": "個人ランキングはここに表示されます。",
+    "notAvailable": "なし",
+    "ended": "チャレンジ終了",
+    "alreadyStarted": "チャレンジ開始済み",
+    "participationType": {
+      "individual": "個人",
+      "group": "グループ"
+    },
+    "verificationType": {
+      "hostReview": "ホストレビュー",
+      "memberReview": "メンバーレビュー"
+    }
   },
+
   "forgotPassword": {
     "title": "パスワードをお忘れですか？",
     "subtitle": "OTPを受け取るためにメールアドレスを入力してください。",
@@ -660,7 +671,7 @@
     }
   },
   "register": {
-    "title": "アカウント登録",
+    "title": "登録",
     "email": "メールアドレス",
     "username": "ユーザー名",
     "password": "パスワード",
