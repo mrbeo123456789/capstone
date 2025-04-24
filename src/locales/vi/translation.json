@@ -335,21 +335,31 @@
     "joining": "Đang tham gia...",
     "joinButton": "Tham gia thử thách",
     "joinSuccess": "Tham gia thử thách thành công!",
-    "joinFail": "Không thể tham gia thử thách.",
-    "category": "Thể loại",
-    "participation": "Hình thức",
-    "verification": "Xác minh",
-    "totalParticipants": "TỔNG NGƯỜI THAM GIA",
+    "joinFail": "Tham gia thử thách thất bại.",
+    "category": "Danh mục",
+    "participation": "Hình thức tham gia",
+    "verification": "Hình thức xác nhận",
+    "totalParticipants": "TỔNG SỐ THÀNH VIÊN",
     "peopleJoined": "người đã tham gia",
     "tab": {
       "info": "Thông tin",
-      "rules": "Quy định",
-      "team": "BXH Đội",
-      "individual": "BXH Cá nhân"
+      "rules": "Quy tắc",
+      "team": "Xếp hạng Nhóm",
+      "individual": "Xếp hạng Cá nhân"
     },
-    "rulesText": "Quy định chi tiết của thử thách sẽ hiển thị tại đây.",
-    "teamRanking": "Bảng xếp hạng đội sẽ hiển thị tại đây.",
-    "individualRanking": "Bảng xếp hạng cá nhân sẽ hiển thị tại đây."
+    "teamRanking": "Xếp hạng nhóm sẽ được hiển thị tại đây.",
+    "individualRanking": "Xếp hạng cá nhân sẽ được hiển thị tại đây.",
+    "notAvailable": "Không có",
+    "ended": "Thử thách đã kết thúc",
+    "alreadyStarted": "Thử thách đã bắt đầu",
+    "participationType": {
+      "individual": "Cá nhân",
+      "group": "Theo nhóm"
+    },
+    "verificationType": {
+      "hostReview": "Host duyệt",
+      "memberReview": "Thành viên duyệt"
+    }
   },
   "forgotPassword": {
     "title": "Quên mật khẩu?",
@@ -654,7 +664,7 @@
     }
   },
   "register": {
-      "title": "Đăng ký tài khoản",
+      "title": "Đăng ký",
       "email": "Email",
       "username": "Tên đăng nhập",
       "password": "Mật khẩu",

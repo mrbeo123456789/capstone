@@ -259,7 +259,31 @@ export const adminUserService = createApi({
             },
             providesTags: ["Admin"],
         }),
+    // 1. Lấy danh sách thử thách đã tạo (Admin)
+       getCreatedChallenges: builder.query({
+             query: ({ keyword = "", status = "", page = 0 } = {}) => {
+           const params = new URLSearchParams();
+           params.append("page", page);
+           if (keyword.trim()) params.append("keyword", keyword.trim());
+           if (status) params.append("status", status);
+           return `/admin/challenges/get_created_challenge?${params.toString()}`;
+         },
+         providesTags: ["Admin"],
+       }),
+
+// 2. Lấy dữ liệu biểu đồ tham gia thử thách của thành viên
+        getMemberParticipationChart: builder.query({
+         query: () => "/admin/challenges/member-participation",
+         providesTags: ["Admin"],
+       }),
+
+// 3. Lấy số lượng báo cáo theo thử thách (Admin)+
+        getAdminReportCounts: builder.query({
+         query: () => "/admin/reports/report-counts",
+         providesTags: ["Admin"],
+       }),
     }),
+
 });
 
 
@@ -284,4 +308,7 @@ export const {
     useFilterReportsQuery,
     useUpdateReportStatusMutation,
     useGetEvidencesByMemberAndChallengeQuery,
+    useGetCreatedChallengesQuery,
+    useGetMemberParticipationChartQuery,
+    useGetAdminReportCountsQuery,
 } = adminUserService;

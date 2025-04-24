@@ -219,7 +219,7 @@ const ReportList = () => {
                                             <tr>
                                                 <th className="p-4 text-left">ID</th>
                                                 <th className="p-4 text-left">Report Type</th>
-                                                <th className="p-4 text-left">Description</th>
+                                                <th className="p-4 text-left">Challenge</th>
                                                 <th className="p-4 text-left">Created Date</th>
                                                 <th className="p-4 text-left">Status</th>
                                                 <th className="p-4 text-center">Actions</th>
@@ -254,7 +254,7 @@ const ReportList = () => {
                                                                 {report.reportType}
                                                             </span>
                                                         </td>
-                                                        <td className="p-4">{report.content || "-"}</td>
+                                                        <td className="p-4">{report.challengeName || "-"}</td>
                                                         <td className="p-4">
                                                             {formatDate(report.createdAt)}
                                                         </td>

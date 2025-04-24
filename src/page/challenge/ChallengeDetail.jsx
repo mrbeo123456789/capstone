@@ -34,13 +34,16 @@ const ChallengeDetail = () => {
     };
 
     const formatDate = (isoString) => {
-        if (!isoString) return "N/A";
+        if (!isoString) return t("ChallengeDetail.notAvailable");
         const date = new Date(isoString);
         return date.toLocaleDateString("en-GB");
     };
 
-    const translateParticipation = (type) => type === "INDIVIDUAL" ? "Cá nhân" : "Theo nhóm";
-    const translateVerification = (type) => type === "HOST_REVIEW" ? "Host duyệt" : "Thành viên duyệt";
+    const translateParticipation = (type) =>
+        type === "INDIVIDUAL" ? t("ChallengeDetail.participationType.individual") : t("ChallengeDetail.participationType.group");
+
+    const translateVerification = (type) =>
+        type === "HOST_REVIEW" ? t("ChallengeDetail.verificationType.hostReview") : t("ChallengeDetail.verificationType.memberReview");
 
     return (
         <div className="p-6 flex flex-col items-center w-full">

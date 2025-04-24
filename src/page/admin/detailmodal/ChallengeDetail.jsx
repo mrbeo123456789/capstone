@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { FaRegClock, FaSearch } from "react-icons/fa";
+import { FaRegClock, FaSearch, FaRunning } from "react-icons/fa";
+import { MdOutlineCategory } from "react-icons/md";
+import { IoIosPeople } from "react-icons/io";
 import { HiUsers } from "react-icons/hi";
 import { CheckCircle, XCircle, ArrowLeft, Ban, UserX } from "lucide-react";
 import toast from "react-hot-toast";
@@ -145,6 +147,17 @@ const ChallengeDetail = () => {
         m.fullName.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    // Format date helper
+    const formatDate = (isoString) => {
+        if (!isoString) return "N/A";
+        const date = new Date(isoString);
+        return date.toLocaleDateString("en-GB");
+    };
+
+    // Simple participation and verification type translators (not using i18n)
+    const getParticipationType = (type) => type === "INDIVIDUAL" ? "Individual" : "Group";
+    const getVerificationType = (type) => type === "HOST_REVIEW" ? "Host Review" : "Member Review";
+
     // Loading/Error screens
     if (isLoading) {
         return (
@@ -173,8 +186,8 @@ const ChallengeDetail = () => {
         challenge.challengeStatus.toLowerCase() === "pending" ||
         challenge.challengeStatus.toLowerCase() === "upcoming";
 
-    // Available tabs based on status
-    const availableTabs = ["info", "rules"];
+    // Available tabs based on status (removed "rules" tab)
+    const availableTabs = ["info"];
     if (!isMembersEvidenceHidden) {
         availableTabs.push("members", "evidence");
     }
@@ -198,25 +211,21 @@ const ChallengeDetail = () => {
 
             {/* Main Content */}
             <div className="p-6 flex flex-col items-center w-full">
-                {/* Banner & Info */}
-                <div className="w-full flex flex-col md:flex-row bg-white rounded shadow-lg overflow-hidden">
+                {/* Banner & Info - Redesigned to match shorter version but without multilingual support */}
+                <div className="w-full flex flex-col md:flex-row bg-white rounded-lg shadow-lg overflow-hidden">
                     {challenge.picture ? (
-                        <img src={challenge.picture} alt="" className="w-full md:w-2/3 object-cover"/>
+                        <img
+                            src={challenge.picture}
+                            alt={challenge.name}
+                            className="object-cover w-full md:w-1/2 max-h-[490px]"
+                        />
                     ) : (
-                        <div className="w-full md:w-2/3 bg-gray-200 h-64"/>
+                        <div className="w-full md:w-1/2 bg-gray-200 h-64"/>
                     )}
-                    <div className="bg-gray-100 p-6 md:w-1/3 flex flex-col justify-between">
-                        {/* Changed from CHALLENGE INFO to challenge name */}
-                        <h2 className="text-xl font-bold">{challenge.name}</h2>
-                        <div className="mt-2 text-sm text-gray-700 space-y-1">
-                            {/* Only keeping type, duration, participants, and action */}
-                            <p>Type: {challenge.challengeType}</p>
-                            <p>Duration: {challenge.duration} days</p>
-                            <div className="mt-4 flex items-center text-blue-500">
-                                <HiUsers className="mr-2"/> {challenge.participantCount} participants
-                            </div>
-                        </div>
-                        <div className="mt-4">
+                    <div className="bg-gray-100 p-6 w-full flex flex-col justify-between">
+                        <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-4">
+                            <h2 className="text-2xl font-bold text-gray-900 line-clamp-2">{challenge.name}</h2>
+                            {/* Review buttons moved here for admin */}
                             {(() => {
                                 const st = challenge.challengeStatus.toLowerCase();
                                 if (st === "pending") {
@@ -247,6 +256,42 @@ const ChallengeDetail = () => {
                                 return null;
                             })()}
                         </div>
+
+                        <div className="mt-4 flex items-center">
+                            <FaRegClock className="text-gray-500 mr-2" />
+                            <p className="text-gray-700 text-sm">
+                                {formatDate(challenge.startDate)} → {formatDate(challenge.endDate)}
+                            </p>
+                        </div>
+
+                        <div className="mt-4 flex items-center">
+                            <MdOutlineCategory className="text-gray-500 mr-2" />
+                            <p className="text-gray-700 text-sm">
+                                Category: {challenge.challengeType}
+                            </p>
+                        </div>
+
+                        <div className="mt-4 flex items-center">
+                            <FaRunning className="text-gray-500 mr-2" />
+                            <p className="text-gray-700 text-sm">
+                                Participation: {getParticipationType(challenge.participationType)}
+                            </p>
+                        </div>
+
+                        <div className="mt-4 flex items-center">
+                            <IoIosPeople className="text-gray-500 mr-2" />
+                            <p className="text-gray-700 text-sm">
+                                Verification: {getVerificationType(challenge.verificationType)}
+                            </p>
+                        </div>
+
+                        <h3 className="text-gray-800 font-semibold mt-6">
+                            Total Participants
+                        </h3>
+                        <div className="mt-2 flex items-center text-lg font-semibold text-blue-500">
+                            <HiUsers className="mr-2" />
+                            <p>{challenge.participantCount} / {challenge.maxParticipants} people joined</p>
+                        </div>
                     </div>
                 </div>
 
@@ -265,11 +310,9 @@ const ChallengeDetail = () => {
                             >
                                 {tab === "info"
                                     ? "Information"
-                                    : tab === "rules"
-                                        ? "Rules"
-                                        : tab === "members"
-                                            ? "Members"
-                                            : "Evidence"}
+                                    : tab === "members"
+                                        ? "Members"
+                                        : "Evidence"}
                             </button>
                         ))}
                     </div>
@@ -279,46 +322,12 @@ const ChallengeDetail = () => {
                         <div className="p-6 bg-white shadow-md rounded">
                             <h2 className="text-2xl font-bold mb-2">{challenge.name}</h2>
                             <p className="text-gray-500 mb-4">
-                                {new Date(challenge.startDate).toLocaleDateString("vi-VN")} –{" "}
-                                {new Date(challenge.endDate).toLocaleDateString("vi-VN")}
+                                {formatDate(challenge.startDate)} – {formatDate(challenge.endDate)}
                             </p>
-                            {/* All challenge info is now displayed here */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                                <div>
-                                    <h3 className="font-semibold mb-1">Challenge Type</h3>
-                                    <p className="text-gray-700">{challenge.challengeType}</p>
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold mb-1">Verification Type</h3>
-                                    <p className="text-gray-700">{challenge.verificationType}</p>
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold mb-1">Participation Type</h3>
-                                    <p className="text-gray-700">{challenge.participationType}</p>
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold mb-1">Duration</h3>
-                                    <p className="text-gray-700">{challenge.duration} days</p>
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold mb-1">Status</h3>
-                                    <p className="text-gray-700">{challenge.challengeStatus}</p>
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold mb-1">Participants</h3>
-                                    <p className="text-gray-700">{challenge.participantCount}</p>
-                                </div>
-                            </div>
-                            <div>
-                                <h3 className="font-semibold mb-1">Description</h3>
-                                <p className="text-gray-700">{challenge.description}</p>
-                            </div>
-                        </div>
-                    )}
-
-                    {activeTab === "rules" && (
-                        <div className="p-6 bg-white shadow-md rounded text-gray-500 italic">
-                            No rules specified for this challenge.
+                            <div
+                                className="mt-6 border-t pt-4 text-gray-700"
+                                dangerouslySetInnerHTML={{ __html: challenge.description }}
+                            ></div>
                         </div>
                     )}
 
@@ -424,13 +433,13 @@ const ChallengeDetail = () => {
                             <h3 className="text-lg font-semibold text-blue-700">{getModalTitle()}</h3>
                         </div>
                         <div className="p-6">
-              <textarea
-                  rows={4}
-                  className="w-full border rounded p-3 focus:outline-none"
-                  placeholder={getMessagePlaceholder()}
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-              />
+                            <textarea
+                                rows={4}
+                                className="w-full border rounded p-3 focus:outline-none"
+                                placeholder={getMessagePlaceholder()}
+                                value={message}
+                                onChange={(e) => setMessage(e.target.value)}
+                            />
                             {actionError && (
                                 <div className="mt-4 p-3 bg-red-100 text-red-700 rounded">
                                     {actionError}
