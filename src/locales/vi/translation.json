@@ -1,12 +1,20 @@
 {
   "menu": {
+    "homepage": "Trang chủ",
     "about": "Về chúng tôi",
     "guide": "Hướng dẫn",
     "challenges": "Thử thách",
     "leaderboard": "Bảng xếp hạng",
     "news": "Tin tức",
-    "logout": "Đăng xuất"
+    "login": "Đăng nhập",
+    "logout": "Đăng xuất",
+    "profile": "Hồ sơ",
+    "dashboard": "Bảng điều khiển",
+    "notifications": "Thông báo",
+    "myChallenges": "Thử thách của tôi",
+    "createChallenge": "Tạo thử thách"
   },
+
   "profileUpdated": "Cập nhật hồ sơ thành công!",
   "updateFailed": "Cập nhật hồ sơ thất bại.",
   "removed": "Đã loại bỏ",

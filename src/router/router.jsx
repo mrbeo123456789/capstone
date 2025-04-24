@@ -45,7 +45,7 @@ const router = createBrowserRouter([
         path: "/",
         element: <Layout />, // ✅ Layout wraps all main pages
         children: [
-            { path: "homepage", element: <HomePage /> },
+            { path: "homepage", element: <HomePage/> },
             { path: "aboutus", element: <AboutUsPage /> },
             { path: "profile", element: <MemberRoute><MemberProfile /></MemberRoute> },
             { path: "statistics", element: <MemberRoute><Statistics /></MemberRoute> },
@@ -53,11 +53,11 @@ const router = createBrowserRouter([
             { path: "password", element: <MemberRoute><ChangePassword /></MemberRoute> },
             { path: "ranking", element: <MemberRoute><Leaderboard/></MemberRoute>},
             { path: "challenges/detail/:id", element: <ChallengeDetail /> },
+            { path: "challenges", element: <ChallengePage /> },
             {
                 path: "challenges",
                 element: <MemberRoute><Outlet /></MemberRoute>,
                 children: [
-                    { index: true, element: <ChallengePage /> },
                     { path: "joins", element: <YourChallenge /> },
                     { path: "create", element: <ChallengeForm /> },
                     { path: "joins/detail/:id", element: <JoinedChallengeDetail /> },
@@ -68,16 +68,10 @@ const router = createBrowserRouter([
                 path: "groups",
                 element: <MemberRoute><Outlet /></MemberRoute>,
                 children: [
-                    // Tạo mới nhóm
-                    { path: "create", element: <GroupForm /> },
-
-                    // Danh sách nhóm đã tham gia
-                    { path: "joins", element: <YourGroup /> },
-
-                    // Chi tiết nhóm đã tham gia
-                    { path: "joins/:id", element: <GroupUsers /> },
-
-                    { path: ":id/edit", element: <GroupForm /> } // ✅ Chính xác
+                    { path: "create", element: <GroupForm /> },     // Tạo mới nhóm
+                    { path: "joins", element: <YourGroup /> },      // Danh sách nhóm đã tham gia
+                    { path: "joins/:id", element: <GroupUsers /> }, // Chi tiết nhóm đã tham gia
+                    { path: ":id/edit", element: <GroupForm /> }
                 ]
             }
         ]
@@ -91,7 +85,6 @@ const router = createBrowserRouter([
     { path: "/enter-otp", element: <EnterOTP /> },
     { path: "/reset-password", element: <ResetPassword /> },
     { path: "/auth/callback", element: <AuthCallBack /> },
-    { path: "/home", element: <Home /> },
 
     // Admin-only layout
     {

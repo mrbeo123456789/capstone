@@ -1,12 +1,20 @@
 {
   "menu": {
+    "homepage": "Home",
     "about": "About",
     "guide": "Guide",
     "challenges": "Challenges",
     "leaderboard": "Leaderboard",
     "news": "News",
-    "logout": "Logout"
+    "login": "Login",
+    "logout": "Logout",
+    "profile": "Profile",
+    "dashboard": "Dashboard",
+    "notifications": "Notifications",
+    "myChallenges": "My Challenges",
+    "createChallenge": "Create Challenge"
   },
+
   "profileUpdated": "Profile updated successfully!",
   "updateFailed": "Failed to update profile.",
   "removed": "Removed",

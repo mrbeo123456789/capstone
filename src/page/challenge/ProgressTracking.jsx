@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { FaPlus, FaCheck, FaQuestionCircle } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 
-export default function ProgressTracking({ challenge, evidence }) {
+export default function ProgressTracking({ challenge, evidence, onUploadSuccess }) {
     // Create map to store evidence by date and status
     const evidenceMap = {};
     const { t } = useTranslation();
@@ -232,6 +232,10 @@ export default function ProgressTracking({ challenge, evidence }) {
                     date={selectedDate}
                     challengeId={challengeId}
                     onClose={() => setShowModal(false)}
+                    onUploadSuccess={() => {
+                        setShowModal(false);
+                        if (onUploadSuccess) onUploadSuccess(); // 👈 gọi callback nếu có
+                    }}
                 />
             )}
 
