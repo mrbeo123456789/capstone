@@ -1,12 +1,20 @@
 {
   "menu": {
+    "homepage": "ホーム",
     "about": "私たちについて",
     "guide": "ガイド",
     "challenges": "チャレンジ",
     "leaderboard": "ランキング",
     "news": "ニュース",
-    "logout": "ログアウト"
+    "login": "ログイン",
+    "logout": "ログアウト",
+    "profile": "プロフィール",
+    "dashboard": "ダッシュボード",
+    "notifications": "通知",
+    "myChallenges": "マイチャレンジ",
+    "createChallenge": "チャレンジ作成"
   },
+
   "profileUpdated": "プロフィールが正常に更新されました！",
   "updateFailed": "プロフィールの更新に失敗しました。",
   "removed": "削除されました",
