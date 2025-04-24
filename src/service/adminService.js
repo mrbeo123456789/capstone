@@ -260,15 +260,16 @@ export const adminUserService = createApi({
             providesTags: ["Admin"],
         }),
     // 1. Lấy danh sách thử thách đã tạo (Admin)
-       getCreatedChallenges: builder.query({
-             query: ({ keyword = "", status = "", page = 0 } = {}) => {
+        getCreatedChallenges: builder.query({
+                 query: ({ keyword = "", status = "", page = 0 } = {}) => {
            const params = new URLSearchParams();
            params.append("page", page);
            if (keyword.trim()) params.append("keyword", keyword.trim());
-           if (status) params.append("status", status);
-           return `/admin/challenges/get_created_challenge?${params.toString()}`;
+           if (status)    params.append("status", status);
+           // Chú ý: cùng route với @GetMapping("/get_created_challenge")
+               return `admin/challenges/get_created_challenge?${params.toString()}`;
          },
-         providesTags: ["Admin"],
+     providesTags: ["Admin"],
        }),
 
 // 2. Lấy dữ liệu biểu đồ tham gia thử thách của thành viên

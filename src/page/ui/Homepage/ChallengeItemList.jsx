@@ -12,9 +12,15 @@ import {
     FaCheck,
     FaClock,
     FaUpload,
-    FaStar
+    FaStar,
+    FaRegClock,
+    FaExclamationTriangle,
+    FaHourglassHalf,
+    FaRegTimesCircle,
+    FaEye,
+    FaMedal
 } from "react-icons/fa";
-import { BsThreeDots } from "react-icons/bs";
+import { BsThreeDots, BsHourglassSplit } from "react-icons/bs";
 import { useGetTasksForDateQuery } from "../../../service/evidenceService.js"; // Adjust path as needed
 import { useNavigate } from "react-router-dom";
 
@@ -45,6 +51,8 @@ const getStatusColor = (evidenceStatus) => {
             return "text-yellow-500";
         case "REJECTED":
             return "text-red-500";
+        case "IN_REVIEW":
+            return "text-blue-500";
         default:
             return "text-gray-500";
     }
@@ -66,6 +74,22 @@ const getStatusText = (evidenceStatus) => {
     }
 };
 
+// Helper function to get status icon based on evidence status
+const getStatusIcon = (evidenceStatus) => {
+    switch (evidenceStatus) {
+        case "COMPLETED":
+            return <FaCheck />;
+        case "PENDING":
+            return <FaRegClock />;
+        case "REJECTED":
+            return <FaRegTimesCircle />;
+        case "IN_REVIEW":
+            return <FaHourglassHalf />;
+        default:
+            return <BsThreeDots />;
+    }
+};
+
 const ChallengeItemList = ({ selectedDate }) => {
     const navigate = useNavigate();
 
@@ -76,7 +100,7 @@ const ChallengeItemList = ({ selectedDate }) => {
     const { data: tasks, isLoading, error } = useGetTasksForDateQuery(dateString);
 
     const handleChallengeClick = (challengeId) => {
-        navigate(`/challenges/detail/${challengeId}`);
+        navigate(`/challenges/joins/detail/${challengeId}`);
     };
 
     if (isLoading) {
@@ -143,8 +167,10 @@ const ChallengeItemList = ({ selectedDate }) => {
                              }}
                         >
                             {item.notificationType === "review"
-                                ? <FaStar />
-                                : getIconForChallenge(item.challengeName)}
+                                ? <FaEye />
+                                : item.evidenceStatus === "COMPLETED"
+                                    ? <FaMedal />
+                                    : <FaUpload />}
                         </div>
                         {/* Title & Meta */}
                         <div className="text-left">
@@ -152,8 +178,8 @@ const ChallengeItemList = ({ selectedDate }) => {
                             <div className="text-xs text-gray-500 flex flex-wrap gap-x-2">
                                 {item.notificationType === "submission" && (
                                     <span className="flex items-center">
-                                        <FaUpload className="inline mr-1" />
-                                        Submit challenge
+                                        {getStatusIcon(item.evidenceStatus)}
+                                        <span className="ml-1">Submit challenge</span>
                                         <span className={getStatusColor(item.evidenceStatus) + " ml-1"}>
                                             {item.statusText}
                                         </span>
@@ -161,7 +187,7 @@ const ChallengeItemList = ({ selectedDate }) => {
                                 )}
                                 {item.notificationType === "review" && (
                                     <span className="flex items-center">
-                                        <FaCheck className="inline mr-1" />
+                                        <FaStar className="inline mr-1" />
                                         Review submissions: {item.reviewCompleted}/{item.totalReviewAssigned}
                                     </span>
                                 )}
@@ -172,22 +198,26 @@ const ChallengeItemList = ({ selectedDate }) => {
                     {/* Right section: Status */}
                     {item.notificationType === "submission" ? (
                         item.evidenceStatus === "COMPLETED" ? (
-                            <div className="text-green-500 text-xl">✔️</div>
+                            <div className="text-green-500 text-xl"><FaCheck /></div>
                         ) : item.evidenceStatus === "IN_REVIEW" ? (
                             <div className="text-yellow-500 text-xl">
-                                <FaClock />
+                                <FaHourglassHalf />
+                            </div>
+                        ) : item.evidenceStatus === "REJECTED" ? (
+                            <div className="text-red-500 text-xl">
+                                <FaExclamationTriangle />
                             </div>
                         ) : (
                             <div className="text-gray-400 text-xl">
-                                <BsThreeDots />
+                                <BsHourglassSplit />
                             </div>
                         )
                     ) : (
                         // For review type
                         item.reviewCompleted >= item.totalReviewAssigned ? (
-                            <div className="text-green-500 text-xl">✔️</div>
+                            <div className="text-green-500 text-xl"><FaCheck /></div>
                         ) : (
-                            <div className="text-blue-500 text-xl">{item.reviewsRemaining}</div>
+                            <div className="text-blue-500 text-xl font-bold">{item.reviewsRemaining}</div>
                         )
                     )}
                 </div>

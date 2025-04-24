@@ -1,30 +1,33 @@
-import React, { useState, useEffect } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import React, { useState } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import Navbar from "../../navbar/AdminNavbar.jsx";
 import { useGetCreatedChallengesQuery, useGetMemberParticipationChartQuery, useGetAdminReportCountsQuery } from '../../../service/adminService.js';
 
-const UserChallengeStats = () => {
+const ChallengeStats = () => {
     const [selectedChallenge, setSelectedChallenge] = useState(null);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [page, setPage] = useState(0);
-    const [status, setStatus] = useState("");
 
     // Fetch data from API endpoints
-    const { data: createdChallengesData, isLoading: isLoadingChallenges } = useGetCreatedChallengesQuery({
+    const { data, isLoading: isLoadingChallenges } = useGetCreatedChallengesQuery({
         keyword: searchTerm,
-        status,
         page
     });
+    const createdChallengesData = data?.content || [];
 
-    const { data: memberParticipationData, isLoading: isLoadingParticipation } = useGetMemberParticipationChartQuery();
+    const { data: participationResponse, isLoading: isLoadingParticipation } = useGetMemberParticipationChartQuery();
+    const memberParticipationData = participationResponse || [];
 
-    const { data: reportCountsData, isLoading: isLoadingReports } = useGetAdminReportCountsQuery();
+    const { data: reportsResponse, isLoading: isLoadingReports } = useGetAdminReportCountsQuery();
+    const reportCountsData = reportsResponse || [];
 
     // Derive statistics from API data
-    const totalCreatedChallenges = createdChallengesData?.length || 0;
-    const activeChallenges = createdChallengesData?.filter(challenge => challenge.status === "Active")?.length || 0;
-    const totalParticipants = memberParticipationData?.reduce((total, challenge) => total + challenge.members, 0) || 0;
+    const totalCreatedChallenges = data?.totalElements || 0;
+    const activeChallenges = Array.isArray(createdChallengesData) ?
+        createdChallengesData.filter(challenge => challenge.status === "Active").length : 0;
+    const totalParticipants = Array.isArray(memberParticipationData) ?
+        memberParticipationData.reduce((total, challenge) => total + (challenge.members || 0), 0) : 0;
 
     const handleRowClick = (challenge) => {
         setSelectedChallenge(challenge.id === selectedChallenge ? null : challenge.id);
@@ -101,11 +104,11 @@ const UserChallengeStats = () => {
                                 ) : (
                                     <ResponsiveContainer width="100%" height="100%">
                                         <BarChart
-                                            data={createdChallengesData?.map(challenge => ({
+                                            data={Array.isArray(createdChallengesData) ? createdChallengesData.map(challenge => ({
                                                 name: challenge.name.length > 15 ? challenge.name.substring(0, 15) + '...' : challenge.name,
                                                 completionRate: challenge.completionRate || 0,
                                                 fullName: challenge.name
-                                            }))}
+                                            })) : []}
                                             margin={{ top: 10, right: 10, left: 10, bottom: 40 }}
                                         >
                                             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -147,11 +150,11 @@ const UserChallengeStats = () => {
                                 ) : (
                                     <ResponsiveContainer width="100%" height="100%">
                                         <BarChart
-                                            data={reportCountsData?.map(item => ({
+                                            data={Array.isArray(reportCountsData) ? reportCountsData.map(item => ({
                                                 name: item.name.length > 15 ? item.name.substring(0, 15) + '...' : item.name,
                                                 reports: item.reportCount || 0,
                                                 fullName: item.name
-                                            }))}
+                                            })) : []}
                                             margin={{ top: 10, right: 10, left: 10, bottom: 40 }}
                                         >
                                             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -193,11 +196,11 @@ const UserChallengeStats = () => {
                             ) : (
                                 <ResponsiveContainer width="100%" height="100%">
                                     <BarChart
-                                        data={memberParticipationData?.map(item => ({
+                                        data={Array.isArray(memberParticipationData) ? memberParticipationData.map(item => ({
                                             name: item.name.length > 15 ? item.name.substring(0, 15) + '...' : item.name,
                                             members: item.members || 0,
                                             fullName: item.name
-                                        }))}
+                                        })) : []}
                                         margin={{ top: 10, right: 10, left: 10, bottom: 40 }}
                                     >
                                         <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -263,7 +266,7 @@ const UserChallengeStats = () => {
                                     </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-200">
-                                    {createdChallengesData?.map((challenge) => (
+                                    {Array.isArray(createdChallengesData) && createdChallengesData.map((challenge) => (
                                         <tr
                                             key={challenge.id}
                                             className={`cursor-pointer hover:bg-gray-50 ${selectedChallenge === challenge.id ? 'bg-blue-50' : ''}`}
@@ -290,7 +293,7 @@ const UserChallengeStats = () => {
                                             </td>
                                         </tr>
                                     ))}
-                                    {createdChallengesData?.length === 0 && (
+                                    {(!Array.isArray(createdChallengesData) || createdChallengesData.length === 0) && (
                                         <tr>
                                             <td colSpan="5" className="py-6 text-center text-gray-500">
                                                 No challenges found.
@@ -311,7 +314,8 @@ const UserChallengeStats = () => {
                             </button>
                             <button
                                 onClick={() => setPage(page + 1)}
-                                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                disabled={!data?.hasNext}
+                                className={`px-4 py-2 rounded ${!data?.hasNext ? 'bg-gray-200 text-gray-500' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
                             >
                                 Next
                             </button>
@@ -323,4 +327,4 @@ const UserChallengeStats = () => {
     );
 };
 
-export default UserChallengeStats;
+export default ChallengeStats;
