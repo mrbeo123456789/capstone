@@ -38,21 +38,23 @@ public class AuthServiceImpl implements AuthService {
                 : accountRepository.findByUsername(loginIdentifier);
 
         Account account = accountOpt.orElseThrow(() ->
-                new ResourceNotFoundException("Tài khoản không tồn tại."));
+                new ResourceNotFoundException("ACCOUNT_NOT_FOUND")); // Mã lỗi
 
         if (account.getStatus() == AccountStatus.INACTIVE) {
-            throw new ForbiddenException("Tài khoản chưa được xác minh. Vui lòng kiểm tra email.");
+                throw new ForbiddenException("ACCOUNT_NOT_VERIFIED");
         }
+
         if (account.getStatus() == AccountStatus.BANNED) {
-            throw new ForbiddenException("Tài khoản đã bị khóa.");
+            throw new ForbiddenException("ACCOUNT_BANNED");
         }
 
         if (!passwordEncoder.matches(rawPassword, account.getPassword())) {
-            throw new UnauthorizedException("Sai mật khẩu.");
+            throw new UnauthorizedException("INVALID_PASSWORD");
         }
 
         return jwtUtil.generateToken(account.getUsername(), account.getRole().toString());
     }
+
 
     @Override
     public Account register(String username, String email, String rawPassword) {
@@ -107,30 +109,44 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void sendOtpToVerifyAccount(String email) {
+    public void sendOtpToVerifyAccount(String loginIdentifier) {
         // Kiểm tra xem email có tồn tại trong hệ thống không
-        Optional<Account> account = accountRepository.findByEmail(email);
+        Optional<Account> account = accountRepository.findByEmail(loginIdentifier);
+
         if (account.isEmpty()) {
-            throw new ResourceNotFoundException("Không tìm thấy tài khoản với email: " + email);
+            account = accountRepository.findByUsername(loginIdentifier);
         }
 
-        otpService.generateAndSendOtp(email);
+        if (account.isEmpty()) {
+            throw new ResourceNotFoundException("ACCOUNT_NOT_FOUND");
+        }
+
+        otpService.generateAndSendOtp(account.get().getEmail());
     }
-
     @Override
-    public boolean verifyAccount(String email, String otp) {
-        if (!otpService.verifyOtp(email, otp)) {
-            throw new BadRequestException("OTP không hợp lệ hoặc đã hết hạn.");
+    public boolean verifyAccount(String loginIdentifier, String otp) {
+        // Tìm theo email trước, không có thì thử username
+        Optional<Account> accountOpt = accountRepository.findByEmail(loginIdentifier);
+        if (accountOpt.isEmpty()) {
+            accountOpt = accountRepository.findByUsername(loginIdentifier);
         }
 
-        Account account = accountRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy tài khoản tương ứng."));
+        Account account = accountOpt.orElseThrow(() ->
+                new ResourceNotFoundException("ACCOUNT_NOT_FOUND")
+        );
 
+        // Xác thực OTP bằng email thật của tài khoản
+        if (!otpService.verifyOtp(account.getEmail(), otp)) {
+            throw new BadRequestException("OTP_INVALID_OR_EXPIRED");
+        }
+
+        // Cập nhật trạng thái
         account.setStatus(AccountStatus.ACTIVE);
         accountRepository.save(account);
 
         return true;
     }
+
 
     @Override
     public void sendOtpForPasswordReset(String email) {

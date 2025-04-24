@@ -4,10 +4,7 @@ import org.capstone.backend.dto.challenge.*;
 import org.capstone.backend.entity.Challenge;
 import org.capstone.backend.entity.ChallengeStarRating;
 import org.capstone.backend.entity.GroupChallenge;
-import org.capstone.backend.utils.enums.ChallengeRole;
-import org.capstone.backend.utils.enums.ChallengeStatus;
-import org.capstone.backend.utils.enums.GroupChallengeStatus;
-import org.capstone.backend.utils.enums.VerificationType;
+import org.capstone.backend.utils.enums.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -162,4 +159,37 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
     @Query("SELECT COUNT(cm) FROM ChallengeMember cm WHERE cm.challenge.id = :challengeId")
     int countParticipants(@Param("challengeId") Long challengeId);
 
+    @Query("""
+    SELECT c.name, ct.name, COUNT(cm), COUNT(cr), c.status
+    FROM Challenge c
+    JOIN c.challengeType ct
+    LEFT JOIN ChallengeMember cm ON cm.challenge.id = c.id
+    LEFT JOIN ChallengeReport cr ON cr.challenge.id = c.id
+    WHERE c.createdBy = :creator
+    AND (:keyword IS NULL OR LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%')))
+    AND (:status IS NULL OR c.status = :status)
+    GROUP BY c.id
+""")
+    List<Object[]> findDashboardChallengesRaw(
+            @Param("creator") String creator,
+            @Param("keyword") String keyword,
+            @Param("status") ChallengeStatus status
+    );
+    @Query("""
+    SELECT c.name, COUNT(cm.id)
+    FROM Challenge c
+    JOIN ChallengeMember cm ON cm.challenge.id = c.id
+    WHERE c.createdBy = :creator
+      AND cm.isParticipate = true
+      AND cm.status = :status
+    GROUP BY c.id
+""")
+    List<Object[]> countActiveParticipantsPerAdminChallenge(@Param("creator") String creator,
+                                                            @Param("status") ChallengeMemberStatus status);
+    @Query("SELECT cr.challenge.name, COUNT(cr) " +
+            "FROM ChallengeReport cr " +
+            "WHERE cr.challenge.createdBy = :creator " +
+            "GROUP BY cr.challenge.name")
+    List<Object[]> countReportsOfAdminChallenges(@Param("creator") String creator);
+    Long countByCreatedByAndStatus(String creator, ChallengeStatus status);
 }
