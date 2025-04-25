@@ -44,12 +44,13 @@ public class ManageChallengeController {
     public ResponseEntity<AdminDashboardSummaryDTO> getAdminDashboardSummary() {
         return ResponseEntity.ok(challengeService.getAdminDashboardSummary());
     }
-    @GetMapping("/get_created_challenge ")
+    @GetMapping("/get_created_challenge")
     public ResponseEntity<Page<ChallengeDashboardDTO>> getCreatedChallenges(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) ChallengeStatus status,
             @PageableDefault(size = 10, sort = "name") Pageable pageable
     ) {
+
         return ResponseEntity.ok(challengeService.getAdminChallengeTable(keyword, status, pageable));
     }
     @GetMapping("/member-participation")

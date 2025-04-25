@@ -24,7 +24,8 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     public OAuth2SuccessHandler(
             AuthService authService,
             ObjectMapper objectMapper,
-            @Value("${google.redirect-uri:http://localhost:5173/auth/callback}") String redirectBaseUrl
+            @Value("${google.frontend-redirect-uri}")
+            String redirectBaseUrl
     ) {
         this.authService = authService;
         this.objectMapper = objectMapper;
@@ -33,14 +34,26 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+        try {
+            OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
 
-        String token = authService.loginWithOAuth2(oAuth2User);
+            System.out.println("✅ OAuth2User: " + oAuth2User.getAttributes());
 
-        String redirectUrl = UriComponentsBuilder.fromUriString(redirectBaseUrl)
-                .queryParam("token", token)
-                .build().toUriString();
+            String token = authService.loginWithOAuth2(oAuth2User);
 
-        response.sendRedirect(redirectUrl);
+            System.out.println("✅ Token: " + token);
+            System.out.println("✅ Redirecting to: " + redirectBaseUrl);
+
+            String redirectUrl = UriComponentsBuilder.fromUriString(redirectBaseUrl)
+                    .queryParam("token", token)
+                    .build().toUriString();
+
+            response.sendRedirect(redirectUrl);
+
+        } catch (Exception e) {
+            System.out.println("❌ OAuth2 SuccessHandler Error:");
+            response.sendRedirect("/login?error=true");
+        }
     }
+
 }
