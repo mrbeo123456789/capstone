@@ -85,7 +85,7 @@ const RichTextEditor = ({ value, onChange }) => {
                     tinydrive_token_provider: (success, failure) => {
                         const token = localStorage.getItem("jwt_token"); // your auth token
 
-                        fetch(`${BASE_URL}/tinymce/token`, {
+                        fetch(`${BASE_URL}tinymce/token`, {
                             method: "GET",
                             headers: {
                                 "Authorization": `Bearer ${token}`,
