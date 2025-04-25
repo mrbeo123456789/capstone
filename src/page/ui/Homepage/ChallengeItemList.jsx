@@ -10,12 +10,13 @@ import {
     FaClipboardCheck,
     FaTasks,
     FaCheck,
-    FaClock,
     FaUpload,
-    FaStar
+    FaEye,
+    FaRegTimesCircle,
+    FaRegClock
 } from "react-icons/fa";
 import { BsThreeDots } from "react-icons/bs";
-import { useGetTasksForDateQuery } from "../../../service/evidenceService.js"; // Adjust path as needed
+import { useGetTasksForDateQuery } from "../../../service/evidenceService.js";
 import { useNavigate } from "react-router-dom";
 
 // Map for icons based on challenge name keywords
@@ -39,7 +40,7 @@ const getIconForChallenge = (challengeName) => {
 // Helper function to determine status color
 const getStatusColor = (evidenceStatus) => {
     switch (evidenceStatus) {
-        case "COMPLETED":
+        case "APPROVED":
             return "text-green-500";
         case "PENDING":
             return "text-yellow-500";
@@ -53,16 +54,28 @@ const getStatusColor = (evidenceStatus) => {
 // Helper function to get readable status text
 const getStatusText = (evidenceStatus) => {
     switch (evidenceStatus) {
-        case "COMPLETED":
-            return "Completed";
+        case "APPROVED":
+            return "Approved";
         case "PENDING":
             return "Pending";
         case "REJECTED":
             return "Rejected";
-        case "IN_REVIEW":
-            return "In Review";
         default:
-            return "Not Started";
+            return "Not Submitted";
+    }
+};
+
+// Helper function to get status icon based on evidence status
+const getStatusIcon = (evidenceStatus) => {
+    switch (evidenceStatus) {
+        case "APPROVED":
+            return <FaCheck />;
+        case "PENDING":
+            return <FaRegClock />;
+        case "REJECTED":
+            return <FaRegTimesCircle />;
+        default:
+            return <BsThreeDots />;
     }
 };
 
@@ -76,7 +89,7 @@ const ChallengeItemList = ({ selectedDate }) => {
     const { data: tasks, isLoading, error } = useGetTasksForDateQuery(dateString);
 
     const handleChallengeClick = (challengeId) => {
-        navigate(`/challenges/detail/${challengeId}`);
+        navigate(`/challenges/joins/detail/${challengeId}`);
     };
 
     if (isLoading) {
@@ -108,14 +121,12 @@ const ChallengeItemList = ({ selectedDate }) => {
 
     // Process each task and create separate notifications
     tasks.forEach(task => {
-        // Create submission notification if applicable
-        if (!task.evidenceStatus || task.evidenceStatus !== "COMPLETED") {
-            notifications.push({
-                ...task,
-                notificationType: "submission",
-                statusText: getStatusText(task.evidenceStatus)
-            });
-        }
+        // Create submission notification
+        notifications.push({
+            ...task,
+            notificationType: "submission",
+            statusText: getStatusText(task.evidenceStatus)
+        });
 
         // Create review notification if there are reviews to do
         if (task.totalReviewAssigned > 0) {
@@ -143,8 +154,8 @@ const ChallengeItemList = ({ selectedDate }) => {
                              }}
                         >
                             {item.notificationType === "review"
-                                ? <FaStar />
-                                : getIconForChallenge(item.challengeName)}
+                                ? <FaEye />
+                                : <FaUpload />}
                         </div>
                         {/* Title & Meta */}
                         <div className="text-left">
@@ -152,16 +163,12 @@ const ChallengeItemList = ({ selectedDate }) => {
                             <div className="text-xs text-gray-500 flex flex-wrap gap-x-2">
                                 {item.notificationType === "submission" && (
                                     <span className="flex items-center">
-                                        <FaUpload className="inline mr-1" />
-                                        Submit challenge
-                                        <span className={getStatusColor(item.evidenceStatus) + " ml-1"}>
-                                            {item.statusText}
-                                        </span>
+                                        <span>Submit challenge</span>
                                     </span>
                                 )}
                                 {item.notificationType === "review" && (
                                     <span className="flex items-center">
-                                        <FaCheck className="inline mr-1" />
+                                        <FaEye className="inline mr-1" />
                                         Review submissions: {item.reviewCompleted}/{item.totalReviewAssigned}
                                     </span>
                                 )}
@@ -171,23 +178,15 @@ const ChallengeItemList = ({ selectedDate }) => {
 
                     {/* Right section: Status */}
                     {item.notificationType === "submission" ? (
-                        item.evidenceStatus === "COMPLETED" ? (
-                            <div className="text-green-500 text-xl">✔️</div>
-                        ) : item.evidenceStatus === "IN_REVIEW" ? (
-                            <div className="text-yellow-500 text-xl">
-                                <FaClock />
-                            </div>
-                        ) : (
-                            <div className="text-gray-400 text-xl">
-                                <BsThreeDots />
-                            </div>
-                        )
+                        <span className={`${getStatusColor(item.evidenceStatus)} font-medium text-sm`}>
+                            {item.statusText}
+                        </span>
                     ) : (
                         // For review type
                         item.reviewCompleted >= item.totalReviewAssigned ? (
-                            <div className="text-green-500 text-xl">✔️</div>
+                            <span className="text-green-500 font-medium text-sm">Completed</span>
                         ) : (
-                            <div className="text-blue-500 text-xl">{item.reviewsRemaining}</div>
+                            <span className="text-blue-500 font-medium text-sm">{item.reviewsRemaining} remaining</span>
                         )
                     )}
                 </div>
