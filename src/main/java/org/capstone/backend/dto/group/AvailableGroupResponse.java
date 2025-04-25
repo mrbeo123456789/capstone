@@ -9,4 +9,5 @@ public class AvailableGroupResponse {
     private Long groupId;
     private String groupName;
     private String groupPicture;
+    private Integer memberCount; // ✅ thêm số lượng thành viên
 }

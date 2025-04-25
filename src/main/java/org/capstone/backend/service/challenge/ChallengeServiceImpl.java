@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class ChallengeServiceImpl implements ChallengeService {
 
     // --- Các thông báo lỗi ---
@@ -213,7 +214,9 @@ public class ChallengeServiceImpl implements ChallengeService {
                 .build();
 
         challengeRepository.save(challenge);
-
+        if (request.getGroupId()!=null){
+            joinGroupToChallenge(request.getGroupId(),challenge.getId())   ;
+        }
         if (isMember) {
             Member member = memberRepository.findById(memberId)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MEMBER_NOT_FOUND_MSG));
@@ -250,7 +253,14 @@ public class ChallengeServiceImpl implements ChallengeService {
         challenge.setAdminNote(request.getAdminNote());
         challengeRepository.save(challenge);
 
-        eventPublisher.publishEvent(new ChallengeStatusUpdatedEvent(challenge, status.name()));
+        String statusMessage = status.name();
+        if ((status == ChallengeStatus.APPROVED || status == ChallengeStatus.REJECTED)
+                && request.getAdminNote() != null && !request.getAdminNote().isBlank()) {
+            statusMessage += " - " + request.getAdminNote();  // ✅ gộp note vào chuỗi status
+        }
+
+        eventPublisher.publishEvent(new ChallengeStatusUpdatedEvent(challenge, statusMessage));
+
         return "Trạng thái thử thách đã được cập nhật thành công.";
     }
 
@@ -320,7 +330,6 @@ public class ChallengeServiceImpl implements ChallengeService {
     }
 
     @Override
-    @Transactional
     public String joinGroupToChallenge(Long groupId, Long challengeId) {
         // 1. Lấy dữ liệu
         Groups group = groupRepository.findById(groupId)

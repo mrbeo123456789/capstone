@@ -1,5 +1,6 @@
 package org.capstone.backend.service.challenge;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.capstone.backend.dto.challenge.*;
 import org.capstone.backend.dto.group.MemberSearchResponse;
@@ -35,7 +36,7 @@ public class InvitationServiceImpl implements InvitationService {
     private final MemberSuggestionService memberSuggestionService;
     private final GroupChallengeRepository groupChallengeRepository;
     private final ApplicationEventPublisher eventPublisher; // Dùng để đẩy notification event
-
+    private  final AccountRepository accountRepository;
     /**
      * Lấy thông tin thành viên đã xác thực hiện tại.
      *
@@ -476,7 +477,13 @@ public class InvitationServiceImpl implements InvitationService {
         Long currentMemberId = authService.getMemberIdFromAuthentication();
         Pageable pageable = PageRequest.of(0, 5);
 
-        // Gọi repository với các tham số đúng và đã lọc theo số lượng thành viên ACTIVE >= 2
+        String creatorUsername = challengeRepository.findById(challengeId)
+                .map(Challenge::getCreatedBy)
+                .orElseThrow(() -> new EntityNotFoundException("Challenge not found"));
+
+        Long creatorMemberId = memberRepository.findMemberIdByUsername(creatorUsername)
+                .orElseThrow(() -> new EntityNotFoundException("Member not found with username: " + creatorUsername));
+
         return groupMemberRepository.searchAvailableGroupLeaders(
                 challengeId,
                 keyword,
@@ -485,8 +492,11 @@ public class InvitationServiceImpl implements InvitationService {
                 GroupChallengeStatus.ONGOING,
                 InvitePermission.EVERYONE,
                 currentMemberId,
+                creatorMemberId,
                 pageable
         );
     }
+
+
 
 }

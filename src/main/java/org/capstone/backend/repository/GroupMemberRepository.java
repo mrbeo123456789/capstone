@@ -63,6 +63,7 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
     AND gm.status = :groupMemberStatus
     AND gm.member.invitePermission = :invitePermission
     AND gm.member.id <> :currentMemberId
+    AND gm.member.id <> :creatorId
     AND g.id NOT IN (
         SELECT gc.group.id
         FROM GroupChallenge gc
@@ -86,23 +87,31 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
             @Param("ongoingStatus") GroupChallengeStatus ongoingStatus,
             @Param("invitePermission") InvitePermission invitePermission,
             @Param("currentMemberId") Long currentMemberId,
+            @Param("creatorId") Long creatorId,
             Pageable pageable
     );
 
-    @Query("""
-    SELECT gm.group
-    FROM GroupMember gm
-    WHERE gm.member.id = :memberId
-    AND gm.role = 'OWNER'
-    AND gm.status = 'ACTIVE'
-    AND gm.group.id NOT IN (
-        SELECT gc.group.id
-        FROM GroupChallenge gc
-        WHERE gc.status = 'ONGOING'
-    )
-    ORDER BY gm.group.name ASC
-""")
-    List<Groups> findAvailableGroupsForMember(@Param("memberId") Long memberId);
+
+    @Query(value = """
+    SELECT g.group_id AS groupId,
+           g.group_name AS groupName,
+           g.picture AS groupPicture,
+           COUNT(gm_all.group_member_id) AS memberCount
+    FROM `groups` g
+    JOIN group_members gm_owner ON gm_owner.group_id = g.group_id
+    JOIN group_members gm_all ON gm_all.group_id = g.group_id AND gm_all.status = 'ACTIVE'
+    WHERE gm_owner.member_id = :memberId
+      AND gm_owner.role = 'OWNER'
+      AND gm_owner.status = 'ACTIVE'
+      AND g.group_id NOT IN (
+          SELECT gc.group_id FROM group_challenge gc WHERE gc.status = 'ONGOING'
+      )
+    GROUP BY g.group_id, g.group_name, g.picture
+    HAVING COUNT(gm_all.group_member_id) > 1
+    ORDER BY g.group_name ASC
+    """, nativeQuery = true)
+    List<Object[]> findAvailableGroupsWithMemberCount(@Param("memberId") Long memberId);
+
 
     List<GroupMember> findByMemberAndRoleAndStatus(Member member, String owner, GroupMemberStatus groupMemberStatus);
 

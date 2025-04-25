@@ -61,4 +61,6 @@ public class ChallengeRequest {
 
     @NotNull(message = "Challenge Type ID must be provided")
     private Long challengeTypeId;
+
+    private Long groupId;
 }
