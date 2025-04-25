@@ -251,10 +251,12 @@
     "challengeRoleUpdated.content": "チャレンジ「{{challengeName}}」でのあなたの役割が {{role}} に変更されました。",
     "challengeStarted.title": "チャレンジ「{{challengeName}}」が開始されました！",
     "challengeStarted.content": "GoBeyond と一緒に「{{challengeName}}」に挑戦しましょう！",
-    "evidence.approved.title": "{{day}} の証拠が承認されました",
-    "evidence.approved.content": "チャレンジ「{{challengeName}}」で提出した {{day}} の証拠が承認されました。引き続き頑張ってください！",
-    "evidence.rejected.title": "{{day}} の証拠が拒否されました",
-    "evidence.rejected.content": "チャレンジ「{{challengeName}}」で提出した {{day}} の証拠が拒否されました。フィードバックを確認して、再提出してください。",
+    "notification.evidence.approved.title": "{{day}}の証拠が承認されました",
+    "notification.evidence.approved.content": "チャレンジ「{{challengeName}}」の{{day}}に提出した証拠が承認されました。フィードバック: {{feedback}}",
+
+    "notification.evidence.rejected.title": "{{day}}の証拠が却下されました",
+    "notification.evidence.rejected.content": "チャレンジ「{{challengeName}}」の{{day}}に提出した証拠は却下されました。フィードバック: {{feedback}}。内容を確認して再提出してください。",
+
     "invite.challenge.title": "チャレンジへの招待",
     "invite.challenge.content": "{{inviterName}} さんがあなたをチャレンジ「{{challengeName}}」に招待しました。",
     "invite.group.title": "グループへの招待",
@@ -277,7 +279,7 @@
     "kickedFromChallenge.content": "あなたはチャレンジ「{{challengeName}}」から管理者により削除されました。",
     "empty": "新しい通知はありません。",
     "challengeStatusUpdated.title": "チャレンジのステータスが更新されました",
-    "notification.challengeStatusUpdated.content": "チャレンジ「{{challengeName}}」のステータスが「{{status}}」に更新されました"
+    "notification.challengeStatusUpdated.content": "チャレンジ「{{challengeName}}」のステータスが {{status}} に更新されました。{{#adminNote}} 管理者メモ: {{adminNote}}{{/adminNote}}"
   },
 
   "suggest.reason.both": "共通の興味があり、近くにいます",
