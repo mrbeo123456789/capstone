@@ -225,13 +225,15 @@
   "notification.challengeRoleUpdated.title": "Challenge Role Updated",
   "notification.challengeRoleUpdated.content": "Your role in the challenge '{{challengeName}}' has been updated to: {{role}}",
   "notification.challengeStatusUpdated.title": "Your challenge status has been updated",
-  "notification.challengeStatusUpdated.content": "The challenge '{{challengeName}}' has been updated and now has status '{{status}}'",
+  "notification.challengeStatusUpdated.content": "The challenge '{{challengeName}}' has been updated to: {{status}}.{{#adminNote}} Note: {{adminNote}}{{/adminNote}}",
   "notification.challengeStarted.title": "The challenge '{{challengeName}}' has started!",
   "notification.challengeStarted.content": "Get ready to conquer the challenge '{{challengeName}}' with GoBeyond!",
   "notification.evidence.approved.title": "Proof on {{day}} approved",
-  "notification.evidence.approved.content": "Your proof submitted on {{day}} in the challenge '{{challengeName}}' has been approved. Keep it up!",
+  "notification.evidence.approved.content": "Your proof submitted on {{day}} in the challenge '{{challengeName}}' has been approved. Feedback: {{feedback}}",
+
   "notification.evidence.rejected.title": "Proof on {{day}} rejected",
-  "notification.evidence.rejected.content": "Your proof submitted on {{day}} in the challenge '{{challengeName}}' was rejected. Please check feedback and resubmit if needed.",
+  "notification.evidence.rejected.content": "Your proof submitted on {{day}} in the challenge '{{challengeName}}' was rejected. Feedback: {{feedback}}. Please check and resubmit if needed.",
+
   "notification.invite.challenge.title": "Challenge Invitation",
   "notification.invite.challenge.content": "{{inviterName}} has invited you to join the challenge '{{challengeName}}'.",
   "notification.invite.group.title": "Group Invitation",

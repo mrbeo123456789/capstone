@@ -102,7 +102,11 @@ export const groupService = createApi({
             }),
          providesTags: ["Group"],
        }),
+        getAvailableGroups: builder.query({
+            query: () => "/groups/available-to-join",
+        }),
     }),
+
 });
 
 export const {
@@ -118,5 +122,6 @@ export const {
     useKickMemberMutation,
     useLeaveGroupMutation,
     useGetGroupRankingQuery,
+    useGetAvailableGroupsQuery,
     useGetGroupChallengeHistoryQuery,
 } = groupService;
