@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "user_achievement", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"member_id", "achievement_id"})
+        @UniqueConstraint(columnNames = {"member_id", "achievement_id"})
 })
 @Getter
 @Setter
@@ -19,7 +19,6 @@ public class UserAchievement {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // ⚠️ Liên kết đến bảng member
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
@@ -28,6 +27,9 @@ public class UserAchievement {
     @JoinColumn(name = "achievement_id", nullable = false)
     private Achievement achievement;
 
+    @Column(name = "progress")
+    private Double progress = 0.0; // 0–100%
+
     @Column(name = "achieved_at")
-    private LocalDateTime achievedAt = LocalDateTime.now();
+    private LocalDateTime achievedAt; // nullable cho tới khi đạt
 }
