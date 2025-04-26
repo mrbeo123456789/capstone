@@ -212,11 +212,16 @@
     "joinCheckbox": "Join this challenge yourself?"
   },
   "ProofUploads": {
-    "loading": "Loading data...",
-    "viewEvidence": "View your evidence",
-    "proofOn": "Proof on",
-    "uploaded": "Completed",
-    "noEvidence": "No evidence for this day"
+    "loading": "Loading data",
+    "viewEvidence": "View all evidences",
+    "has no proof": "You don't have any proof yet!",
+    "uploaded": "Uploaded",
+    "not have evidence": "Don't have evidence for this day",
+    "previous": "Previous",
+    "page": "Page",
+    "next": "Next",
+    "fullEvidence": "Full Evidence",
+    "close": "Close"
   },
   "notification.challengeResult.title": "Challenge Result: Completed",
   "notification.challengeResult.content": "You have successfully completed the challenge '{{challengeName}}'! Check out your achievement now!",
@@ -225,13 +230,15 @@
   "notification.challengeRoleUpdated.title": "Challenge Role Updated",
   "notification.challengeRoleUpdated.content": "Your role in the challenge '{{challengeName}}' has been updated to: {{role}}",
   "notification.challengeStatusUpdated.title": "Your challenge status has been updated",
-  "notification.challengeStatusUpdated.content": "The challenge '{{challengeName}}' has been updated and now has status '{{status}}'",
+  "notification.challengeStatusUpdated.content": "The challenge '{{challengeName}}' has been updated to: {{status}}.{{#adminNote}} Note: {{adminNote}}{{/adminNote}}",
   "notification.challengeStarted.title": "The challenge '{{challengeName}}' has started!",
   "notification.challengeStarted.content": "Get ready to conquer the challenge '{{challengeName}}' with GoBeyond!",
   "notification.evidence.approved.title": "Proof on {{day}} approved",
-  "notification.evidence.approved.content": "Your proof submitted on {{day}} in the challenge '{{challengeName}}' has been approved. Keep it up!",
+  "notification.evidence.approved.content": "Your proof submitted on {{day}} in the challenge '{{challengeName}}' has been approved. Feedback: {{feedback}}",
+
   "notification.evidence.rejected.title": "Proof on {{day}} rejected",
-  "notification.evidence.rejected.content": "Your proof submitted on {{day}} in the challenge '{{challengeName}}' was rejected. Please check feedback and resubmit if needed.",
+  "notification.evidence.rejected.content": "Your proof submitted on {{day}} in the challenge '{{challengeName}}' was rejected. Feedback: {{feedback}}. Please check and resubmit if needed.",
+
   "notification.invite.challenge.title": "Challenge Invitation",
   "notification.invite.challenge.content": "{{inviterName}} has invited you to join the challenge '{{challengeName}}'.",
   "notification.invite.group.title": "Group Invitation",
@@ -253,18 +260,41 @@
   "notification.kickedFromChallenge.title": "You were removed from the challenge",
   "notification.kickedFromChallenge.content": "You were removed from the challenge '{{challengeName}}' by the admin.",
   "notification.empty": "No new notifications.",
-  "ProofUpLoads": {
-    "loading": "Loading data",
-    "view evidence": "View all evidences",
-    "has no proof": "You don't have any proof yet!",
-    "uploaded": "Uploaded",
-    "not have evidence": "Don't have evidence for this day",
-    "previous": "Previous",
-    "page": "Page",
-    "next": "Next",
-    "fullEvidence": "Full Evidence",
-    "close": "Close"
+  "ChallengeDetail": {
+    "joinedStatus": "Joined",
+    "joining": "Joining...",
+    "joinButton": "Join Challenge",
+    "joinSuccess": "Successfully joined the challenge!",
+    "joinFail": "Failed to join the challenge.",
+    "category": "Category",
+    "participation": "Participation",
+    "verification": "Verification",
+    "totalParticipants": "TOTAL PARTICIPANTS",
+    "peopleJoined": "people have joined",
+    "tab": {
+      "info": "Information",
+      "rules": "Rules",
+      "team": "Team Ranking",
+      "individual": "Individual Ranking"
+    },
+    "teamRanking": "Team ranking will be displayed here.",
+    "individualRanking": "Individual ranking will be displayed here.",
+    "notAvailable": "N/A",
+    "ended": "Challenge ended",
+    "alreadyStarted": "Challenge already started",
+    "participationType": {
+      "individual": "Individual",
+      "group": "Group"
+    },
+    "verificationType": {
+      "hostReview": "Host Review",
+      "memberReview": "Member Review"
+    },
+    "loginRequired": "You need to log in first.",
+    "maxGroups": "Max Groups",
+    "maxMembersPerGroup": "Max Members per Group"
   },
+
   "ProgressTracking": {
     "viewExplanation": "View explanation",
     "daysOfWeek": {
@@ -334,28 +364,29 @@
         "invalidToken": "Invalid token",
         "loginFailed": "Login failed. Please try again"
       }
+    },
+    "register": {
+      "title": "Register",
+      "email": "Email",
+      "username": "Username",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "registerButton": "Register",
+      "registering": "Registering...",
+      "haveAccount": "Already have an account?",
+      "loginNow": "Login now",
+      "errors": {
+        "emptyEmail": "Email cannot be empty.",
+        "invalidEmail": "Email must include '@'.",
+        "emptyUsername": "Username cannot be empty.",
+        "emptyPassword": "Password cannot be empty.",
+        "shortPassword": "Password must be at least 6 characters.",
+        "passwordMismatch": "Confirmation password doesn't match.",
+        "registerFailed": "Registration failed. Please try again."
+      }
     }
   },
-  "register": {
-    "title": "Register Account",
-    "email": "Email",
-    "username": "Username",
-    "password": "Password",
-    "confirmPassword": "Confirm Password",
-    "registerButton": "Register",
-    "registering": "Registering...",
-    "haveAccount": "Already have an account?",
-    "loginNow": "Login now",
-    "errors": {
-      "emptyEmail": "Email cannot be empty.",
-      "invalidEmail": "Email must include '@'.",
-      "emptyUsername": "Username cannot be empty.",
-      "emptyPassword": "Password cannot be empty.",
-      "shortPassword": "Password must be at least 6 characters.",
-      "passwordMismatch": "Confirmation password doesn't match.",
-      "registerFailed": "Registration failed. Please try again."
-    }
-  },
+
   "JoinsChallengeDetail": {
     "reportTab": "Feedback & Reports",
     "groups": "Groups",
@@ -407,27 +438,7 @@
   "selectWarning": "Please select at least one group.",
   "success": "Groups invited successfully!",
   "searchPlaceholderGroup": "Enter group name...",
-  "ChallengeDetail": {
-    "joinedStatus": "Joined",
-    "joining": "Joining...",
-    "joinButton": "Join Challenge",
-    "joinSuccess": "Successfully joined the challenge!",
-    "joinFail": "Failed to join the challenge.",
-    "category": "Category",
-    "participation": "Participation",
-    "verification": "Verification",
-    "totalParticipants": "TOTAL PARTICIPANTS",
-    "peopleJoined": "people have joined",
-    "tab": {
-      "info": "Information",
-      "rules": "Rules",
-      "team": "Team Ranking",
-      "individual": "Individual Ranking"
-    },
-    "rulesText": "Detailed challenge rules will be displayed here.",
-    "teamRanking": "Team ranking will be displayed here.",
-    "individualRanking": "Individual ranking will be displayed here."
-  },
+
   "yourChallenge": {
     "create": "Create a challenge",
     "search": "Search",
@@ -471,28 +482,8 @@
     "loadError": "Failed to load groups.",
     "selectWarning": "Please select at least one group.",
     "success": "Groups invited successfully!",
-    "searchPlaceholderGroup": "Enter group name...",
-    "ChallengeDetail": {
-      "joinedStatus": "Joined",
-      "joining": "Joining...",
-      "joinButton": "Join Challenge",
-      "joinSuccess": "Successfully joined the challenge!",
-      "joinFail": "Failed to join the challenge.",
-      "category": "Category",
-      "participation": "Participation",
-      "verification": "Verification",
-      "totalParticipants": "TOTAL PARTICIPANTS",
-      "peopleJoined": "people have joined",
-      "tab": {
-        "info": "Information",
-        "rules": "Rules",
-        "team": "Team Ranking",
-        "individual": "Individual Ranking"
-      },
-      "rulesText": "Detailed challenge rules will be displayed here.",
-      "teamRanking": "Team ranking will be displayed here.",
-      "individualRanking": "Individual ranking will be displayed here."
-    },
+    "searchPlaceholderGroup": "Enter group name..."
+  },
     "forgotPassword": {
       "title": "Forgot Password?",
       "subtitle": "Enter your email to receive an OTP.",
@@ -719,8 +710,7 @@
       "copyright": "Copyright © {year}",
       "page": "Page",
       "of": "/"
-    }
-  },
+    },
   "challenges": {
     "groupHistory": "Group Challenge History",
     "name": "Challenge Name",
@@ -750,6 +740,116 @@
     "next": "Next",
     "first": "First",
     "last": "Last"
+  },
+  "achievement": {
+    "title": "Your Achievements",
+    "of": "of",
+    "achieved": "achievements unlocked",
+    "totalProgress": "Total Progress",
+    "progress": "Progress",
+    "earned": "Earned",
+    "community": "Community",
+    "users": "users",
+    "unlocked": "UNLOCKED",
+    "locked": "LOCKED",
+    "prev": "Prev",
+    "next": "Next",
+    "notYetEarned": "Not yet earned",
+
+    "fitnessChampion": "Fitness Champion",
+    "fitnessChampionDesc": "Ranked in the top 10 of a monthly challenge.",
+
+    "peakPerformer": "Peak Performer",
+    "peakPerformerDesc": "Completed an advanced intensity workout program.",
+
+    "perfectForm": "Perfect Form",
+    "perfectFormDesc": "Received a perfect score on workout technique.",
+
+    "risingAthlete": "Rising Athlete",
+    "risingAthleteDesc": "Improved fitness score by 50% in a month.",
+
+    "quickStarter": "Quick Starter",
+    "quickStarterDesc": "Completed 5 different workouts in a day.",
+
+    "trainingStreak": "Training Streak",
+    "trainingStreakDesc": "10-day streak of completing workouts.",
+
+    "hiitMaster": "HIIT Master",
+    "hiitMasterDesc": "Complete a HIIT workout with perfect timing.",
+
+    "teamPlayer": "Team Player",
+    "teamPlayerDesc": "Complete 10 group workouts.",
+
+    "workoutPlanner": "Workout Planner",
+    "workoutPlannerDesc": "Create a custom training plan and complete it.",
+
+    "eliteAthlete": "Elite Athlete",
+    "eliteAthleteDesc": "Maintain top 5% fitness rank for a month.",
+
+    "challengeCreator": "Challenge Creator",
+    "challengeCreatorDesc": "Create a workout challenge with 100+ participants.",
+
+    "fitnessMentor": "Fitness Mentor",
+    "fitnessMentorDesc": "Help 20 other users with their workout form.",
+
+    "cardioKing": "Cardio King",
+    "cardioKingDesc": "Win 3 consecutive cardio challenges.",
+
+    "calorieCrusher": "Calorie Crusher",
+    "calorieCrusherDesc": "Burn 5,000 calories in a week.",
+
+    "crossTrainer": "Cross-Trainer",
+    "crossTrainerDesc": "Complete workouts across 5 different fitness categories.",
+
+    "progressTracker": "Progress Tracker",
+    "progressTrackerDesc": "Log workouts for 30 consecutive days.",
+
+    "globalAthlete": "Global Athlete",
+    "globalAthleteDesc": "Join workouts with users from 5 different countries.",
+
+    "mindBodyMaster": "Mind-Body Master",
+    "mindBodyMasterDesc": "Complete 10 mindfulness and yoga sessions.",
+
+    "balancedDiet": "Balanced Diet",
+    "balancedDietDesc": "Log nutrition goals for 25 days.",
+
+    "strengthChampion": "Strength Champion",
+    "strengthChampionDesc": "Set 10 personal records in strength exercises.",
+
+    "enduranceBuilder": "Endurance Builder",
+    "enduranceBuilderDesc": "Complete a 2-hour endurance challenge.",
+
+    "goalCrusher": "Goal Crusher",
+    "goalCrusherDesc": "Achieve 5 personal fitness goals.",
+
+    "fitnessLegend": "Fitness Legend",
+    "fitnessLegendDesc": "Achieve the highest fitness level in the system.",
+
+    "fitnessExplorer": "Fitness Explorer",
+    "fitnessExplorerDesc": "Try workouts across all fitness categories.",
+
+    "activeLifestyle": "Active Lifestyle",
+    "activeLifestyleDesc": "Record physical activity for 60 days straight."
+  },
+
+  "SelectGroupModal": {
+    "title": "Select a Group",
+    "searchPlaceholder": "Search your groups...",
+    "filterExactMembers": "Only show groups with exactly {{number}} members",
+    "noGroups": "No matching groups found.",
+    "prev": "Previous",
+    "next": "Next",
+    "cancel": "Cancel",
+    "join": "Join Challenge",
+    "joining": "Joining...",
+    "joinSuccess": "Joined challenge successfully!",
+    "joinFail": "Failed to join challenge. Please try again.",
+    "selectGroupFirst": "Please select a group first!",
+    "yourRole": "Your Role",
+    "owner": "Leader",
+    "member": "Member",
+    "notLeaderTooltip": "You are not the leader of this group. Please select a group you own.",
+    "notExactMembersTooltip": "This group does not have exactly {{number}} members."
   }
 }
 

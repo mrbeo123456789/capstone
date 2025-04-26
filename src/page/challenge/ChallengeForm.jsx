@@ -9,11 +9,12 @@ import { challengeValidation } from "../../utils/validation.js";
 import { yupResolver } from "@hookform/resolvers/yup";
 import RichTextEditor from "../ui/RichTextEditor.jsx";
 import { useTranslation } from "react-i18next";
+import { useGetAvailableGroupsQuery } from "../../service/groupService";
 
 const CreateChallenge = () => {
-    const { t } = useTranslation();
-    const [createChallenge, { isLoading , error}] = useCreateChallengeMutation();
-    const { data: challengeTypes } = useGetChallengeTypesQuery();
+    const {t} = useTranslation();
+    const [createChallenge, {isLoading, error}] = useCreateChallengeMutation();
+    const {data: challengeTypes} = useGetChallengeTypesQuery();
     const navigate = useNavigate();
     const [preview, setPreview] = useState("");
     const [bannerPreview, setBannerPreview] = useState("");
@@ -25,6 +26,9 @@ const CreateChallenge = () => {
     tomorrow.setDate(today.getDate() + 1);
 
     const getFormattedDate = (date) => date.toISOString().split('T')[0];
+    const {data: availableGroups = []} = useGetAvailableGroupsQuery(undefined, {
+        skip: participationType !== "GROUP"
+    });
 
     const {
         register,
@@ -32,7 +36,8 @@ const CreateChallenge = () => {
         setValue,
         reset,
         trigger,
-        formState: { errors, isValid }
+        watch,
+        formState: {errors, isValid}
     } = useForm({
         mode: "all",
         resolver: yupResolver(challengeValidation),
@@ -41,6 +46,9 @@ const CreateChallenge = () => {
             endDate: getFormattedDate(tomorrow)
         }
     });
+    const isParticipating = watch("isParticipate", true); // default true
+    const showGroupStructureFields = participationType === "GROUP";
+    const showGroupJoinSelector = participationType === "GROUP" && isParticipating;
 
     const onSubmit = async (data) => {
         if (!isValid) {
@@ -78,6 +86,7 @@ const CreateChallenge = () => {
                 formData.append(key, processed[key] ?? "");
             }
         });
+        processed.groupId = data.groupId;
 
         if (isValid) {
             try {
@@ -95,7 +104,7 @@ const CreateChallenge = () => {
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
-        setValue("picture", file, { shouldValidate: true });
+        setValue("picture", file, {shouldValidate: true});
         setPreview(URL.createObjectURL(file));
     };
 
@@ -111,7 +120,7 @@ const CreateChallenge = () => {
     const handleClosePreview = (e) => {
         e.stopPropagation();
         setPreview(null);
-        setValue("avatar", null, { shouldValidate: true });
+        setValue("avatar", null, {shouldValidate: true});
     };
 
     return (
@@ -138,52 +147,38 @@ const CreateChallenge = () => {
                             <div className="relative w-full h-40 border-2 border-dashed rounded-lg bg-gray-50">
                                 {bannerPreview ? (
                                     <>
-                                        <img
-                                            src={bannerPreview}
-                                            className="w-full h-full object-cover rounded-lg"
-                                            alt="Banner Preview"
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                e.preventDefault(); // ✅ quan trọng
-                                                setBannerPreview(null);
-                                                setValue("banner", null, {shouldValidate: true});
-                                            }}
-                                            className="absolute top-1 right-1 text-white bg-black/50 hover:bg-black/80 rounded-full p-1 z-10"
-                                            title="Remove banner"
-                                        >
+                                        <img src={bannerPreview} className="w-full h-full object-cover rounded-lg"
+                                             alt="Banner Preview"/>
+                                        <button type="button" onClick={(e) => {
+                                            e.stopPropagation();
+                                            e.preventDefault();
+                                            setBannerPreview(null);
+                                            setValue("banner", null, {shouldValidate: true});
+                                        }}
+                                                className="absolute top-1 right-1 text-white bg-black/50 hover:bg-black/80 rounded-full p-1 z-10"
+                                                title="Remove banner">
                                             <FaWindowClose className="text-lg"/>
                                         </button>
                                     </>
                                 ) : (
-                                    <label
-                                        htmlFor="banner-upload"
-                                        className="w-full h-full flex items-center justify-center cursor-pointer text-center text-gray-400"
-                                    >
+                                    <label htmlFor="banner-upload"
+                                           className="w-full h-full flex items-center justify-center cursor-pointer text-center text-gray-400">
                                         <div>
                                             <IoCloudUploadOutline className="text-3xl mx-auto mb-2"/>
                                             <p className="text-sm">{t("createChallenge.clickUpload")}</p>
                                         </div>
                                     </label>
                                 )}
-                                <input
-                                    id="banner-upload"
-                                    type="file"
-                                    accept="image/*"
-                                    className="hidden"
-                                    onChange={(e) => {
-                                        const file = e.target.files[0];
-                                        if (file) {
-                                            setBannerPreview(URL.createObjectURL(file));
-                                            setValue("banner", file, {shouldValidate: true});
-                                        }
-                                    }}
-                                />
+                                <input id="banner-upload" type="file" accept="image/*" className="hidden"
+                                       onChange={(e) => {
+                                           const file = e.target.files[0];
+                                           if (file) {
+                                               setBannerPreview(URL.createObjectURL(file));
+                                               setValue("banner", file, {shouldValidate: true});
+                                           }
+                                       }}/>
                             </div>
                         </div>
-
                     </div>
                     <label htmlFor="dropzone-file" className="relative group cursor-pointer md:m-2">
                         <label className="text-sm font-medium">{t("createChallenge.picture")}</label><span
@@ -207,8 +202,7 @@ const CreateChallenge = () => {
                 </div>
             </div>
             <div className="bg-gradient-to-r from-red-700 to-blue-600 rounded-lg w-full p-px">
-                <div className="bg-white flex flex-col rounded-lg shadow-md h-full">
-                </div>
+                <div className="bg-white flex flex-col rounded-lg shadow-md h-full"/>
             </div>
             <div className="rounded-lg w-full p-6">
                 <h3 className="mb-4 text-xl font-bold">{t("createChallenge.details")}</h3>
@@ -230,38 +224,23 @@ const CreateChallenge = () => {
                             <label className="text-sm font-medium block mb-1">{t("createChallenge.privacy")}</label>
                             <div className="flex gap-4">
                                 <label className="flex items-center gap-2">
-                                    <input
-                                        type="radio"
-                                        value="PUBLIC"
-                                        {...register("privacy")}
-                                        defaultChecked
-                                    />
+                                    <input type="radio" value="PUBLIC" {...register("privacy")} defaultChecked/>
                                     {t("public")}
                                 </label>
                                 <label className="flex items-center gap-2">
-                                    <input
-                                        type="radio"
-                                        value="PRIVATE"
-                                        {...register("privacy")}
-                                    />
+                                    <input type="radio" value="PRIVATE" {...register("privacy")} />
                                     {t("private")}
                                 </label>
                             </div>
                         </div>
-
                         <div>
                             <label
                                 className="text-sm font-medium block mb-1">{t("createChallenge.isParticipate")}</label>
                             <label className="flex items-center gap-2">
-                                <input
-                                    type="checkbox"
-                                    defaultChecked
-                                    {...register("isParticipate")}
-                                />
+                                <input type="checkbox" defaultChecked {...register("isParticipate")} />
                                 {t("createChallenge.joinCheckbox")}
                             </label>
                         </div>
-
                         <div>
                             <label className="text-sm font-medium">{t("createChallenge.verificationType.label")}</label>
                             <select {...register("verificationType")} className="w-full p-2 border rounded-md">
@@ -271,21 +250,17 @@ const CreateChallenge = () => {
                             </select>
                         </div>
                         <div>
-                            <label className="text-sm font-medium">
-                                {t("createChallenge.participationType.label")}
-                            </label>
-                            <select
-                                {...register("participationType")}
-                                onChange={(e) => {
-                                    setParticipationType(e.target.value);
-                                    setValue("participationType", e.target.value, {shouldValidate: true});
-                                }}
-                                className="w-full p-2 border rounded-md"
-                            >
+                            <label
+                                className="text-sm font-medium">{t("createChallenge.participationType.label")}</label>
+                            <select {...register("participationType")}
+                                    onChange={(e) => {
+                                        setParticipationType(e.target.value);
+                                        setValue("participationType", e.target.value, {shouldValidate: true});
+                                    }}
+                                    className="w-full p-2 border rounded-md">
                                 <option value="INDIVIDUAL">{t("createChallenge.participationType.individual")}</option>
                                 <option value="GROUP">{t("createChallenge.participationType.group")}</option>
                             </select>
-
                         </div>
                         <div>
                             <label className="text-sm font-medium">{t("createChallenge.challengeType")}</label>
@@ -298,16 +273,14 @@ const CreateChallenge = () => {
                             </select>
                             <p className="text-red-600">{errors.challengeTypeId?.message}</p>
                         </div>
+
                         {participationType === "INDIVIDUAL" && (
                             <div>
                                 <label
                                     className="text-sm font-medium">{t("createChallenge.maxParticipants")}</label><span
                                 className="text-red-500">*</span>
-                                <input
-                                    type="number"
-                                    {...register("maxParticipants")}
-                                    className="w-full p-2 border rounded-md"
-                                />
+                                <input type="number" {...register("maxParticipants")}
+                                       className="w-full p-2 border rounded-md"/>
                                 <p className="text-red-600">{errors.maxParticipants?.message}</p>
                             </div>
                         )}
@@ -315,27 +288,42 @@ const CreateChallenge = () => {
                         {participationType === "GROUP" && (
                             <>
                                 <div>
-                                    <label className="text-sm font-medium">{t("createChallenge.maxGroups")}</label><span
-                                    className="text-red-500">*</span>
-                                    <input
-                                        type="number"
-                                        {...register("maxParticipants")}
-                                        className="w-full p-2 border rounded-md"
-                                    />
+                                    <label className="text-sm font-medium">{t("createChallenge.maxGroups")}</label>
+                                    <input type="number" {...register("maxParticipants")}
+                                           className="w-full p-2 border rounded-md"/>
                                     <p className="text-red-600">{errors.maxParticipants?.message}</p>
                                 </div>
                                 <div>
                                     <label
-                                        className="text-sm font-medium">{t("createChallenge.maxMembersPerGroup")}</label><span
-                                    className="text-red-500">*</span>
-                                    <input
-                                        type="number"
-                                        {...register("maxMembersPerGroup")}
-                                        className="w-full p-2 border rounded-md"
-                                    />
+                                        className="text-sm font-medium">{t("createChallenge.maxMembersPerGroup")}</label>
+                                    <input type="number" {...register("maxMembersPerGroup")}
+                                           className="w-full p-2 border rounded-md"/>
                                     <p className="text-red-600">{errors.maxMembersPerGroup?.message}</p>
                                 </div>
                             </>
+                        )}
+
+                        {participationType === "GROUP" && isParticipating && (
+                            <div>
+                                <label className="text-sm font-medium">{t("createChallenge.selectGroup")}</label>
+                                <select {...register("groupId", {required: true})}
+                                        onChange={(e) => {
+                                            const selectedGroup = availableGroups.find(g => g.groupId === Number(e.target.value));
+                                            if (selectedGroup) {
+                                                setValue("maxGroups", 1);
+                                                setValue("maxMembersPerGroup", selectedGroup.memberCount);
+                                            }
+                                        }}
+                                        className="w-full p-2 border rounded-md">
+                                    <option value="">{t("createChallenge.selectGroupPlaceholder")}</option>
+                                    {availableGroups.map(group => (
+                                        <option key={group.groupId} value={group.groupId}>
+                                            {group.groupName} ({group.memberCount} {t("createChallenge.members")})
+                                        </option>
+                                    ))}
+                                </select>
+                                <p className="text-red-600">{errors.groupId?.message}</p>
+                            </div>
                         )}
                     </div>
 
@@ -365,5 +353,4 @@ const CreateChallenge = () => {
         </div>
     );
 };
-
 export default CreateChallenge;

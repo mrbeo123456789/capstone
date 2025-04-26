@@ -3,6 +3,7 @@ import { ChevronDown, Home } from "lucide-react";
 import Header from "./Header.jsx";
 import { useTranslation } from "react-i18next";
 
+
 const AboutUsPage = () => {
     const { t } = useTranslation();
 
@@ -93,11 +94,11 @@ const AboutUsPage = () => {
 
                     <div className="grid md:grid-cols-5 gap-6">
                         {[
-                            { name: "Nguyễn Đình Anh Đức", role: t("AboutUs.team.roles.analyst"), image: "/api/placeholder/300/300" },
-                            { name: "Lương Thanh Cường", role: t("AboutUs.team.roles.backend"), image: "/api/placeholder/300/300" },
-                            { name: "Lê Văn Duy", role: t("AboutUs.team.roles.leader"), image: "/api/placeholder/300/300" },
-                            { name: "Nguyễn Xuân Khánh", role: t("AboutUs.team.roles.frontend"), image: "/api/placeholder/300/300" },
-                            { name: "Trần Khang Minh", role: t("AboutUs.team.roles.tester"), image: "/api/placeholder/300/300" }
+                            { name: "Nguyễn Đình Anh Đức", role: t("AboutUs.team.roles.analyst"), image: "https://scontent.fhan14-4.fna.fbcdn.net/v/t39.30808-6/490772780_122199600566252867_8675894243840736145_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeErEUVVvTHCWrWXTK0OWv5UfWjQEP9JzN59aNAQ_0nM3ii3KgVzn2HHNjjeNOHVx9kvG0FmNBTnojoqLcVSkvCy&_nc_ohc=N6_57Rhj_hwQ7kNvwHE-8-N&_nc_oc=Admmg_FSMxU3VKua7bewae7kqhkZDobNTtyT40YuXSah2rbVsE-p29KIrdTSekDNbr4&_nc_zt=23&_nc_ht=scontent.fhan14-4.fna&_nc_gid=Z0a780G1S8sV5P9-Lrd7jg&oh=00_AfG4jqXzo7DdOuyYTmbUtQBJnOyQs0aCpvk44ukcNS4kRw&oe=6810E5E5" },
+                            { name: "Lương Thanh Cường", role: t("AboutUs.team.roles.backend"), image: "https://scontent.fhan14-2.fna.fbcdn.net/v/t39.30808-6/491891759_122199600980252867_8617603719158073493_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeFQORoWtalJ1dZb9V0KpwfsKvNQK0L6G6Yq81ArQvobpn-tCrjiLPSlGgFwGbh_sNKrlTETwR5sHj9nlz7kZfXm&_nc_ohc=AnXFXXsumYIQ7kNvwHBqHe0&_nc_oc=AdlKFD481IsnS56kuWL22QODJAjqjpFSHu6wBKr9Qk15cWJT8ipJjmrzXOYjUpQBIUo&_nc_zt=23&_nc_ht=scontent.fhan14-2.fna&_nc_gid=jm6aNXs4fIFwf86-zEiC-Q&oh=00_AfGOh05DXRiVjZ_wVzZWs-qm7SGfYT91jwOY21TW2_qv8g&oe=6810E321" },
+                            { name: "Lê Văn Duy", role: t("AboutUs.team.roles.leader"), image: "https://scontent.fhan14-4.fna.fbcdn.net/v/t39.30808-6/491719127_122199600926252867_6038569430090388375_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeFFUIAJIjD-CwRDzmiAnL5J77ZzFmUBo0DvtnMWZQGjQIcNT3b9BwckvscOTlyhlPVP1O_aPYqn9Amz0npVM8sk&_nc_ohc=5raBh5rdKoEQ7kNvwELAF-b&_nc_oc=AdlY9ygqNJvOBnSiSEYF6IDufOcYyXa4qIi2pRQQjaRYintA5obJVdT6NVEywZ_EE-k&_nc_zt=23&_nc_ht=scontent.fhan14-4.fna&_nc_gid=LN98g_2LTYPvoc_jT16EZw&oh=00_AfGsx6xMyb3a1eWDO6JogX_93dCtMrXO6axzk48muUydOg&oe=6810CF9B" },
+                            { name: "Nguyễn Xuân Khánh", role: t("AboutUs.team.roles.frontend"), image: "https://scontent.fhan14-3.fna.fbcdn.net/v/t39.30808-6/491916207_122199600800252867_5975867216110619669_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeF3q9IruwzC1sf8MIiIkvH7oT1PhQyh6QyhPU-FDKHpDDj2jwXCMzkxNSp6eqTBjrqki4oPiV9wR__4n7uQqB3q&_nc_ohc=gXrGy-550-YQ7kNvwFcsNMp&_nc_oc=AdmtjpO-LRjeFSSrGpGGbsuAlc2i-snB658vYfGf3WL9KBm5yc6jibLgPjJGeKlPwas&_nc_zt=23&_nc_ht=scontent.fhan14-3.fna&_nc_gid=E0BP2DXcT5Eri_W4wEB9yA&oh=00_AfGG_EROMmTXCDw3Q6_piCcqvsj_ZtIOm0FjiRY7bzsmCQ&oe=6810C982" },
+                            { name: "Trần Khang Minh", role: t("AboutUs.team.roles.tester"), image: "https://scontent.fhan14-5.fna.fbcdn.net/v/t39.30808-6/491354671_122199601040252867_549046282574786911_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeFxB2iodWv1kYDF5F9Iiw3GnExmP5S0Qh-cTGY_lLRCH9q7mdQvZ-YWGzSHvW7FXr3qeP7nwXhVBkry_MX4aKES&_nc_ohc=lgxvPiECiUMQ7kNvwH7sDji&_nc_oc=Adn9SkTQGXa6voSf0PS7U0-YHlle1gYTM0IK_96fxDuWXs8MlU2dQyOL__RqQqoBP1o&_nc_zt=23&_nc_ht=scontent.fhan14-5.fna&_nc_gid=PbNKCyKKfPS93cqZ1k5e7Q&oh=00_AfE0eQVQ5c9K1Z562tJIvzgNvL1iGHi42TGBz9KfZcJz5g&oe=6810F356" }
                         ].map((member, index) => (
                             <div key={index} className="bg-white rounded-xl shadow-md overflow-hidden group">
                                 <div className="relative h-56 overflow-hidden">

@@ -251,10 +251,12 @@
     "challengeRoleUpdated.content": "チャレンジ「{{challengeName}}」でのあなたの役割が {{role}} に変更されました。",
     "challengeStarted.title": "チャレンジ「{{challengeName}}」が開始されました！",
     "challengeStarted.content": "GoBeyond と一緒に「{{challengeName}}」に挑戦しましょう！",
-    "evidence.approved.title": "{{day}} の証拠が承認されました",
-    "evidence.approved.content": "チャレンジ「{{challengeName}}」で提出した {{day}} の証拠が承認されました。引き続き頑張ってください！",
-    "evidence.rejected.title": "{{day}} の証拠が拒否されました",
-    "evidence.rejected.content": "チャレンジ「{{challengeName}}」で提出した {{day}} の証拠が拒否されました。フィードバックを確認して、再提出してください。",
+    "notification.evidence.approved.title": "{{day}}の証拠が承認されました",
+    "notification.evidence.approved.content": "チャレンジ「{{challengeName}}」の{{day}}に提出した証拠が承認されました。フィードバック: {{feedback}}",
+
+    "notification.evidence.rejected.title": "{{day}}の証拠が却下されました",
+    "notification.evidence.rejected.content": "チャレンジ「{{challengeName}}」の{{day}}に提出した証拠は却下されました。フィードバック: {{feedback}}。内容を確認して再提出してください。",
+
     "invite.challenge.title": "チャレンジへの招待",
     "invite.challenge.content": "{{inviterName}} さんがあなたをチャレンジ「{{challengeName}}」に招待しました。",
     "invite.group.title": "グループへの招待",
@@ -277,7 +279,7 @@
     "kickedFromChallenge.content": "あなたはチャレンジ「{{challengeName}}」から管理者により削除されました。",
     "empty": "新しい通知はありません。",
     "challengeStatusUpdated.title": "チャレンジのステータスが更新されました",
-    "notification.challengeStatusUpdated.content": "チャレンジ「{{challengeName}}」のステータスが「{{status}}」に更新されました"
+    "notification.challengeStatusUpdated.content": "チャレンジ「{{challengeName}}」のステータスが {{status}} に更新されました。{{#adminNote}} 管理者メモ: {{adminNote}}{{/adminNote}}"
   },
 
   "suggest.reason.both": "共通の興味があり、近くにいます",
@@ -333,13 +335,13 @@
   "ChallengeDetail": {
     "joinedStatus": "参加済み",
     "joining": "参加中...",
-    "joinButton": "チャレンジに参加する",
-    "joinSuccess": "チャレンジへの参加が成功しました！",
-    "joinFail": "チャレンジに参加できませんでした。",
+    "joinButton": "チャレンジに参加",
+    "joinSuccess": "チャレンジに参加しました！",
+    "joinFail": "チャレンジへの参加に失敗しました。",
     "category": "カテゴリー",
-    "participation": "参加形式",
+    "participation": "参加タイプ",
     "verification": "検証方法",
-    "totalParticipants": "参加者合計",
+    "totalParticipants": "総参加者数",
     "peopleJoined": "人が参加しました",
     "tab": {
       "info": "情報",
@@ -347,10 +349,24 @@
       "team": "チームランキング",
       "individual": "個人ランキング"
     },
-    "rulesText": "チャレンジの詳細なルールがここに表示されます。",
-    "teamRanking": "チームランキングがここに表示されます。",
-    "individualRanking": "個人ランキングがここに表示されます。"
+    "teamRanking": "チームランキングはここに表示されます。",
+    "individualRanking": "個人ランキングはここに表示されます。",
+    "notAvailable": "なし",
+    "ended": "チャレンジ終了",
+    "alreadyStarted": "チャレンジ開始済み",
+    "participationType": {
+      "individual": "個人",
+      "group": "グループ"
+    },
+    "verificationType": {
+      "hostReview": "ホストレビュー",
+      "memberReview": "メンバーレビュー"
+    },
+    "loginRequired": "最初にログインする必要があります。",
+    "maxGroups": "最大グループ数",
+    "maxMembersPerGroup": "グループあたりの最大メンバー数"
   },
+
   "forgotPassword": {
     "title": "パスワードをお忘れですか？",
     "subtitle": "OTPを受け取るためにメールアドレスを入力してください。",
@@ -660,7 +676,7 @@
     }
   },
   "register": {
-    "title": "アカウント登録",
+    "title": "登録",
     "email": "メールアドレス",
     "username": "ユーザー名",
     "password": "パスワード",
@@ -709,6 +725,117 @@
     "next": "次へ",
     "first": "最初",
     "last": "最後"
+  },
+
+  "achievement": {
+    "title": "あなたの実績",
+    "of": "中",
+    "achieved": "件の実績を獲得",
+    "totalProgress": "総合進捗",
+    "progress": "進捗",
+    "earned": "獲得日",
+    "community": "コミュニティ",
+    "users": "人のユーザー",
+    "unlocked": "獲得済",
+    "locked": "未獲得",
+    "prev": "前へ",
+    "next": "次へ",
+    "notYetEarned": "未獲得",
+
+    "fitnessChampion": "フィットネスチャンピオン",
+    "fitnessChampionDesc": "月間チャレンジでトップ10にランクイン",
+
+    "peakPerformer": "ピークパフォーマー",
+    "peakPerformerDesc": "高強度ワークアウトプログラムを完了",
+
+    "perfectForm": "パーフェクトフォーム",
+    "perfectFormDesc": "ワークアウト技術で満点を獲得",
+
+    "risingAthlete": "台頭するアスリート",
+    "risingAthleteDesc": "1ヶ月でフィットネススコアを50％向上",
+
+    "quickStarter": "クイックスターター",
+    "quickStarterDesc": "1日で5種類のワークアウトを完了",
+
+    "trainingStreak": "トレーニング連続記録",
+    "trainingStreakDesc": "10日連続でワークアウトを完了",
+
+    "hiitMaster": "HIITマスター",
+    "hiitMasterDesc": "完璧なタイミングでHIITワークアウトを完了",
+
+    "teamPlayer": "チームプレイヤー",
+    "teamPlayerDesc": "10回のグループワークアウトを完了",
+
+    "workoutPlanner": "ワークアウトプランナー",
+    "workoutPlannerDesc": "カスタムトレーニングプランを作成し完了",
+
+    "eliteAthlete": "エリートアスリート",
+    "eliteAthleteDesc": "1ヶ月間フィットネスランクの上位5％を維持",
+
+    "challengeCreator": "チャレンジクリエイター",
+    "challengeCreatorDesc": "100人以上が参加するワークアウトチャレンジを作成",
+
+    "fitnessMentor": "フィットネスメンター",
+    "fitnessMentorDesc": "20人のユーザーのワークアウトフォームを支援",
+
+    "cardioKing": "カーディオキング",
+    "cardioKingDesc": "3回連続でカーディオチャレンジに勝利",
+
+    "calorieCrusher": "カロリークラッシャー",
+    "calorieCrusherDesc": "1週間で5,000カロリーを消費",
+
+    "crossTrainer": "クロストレーナー",
+    "crossTrainerDesc": "5つの異なるフィットネスカテゴリーでワークアウトを完了",
+
+    "progressTracker": "進捗トラッカー",
+    "progressTrackerDesc": "30日連続でワークアウトを記録",
+
+    "globalAthlete": "グローバルアスリート",
+    "globalAthleteDesc": "5カ国のユーザーとのワークアウトに参加",
+
+    "mindBodyMaster": "心身マスター",
+    "mindBodyMasterDesc": "10回のマインドフルネスとヨガセッションを完了",
+
+    "balancedDiet": "バランスの取れた食事",
+    "balancedDietDesc": "25日間の栄養目標を記録",
+
+    "strengthChampion": "筋力チャンピオン",
+    "strengthChampionDesc": "筋力トレーニングで10の自己記録を達成",
+
+    "enduranceBuilder": "持久力ビルダー",
+    "enduranceBuilderDesc": "2時間の持久力チャレンジを完了",
+
+    "goalCrusher": "目標達成者",
+    "goalCrusherDesc": "5つの個人フィットネス目標を達成",
+
+    "fitnessLegend": "フィットネスレジェンド",
+    "fitnessLegendDesc": "システム内で最高のフィットネスレベルを達成",
+
+    "fitnessExplorer": "フィットネスエクスプローラー",
+    "fitnessExplorerDesc": "すべてのフィットネスカテゴリーでワークアウトを試す",
+
+    "activeLifestyle": "アクティブなライフスタイル",
+    "activeLifestyleDesc": "60日間連続で身体活動を記録"
+  },
+
+  "SelectGroupModal": {
+    "title": "グループを選択",
+    "searchPlaceholder": "あなたのグループを検索...",
+    "filterExactMembers": "{{number}}人ぴったりのグループのみ表示",
+    "noGroups": "一致するグループが見つかりません。",
+    "prev": "前へ",
+    "next": "次へ",
+    "cancel": "キャンセル",
+    "join": "チャレンジに参加",
+    "joining": "参加中...",
+    "joinSuccess": "チャレンジに参加しました！",
+    "joinFail": "チャレンジへの参加に失敗しました。再試行してください。",
+    "selectGroupFirst": "まずグループを選択してください！",
+    "yourRole": "あなたの役割",
+    "owner": "リーダー",
+    "member": "メンバー",
+    "notLeaderTooltip": "このグループのリーダーではありません。リーダーのグループを選択してください。",
+    "notExactMembersTooltip": "このグループは{{number}}人ぴったりではありません。"
   }
 
 }
