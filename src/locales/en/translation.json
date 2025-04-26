@@ -289,7 +289,10 @@
     "verificationType": {
       "hostReview": "Host Review",
       "memberReview": "Member Review"
-    }
+    },
+    "loginRequired": "You need to log in first.",
+    "maxGroups": "Max Groups",
+    "maxMembersPerGroup": "Max Members per Group"
   },
 
   "ProgressTracking": {

@@ -7,12 +7,15 @@ import { useGetChallengeDetailQuery, useJoinChallengeMutation } from "../../serv
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import SelectGroupModal from "./modal/SelectGroupModal.jsx";
 
 const ChallengeDetail = () => {
     const [activeTab, setActiveTab] = useState("description");
     const { id } = useParams();
     const { t } = useTranslation();
     const [joinChallenge, { isLoading }] = useJoinChallengeMutation();
+    const [showGroupModal, setShowGroupModal] = useState(false);
+
 
     const {
         data: challenge,
@@ -23,13 +26,27 @@ const ChallengeDetail = () => {
     if (isLoadingDetail) return <p>{t("loading")}</p>;
     if (error) return <p>{t("error")}</p>;
 
+
     const handleJoin = async () => {
-        try {
-            await joinChallenge(parseInt(id));
-            toast.success(t("ChallengeDetail.joinSuccess"));
-        } catch (err) {
-            console.error(err);
-            toast.error(t("ChallengeDetail.joinFail"));
+        if (!challenge.memberId) {
+            toast.warn(t("ChallengeDetail.loginRequired"));
+            setTimeout(() => {
+                window.location.href = "/login";
+            }, 1000);
+            return;
+        }
+
+        if (challenge.participationType === "GROUP") {
+            setShowGroupModal(true); // 👉 Open chọn nhóm
+        } else {
+            try {
+                await joinChallenge(parseInt(id));
+                toast.success(t("ChallengeDetail.joinSuccess"));
+                window.location.reload();
+            } catch (err) {
+                console.error(err);
+                toast.error(t("ChallengeDetail.joinFail"));
+            }
         }
     };
 
@@ -111,13 +128,25 @@ const ChallengeDetail = () => {
                         </p>
                     </div>
 
-                    <h3 className="text-gray-800 font-semibold mt-6">
-                        {t("ChallengeDetail.totalParticipants")}
-                    </h3>
-                    <div className="mt-2 flex items-center text-lg font-semibold text-orange-500">
-                        <HiUsers className="mr-2" />
-                        <p>{challenge.participantCount} / {challenge.maxParticipants} {t("ChallengeDetail.peopleJoined")}</p>
-                    </div>
+                    {/* Group Challenge Specific */}
+                    {challenge.participationType === "GROUP" && (
+                        <div className="mt-4 space-y-2">
+                            <p className="text-gray-700 text-sm">
+                                {t("ChallengeDetail.maxGroups")}: {challenge.maxGroups}
+                            </p>
+                            <p className="text-gray-700 text-sm">
+                                {t("ChallengeDetail.maxMembersPerGroup")}: {challenge.maxMembersPerGroup}
+                            </p>
+                        </div>
+                    )}
+
+                    {/* Individual Challenge Specific */}
+                    {challenge.participationType === "INDIVIDUAL" && (
+                        <div className="mt-2 flex items-center text-lg font-semibold text-orange-500">
+                            <HiUsers className="mr-2" />
+                            <p>{challenge.participantCount} / {challenge.maxParticipants} {t("ChallengeDetail.peopleJoined")}</p>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -173,6 +202,12 @@ const ChallengeDetail = () => {
                     )}
                 </div>
             </div>
+            {showGroupModal && (
+                <SelectGroupModal
+                    challengeId={challenge.id}
+                    onClose={() => setShowGroupModal(false)}
+                />
+            )}
         </div>
     );
 };

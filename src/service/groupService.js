@@ -105,6 +105,15 @@ export const groupService = createApi({
         getAvailableGroups: builder.query({
             query: () => "/groups/available-to-join",
         }),
+        getMyGroups: builder.query({
+            query: () => "/groups/my-groups",
+        }),
+        joinGroupToChallenge: builder.mutation({
+            query: ({ groupId, challengeId }) => ({
+                url: `/challenges/${groupId}/join-challenge/${challengeId}`,
+                method: "POST",
+            }),
+        }),
     }),
 
 });
@@ -124,4 +133,6 @@ export const {
     useGetGroupRankingQuery,
     useGetAvailableGroupsQuery,
     useGetGroupChallengeHistoryQuery,
+    useGetMyGroupsQuery,
+    useJoinGroupToChallengeMutation,
 } = groupService;

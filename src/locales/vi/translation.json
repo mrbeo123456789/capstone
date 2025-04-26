@@ -367,7 +367,10 @@
     "verificationType": {
       "hostReview": "Host duyệt",
       "memberReview": "Thành viên duyệt"
-    }
+    },
+    "loginRequired": "Bạn cần đăng nhập trước.",
+    "maxGroups": "Số nhóm tối đa",
+    "maxMembersPerGroup": "Số thành viên tối đa mỗi nhóm"
   },
   "forgotPassword": {
     "title": "Quên mật khẩu?",

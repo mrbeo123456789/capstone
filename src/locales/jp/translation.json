@@ -361,7 +361,10 @@
     "verificationType": {
       "hostReview": "ホストレビュー",
       "memberReview": "メンバーレビュー"
-    }
+    },
+    "loginRequired": "最初にログインする必要があります。",
+    "maxGroups": "最大グループ数",
+    "maxMembersPerGroup": "グループあたりの最大メンバー数"
   },
 
   "forgotPassword": {
