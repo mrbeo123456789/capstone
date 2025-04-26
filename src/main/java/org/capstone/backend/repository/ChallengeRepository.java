@@ -104,15 +104,39 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
             WHERE cm.challenge.id = c.id 
               AND cm.member.id = :memberId
               AND cm.status = org.capstone.backend.utils.enums.ChallengeMemberStatus.JOINED
-        )
+        ),
+        c.maxGroups,
+        c.maxMembersPerGroup,
+        (
+            SELECT cm.groupId
+            FROM ChallengeMember cm
+            WHERE cm.challenge.id = c.id
+              AND cm.member.id = :memberId
+              AND cm.status = org.capstone.backend.utils.enums.ChallengeMemberStatus.JOINED
+        ),
+        (
+            SELECT gc.id
+            FROM GroupChallenge gc
+            WHERE gc.challenge.id = c.id
+              AND gc.group.id = (
+                  SELECT cm.groupId
+                  FROM ChallengeMember cm
+                  WHERE cm.challenge.id = c.id
+                    AND cm.member.id = :memberId
+                    AND cm.status = org.capstone.backend.utils.enums.ChallengeMemberStatus.JOINED
+              )
+        ),
+        :memberId
     )
     FROM Challenge c
     WHERE c.id = :challengeId
-    """)
+""")
     ChallengeDetailResponse findChallengeDetailByIdAndMemberId(
             @Param("challengeId") Long challengeId,
             @Param("memberId") Long memberId
     );
+
+
 
 
 

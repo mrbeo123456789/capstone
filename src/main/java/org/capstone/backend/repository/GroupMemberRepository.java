@@ -2,6 +2,7 @@ package org.capstone.backend.repository;
 
 import org.capstone.backend.dto.group.GroupMemberRankingDTO;
 import org.capstone.backend.dto.group.MemberSearchResponse;
+import org.capstone.backend.dto.group.MyGroupResponse;
 import org.capstone.backend.entity.GroupMember;
 import org.capstone.backend.entity.Groups;
 import org.capstone.backend.entity.Member;
@@ -139,5 +140,20 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
             Pageable pageable
     );
 
+    @Query("""
+        SELECT new org.capstone.backend.dto.group.MyGroupResponse(
+            g.id,
+            g.name,
+            g.picture,
+            gm.role,
+            SIZE(g.members)
+        )
+        FROM GroupMember gm
+        JOIN gm.group g
+        WHERE gm.member.id = :memberId
+          AND gm.status = org.capstone.backend.utils.enums.GroupMemberStatus.ACTIVE
+          AND (:keyword IS NULL OR LOWER(g.name) LIKE LOWER(CONCAT('%', :keyword, '%')))
+    """)
+    Page<MyGroupResponse> findMyGroups(Long memberId, String keyword, Pageable pageable);
 }
 

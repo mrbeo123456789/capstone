@@ -402,6 +402,12 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    public Page<MyGroupResponse> getMyGroups(String keyword, Pageable pageable) {
+        Long memberId = authService.getMemberIdFromAuthentication();
+        return groupMemberRepository.findMyGroups(memberId, keyword, pageable);
+    }
+
+    @Override
     public Page<GroupMemberRankingDTO> getGroupMemberRanking(Long groupId, String keyword, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return groupMemberRepository.searchGroupRankingWithKeyword(groupId, keyword == null ? "" : keyword, pageable);

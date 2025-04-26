@@ -31,4 +31,9 @@ public class ChallengeDetailResponse {
     private VerificationType verificationType;
     private ParticipationType participationType;
     private ChallengeRole role;
+    private Integer maxGroups;
+    private Integer maxMembersPerGroup;
+    private Long groupId;
+    private Long groupChallengeId;
+    private Long memberId; // 👈 người đang request (optional, nếu cần)
 }

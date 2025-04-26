@@ -189,6 +189,7 @@ public class ChallengeServiceImpl implements ChallengeService {
     }
 
     @Override
+    @Transactional
     public String createChallenge(ChallengeRequest request, MultipartFile picture, MultipartFile banner) {
         Long memberId = authService.getMemberIdFromAuthentication();
         boolean isMember = (memberId != null);
@@ -210,19 +211,24 @@ public class ChallengeServiceImpl implements ChallengeService {
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
                 .maxParticipants(request.getMaxParticipants())
+                .maxGroups(request.getMaxGroups())                      // ✅ THÊM DÒNG NÀY
+                .maxMembersPerGroup(request.getMaxMembersPerGroup())    // ✅ THÊM DÒNG NÀY
                 .challengeType(challengeType)
                 .picture(pictureUrl)
                 .banner(bannerUrl)
                 .build();
 
         challengeRepository.save(challenge);
-        if (request.getGroupId()!=null){
-            joinGroupToChallenge(request.getGroupId(),challenge.getId())   ;
+
+        // Nếu user có groupId -> tự động join group vào challenge
+        if (request.getGroupId() != null) {
+            joinGroupToChallenge(request.getGroupId(), challenge.getId());
         }
+
+        // Nếu đang login, thì add người tạo làm Host (CO_HOST)
         if (isMember) {
             Member member = memberRepository.findById(memberId)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MEMBER_NOT_FOUND_MSG));
-            // Truyền request.isParticipate để set đúng cờ cho host
             addHostAsChallengeMember(challenge, member, request.getIsParticipate());
         }
 
@@ -423,7 +429,12 @@ public class ChallengeServiceImpl implements ChallengeService {
 
     @Override
     public ChallengeDetailResponse getChallengeDetail(Long challengeId) {
-        Long memberId = authService.getMemberIdFromAuthentication();
+        Long memberId = null;
+        try {
+            memberId = authService.getMemberIdFromAuthentication();
+        } catch (Exception e) {
+            // Optionally log it: logger.debug("Guest access to challenge detail");
+        }
         return challengeRepository.findChallengeDetailByIdAndMemberId(challengeId, memberId);
     }
 

@@ -7,6 +7,7 @@ import org.capstone.backend.dto.group.GroupRequest;
 import org.capstone.backend.entity.Member;
 import org.capstone.backend.utils.enums.GroupChallengeStatus;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.multipart.MultipartFile;
 import org.capstone.backend.utils.enums.GroupMemberStatus;
@@ -34,4 +35,5 @@ public interface GroupService {
     Page<GroupMemberRankingDTO> getGroupMemberRanking(Long groupId, String keyword, int page, int size);
     List<MemberSearchResponse> searchMembers(MemberSearchRequest request);
     Page<GroupChallengeHistoryDTO> getGroupChallengeHistories(Long groupId, GroupChallengeStatus status, int page);
+    Page<MyGroupResponse> getMyGroups(String keyword, Pageable pageable);
 }

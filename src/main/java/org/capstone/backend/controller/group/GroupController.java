@@ -9,6 +9,7 @@ import org.capstone.backend.utils.enums.GroupChallengeStatus;
 import org.capstone.backend.utils.enums.GroupMemberStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -123,6 +124,14 @@ public class GroupController {
     ) {
         Page<GroupMemberRankingDTO> result = groupService.getGroupMemberRanking(groupId, keyword, page, size);
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/my-groups")
+    public ResponseEntity<Page<MyGroupResponse>> getMyGroups(
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @PageableDefault(size = 10) Pageable pageable
+    ) {
+        return ResponseEntity.ok(groupService.getMyGroups(keyword, pageable));
     }
 
 }
