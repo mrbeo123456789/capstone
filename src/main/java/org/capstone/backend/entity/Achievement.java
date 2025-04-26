@@ -2,6 +2,8 @@ package org.capstone.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.capstone.backend.utils.enums.AchievementType;
+import org.capstone.backend.utils.enums.AchievementCategory;
 
 @Entity
 @Table(name = "achievement")
@@ -16,8 +18,13 @@ public class Achievement {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
-    private String code; // VD: A1, A2, A3
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false, unique = true)
+    private AchievementType type; // VD: FIRST_TRY, STREAK_MASTER...
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category", nullable = false)
+    private AchievementCategory category; // SINGLE_CONDITION, CUMULATIVE...
 
     @Column(nullable = false)
     private String name;
@@ -25,6 +32,7 @@ public class Achievement {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "icon_url")
-    private String iconUrl; // optional nếu có ảnh/icon minh họa
+
+    @Column(name = "has_progress", nullable = false)
+    private boolean hasProgress; // true nếu có progress bar
 }

@@ -46,4 +46,5 @@ public class EvidenceReport {
 
     @Column(name = "updated_by")
     private Long updatedBy;
+
 }

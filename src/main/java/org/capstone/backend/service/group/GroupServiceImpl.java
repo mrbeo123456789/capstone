@@ -383,12 +383,14 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public List<AvailableGroupResponse> getAvailableGroupsToJoinChallenge() {
         Long memberId = authService.getMemberIdFromAuthentication();
-        List<Groups> groups = groupMemberRepository.findAvailableGroupsForMember(memberId);
-        return groups.stream()
-                .map(group -> new AvailableGroupResponse(
-                        group.getId(),
-                        group.getName(),
-                        group.getPicture()
+        List<Object[]> rawResults = groupMemberRepository.findAvailableGroupsWithMemberCount(memberId);
+
+        return rawResults.stream()
+                .map(obj -> new AvailableGroupResponse(
+                        ((Number) obj[0]).longValue(),   // groupId
+                        (String) obj[1],                 // groupName
+                        (String) obj[2],                 // groupPicture
+                        ((Number) obj[3]).intValue()     // memberCount
                 ))
                 .collect(Collectors.toList());
     }

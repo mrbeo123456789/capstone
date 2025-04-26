@@ -61,6 +61,8 @@ public interface MemberRepository  extends JpaRepository<Member, Long> {
     """, nativeQuery = true)
     MemberStatisticDTO getMemberStatistics(@Param("memberId") Long memberId);
 
+    @Query("SELECT m.id FROM Member m WHERE m.account.username = :username")
+    Optional<Long> findMemberIdByUsername(@Param("username") String username);
 
 
 

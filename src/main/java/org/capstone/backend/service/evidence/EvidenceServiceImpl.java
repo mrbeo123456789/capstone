@@ -21,10 +21,7 @@ import org.capstone.backend.repository.EvidenceReportRepository;
 import org.capstone.backend.repository.EvidenceRepository;
 import org.capstone.backend.repository.MemberRepository;
 import org.capstone.backend.service.auth.AuthService;
-import org.capstone.backend.utils.enums.ChallengeMemberStatus;
-import org.capstone.backend.utils.enums.ChallengeRole;
-import org.capstone.backend.utils.enums.EvidenceStatus;
-import org.capstone.backend.utils.enums.VerificationType;
+import org.capstone.backend.utils.enums.*;
 import org.capstone.backend.utils.sendmail.FixedGmailService;
 import org.capstone.backend.utils.upload.FirebaseUpload;
 import org.springframework.context.ApplicationEventPublisher;
@@ -478,15 +475,17 @@ public class EvidenceServiceImpl implements EvidenceService {
     public List<TaskChecklistDTO> getTasksForDate(LocalDate date) {
         Long memberId = authService.getMemberIdFromAuthentication();
 
-
         boolean isTodayOrFuture = !date.isBefore(LocalDate.now());
-
 
         List<ChallengeMember> challengeMembers = isTodayOrFuture
                 ? challengeMemberRepository.findOngoingChallengesForMemberOnDate(memberId, date)
                 : challengeMemberRepository.findAllChallengesForMemberOnDate(memberId, date);
 
         return challengeMembers.stream()
+                .filter(cm -> {
+                    ChallengeStatus status = cm.getChallenge().getStatus();
+                    return status != ChallengeStatus.PENDING && status != ChallengeStatus.UPCOMING;
+                })
                 .map(cm -> {
                     Challenge challenge = cm.getChallenge();
                     Long challengeId = challenge.getId();
@@ -494,22 +493,19 @@ public class EvidenceServiceImpl implements EvidenceService {
                     TaskChecklistDTO taskDTO = new TaskChecklistDTO();
                     taskDTO.setChallengeId(challengeId);
                     taskDTO.setChallengeName(challenge.getName());
-                    // Lấy evidence cá nhân theo ngày
+
                     evidenceRepository.findByMemberIdAndChallengeIdAndDate(memberId, challengeId, date)
                             .ifPresent(evidence -> {
-                                System.out.println("📄 Found evidence with status: " + evidence.getStatus());
                                 if (evidence.getStatus() != null) {
                                     taskDTO.setEvidenceStatus(evidence.getStatus().toString());
                                 }
                             });
 
-                    // Nếu là MEMBER_REVIEW thì thêm phần review checklist
                     if (challenge.getVerificationType() == VerificationType.MEMBER_REVIEW) {
                         List<EvidenceReport> reports =
                                 evidenceReportRepository.findByReviewerIdAndChallengeIdAndAssignedDate(memberId, challengeId, date);
 
                         int reviewed = (int) reports.stream().filter(r -> r.getReviewedAt() != null).count();
-                        System.out.println("📝 Total review assigned: " + reports.size() + ", Reviewed: " + reviewed);
 
                         taskDTO.setTotalReviewAssigned(reports.size());
                         taskDTO.setReviewCompleted(reviewed);

@@ -85,8 +85,9 @@ public class Member {
     private InvitePermission invitePermission = InvitePermission.EVERYONE;
 
     @OneToOne
-    @JoinColumn(name = "account_id", nullable = false)
+    @JoinColumn(name = "account_id", nullable = false, unique = true)
     private Account account;
+
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChallengeMember> challengeMembers;
 }

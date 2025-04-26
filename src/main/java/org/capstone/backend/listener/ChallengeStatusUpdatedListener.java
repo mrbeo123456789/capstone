@@ -27,17 +27,32 @@ public class ChallengeStatusUpdatedListener {
     public void handleChallengeStatusUpdated(ChallengeStatusUpdatedEvent event) {
         Challenge challenge = event.challenge();
         String challengeName = challenge.getName();
-        String status = event.newStatus();
+        String statusMessage = event.newStatus();
+
+        // Giả định nếu có " - " thì phần sau là adminNote
+        String status;
+        String note;
+
+        if (statusMessage.contains(" - ")) {
+            String[] parts = statusMessage.split(" - ", 2);
+            status = parts[0];
+            note = parts[1];
+        } else {
+            status = statusMessage;
+            note = null;
+        }
 
         challengeMemberRepository.findByChallenge(challenge).forEach(member -> {
             String userId = member.getMember().getId().toString();
             String fullName = member.getMember().getFullName();
             String email = member.getMember().getAccount().getEmail();
 
-            // i18n placeholders
             Map<String, String> data = new HashMap<>();
             data.put("challengeName", challengeName);
             data.put("status", status);
+            if (note != null) {
+                data.put("adminNote", note);
+            }
 
             // 1. Gửi Notification
             notificationService.sendNotification(
@@ -46,22 +61,28 @@ public class ChallengeStatusUpdatedListener {
                     "notification.challengeStatusUpdated.content",
                     NotificationType.SYSTEM_ANNOUNCEMENT,
                     data
-
             );
 
             // 2. Gửi Email
             try {
                 String subject = "Cập nhật trạng thái thử thách '" + challengeName + "'";
                 String body = String.format("""
-                        Xin chào %s,
+                    Xin chào %s,
 
-                        Thử thách '%s' mà bạn tham gia đã được cập nhật trạng thái: %s.
+                    Thử thách '%s' mà bạn tham gia đã được cập nhật trạng thái: %s.
 
-                        Vui lòng kiểm tra thử thách để nắm rõ thông tin mới nhất.
+                    %s
 
-                        Trân trọng,
-                        Đội ngũ GoBeyond
-                        """, fullName, challengeName, status);
+                    Vui lòng kiểm tra thử thách để nắm rõ thông tin mới nhất.
+
+                    Trân trọng,
+                    Đội ngũ GoBeyond
+                    """,
+                        fullName,
+                        challengeName,
+                        status,
+                        (note != null ? "Ghi chú từ quản trị viên: " + note : "") // ✅ chèn note nếu có
+                );
 
                 fixedGmailService.sendEmail(email, subject, body);
             } catch (Exception e) {
@@ -69,4 +90,5 @@ public class ChallengeStatusUpdatedListener {
             }
         });
     }
+
 }

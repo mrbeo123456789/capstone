@@ -16,29 +16,29 @@ import java.time.LocalDateTime;
 public class AchievementServiceImpl implements AchievementService {
 
 
-    private AchievementRepository achievementRepository;
-
-
-    private UserAchievementRepository userAchievementRepository;
-
-    public void grantAchievement(Member member, String code) {
-        Achievement achievement = achievementRepository.findByCode(code)
-                .orElseThrow(() -> new RuntimeException("Achievement not found"));
-
-        boolean alreadyHas = userAchievementRepository
-                .existsByMemberAndAchievement(member, achievement);
-
-        if (!alreadyHas) {
-            UserAchievement ua = UserAchievement.builder()
-                    .member(member)
-                    .achievement(achievement)
-                    .achievedAt(LocalDateTime.now())
-                    .build();
-            userAchievementRepository.save(ua);
-
-
-        }
-    }
+//    private AchievementRepository achievementRepository;
+//
+//
+//    private UserAchievementRepository userAchievementRepository;
+//
+//    public void grantAchievement(Member member, String code) {
+//        Achievement achievement = achievementRepository.findByCode(code)
+//                .orElseThrow(() -> new RuntimeException("Achievement not found"));
+//
+//        boolean alreadyHas = userAchievementRepository
+//                .existsByMemberAndAchievement(member, achievement);
+//
+//        if (!alreadyHas) {
+//            UserAchievement ua = UserAchievement.builder()
+//                    .member(member)
+//                    .achievement(achievement)
+//                    .achievedAt(LocalDateTime.now())
+//                    .build();
+//            userAchievementRepository.save(ua);
+//
+//
+//        }
+//    }
 
 
 }

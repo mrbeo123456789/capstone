@@ -61,6 +61,14 @@ public class Evidence {
         this.submittedAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
+    public EvidenceReport getLatestReport() {
+        if (evidenceReports == null || evidenceReports.isEmpty()) return null;
+
+        // Mới nhất lên đầu
+        return evidenceReports.stream()
+                .filter(r -> r.getReviewedAt() != null).min((r1, r2) -> r2.getReviewedAt().compareTo(r1.getReviewedAt()))
+                .orElse(null);
+    }
 
     @PreUpdate
     protected void onUpdate() {
