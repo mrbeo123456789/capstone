@@ -788,6 +788,26 @@
     "fitnessExplorerDesc": "Thử các bài tập trong tất cả các danh mục thể hình.",
     "activeLifestyle": "Lối sống năng động",
     "activeLifestyleDesc": "Ghi lại hoạt động thể chất trong 60 ngày liên tiếp."
+  },
+
+  "SelectGroupModal": {
+    "title": "Chọn Nhóm",
+    "searchPlaceholder": "Tìm kiếm nhóm của bạn...",
+    "filterExactMembers": "Chỉ hiển thị nhóm có đúng {{number}} thành viên",
+    "noGroups": "Không tìm thấy nhóm phù hợp.",
+    "prev": "Trước",
+    "next": "Sau",
+    "cancel": "Hủy",
+    "join": "Tham gia thử thách",
+    "joining": "Đang tham gia...",
+    "joinSuccess": "Tham gia thử thách thành công!",
+    "joinFail": "Tham gia thất bại. Vui lòng thử lại.",
+    "selectGroupFirst": "Vui lòng chọn một nhóm trước!",
+    "yourRole": "Vai trò của bạn",
+    "owner": "Trưởng nhóm",
+    "member": "Thành viên",
+    "notLeaderTooltip": "Bạn không phải trưởng nhóm. Vui lòng chọn nhóm bạn sở hữu.",
+    "notExactMembersTooltip": "Nhóm này không có đúng {{number}} thành viên."
   }
 }
 

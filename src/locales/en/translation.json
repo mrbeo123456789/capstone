@@ -830,6 +830,26 @@
 
     "activeLifestyle": "Active Lifestyle",
     "activeLifestyleDesc": "Record physical activity for 60 days straight."
+  },
+
+  "SelectGroupModal": {
+    "title": "Select a Group",
+    "searchPlaceholder": "Search your groups...",
+    "filterExactMembers": "Only show groups with exactly {{number}} members",
+    "noGroups": "No matching groups found.",
+    "prev": "Previous",
+    "next": "Next",
+    "cancel": "Cancel",
+    "join": "Join Challenge",
+    "joining": "Joining...",
+    "joinSuccess": "Joined challenge successfully!",
+    "joinFail": "Failed to join challenge. Please try again.",
+    "selectGroupFirst": "Please select a group first!",
+    "yourRole": "Your Role",
+    "owner": "Leader",
+    "member": "Member",
+    "notLeaderTooltip": "You are not the leader of this group. Please select a group you own.",
+    "notExactMembersTooltip": "This group does not have exactly {{number}} members."
   }
 }
 

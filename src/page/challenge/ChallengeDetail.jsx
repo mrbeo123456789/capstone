@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react"; // 🆙 nhớ thêm useEffect
+import { useNavigate, useParams } from "react-router-dom"; // 🆙 nhớ import navigate
 import { FaRegClock, FaRunning } from "react-icons/fa";
 import { MdOutlineCategory } from "react-icons/md";
 import { IoIosPeople } from "react-icons/io";
 import { HiUsers } from "react-icons/hi";
 import { useGetChallengeDetailQuery, useJoinChallengeMutation } from "../../service/challengeService";
 import { toast } from "react-toastify";
-import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import SelectGroupModal from "./modal/SelectGroupModal.jsx";
 
@@ -13,15 +13,27 @@ const ChallengeDetail = () => {
     const [activeTab, setActiveTab] = useState("description");
     const { id } = useParams();
     const { t } = useTranslation();
+    const navigate = useNavigate(); // 🆙 cần navigate
     const [joinChallenge, { isLoading }] = useJoinChallengeMutation();
     const [showGroupModal, setShowGroupModal] = useState(false);
-
 
     const {
         data: challenge,
         isLoading: isLoadingDetail,
         error,
     } = useGetChallengeDetailQuery(id);
+
+    useEffect(() => {
+        if (challenge) {
+            const { challengeStatus, role } = challenge;
+            if (challengeStatus === "PENDING" && role !== "HOST") {
+                toast.warning(t("ChallengeDetail.challengePending"));
+                setTimeout(() => {
+                    navigate("/homepage");
+                }, 1000);
+            }
+        }
+    }, [challenge, navigate, t]);
 
     if (isLoadingDetail) return <p>{t("loading")}</p>;
     if (error) return <p>{t("error")}</p>;
@@ -206,8 +218,10 @@ const ChallengeDetail = () => {
                 <SelectGroupModal
                     challengeId={challenge.id}
                     onClose={() => setShowGroupModal(false)}
+                    requiredMembers={challenge.maxMembersPerGroup}
                 />
             )}
+
         </div>
     );
 };

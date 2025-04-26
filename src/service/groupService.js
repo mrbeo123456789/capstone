@@ -106,7 +106,15 @@ export const groupService = createApi({
             query: () => "/groups/available-to-join",
         }),
         getMyGroups: builder.query({
-            query: () => "/groups/my-groups",
+            query: ({ keyword = "", page = 0, size = 5, requiredMembers }) => {
+                const params = new URLSearchParams();
+                if (keyword) params.append("keyword", keyword);
+                if (requiredMembers !== undefined) params.append("requiredMembers", requiredMembers); // 👈 thêm dòng này
+                params.append("page", page);
+                params.append("size", size);
+
+                return `/groups/my-groups?${params.toString()}`;
+            },
         }),
         joinGroupToChallenge: builder.mutation({
             query: ({ groupId, challengeId }) => ({
