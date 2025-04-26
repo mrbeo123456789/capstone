@@ -129,9 +129,10 @@ public class GroupController {
     @GetMapping("/my-groups")
     public ResponseEntity<Page<MyGroupResponse>> getMyGroups(
             @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "requiredMembers", required = false) Integer requiredMembers, // 👈 thêm nè
             @PageableDefault(size = 10) Pageable pageable
     ) {
-        return ResponseEntity.ok(groupService.getMyGroups(keyword, pageable));
+        return ResponseEntity.ok(groupService.getMyGroups(keyword, requiredMembers, pageable));
     }
 
 }

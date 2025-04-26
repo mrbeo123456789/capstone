@@ -402,9 +402,9 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Page<MyGroupResponse> getMyGroups(String keyword, Pageable pageable) {
+    public Page<MyGroupResponse> getMyGroups(String keyword, Integer requiredMembers, Pageable pageable) {
         Long memberId = authService.getMemberIdFromAuthentication();
-        return groupMemberRepository.findMyGroups(memberId, keyword, pageable);
+        return groupRepository.findMyGroups(memberId, keyword, requiredMembers, pageable);
     }
 
     @Override

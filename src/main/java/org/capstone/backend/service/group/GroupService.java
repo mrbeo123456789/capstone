@@ -35,5 +35,5 @@ public interface GroupService {
     Page<GroupMemberRankingDTO> getGroupMemberRanking(Long groupId, String keyword, int page, int size);
     List<MemberSearchResponse> searchMembers(MemberSearchRequest request);
     Page<GroupChallengeHistoryDTO> getGroupChallengeHistories(Long groupId, GroupChallengeStatus status, int page);
-    Page<MyGroupResponse> getMyGroups(String keyword, Pageable pageable);
+    Page<MyGroupResponse> getMyGroups(String keyword,Integer requiredMembers ,Pageable pageable);
 }

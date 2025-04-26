@@ -1,6 +1,7 @@
 package org.capstone.backend.repository;
 
 import org.capstone.backend.dto.group.GroupSummaryDTO;
+import org.capstone.backend.dto.group.MyGroupResponse;
 import org.capstone.backend.entity.Groups;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,5 +34,28 @@ public interface GroupRepository extends JpaRepository<Groups, Long> {
         ORDER BY g.createdAt DESC
     """)
     Page<GroupSummaryDTO> searchGroupsByName(@Param("keyword") String keyword, Pageable pageable);
+
+    @Query("""
+    SELECT new org.capstone.backend.dto.group.MyGroupResponse(
+        g.id,
+        g.name,
+        g.picture,
+        gm.role,
+        SIZE(g.members)
+    )
+    FROM GroupMember gm
+    JOIN gm.group g
+    WHERE gm.member.id = :memberId
+      AND gm.status = org.capstone.backend.utils.enums.GroupMemberStatus.ACTIVE
+      AND (:keyword IS NULL OR LOWER(g.name) LIKE LOWER(CONCAT('%', :keyword, '%')))
+      AND (:requiredMembers IS NULL OR SIZE(g.members) = :requiredMembers)
+""")
+    Page<MyGroupResponse> findMyGroups(
+            @Param("memberId") Long memberId,
+            @Param("keyword") String keyword,
+            @Param("requiredMembers") Integer requiredMembers,
+            Pageable pageable
+    );
+
 
 }
