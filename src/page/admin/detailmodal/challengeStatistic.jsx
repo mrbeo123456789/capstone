@@ -94,50 +94,50 @@ const ChallengeStats = () => {
                     {/* Charts Row */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         {/* Average Completion Rate Chart */}
-                        <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500">
-                            <h2 className="text-xl font-bold mb-4 text-gray-800">Completion Rates</h2>
-                            <div className="h-72">
-                                {isLoadingChallenges ? (
-                                    <div className="flex items-center justify-center h-full">
-                                        <p>Loading chart data...</p>
-                                    </div>
-                                ) : (
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <BarChart
-                                            data={Array.isArray(createdChallengesData) ? createdChallengesData.map(challenge => ({
-                                                name: challenge.name.length > 15 ? challenge.name.substring(0, 15) + '...' : challenge.name,
-                                                completionRate: challenge.completionRate || 0,
-                                                fullName: challenge.name
-                                            })) : []}
-                                            margin={{ top: 10, right: 10, left: 10, bottom: 40 }}
-                                        >
-                                            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                                            <XAxis
-                                                dataKey="name"
-                                                tick={{ fill: '#4b5563', fontSize: 12 }}
-                                                angle={-45}
-                                                textAnchor="end"
-                                                height={70}
-                                            />
-                                            <YAxis
-                                                domain={[0, 100]}
-                                                tick={{ fill: '#4b5563', fontSize: 12 }}
-                                                tickFormatter={(tick) => `${tick}%`}
-                                            />
-                                            <Tooltip content={<CustomTooltip />} />
-                                            <Bar
-                                                dataKey="completionRate"
-                                                fill={chartColors.completion}
-                                                radius={[4, 4, 0, 0]}
-                                                barSize={40}
-                                                animationDuration={1500}
-                                                animationEasing="ease-out"
-                                            />
-                                        </BarChart>
-                                    </ResponsiveContainer>
-                                )}
-                            </div>
-                        </div>
+                        {/*<div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500">*/}
+                        {/*    <h2 className="text-xl font-bold mb-4 text-gray-800">Completion Rates</h2>*/}
+                        {/*    <div className="h-72">*/}
+                        {/*        {isLoadingChallenges ? (*/}
+                        {/*            <div className="flex items-center justify-center h-full">*/}
+                        {/*                <p>Loading chart data...</p>*/}
+                        {/*            </div>*/}
+                        {/*        ) : (*/}
+                        {/*            <ResponsiveContainer width="100%" height="100%">*/}
+                        {/*                <BarChart*/}
+                        {/*                    data={Array.isArray(createdChallengesData) ? createdChallengesData.map(challenge => ({*/}
+                        {/*                        name: challenge.name.length > 15 ? challenge.name.substring(0, 15) + '...' : challenge.name,*/}
+                        {/*                        completionRate: challenge.completionRate || 0,*/}
+                        {/*                        fullName: challenge.name*/}
+                        {/*                    })) : []}*/}
+                        {/*                    margin={{ top: 10, right: 10, left: 10, bottom: 40 }}*/}
+                        {/*                >*/}
+                        {/*                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />*/}
+                        {/*                    <XAxis*/}
+                        {/*                        dataKey="name"*/}
+                        {/*                        tick={{ fill: '#4b5563', fontSize: 12 }}*/}
+                        {/*                        angle={-45}*/}
+                        {/*                        textAnchor="end"*/}
+                        {/*                        height={70}*/}
+                        {/*                    />*/}
+                        {/*                    <YAxis*/}
+                        {/*                        domain={[0, 100]}*/}
+                        {/*                        tick={{ fill: '#4b5563', fontSize: 12 }}*/}
+                        {/*                        tickFormatter={(tick) => `${tick}%`}*/}
+                        {/*                    />*/}
+                        {/*                    <Tooltip content={<CustomTooltip />} />*/}
+                        {/*                    <Bar*/}
+                        {/*                        dataKey="completionRate"*/}
+                        {/*                        fill={chartColors.completion}*/}
+                        {/*                        radius={[4, 4, 0, 0]}*/}
+                        {/*                        barSize={40}*/}
+                        {/*                        animationDuration={1500}*/}
+                        {/*                        animationEasing="ease-out"*/}
+                        {/*                    />*/}
+                        {/*                </BarChart>*/}
+                        {/*            </ResponsiveContainer>*/}
+                        {/*        )}*/}
+                        {/*    </div>*/}
+                        {/*</div>*/}
 
                         {/* Reports Chart */}
                         <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-orange-500">
