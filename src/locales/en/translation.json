@@ -212,11 +212,16 @@
     "joinCheckbox": "Join this challenge yourself?"
   },
   "ProofUploads": {
-    "loading": "Loading data...",
-    "viewEvidence": "View your evidence",
-    "proofOn": "Proof on",
-    "uploaded": "Completed",
-    "noEvidence": "No evidence for this day"
+    "loading": "Loading data",
+    "viewEvidence": "View all evidences",
+    "has no proof": "You don't have any proof yet!",
+    "uploaded": "Uploaded",
+    "not have evidence": "Don't have evidence for this day",
+    "previous": "Previous",
+    "page": "Page",
+    "next": "Next",
+    "fullEvidence": "Full Evidence",
+    "close": "Close"
   },
   "notification.challengeResult.title": "Challenge Result: Completed",
   "notification.challengeResult.content": "You have successfully completed the challenge '{{challengeName}}'! Check out your achievement now!",
@@ -284,18 +289,7 @@
       "memberReview": "Member Review"
     }
   },
-  "ProofUpLoads": {
-    "loading": "Loading data",
-    "view evidence": "View all evidences",
-    "has no proof": "You don't have any proof yet!",
-    "uploaded": "Uploaded",
-    "not have evidence": "Don't have evidence for this day",
-    "previous": "Previous",
-    "page": "Page",
-    "next": "Next",
-    "fullEvidence": "Full Evidence",
-    "close": "Close"
-  },
+
   "ProgressTracking": {
     "viewExplanation": "View explanation",
     "daysOfWeek": {
@@ -483,8 +477,8 @@
     "loadError": "Failed to load groups.",
     "selectWarning": "Please select at least one group.",
     "success": "Groups invited successfully!",
-    "searchPlaceholderGroup": "Enter group name...",
-
+    "searchPlaceholderGroup": "Enter group name..."
+  },
     "forgotPassword": {
       "title": "Forgot Password?",
       "subtitle": "Enter your email to receive an OTP.",
@@ -711,8 +705,7 @@
       "copyright": "Copyright © {year}",
       "page": "Page",
       "of": "/"
-    }
-  },
+    },
   "challenges": {
     "groupHistory": "Group Challenge History",
     "name": "Challenge Name",
