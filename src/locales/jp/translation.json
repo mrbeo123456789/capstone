@@ -720,6 +720,97 @@
     "next": "次へ",
     "first": "最初",
     "last": "最後"
+  },
+
+  "achievement": {
+    "title": "あなたの実績",
+    "of": "中",
+    "achieved": "件の実績を獲得",
+    "totalProgress": "総合進捗",
+    "progress": "進捗",
+    "earned": "獲得日",
+    "community": "コミュニティ",
+    "users": "人のユーザー",
+    "unlocked": "獲得済",
+    "locked": "未獲得",
+    "prev": "前へ",
+    "next": "次へ",
+    "notYetEarned": "未獲得",
+
+    "fitnessChampion": "フィットネスチャンピオン",
+    "fitnessChampionDesc": "月間チャレンジでトップ10にランクイン",
+
+    "peakPerformer": "ピークパフォーマー",
+    "peakPerformerDesc": "高強度ワークアウトプログラムを完了",
+
+    "perfectForm": "パーフェクトフォーム",
+    "perfectFormDesc": "ワークアウト技術で満点を獲得",
+
+    "risingAthlete": "台頭するアスリート",
+    "risingAthleteDesc": "1ヶ月でフィットネススコアを50％向上",
+
+    "quickStarter": "クイックスターター",
+    "quickStarterDesc": "1日で5種類のワークアウトを完了",
+
+    "trainingStreak": "トレーニング連続記録",
+    "trainingStreakDesc": "10日連続でワークアウトを完了",
+
+    "hiitMaster": "HIITマスター",
+    "hiitMasterDesc": "完璧なタイミングでHIITワークアウトを完了",
+
+    "teamPlayer": "チームプレイヤー",
+    "teamPlayerDesc": "10回のグループワークアウトを完了",
+
+    "workoutPlanner": "ワークアウトプランナー",
+    "workoutPlannerDesc": "カスタムトレーニングプランを作成し完了",
+
+    "eliteAthlete": "エリートアスリート",
+    "eliteAthleteDesc": "1ヶ月間フィットネスランクの上位5％を維持",
+
+    "challengeCreator": "チャレンジクリエイター",
+    "challengeCreatorDesc": "100人以上が参加するワークアウトチャレンジを作成",
+
+    "fitnessMentor": "フィットネスメンター",
+    "fitnessMentorDesc": "20人のユーザーのワークアウトフォームを支援",
+
+    "cardioKing": "カーディオキング",
+    "cardioKingDesc": "3回連続でカーディオチャレンジに勝利",
+
+    "calorieCrusher": "カロリークラッシャー",
+    "calorieCrusherDesc": "1週間で5,000カロリーを消費",
+
+    "crossTrainer": "クロストレーナー",
+    "crossTrainerDesc": "5つの異なるフィットネスカテゴリーでワークアウトを完了",
+
+    "progressTracker": "進捗トラッカー",
+    "progressTrackerDesc": "30日連続でワークアウトを記録",
+
+    "globalAthlete": "グローバルアスリート",
+    "globalAthleteDesc": "5カ国のユーザーとのワークアウトに参加",
+
+    "mindBodyMaster": "心身マスター",
+    "mindBodyMasterDesc": "10回のマインドフルネスとヨガセッションを完了",
+
+    "balancedDiet": "バランスの取れた食事",
+    "balancedDietDesc": "25日間の栄養目標を記録",
+
+    "strengthChampion": "筋力チャンピオン",
+    "strengthChampionDesc": "筋力トレーニングで10の自己記録を達成",
+
+    "enduranceBuilder": "持久力ビルダー",
+    "enduranceBuilderDesc": "2時間の持久力チャレンジを完了",
+
+    "goalCrusher": "目標達成者",
+    "goalCrusherDesc": "5つの個人フィットネス目標を達成",
+
+    "fitnessLegend": "フィットネスレジェンド",
+    "fitnessLegendDesc": "システム内で最高のフィットネスレベルを達成",
+
+    "fitnessExplorer": "フィットネスエクスプローラー",
+    "fitnessExplorerDesc": "すべてのフィットネスカテゴリーでワークアウトを試す",
+
+    "activeLifestyle": "アクティブなライフスタイル",
+    "activeLifestyleDesc": "60日間連続で身体活動を記録"
   }
 
 }
