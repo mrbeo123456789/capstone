@@ -127,9 +127,9 @@ public class EvidenceServiceImpl implements EvidenceService {
         }
     }
 
-    @Override
-    @Transactional
-    public void reviewEvidence(EvidenceReviewRequest request) {
+//    @Override
+//    @Transactional
+    public void reviewEvidenceNotFixed(EvidenceReviewRequest request) {
         Long reviewerId = authService.getMemberIdFromAuthentication();
 
         Evidence evidence = evidenceRepository.findById(request.getEvidenceId())
@@ -303,8 +303,8 @@ public class EvidenceServiceImpl implements EvidenceService {
          * @param challengeId ID của thử thách
          * @return danh sách EvidenceToReviewDTO
          */
-    @Override
-    public List<EvidenceToReviewDTO> getEvidenceAssignedForMemberToReview(Long challengeId) {
+//    @Override
+    public List<EvidenceToReviewDTO> getEvidenceAssignedForMemberToReviewNotFixed(Long challengeId) {
         Long reviewerId = authService.getMemberIdFromAuthentication();
         List<EvidenceReport> reports = evidenceReportRepository.findByReviewerIdAndIsApprovedIsNull(reviewerId);
         return reports.stream()
@@ -379,7 +379,7 @@ public class EvidenceServiceImpl implements EvidenceService {
      * @param excludeMemberId ID của submitter cần loại trừ
      * @return một Member reviewer phù hợp hoặc null nếu không tìm được
      */
-    private Member selectReviewer(Long challengeId, Long excludeMemberId) {
+    private Member selectReviewerNotFixed(Long challengeId, Long excludeMemberId) {
         Long excludeGroupId = challengeMemberRepository.findByChallengeIdAndMemberId(challengeId, excludeMemberId)
                 .map(ChallengeMember::getGroupId)
                 .orElse(null);
@@ -534,21 +534,28 @@ public class EvidenceServiceImpl implements EvidenceService {
         List<EvidenceReport> reportsToSave = new ArrayList<>();
 
         for (Evidence evidence : evidences) {
-            int currentReviewCount = evidenceReportRepository.countByEvidenceId(evidence.getId());
+            Long evidenceId = evidence.getId();
+
+            // Đếm tổng số reviewer đã review evidence này
+            int currentReviewCount = evidenceReportRepository.countByEvidenceId(evidenceId);
+
+            // Nếu đã đủ 3 người review thì bỏ qua
             if (currentReviewCount >= 3) {
-                continue; // already reviewed by enough reviewers
+                continue;
             }
 
-            Long submitterId = evidence.getMember().getId();
-            Member reviewer = selectReviewer(challengeId, submitterId);
-            if (reviewer != null) {
-                EvidenceReport report = EvidenceReport.builder()
-                        .evidence(evidence)
-                        .reviewer(reviewer)
-                        .createdAt(LocalDateTime.now())
-                        .build();
-                reportsToSave.add(report);
+            // Kiểm tra có report nào reviewer_id == NULL chưa
+            boolean hasPendingAssignment = evidenceReportRepository.existsByEvidenceIdAndReviewerIsNull(evidenceId);
+            if (hasPendingAssignment) {
+                continue; // Đang có slot trống, không cần tạo thêm
             }
+
+            // Nếu không có slot trống thì mới tạo slot mới
+            EvidenceReport report = EvidenceReport.builder()
+                    .evidence(evidence)
+                    .createdAt(LocalDateTime.now())
+                    .build();
+            reportsToSave.add(report);
         }
 
         if (!reportsToSave.isEmpty()) {
@@ -608,6 +615,143 @@ public class EvidenceServiceImpl implements EvidenceService {
 
         // ✅ Save all at once
         evidenceReportRepository.saveAll(reports);
+    }
+
+    private Member selectReviewer(Long challengeId, Long submitterId) {
+        Long submitterGroupId = challengeMemberRepository.findByChallengeIdAndMemberId(challengeId, submitterId)
+                .map(ChallengeMember::getGroupId)
+                .orElse(null);
+
+        boolean isIndividual = (submitterGroupId == null);
+
+        List<Member> eligible = challengeMemberRepository.findMembersByChallengeIdExceptUser(challengeId, submitterId)
+                .stream()
+                .filter(member -> {
+                    if (!isIndividual) {
+                        Long candidateGroupId = challengeMemberRepository.findByChallengeIdAndMemberId(challengeId, member.getId())
+                                .map(ChallengeMember::getGroupId)
+                                .orElse(null);
+                        // must be from different groups
+                        return candidateGroupId == null || !candidateGroupId.equals(submitterGroupId);
+                    }
+                    return true; // individual: anyone except submitter
+                })
+                .toList();
+
+        if (eligible.isEmpty()) {
+            return null;
+        }
+
+        return eligible.get(random.nextInt(eligible.size()));
+    }
+
+    @Override
+    @Transactional
+    public void reviewEvidence(EvidenceReviewRequest request) {
+        Long reviewerId = authService.getMemberIdFromAuthentication();
+
+        Evidence evidence = evidenceRepository.findById(request.getEvidenceId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy bằng chứng."));
+
+        // 1. Tìm EvidenceReport chưa có reviewerId trước
+        EvidenceReport report = evidenceReportRepository.findFirstByEvidenceIdAndReviewerIdIsNull(evidence.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Không còn lượt review trống cho bằng chứng này."));
+
+        // 2. Gán reviewer vào report
+        report.setReviewer(Member.builder().id(reviewerId).build());
+        report.setIsApproved(request.getIsApproved());
+        report.setFeedback(request.getFeedback());
+        report.setReviewedAt(LocalDateTime.now());
+        report.setUpdatedAt(LocalDateTime.now());
+        report.setUpdatedBy(reviewerId);
+
+        evidenceReportRepository.save(report);
+
+        // 3. Kiểm tra tổng số lượt review
+        int approvedCount = evidenceReportRepository.countByEvidenceIdAndIsApproved(evidence.getId(), true);
+        int rejectedCount = evidenceReportRepository.countByEvidenceIdAndIsApproved(evidence.getId(), false);
+
+        if (approvedCount + rejectedCount >= 3) {
+            if (approvedCount >= 2) {
+                evidence.setStatus(EvidenceStatus.APPROVED);
+            } else if (rejectedCount >= 2) {
+                evidence.setStatus(EvidenceStatus.REJECTED);
+            }
+            evidence.setUpdatedAt(LocalDateTime.now());
+            evidence.setUpdatedBy(reviewerId);
+
+            evidenceRepository.save(evidence);
+        }
+    }
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<EvidenceToReviewDTO> getEvidenceAssignedForMemberToReview(Long challengeId) {
+        Long reviewerId = authService.getMemberIdFromAuthentication();
+
+        // Lấy danh sách evidenceId mà reviewer này đã từng review
+        List<Long> reviewedEvidenceIds = evidenceReportRepository.findEvidenceIdsReviewedByMember(reviewerId);
+
+        // Lấy các evidence report chưa có reviewer
+        List<EvidenceReport> unassignedReports = evidenceReportRepository.findUnassignedReportsByChallenge(challengeId);
+
+        // Lấy thông tin loại thử thách (Group hay Individual)
+        Challenge challenge = challengeRepository.findById(challengeId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy thử thách."));
+
+        boolean isGroupChallenge = challenge.getParticipationType() == ParticipationType.GROUP;
+
+        // Nếu là group challenge, lấy groupId của reviewer
+        Long reviewerGroupId = null;
+        if (isGroupChallenge) {
+            reviewerGroupId = challengeMemberRepository.findByChallengeIdAndMemberId(challengeId, reviewerId)
+                    .map(cm -> cm.getGroupId())
+                    .orElse(null);
+        }
+
+        Long finalReviewerGroupId = reviewerGroupId; // cần final để dùng trong lambda
+
+        return unassignedReports.stream()
+                .filter(report -> {
+                    Evidence evidence = report.getEvidence();
+                    Long submitterId = evidence.getMember().getId();
+
+                    // Không nhận evidence mình đã review
+                    if (reviewedEvidenceIds.contains(evidence.getId())) {
+                        return false;
+                    }
+
+                    // Không nhận bằng chứng do mình nộp
+                    if (submitterId.equals(reviewerId)) {
+                        return false;
+                    }
+
+                    // Nếu là group challenge, không nhận evidence cùng group
+                    if (isGroupChallenge && finalReviewerGroupId != null) {
+                        Long submitterGroupId = challengeMemberRepository.findByChallengeIdAndMemberId(challengeId, submitterId)
+                                .map(cm -> cm.getGroupId())
+                                .orElse(null);
+                        if (finalReviewerGroupId.equals(submitterGroupId)) {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                })
+                .map(report -> {
+                    Evidence e = report.getEvidence();
+                    return new EvidenceToReviewDTO(
+                            e.getId(),
+                            e.getMember().getId(),
+                            e.getMember().getFullName(),
+                            e.getEvidenceUrl(),
+                            e.getStatus(),
+                            true,
+                            e.getSubmittedAt()
+                    );
+                })
+                .collect(Collectors.toList());
     }
 
 }

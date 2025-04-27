@@ -36,4 +36,46 @@ public interface EvidenceReportRepository extends JpaRepository<EvidenceReport, 
 
     int countByEvidenceId(Long evidenceId);
 
+    int countByEvidenceIdAndIsApproved(Long evidenceId, boolean isApproved);
+
+    Optional<EvidenceReport> findByEvidenceIdAndReviewerId(Long evidenceId, Long reviewerId);
+
+    @Query("""
+    SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END
+    FROM EvidenceReport r
+    WHERE r.evidence.id = :evidenceId
+      AND r.reviewer IS NULL
+""")
+    boolean existsByEvidenceIdAndReviewerIsNull(@Param("evidenceId") Long evidenceId);
+
+    @Query("""
+    SELECT r FROM EvidenceReport r
+    WHERE r.evidence.challenge.id = :challengeId
+      AND r.reviewer IS NULL
+""")
+    List<EvidenceReport> findByChallengeIdAndReviewerIsNull(@Param("challengeId") Long challengeId);
+
+    @Query("""
+    SELECT r FROM EvidenceReport r
+    WHERE r.evidence.challenge.id = :challengeId
+      AND r.reviewer IS NULL
+      AND r.isApproved IS NULL
+""")
+    List<EvidenceReport> findUnassignedReportsByChallenge(@Param("challengeId") Long challengeId);
+
+    @Query("""
+    SELECT r FROM EvidenceReport r
+    WHERE r.evidence.id = :evidenceId
+      AND r.reviewer IS NULL
+    ORDER BY r.createdAt ASC
+    LIMIT 1
+""")
+    Optional<EvidenceReport> findFirstByEvidenceIdAndReviewerIdIsNull(@Param("evidenceId") Long evidenceId);
+
+    @Query("""
+    SELECT DISTINCT r.evidence.id FROM EvidenceReport r
+    WHERE r.reviewer.id = :reviewerId
+""")
+    List<Long> findEvidenceIdsReviewedByMember(@Param("reviewerId") Long reviewerId);
+
 }

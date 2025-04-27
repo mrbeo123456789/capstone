@@ -38,9 +38,9 @@ public class EvidenceVoteServiceImpl implements EvidenceVoteService {
         Evidence evidence = evidenceRepository.findById(evidenceId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy bằng chứng."));
 
-        if (!evidence.getStatus().equals(EvidenceStatus.APPROVED)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bạn chỉ có thể bình chọn những bằng chứng đã được phê duyệt.");
-        }
+//        if (!evidence.getStatus().equals(EvidenceStatus.APPROVED)) {
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bạn chỉ có thể bình chọn những bằng chứng đã được phê duyệt.");
+//        }
 
         if (evidence.getMember().getId().equals(voterId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không được phép bình chọn bằng chứng của chính mình.");

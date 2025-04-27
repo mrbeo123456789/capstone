@@ -26,7 +26,7 @@ public class EvidenceReport {
     private Evidence evidence;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reviewer_id", nullable = false)
+    @JoinColumn(name = "reviewer_id")
     private Member reviewer;
 
     private Boolean isApproved;
