@@ -15,7 +15,8 @@ const VideoModal = ({
                         onNext,
                         uploader,
                         evidenceId,
-                        isLastEvidence // ✅ new prop
+                        isLastEvidence,
+                        onReviewed
                     }) => {
     const { t } = useTranslation();
     const [reviewEvidence] = useReviewEvidenceMutation();
@@ -32,40 +33,32 @@ const VideoModal = ({
         if (isReviewed) return;
 
         try {
-            // ✅ First, approve the evidence
             await reviewEvidence({
                 evidenceId: evidenceId,
                 isApproved: true,
                 feedback: t("VideoModal.approveMessage")
             });
 
-            // ✅ Then, vote on the evidence
-            await voteEvidence({
+            const response = await voteEvidence({
                 evidenceId: evidenceId,
-                score: Math.round((rating || 5) * 10), // default to 5 if user forgets to select
+                score: Math.round((rating || 5) * 10),
             });
 
-            toast.success(t("VideoModal.approveSuccess"));
+            toast(response?.error?.data || t("VideoModal.approveSuccess"));
+
             setIsReviewed(true);
-            console.log("Approved");
-            // ✅ Local tracking
-            const reviewedKey = `reviewedEvidences-${evidenceId}`; // 🔧 simplified
-            const savedReviewed = JSON.parse(localStorage.getItem(reviewedKey) || "[]");
-            if (!savedReviewed.includes(evidenceId)) {
-                localStorage.setItem(reviewedKey, JSON.stringify([...savedReviewed, evidenceId]));
+
+            if (onReviewed) {
+                onReviewed(evidenceId); // <<< 📣 GỌI callback về cha
             }
 
-            console.log("NExt video or close");
-
-            // ✅ Next video
             setTimeout(() => {
                 if (isLastEvidence) {
-                    onClose();         // ✅ close modal
-                    window.location.reload(); // ✅ trigger full reload (or use context/event if smarter reload preferred)
+                    onClose();
                 } else {
-                    onNext();          // ✅ continue to next
+                    onNext();
                 }
-            }, 1000);
+            }, 500);
         } catch (error) {
             toast.error(t("VideoModal.approveFail"));
             console.error(error);
