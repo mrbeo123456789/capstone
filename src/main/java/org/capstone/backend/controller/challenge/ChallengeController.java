@@ -163,4 +163,15 @@ public class ChallengeController {
         return ResponseEntity.ok(challengeService.getChallengeStatistics(challengeId));
     }
 
+    @GetMapping("/{challengeId}/member-management")
+    public ResponseEntity<Page<ChallengeMemberManagementDTO>> getChallengeMembersForManagement(
+            @PathVariable Long challengeId,
+            @RequestParam(defaultValue = "") String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Page<ChallengeMemberManagementDTO> result = challengeService.getChallengeMembersForManagement(challengeId, keyword, page, size);
+        return ResponseEntity.ok(result);
+    }
+
 }

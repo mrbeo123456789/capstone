@@ -36,4 +36,5 @@ public interface ChallengeService {
     ChallengeStatisticDTO getChallengeStatistics(Long challengeId);
     Page<ChallengeDashboardDTO> getAdminChallengeTable(String keyword, ChallengeStatus status, Pageable pageable);
     List<ChallengeParticipationChartDTO> getAdminChallengeParticipationChart();
+    Page<ChallengeMemberManagementDTO> getChallengeMembersForManagement(Long challengeId, String keyword, int page, int size);
 }

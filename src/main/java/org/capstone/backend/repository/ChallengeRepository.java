@@ -216,4 +216,43 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
             "GROUP BY cr.challenge.name")
     List<Object[]> countReportsOfAdminChallenges(@Param("creator") String creator);
     Long countByCreatedByAndStatus(String creator, ChallengeStatus status);
+
+    @Query("""
+    SELECT new org.capstone.backend.dto.challenge.ChallengeMemberManagementDTO(
+        m.id,
+        m.fullName,
+        a.email,
+        m.avatar,
+        CAST(cm.role AS string),
+        cm.isParticipate,
+        CASE WHEN m.id = :currentMemberId THEN true ELSE false END
+    )
+    FROM ChallengeMember cm
+    JOIN cm.member m
+    JOIN m.account a
+    WHERE cm.challenge.id = :challengeId
+      AND cm.status = org.capstone.backend.utils.enums.ChallengeMemberStatus.JOINED
+      AND (
+          :keyword IS NULL
+          OR LOWER(m.fullName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+          OR LOWER(a.email) LIKE LOWER(CONCAT('%', :keyword, '%'))
+      )
+    ORDER BY
+      CASE cm.role
+          WHEN 'HOST' THEN 1
+          WHEN 'CO_HOST' THEN 2
+          WHEN 'MEMBER' THEN 3
+          ELSE 4
+      END,
+      m.fullName
+""")
+    Page<ChallengeMemberManagementDTO> findChallengeMembersForManagement(
+            @Param("challengeId") Long challengeId,
+            @Param("keyword") String keyword,
+            @Param("currentMemberId") Long currentMemberId,
+            Pageable pageable
+    );
+
+
+
 }

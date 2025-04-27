@@ -731,7 +731,7 @@ public class ChallengeServiceImpl implements ChallengeService {
         int end = Math.min(start + pageable.getPageSize(), dtos.size());
         return new PageImpl<>(dtos.subList(start, end), pageable, dtos.size());
     }
-@Override
+    @Override
     public List<ChallengeParticipationChartDTO> getAdminChallengeParticipationChart() {
         ChallengeMemberStatus joined = ChallengeMemberStatus.JOINED;
 
@@ -741,4 +741,12 @@ public class ChallengeServiceImpl implements ChallengeService {
                 .map(obj -> new ChallengeParticipationChartDTO((String) obj[0], (Long) obj[1]))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public Page<ChallengeMemberManagementDTO> getChallengeMembersForManagement(Long challengeId, String keyword, int page, int size) {
+        Long currentMemberId = authService.getMemberIdFromAuthentication(); // 👈 Lấy ID người đang login
+        Pageable pageable = PageRequest.of(page, size);
+        return challengeRepository.findChallengeMembersForManagement(challengeId, keyword, currentMemberId, pageable);
+    }
+
 }
