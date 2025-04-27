@@ -533,24 +533,28 @@ public class EvidenceServiceImpl implements EvidenceService {
         List<Evidence> evidences = evidenceRepository.findPendingEvidenceByChallengeOrderBySubmittedAtAsc(challengeId);
         List<EvidenceReport> reportsToSave = new ArrayList<>();
 
-        evidences.forEach(e -> {
-            Long submitterId = e.getMember().getId();
+        for (Evidence evidence : evidences) {
+            int currentReviewCount = evidenceReportRepository.countByEvidenceId(evidence.getId());
+            if (currentReviewCount >= 3) {
+                continue; // already reviewed by enough reviewers
+            }
+
+            Long submitterId = evidence.getMember().getId();
             Member reviewer = selectReviewer(challengeId, submitterId);
             if (reviewer != null) {
                 EvidenceReport report = EvidenceReport.builder()
-                        .evidence(e)
+                        .evidence(evidence)
                         .reviewer(reviewer)
                         .createdAt(LocalDateTime.now())
                         .build();
                 reportsToSave.add(report);
             }
-        });
+        }
 
         if (!reportsToSave.isEmpty()) {
             evidenceReportRepository.saveAll(reportsToSave);
         }
     }
-
 
     private static final int REVIEWERS_PER_EVIDENCE = 3;
 
