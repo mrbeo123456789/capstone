@@ -347,25 +347,28 @@ public class EvidenceServiceImpl implements EvidenceService {
                 .collect(Collectors.toList());
     }
 
+
+
+
     /**
      * Gán tự động reviewer cho các bằng chứng chưa được gán của thử thách.
      *
      * @param challengeId ID của thử thách
      */
-    public void assignPendingReviewersForChallenge(Long challengeId) {
-        List<Evidence> evidences = evidenceRepository.findAllUnassignedEvidenceByChallengeOrderBySubmittedAtAsc(challengeId);
-        evidences.forEach(e -> {
-            Long submitterId = e.getMember().getId();
-            Member reviewer = selectReviewer(challengeId, submitterId);
-            if (reviewer != null) {
-                EvidenceReport report = EvidenceReport.builder()
-                        .evidence(e)
-                        .reviewer(reviewer)
-                        .build();
-                evidenceReportRepository.save(report);
-            }
-        });
-    }
+//    public void assignPendingReviewersForChallenge(Long challengeId) {
+//        List<Evidence> evidences = evidenceRepository.findAllUnassignedEvidenceByChallengeOrderBySubmittedAtAsc(challengeId);
+//        evidences.forEach(e -> {
+//            Long submitterId = e.getMember().getId();
+//            Member reviewer = selectReviewer(challengeId, submitterId);
+//            if (reviewer != null) {
+//                EvidenceReport report = EvidenceReport.builder()
+//                        .evidence(e)
+//                        .reviewer(reviewer)
+//                        .build();
+//                evidenceReportRepository.save(report);
+//            }
+//        });
+//    }
 
     private final Random random = new Random();
 
@@ -393,7 +396,7 @@ public class EvidenceServiceImpl implements EvidenceService {
                             return false;
                         }
                     }
-                    return getReviewCount(member) < 3;
+                    return true;
                 })
                 .toList();
 
@@ -469,8 +472,6 @@ public class EvidenceServiceImpl implements EvidenceService {
     }
 
 
-
-
     @Override
     public List<TaskChecklistDTO> getTasksForDate(LocalDate date) {
         Long memberId = authService.getMemberIdFromAuthentication();
@@ -516,10 +517,6 @@ public class EvidenceServiceImpl implements EvidenceService {
                 .collect(Collectors.toList());
     }
 
-
-
-
-
     public List<EvidenceStatusCountDTO> countEvidenceByStatusForHost(
             Long challengeId,
             Long memberId
@@ -528,6 +525,85 @@ public class EvidenceServiceImpl implements EvidenceService {
         return evidenceRepository.countEvidenceByStatusForHost(
                 challengeId, memberId
         );
+    }
+
+    //    Đang fix đoạn sau, đây là đoạn test thuật toán mới
+    @Transactional
+    public void assignPendingReviewersForChallenge(Long challengeId) {
+        List<Evidence> evidences = evidenceRepository.findPendingEvidenceByChallengeOrderBySubmittedAtAsc(challengeId);
+        List<EvidenceReport> reportsToSave = new ArrayList<>();
+
+        evidences.forEach(e -> {
+            Long submitterId = e.getMember().getId();
+            Member reviewer = selectReviewer(challengeId, submitterId);
+            if (reviewer != null) {
+                EvidenceReport report = EvidenceReport.builder()
+                        .evidence(e)
+                        .reviewer(reviewer)
+                        .createdAt(LocalDateTime.now())
+                        .build();
+                reportsToSave.add(report);
+            }
+        });
+
+        if (!reportsToSave.isEmpty()) {
+            evidenceReportRepository.saveAll(reportsToSave);
+        }
+    }
+
+
+    private static final int REVIEWERS_PER_EVIDENCE = 3;
+
+    private void assignReviewersToEvidence(Long challengeId, Evidence evidence) {
+        Long submitterId = evidence.getMember().getId();
+        Long excludeGroupId = challengeMemberRepository.findByChallengeIdAndMemberId(challengeId, submitterId)
+                .map(ChallengeMember::getGroupId)
+                .orElse(null);
+        boolean isIndividualChallenge = (excludeGroupId == null);
+
+        List<Member> eligibleReviewers = challengeMemberRepository.findMembersByChallengeIdExceptUser(challengeId, submitterId)
+                .stream()
+                .filter(member -> {
+                    if (!isIndividualChallenge) {
+                        Long candidateGroupId = challengeMemberRepository.findByChallengeIdAndMemberId(challengeId, member.getId())
+                                .map(ChallengeMember::getGroupId)
+                                .orElse(null);
+                        return !Objects.equals(excludeGroupId, candidateGroupId);
+                    }
+                    return true;
+                })
+                .collect(Collectors.toList());
+
+        if (eligibleReviewers.isEmpty()) return;
+
+        Map<Integer, List<Member>> reviewCountMap = eligibleReviewers.stream()
+                .collect(Collectors.groupingBy(this::getReviewCount));
+
+        int minReviewCount = reviewCountMap.keySet().stream()
+                .min(Integer::compareTo)
+                .orElse(0);
+
+        List<Member> candidates = reviewCountMap.getOrDefault(minReviewCount, Collections.emptyList());
+
+        if (candidates.isEmpty()) return;
+
+        Collections.shuffle(candidates, new Random());
+
+        int reviewerCount = Math.min(REVIEWERS_PER_EVIDENCE, candidates.size());
+
+        List<Member> selectedReviewers = candidates.subList(0, reviewerCount);
+
+        // ✅ Collect all reports first
+        List<EvidenceReport> reports = selectedReviewers.stream()
+                .map(reviewer -> EvidenceReport.builder()
+                        .evidence(evidence)
+                        .reviewer(reviewer)
+                        .createdAt(LocalDateTime.now())
+                        .build())
+                .toList();
+
+        // ✅ Save all at once
+        evidenceReportRepository.saveAll(reports);
     }
 
 }

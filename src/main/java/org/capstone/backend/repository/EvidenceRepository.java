@@ -120,6 +120,14 @@ public interface EvidenceRepository extends JpaRepository<Evidence, Long> {
     @Query("SELECT COUNT(e) FROM Evidence e WHERE e.challenge.id = :challengeId AND DATE(e.submittedAt) = CURRENT_DATE")
     int countEvidenceToday(@Param("challengeId") Long challengeId);
 
+    @Query("""
+    SELECT e FROM Evidence e
+    WHERE e.challenge.id = :challengeId
+      AND e.status = 'PENDING'
+    ORDER BY e.submittedAt ASC
+""")
+    List<Evidence> findPendingEvidenceByChallengeOrderBySubmittedAtAsc(@Param("challengeId") Long challengeId);
+
 }
 
 
