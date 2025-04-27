@@ -825,6 +825,25 @@
 
     "activeLifestyle": "Active Lifestyle",
     "activeLifestyleDesc": "Record physical activity for 60 days straight."
+  },
+  "title": "Sports News Today",
+  "search": {
+    "placeholder": "Search news...",
+    "noResults": "No matching news found"
+  },
+  "viewMode": {
+    "grid": "Grid",
+    "list": "List"
+  },
+  "errors": {
+    "loading": "Error loading news",
+    "network": "Could not connect to server"
+  },
+  "buttons": {
+    "retry": "Retry"
+  },
+  "images": {
+    "notAvailable": "No image"
   }
 }
 

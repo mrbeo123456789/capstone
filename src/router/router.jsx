@@ -36,6 +36,7 @@ import Settings from "../page/admin/list/Settings.jsx";
 import Leaderboard from "../page/ui/Leaderboard.jsx";
 import ChallengeEdit from "../page/challenge/ChallengeEdit.jsx";
 import ChallengeStatistics from "../page/admin/detailmodal/challengeStatistic.jsx";
+import News from "../page/ui/News.jsx"
 const router = createBrowserRouter([
     { path: "/", element: <Navigate to="/homepage" /> },
     { path: "*", element: <NotFoundPage /> },
@@ -47,6 +48,7 @@ const router = createBrowserRouter([
         children: [
             { path: "homepage", element: <HomePage/> },
             { path: "aboutus", element: <AboutUsPage /> },
+            { path: "news", element: <News /> },
             { path: "profile", element: <MemberRoute><MemberProfile /></MemberRoute> },
             { path: "statistics", element: <MemberRoute><Statistics /></MemberRoute> },
             { path: "achievement", element: <MemberRoute><Achievement /></MemberRoute> },

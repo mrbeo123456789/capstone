@@ -811,8 +811,26 @@
 
     "activeLifestyle": "アクティブなライフスタイル",
     "activeLifestyleDesc": "60日間連続で身体活動を記録"
+  },
+  "title": "今日のスポーツニュース",
+  "search": {
+    "placeholder": "ニュースを検索...",
+    "noResults": "該当するニュースがありません"
+  },
+  "viewMode": {
+    "grid": "グリッド",
+    "list": "リスト"
+  },
+  "errors": {
+    "loading": "ニュースの読み込みエラー",
+    "network": "サーバーに接続できません"
+  },
+  "buttons": {
+    "retry": "再試行"
+  },
+  "images": {
+    "notAvailable": "画像なし"
   }
-
 }
 
 

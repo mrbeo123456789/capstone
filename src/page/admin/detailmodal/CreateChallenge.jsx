@@ -292,7 +292,7 @@ const ChallengeForm = () => {
 
                             {/* Challenge Type */}
                             <div>
-                                <label className="text-sm font-medium">{t('challengeType')}</label>
+                                <label className="text-sm font-medium">Challenge Type</label>
                                 <select
                                     {...register("challengeTypeId", {required: true})}
                                     className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"

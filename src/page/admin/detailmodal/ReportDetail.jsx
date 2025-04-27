@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import Sidebar from "../../navbar/AdminNavbar.jsx";
 import {  useUpdateReportStatusMutation, useReviewChallengeMutation } from "../../../service/adminService.js";
 import {  useGetChallengeDetailQuery,} from "../../../service/challengeService.js";
-import { ArrowLeft, Check, X, Ban } from "lucide-react";
+import { ArrowLeft, Check, X, Ban, AlertTriangle } from "lucide-react";
 
 const ReportDetail = ({ reportData }) => {
     const { reportId } = useParams();
@@ -13,79 +13,112 @@ const ReportDetail = ({ reportData }) => {
     // Use the reportData passed as props instead of fetching it
     const report = reportData;
     console.log(report);
+
     // Fetch challenge details if report is loaded
     const { data: challengeData, isLoading: isLoadingChallenge, isError: isChallengeError } =
         useGetChallengeDetailQuery(report?.challengeId, { skip: !report?.challengeId });
-    console.log(challengeData)
+    console.log(challengeData);
+
     // Mutation for updating report status
     const [updateReportStatus, { isLoading: isUpdating }] = useUpdateReportStatusMutation();
     const [reviewChallenge, { isLoading: isReviewing }] = useReviewChallengeMutation();
 
-    // Handle approve report
-    const handleApprove = async () => {
-        try {
-            await updateReportStatus({
-                reportId: reportId,
-                status: "APPROVED"
-            }).unwrap();
-            // Navigate back or show success message
-            navigate('/admin/reports');
-        } catch (error) {
-            console.error("Failed to approve report:", error);
-        }
+    // Confirmation modal states
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [confirmAction, setConfirmAction] = useState(null);
+    const [banChallenge, setBanChallenge] = useState(false);
+
+    // Show confirmation modal
+    const showConfirmationModal = (action, shouldBanChallenge = false) => {
+        setConfirmAction(action);
+        setBanChallenge(shouldBanChallenge);
+        setShowConfirmModal(true);
     };
 
-    // Handle reject report
-    const handleReject = async () => {
-        try {
-            await updateReportStatus({
-                reportId: reportId,
-                status: "REJECTED"
-            }).unwrap();
-            // Navigate back or show success message
-            navigate('/admin/reports');
-        } catch (error) {
-            console.error("Failed to reject report:", error);
-        }
+    // Close confirmation modal
+    const closeConfirmModal = () => {
+        setShowConfirmModal(false);
+        setConfirmAction(null);
+        setBanChallenge(false);
     };
 
-    // Handle ban challenge
-    const handleBanChallenge = async () => {
-        if (window.confirm("Are you sure you want to ban this challenge?")) {
+    // Handle confirm action
+    const handleConfirmAction = async () => {
+        if (!confirmAction) return;
+
+        try {
+            const status = confirmAction === 'approve' ? "APPROVED" : "REJECTED";
+
+            // If we're banning the challenge first
+            if (banChallenge) {
+                try {
+                    await reviewChallenge({
+                        challengeId: report.challengeId,
+                        status: "BANNED",
+                        reason: "Violation of community guidelines"
+                    }).unwrap();
+                    console.log("Challenge banned successfully");
+                } catch (error) {
+                    // Check if it's a parsing error but with a successful status
+                    if (error.status === 'PARSING_ERROR' && error.originalStatus === 200) {
+                        console.log("Challenge banned successfully despite parsing error");
+                        // Continue with the flow since the operation was successful
+                    } else {
+                        console.error("Failed to ban challenge:", error);
+                        alert("Failed to ban challenge");
+                        closeConfirmModal();
+                        return; // Exit early if banning fails
+                    }
+                }
+            }
+
+            // Then update report status
             try {
-                await reviewChallenge({
-                    challengeId: report.challengeId,
-                    status: "BANNED",
-                    reason: "Violation of community guidelines"
-                }).unwrap();
-
-                // Approve the report as well
                 await updateReportStatus({
                     reportId: reportId,
-                    status: "APPROVED"
+                    status: status
                 }).unwrap();
+                console.log(`Successfully ${confirmAction}d report ${reportId}`);
 
-                alert("Challenge has been banned successfully");
+                // If we're here, both actions completed successfully
+                closeConfirmModal();
+                if (banChallenge) {
+                    alert("Challenge has been banned and report has been approved successfully");
+                }
                 navigate('/admin/reports');
             } catch (error) {
-                console.error("Failed to ban challenge:", error);
-                alert("Failed to ban challenge");
+                // Check if it's a parsing error but with a successful status
+                if (error.status === 'PARSING_ERROR' && error.originalStatus === 200) {
+                    console.log(`Successfully ${confirmAction}d report despite parsing error`);
+                    closeConfirmModal();
+                    if (banChallenge) {
+                        alert("Challenge has been banned and report has been approved successfully");
+                    }
+                    navigate('/admin/reports');
+                } else {
+                    console.error(`Failed to ${confirmAction} report:`, error);
+                    alert(`Failed to ${confirmAction} report`);
+                    closeConfirmModal();
+                }
             }
+        } catch (generalError) {
+            console.error("An error occurred:", generalError);
+            closeConfirmModal();
         }
     };
 
-    // Hàm định dạng ngày từ dữ liệu backend
+    // Format date from backend data
     const formatDate = (dateValue) => {
         if (!dateValue) return "Invalid date";
 
         let dateObj;
 
-        // Xử lý trường hợp dữ liệu là mảng (kiểu cũ)
+        // Handle array format (old format)
         if (Array.isArray(dateValue) && dateValue.length >= 3) {
             const [year, month, day] = dateValue;
             dateObj = new Date(year, month - 1, day);
         }
-        // Xử lý trường hợp dữ liệu là timestamp hoặc chuỗi ngày tháng
+        // Handle timestamp or date string
         else {
             try {
                 dateObj = new Date(dateValue);
@@ -95,12 +128,12 @@ const ReportDetail = ({ reportData }) => {
             }
         }
 
-        // Kiểm tra xem dateObj có phải là ngày hợp lệ không
+        // Check if dateObj is a valid date
         if (isNaN(dateObj.getTime())) {
             return "Invalid date";
         }
 
-        // Format thành dd/mm/yyyy
+        // Format as dd/mm/yyyy
         const day = String(dateObj.getDate()).padStart(2, '0');
         const month = String(dateObj.getMonth() + 1).padStart(2, '0');
         const year = dateObj.getFullYear();
@@ -143,7 +176,7 @@ const ReportDetail = ({ reportData }) => {
                             {report && report.status === "PENDING" && (
                                 <div className="flex space-x-3">
                                     <button
-                                        onClick={handleReject}
+                                        onClick={() => showConfirmationModal('reject')}
                                         className="px-4 py-2 bg-white border border-red-500 text-red-500 rounded-md hover:bg-red-50 transition-colors disabled:opacity-50"
                                         disabled={isUpdating || isReviewing}
                                     >
@@ -153,7 +186,7 @@ const ReportDetail = ({ reportData }) => {
                                         </div>
                                     </button>
                                     <button
-                                        onClick={handleApprove}
+                                        onClick={() => showConfirmationModal('approve')}
                                         className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors disabled:opacity-50"
                                         disabled={isUpdating || isReviewing}
                                     >
@@ -261,7 +294,7 @@ const ReportDetail = ({ reportData }) => {
 
                                                 {report && report.status === "PENDING" && (
                                                     <button
-                                                        onClick={handleBanChallenge}
+                                                        onClick={() => showConfirmationModal('approve', true)}
                                                         className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors disabled:opacity-50"
                                                         disabled={isUpdating || isReviewing}
                                                     >
@@ -359,6 +392,55 @@ const ReportDetail = ({ reportData }) => {
                     </div>
                 </div>
             </div>
+
+            {/* Confirmation Modal */}
+            {showConfirmModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full animate-fadeIn">
+                        <div className="flex items-center text-amber-500 mb-4">
+                            <AlertTriangle className="mr-2" size={24} />
+                            <h3 className="text-lg font-bold">Confirm Action</h3>
+                        </div>
+                        <p className="mb-6">
+                            {banChallenge
+                                ? "Are you sure you want to ban this challenge and approve the report? This action cannot be undone."
+                                : `Are you sure you want to ${confirmAction} this report? This action cannot be undone.`
+                            }
+                        </p>
+                        <div className="flex justify-end space-x-3">
+                            <button
+                                onClick={closeConfirmModal}
+                                className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleConfirmAction}
+                                className={`px-4 py-2 rounded-md text-white ${
+                                    banChallenge
+                                        ? 'bg-red-600 hover:bg-red-700'
+                                        : confirmAction === 'approve'
+                                            ? 'bg-green-500 hover:bg-green-600'
+                                            : 'bg-red-500 hover:bg-red-600'
+                                } disabled:opacity-50`}
+                                disabled={isUpdating || isReviewing}
+                            >
+                                {isUpdating || isReviewing ? (
+                                    <span className="flex items-center">
+                                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        Processing...
+                                    </span>
+                                ) : (
+                                    banChallenge ? 'Ban Challenge' : `${confirmAction === 'approve' ? 'Approve' : 'Reject'}`
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

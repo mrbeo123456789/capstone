@@ -785,6 +785,25 @@
     "fitnessExplorerDesc": "Thử các bài tập trong tất cả các danh mục thể hình.",
     "activeLifestyle": "Lối sống năng động",
     "activeLifestyleDesc": "Ghi lại hoạt động thể chất trong 60 ngày liên tiếp."
+  },
+  "title": "Tin Thể Thao Hôm Nay",
+  "search": {
+    "placeholder": "Tìm kiếm tin tức...",
+    "noResults": "Không tìm thấy tin tức phù hợp"
+  },
+  "viewMode": {
+    "grid": "Lưới",
+    "list": "Danh sách"
+  },
+  "errors": {
+    "loading": "Lỗi khi tải tin tức",
+    "network": "Không thể kết nối đến máy chủ"
+  },
+  "buttons": {
+    "retry": "Thử lại"
+  },
+  "images": {
+    "notAvailable": "Không có ảnh"
   }
 }
 
