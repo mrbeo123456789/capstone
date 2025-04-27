@@ -60,8 +60,8 @@ const MemberManagementModal = ({ show, onClose, challengeId }) => {
 
     const handleToggle = async (memberId) => {
         try {
-            await toggleCoHost({ challengeId, memberId }).unwrap();
-            toast.success(t("MemberManagement.toggleSuccess"));
+            const response = await toggleCoHost({ challengeId, memberId });
+            toast(response?.error?.data || t("MemberManagement.toggleSuccess")); // ✅ in đúng chuỗi từ backend nếu có
             refetch();
         } catch (err) {
             toast.error(err?.data?.message || t("MemberManagement.toggleFail"));
@@ -155,8 +155,8 @@ const MemberManagementModal = ({ show, onClose, challengeId }) => {
                                 </td>
                                 <td className="text-center">
                                     <Toggle
-                                        checked={member.role === "CO_HOST"}
-                                        onChange={() => handleToggle(member.memberId)}
+                                        isOn={member.role === "CO_HOST"}
+                                        onToggle={() => handleToggle(member.memberId)}
                                         disabled={member.role === "HOST"}
                                     />
                                 </td>
