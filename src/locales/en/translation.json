@@ -167,50 +167,55 @@
     "enterKeyword": "Please enter a keyword."
   },
   "createChallenge": {
-    "create": "Create Challenge",
-    "creating": "Creating Challenge",
-    "maxMembersPerGroup": "Số người trong 1 nhóm",
-    "success": "Challenge created successfully!",
     "editTitle": "Edit Challenge",
-    "successUpdate": "Challenge updated successfully!",
-    "updating": "Updating...",
     "update": "Update",
+    "updating": "Updating...",
+    "successUpdate": "Challenge updated successfully!",
+    "editFail": "Failed to update challenge: ",
+    "editValidationError": "Please fill all required fields.",
     "generalInfo": "General Information",
-    "details": "Challenge Details",
     "name": "Challenge Name",
     "namePlaceholder": "Enter challenge name",
     "summary": "Summary",
-    "summaryPlaceholder": "Brief summary of the challenge",
-    "banner": "Banner (optional)",
-    "picture": "Challenge Image",
-    "pictureNote": "Accepted formats: JPG, PNG. Max size 2MB.",
-    "clickUpload": "Click or drag file to upload",
+    "summaryPlaceholder": "Short summary",
+    "banner": "Banner (Optional)",
+    "clickUpload": "Click or Drag to upload",
+    "picture": "Challenge Picture",
+    "pictureNote": "Recommended size: 800x400px",
+    "details": "Challenge Details",
     "startDate": "Start Date",
     "endDate": "End Date",
     "privacy": "Privacy",
+    "isParticipate": "Participation Option",
+    "joinCheckbox": "I want to participate after creating",
     "verificationType": {
-      "label": "Verification Type",
-      "hostReview": "Host Review",
-      "memberReview": "Member Review"
+      "label": "Verification Method",
+      "memberReview": "Member Review",
+      "hostReview": "Host Review"
     },
     "participationType": {
       "label": "Participation Type",
       "individual": "Individual",
       "group": "Group"
     },
-    "isParticipate": {
-      "join": "Join",
-      "not join": "Not join"
-    },
     "challengeType": "Challenge Type",
-    "selectChallengeType": "Select challenge type",
-    "maxParticipants": "Maximum Participants",
-    "description": "Challenge Description",
+    "selectChallengeType": "Select Challenge Type",
+    "maxParticipants": "Max Participants",
+    "maxGroups": "Max Groups",
+    "maxMembersPerGroup": "Max Members per Group",
+    "selectGroup": "Select Group",
+    "selectGroupPlaceholder": "Select a group to join",
+    "members": "members",
+    "description": "Description",
+    "create": "Create",
     "cancel": "Cancel",
-    "validationError": "Please correct all errors before submitting.",
-    "fail": "Failed to update challenge: ",
-    "joinCheckbox": "Join this challenge yourself?"
+    "creating": "Creating...",
+    "success": "Challenge created successfully!",
+    "fail": "Failed to create challenge: ",
+    "validationError": "Please fill all required fields."
   },
+  "public": "Public",
+  "private": "Private",
   "ProofUploads": {
     "loading": "Loading data",
     "viewEvidence": "View all evidences",
@@ -230,13 +235,15 @@
   "notification.challengeRoleUpdated.title": "Challenge Role Updated",
   "notification.challengeRoleUpdated.content": "Your role in the challenge '{{challengeName}}' has been updated to: {{role}}",
   "notification.challengeStatusUpdated.title": "Your challenge status has been updated",
-  "notification.challengeStatusUpdated.content": "The challenge '{{challengeName}}' has been updated and now has status '{{status}}'",
+  "notification.challengeStatusUpdated.content": "The challenge '{{challengeName}}' has been updated to: {{status}}.{{#adminNote}} Note: {{adminNote}}{{/adminNote}}",
   "notification.challengeStarted.title": "The challenge '{{challengeName}}' has started!",
   "notification.challengeStarted.content": "Get ready to conquer the challenge '{{challengeName}}' with GoBeyond!",
   "notification.evidence.approved.title": "Proof on {{day}} approved",
-  "notification.evidence.approved.content": "Your proof submitted on {{day}} in the challenge '{{challengeName}}' has been approved. Keep it up!",
+  "notification.evidence.approved.content": "Your proof submitted on {{day}} in the challenge '{{challengeName}}' has been approved. Feedback: {{feedback}}",
+
   "notification.evidence.rejected.title": "Proof on {{day}} rejected",
-  "notification.evidence.rejected.content": "Your proof submitted on {{day}} in the challenge '{{challengeName}}' was rejected. Please check feedback and resubmit if needed.",
+  "notification.evidence.rejected.content": "Your proof submitted on {{day}} in the challenge '{{challengeName}}' was rejected. Feedback: {{feedback}}. Please check and resubmit if needed.",
+
   "notification.invite.challenge.title": "Challenge Invitation",
   "notification.invite.challenge.content": "{{inviterName}} has invited you to join the challenge '{{challengeName}}'.",
   "notification.invite.group.title": "Group Invitation",
@@ -287,7 +294,10 @@
     "verificationType": {
       "hostReview": "Host Review",
       "memberReview": "Member Review"
-    }
+    },
+    "loginRequired": "You need to log in first.",
+    "maxGroups": "Max Groups",
+    "maxMembersPerGroup": "Max Members per Group"
   },
 
   "ProgressTracking": {
@@ -383,6 +393,10 @@
   },
 
   "JoinsChallengeDetail": {
+    "confirmCancelTitle": "Confirm Cancellation",
+    "confirmCancelMessage": "Are you sure you want to cancel this challenge?",
+    "confirmCancelNo": "No, Keep",
+    "confirmCancelYes": "Yes, Cancel",
     "reportTab": "Feedback & Reports",
     "groups": "Groups",
     "disabledDuringChallenge": "This action is disabled during or after the challenge.",
@@ -825,6 +839,46 @@
 
     "activeLifestyle": "Active Lifestyle",
     "activeLifestyleDesc": "Record physical activity for 60 days straight."
+  },
+
+  "SelectGroupModal": {
+    "title": "Select a Group",
+    "searchPlaceholder": "Search your groups...",
+    "filterExactMembers": "Only show groups with exactly {{number}} members",
+    "noGroups": "No matching groups found.",
+    "prev": "Previous",
+    "next": "Next",
+    "cancel": "Cancel",
+    "join": "Join Challenge",
+    "joining": "Joining...",
+    "joinSuccess": "Joined challenge successfully!",
+    "joinFail": "Failed to join challenge. Please try again.",
+    "selectGroupFirst": "Please select a group first!",
+    "yourRole": "Your Role",
+    "owner": "Leader",
+    "member": "Member",
+    "notLeaderTooltip": "You are not the leader of this group. Please select a group you own.",
+    "notExactMembersTooltip": "This group does not have exactly {{number}} members."
+  },
+  "MemberManagement": {
+    "title": "Member Management",
+    "searchPlaceholder": "Search by name or email...",
+    "member": "Member",
+    "role": "Role",
+    "participate": "Participate",
+    "coHost": "Co-host",
+    "actions": "Actions",
+    "me": "Me",
+    "prev": "Previous",
+    "next": "Next",
+    "kickSuccess": "Member kicked successfully!",
+    "kickFail": "Failed to kick member.",
+    "toggleSuccess": "Updated role successfully!",
+    "toggleFail": "Failed to update role.",
+    "confirmKickTitle": "Confirm Kick",
+    "confirmKickMessage": "Are you sure you want to kick {{name}} from the challenge?",
+    "cancel": "Cancel",
+    "confirm": "Confirm"
   },
   "title": "Sports News Today",
   "search": {

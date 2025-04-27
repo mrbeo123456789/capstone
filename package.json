@@ -26,6 +26,7 @@
     "i18next": "^24.2.3",
     "jsonwebtoken-esm": "^2.0.1",
     "jwt-decode": "^4.0.0",
+    "lodash": "^4.17.21",
     "lucide-react": "^0.479.0",
     "prop-types": "^15.8.1",
     "react": "^19.0.0",

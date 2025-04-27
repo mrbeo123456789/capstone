@@ -167,46 +167,61 @@
     "enterKeyword": "キーワードを入力してください。"
   },
   "createChallenge": {
-    "create": "チャレンジを作成",
-    "creating": "作成中...",
-    "success": "チャレンジが正常に作成されました！",
     "editTitle": "チャレンジを編集",
-    "successUpdate": "チャレンジが正常に更新されました！",
-    "updating": "更新中...",
     "update": "更新",
+    "updating": "更新中...",
+    "successUpdate": "チャレンジが正常に更新されました！",
+    "editFail": "チャレンジの更新に失敗しました: ",
+    "editValidationError": "必須項目をすべて入力してください。",
     "generalInfo": "基本情報",
-    "details": "チャレンジの詳細",
     "name": "チャレンジ名",
-    "namePlaceholder": "チャレンジ名を入力",
+    "namePlaceholder": "チャレンジ名を入力してください",
     "summary": "概要",
-    "summaryPlaceholder": "チャレンジの簡単な説明",
-    "banner": "バナー（任意）",
-    "picture": "チャレンジ画像",
-    "pictureNote": "対応形式：JPG、PNG。最大サイズ：2MB。",
+    "summaryPlaceholder": "簡単な説明",
+    "banner": "バナー（オプション）",
     "clickUpload": "クリックまたはドラッグしてアップロード",
+    "picture": "チャレンジ画像",
+    "pictureNote": "推奨サイズ：800x400px",
+    "details": "チャレンジ詳細",
     "startDate": "開始日",
     "endDate": "終了日",
-    "privacy": "公開範囲",
+    "privacy": "プライバシー設定",
+    "isParticipate": "参加オプション",
+    "joinCheckbox": "作成後に参加したい",
     "verificationType": {
       "label": "認証方法",
-      "hostReview": "ホストによる確認",
-      "memberReview": "メンバーによる確認"
+      "memberReview": "メンバー審査",
+      "hostReview": "ホスト審査"
     },
     "participationType": {
-      "label": "参加形式",
+      "label": "参加タイプ",
       "individual": "個人",
       "group": "グループ"
     },
-    "challengeType": "チャレンジの種類",
-    "selectChallengeType": "チャレンジの種類を選択",
-    "maxParticipants": "最大参加人数",
-    "description": "チャレンジの説明",
+    "challengeType": "チャレンジタイプ",
+    "selectChallengeType": "チャレンジタイプを選択",
+    "maxParticipants": "最大参加者数",
+    "maxGroups": "最大グループ数",
+    "maxMembersPerGroup": "グループあたりの最大メンバー数",
+    "selectGroup": "グループを選択",
+    "selectGroupPlaceholder": "グループを選んでください",
+    "members": "メンバー",
+    "description": "説明",
+    "create": "作成",
     "cancel": "キャンセル",
-    "validationError": "すべてのエラーを修正してください。",
-    "fail": "チャレンジの更新に失敗しました: "
+    "creating": "作成中...",
+    "success": "チャレンジが正常に作成されました！",
+    "fail": "チャレンジ作成に失敗しました：",
+    "validationError": "必須項目をすべて入力してください。"
   },
+  "public": "公開",
+  "private": "非公開",
 
   "JoinsChallengeDetail": {
+    "confirmCancelTitle": "チャレンジのキャンセル確認",
+    "confirmCancelMessage": "このチャレンジをキャンセルしてもよろしいですか？",
+    "confirmCancelNo": "いいえ、維持します",
+    "confirmCancelYes": "はい、キャンセルします",
     "reportTab": "フィードバックと報告",
     "groups": "グループ",
     "disabledDuringChallenge": "チャレンジ中または終了後はこの操作はできません。",
@@ -251,10 +266,12 @@
     "challengeRoleUpdated.content": "チャレンジ「{{challengeName}}」でのあなたの役割が {{role}} に変更されました。",
     "challengeStarted.title": "チャレンジ「{{challengeName}}」が開始されました！",
     "challengeStarted.content": "GoBeyond と一緒に「{{challengeName}}」に挑戦しましょう！",
-    "evidence.approved.title": "{{day}} の証拠が承認されました",
-    "evidence.approved.content": "チャレンジ「{{challengeName}}」で提出した {{day}} の証拠が承認されました。引き続き頑張ってください！",
-    "evidence.rejected.title": "{{day}} の証拠が拒否されました",
-    "evidence.rejected.content": "チャレンジ「{{challengeName}}」で提出した {{day}} の証拠が拒否されました。フィードバックを確認して、再提出してください。",
+    "notification.evidence.approved.title": "{{day}}の証拠が承認されました",
+    "notification.evidence.approved.content": "チャレンジ「{{challengeName}}」の{{day}}に提出した証拠が承認されました。フィードバック: {{feedback}}",
+
+    "notification.evidence.rejected.title": "{{day}}の証拠が却下されました",
+    "notification.evidence.rejected.content": "チャレンジ「{{challengeName}}」の{{day}}に提出した証拠は却下されました。フィードバック: {{feedback}}。内容を確認して再提出してください。",
+
     "invite.challenge.title": "チャレンジへの招待",
     "invite.challenge.content": "{{inviterName}} さんがあなたをチャレンジ「{{challengeName}}」に招待しました。",
     "invite.group.title": "グループへの招待",
@@ -277,7 +294,7 @@
     "kickedFromChallenge.content": "あなたはチャレンジ「{{challengeName}}」から管理者により削除されました。",
     "empty": "新しい通知はありません。",
     "challengeStatusUpdated.title": "チャレンジのステータスが更新されました",
-    "notification.challengeStatusUpdated.content": "チャレンジ「{{challengeName}}」のステータスが「{{status}}」に更新されました"
+    "notification.challengeStatusUpdated.content": "チャレンジ「{{challengeName}}」のステータスが {{status}} に更新されました。{{#adminNote}} 管理者メモ: {{adminNote}}{{/adminNote}}"
   },
 
   "suggest.reason.both": "共通の興味があり、近くにいます",
@@ -359,7 +376,10 @@
     "verificationType": {
       "hostReview": "ホストレビュー",
       "memberReview": "メンバーレビュー"
-    }
+    },
+    "loginRequired": "最初にログインする必要があります。",
+    "maxGroups": "最大グループ数",
+    "maxMembersPerGroup": "グループあたりの最大メンバー数"
   },
 
   "forgotPassword": {
@@ -811,6 +831,46 @@
 
     "activeLifestyle": "アクティブなライフスタイル",
     "activeLifestyleDesc": "60日間連続で身体活動を記録"
+  },
+
+  "SelectGroupModal": {
+    "title": "グループを選択",
+    "searchPlaceholder": "あなたのグループを検索...",
+    "filterExactMembers": "{{number}}人ぴったりのグループのみ表示",
+    "noGroups": "一致するグループが見つかりません。",
+    "prev": "前へ",
+    "next": "次へ",
+    "cancel": "キャンセル",
+    "join": "チャレンジに参加",
+    "joining": "参加中...",
+    "joinSuccess": "チャレンジに参加しました！",
+    "joinFail": "チャレンジへの参加に失敗しました。再試行してください。",
+    "selectGroupFirst": "まずグループを選択してください！",
+    "yourRole": "あなたの役割",
+    "owner": "リーダー",
+    "member": "メンバー",
+    "notLeaderTooltip": "このグループのリーダーではありません。リーダーのグループを選択してください。",
+    "notExactMembersTooltip": "このグループは{{number}}人ぴったりではありません。"
+  },
+  "MemberManagement": {
+    "title": "メンバー管理",
+    "searchPlaceholder": "名前またはメールで検索...",
+    "member": "メンバー",
+    "role": "役割",
+    "participate": "参加",
+    "coHost": "共同ホスト",
+    "actions": "アクション",
+    "me": "自分",
+    "prev": "前へ",
+    "next": "次へ",
+    "kickSuccess": "メンバーを削除しました！",
+    "kickFail": "メンバーの削除に失敗しました。",
+    "toggleSuccess": "役割を更新しました！",
+    "toggleFail": "役割の更新に失敗しました。",
+    "confirmKickTitle": "削除の確認",
+    "confirmKickMessage": "{{name}} をチャレンジから削除してもよろしいですか？",
+    "cancel": "キャンセル",
+    "confirm": "確認"
   },
   "title": "今日のスポーツニュース",
   "search": {

@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import {
     FaCheckCircle, FaClipboardCheck, FaFlag, FaInfoCircle,
-    FaShareAlt, FaSignOutAlt, FaUsers, FaUserPlus
+    FaShareAlt, FaSignOutAlt, FaUsers, FaUserPlus, FaWindowClose
 } from "react-icons/fa";
 import ProofUploads from "./ProofUploads";
 import RankingList from "./RankingList";
@@ -13,6 +13,7 @@ import Description from "./Description.jsx";
 import ProgressTracking from "./ProgressTracking.jsx";
 import ChallengeInvitePopup from "./ChallengeInvitePopup.jsx";
 import {
+    useCancelChallengeMutation,
     useGetChallengeDetailQuery,
     useLeaveChallengeMutation
 } from "../../service/challengeService.js";
@@ -21,7 +22,6 @@ import ReportChallengeModal from "./modal/ReportChallengeModal.jsx";
 import MemberManagementModal from "./modal/MemberManagementModal.jsx";
 import ChallengeGroupTab from "./ChallengeGroupTab.jsx";
 import HostEvidenceManagement from "./HostEvidenceManagement.jsx";
-import InviteGroups from "./InviteGroups.jsx";
 import GroupChallengeInvite from "./GroupChallengeInvite.jsx";
 
 const JoinedChallengeDetail = () => {
@@ -32,6 +32,7 @@ const JoinedChallengeDetail = () => {
     const [showMemberModal, setShowMemberModal] = useState(false);
     const [showMemberInvite, setShowMemberInvite] = useState(false);
     const [showGroupInvite, setShowGroupInvite] = useState(false);
+    const [showConfirmCancelModal, setShowConfirmCancelModal] = useState(false);
     const navigate = useNavigate();
     const { id } = useParams();
 
@@ -43,6 +44,7 @@ const JoinedChallengeDetail = () => {
     } = useGetMyEvidencesByChallengeQuery(id);
 
     const [leaveChallenge] = useLeaveChallengeMutation();
+    const [cancelChallenge] = useCancelChallengeMutation();
 
     useEffect(() => {
         if (data && data.joined === false) {
@@ -92,6 +94,52 @@ const JoinedChallengeDetail = () => {
         }
     };
 
+    const ConfirmCancelModal = ({ onConfirm, onCancel }) => {
+        return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 animate-fadeIn">
+                <div className="bg-white rounded-lg shadow-lg max-w-sm w-full p-6 animate-scaleIn">
+                    <h2 className="text-xl font-bold text-center mb-4">{t("JoinsChallengeDetail.confirmCancelTitle")}</h2>
+                    <p className="text-gray-700 text-center mb-6">{t("JoinsChallengeDetail.confirmCancelMessage")}</p>
+                    <div className="flex justify-center gap-6">
+                        <button
+                            onClick={onCancel}
+                            className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
+                        >
+                            {t("JoinsChallengeDetail.confirmCancelNo")}
+                        </button>
+                        <button
+                            onClick={onConfirm}
+                            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                        >
+                            {t("JoinsChallengeDetail.confirmCancelYes")}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    const handleCancelChallenge = async () => {
+        setShowConfirmCancelModal(true); // 🆕 mở modal trước
+    };
+
+    const confirmCancelChallenge = async () => {
+        try {
+            await cancelChallenge(challenge.id).unwrap();
+            toast.success(t("JoinsChallengeDetail.cancelSuccess"));
+            navigate("/challenges/joins");
+        } catch (e) {
+            const message = e?.data?.message || t("JoinsChallengeDetail.cancelFail");
+            toast.error(message);
+        } finally {
+            setShowConfirmCancelModal(false); // đóng modal
+        }
+    };
+
+    const cancelModal = () => {
+        setShowConfirmCancelModal(false); // chỉ đóng modal
+    };
+
     const tabItems = [
         { key: "proof", label: t("JoinsChallengeDetail.proof"), icon: <FaCheckCircle /> },
         {
@@ -131,7 +179,6 @@ const JoinedChallengeDetail = () => {
                                     const isBeforeStart = now < start;
                                     const isAfterEnd = now > end;
                                     const isOngoing = now >= start && now <= end;
-
                                     return (
                                         <>
                                             {challenge?.role === "HOST" && (
@@ -213,6 +260,16 @@ const JoinedChallengeDetail = () => {
                                             >
                                                 <FaFlag/>
                                             </button>
+
+                                            {challenge?.role === "HOST" && (
+                                                <button
+                                                    title={t("JoinsChallengeDetail.cancelChallenge")}
+                                                    onClick={handleCancelChallenge}
+                                                    className="text-red-600 hover:text-red-800 text-xl"
+                                                >
+                                                    <FaWindowClose />
+                                                </button>
+                                            )}
                                         </>
                                     );
                                 })()}
@@ -298,9 +355,12 @@ const JoinedChallengeDetail = () => {
                         challengeId={challenge.id}
                     />
                 )}
-
-
-
+                {showConfirmCancelModal && (
+                    <ConfirmCancelModal
+                        onConfirm={confirmCancelChallenge}
+                        onCancel={cancelModal}
+                    />
+                )}
             </div>
         </div>
     );
