@@ -38,10 +38,12 @@ public class Schedule {
     private final EvidenceRepository evidenceRepository;
     // ==== 00:00 – Roll UPCOMING → ONGOING & ONGOING → FINISH ====
     @Transactional
-    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Bangkok")
+//    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Bangkok")
+    @Scheduled(fixedRate = 30000)
     public void rollChallengeStatuses() {
         LocalDate today = LocalDate.now();
 
+        // Start challenges that start today
         var toStart = challengeRepository
                 .findByStatusAndStartDate(ChallengeStatus.UPCOMING, today)
                 .stream()
@@ -51,15 +53,30 @@ public class Schedule {
                     log.info("Challenge {} started", ch.getId());
                 });
 
+        // Finish challenges that ENDED yesterday (today > endDate)
         var toFinish = challengeRepository
-                .findByStatusAndEndDate(ChallengeStatus.ONGOING, today)
+                .findByStatus(ChallengeStatus.ONGOING)
                 .stream()
+                .filter(ch -> ch.getEndDate().isBefore(today)) // <-- important fix
                 .peek(ch -> {
                     ch.setStatus(ChallengeStatus.FINISH);
                     log.info("Challenge {} finished", ch.getId());
                 });
 
-        challengeRepository.saveAll(Stream.concat(toStart, toFinish).toList());
+        // Cancel pending challenges whose start date has already passed
+        var toCancel = challengeRepository
+                .findByStatus(ChallengeStatus.PENDING)
+                .stream()
+                .filter(ch -> !ch.getStartDate().isAfter(today)) // startDate <= today
+                .peek(ch -> {
+                    ch.setStatus(ChallengeStatus.CANCELED);
+                    log.info("Challenge {} cancelled because pending and start date passed", ch.getId());
+                });
+
+        // Save all updates together
+        challengeRepository.saveAll(
+                Stream.concat(Stream.concat(toStart, toFinish), toCancel).toList()
+        );
 
         markMemberCompletion(today);
         updateGroupChallengeStatuses(today);
@@ -85,12 +102,12 @@ public class Schedule {
     }
 
     // ===== 🕔 00:15 – Gán reviewer tự động cho thử thách MEMBER_REVIEW trong ngày =====
-    @Scheduled(cron = "0 15 0 * * *", zone = "Asia/Bangkok")
-    public void assignDailyReviewers() {
-        challengeRepository
-                .findCrossCheckChallengesHappeningToday(ChallengeStatus.ONGOING, VerificationType.MEMBER_REVIEW)
-                .forEach(assignmentService::assignPendingReviewersForChallenge);
-    }
+//    @Scheduled(cron = "0 15 0 * * *", zone = "Asia/Bangkok")
+//    public void assignDailyReviewers() {
+//        challengeRepository
+//                .findCrossCheckChallengesHappeningToday(ChallengeStatus.ONGOING, VerificationType.MEMBER_REVIEW)
+//                .forEach(assignmentService::assignPendingReviewersForChallenge);
+//    }
 
     // ===== 🗓 Chủ Nhật hàng tuần lúc 01:00 – Cập nhật bảng xếp hạng tổng thể (cá nhân + nhóm) =====
     @Scheduled(cron = "0 0 1 * * SUN", zone = "Asia/Bangkok")
@@ -102,13 +119,13 @@ public class Schedule {
 
 
     // ===== 🌙 21:02 – Gán reviewer cuối ngày cho thử thách kết thúc hôm nay =====
-    @Scheduled(cron = "0 2 21 * * *", zone = "Asia/Bangkok")
-    public void assignEndDayReviewers() {
-        LocalDate today = LocalDate.now();
-        challengeRepository
-                .findChallengesEndingToday(today)
-                .forEach(assignmentService::assignPendingReviewersForChallenge);
-    }
+//    @Scheduled(cron = "0 2 21 * * *", zone = "Asia/Bangkok")
+//    public void assignEndDayReviewers() {
+//        LocalDate today = LocalDate.now();
+//        challengeRepository
+//                .findChallengesEndingToday(today)
+//                .forEach(assignmentService::assignPendingReviewersForChallenge);
+//    }
 
     @Transactional
     protected void markMemberCompletion(LocalDate today) {
@@ -220,6 +237,58 @@ public class Schedule {
         }
 
         return (double) completedDays / totalDays;
+    }
+
+    // ===== 🕔 00:05 – Check and finalize daily pending evidence =====
+//    @Scheduled(cron = "0 5 0 * * *", zone = "Asia/Bangkok")
+    @Scheduled(fixedRate = 30000) // 30 seconds
+    @Transactional
+    public void finalizeDailyPendingEvidence() {
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+
+        List<Challenge> ongoingChallenges = challengeRepository.findByStatus(ChallengeStatus.ONGOING);
+
+        for (Challenge challenge : ongoingChallenges) {
+            List<EvidenceReport> pendingReports = evidenceReportRepository.findUnfinishedReportsByChallengeAndDate(challenge.getId(), yesterday);
+
+            pendingReports.stream()
+                    .map(EvidenceReport::getEvidence)
+                    .distinct()
+                    .forEach(evidence -> {
+                        Long evidenceId = evidence.getId();
+                        Long submitterId = evidence.getMember().getId();
+
+                        int totalReviews = evidenceReportRepository.countFinishedReportsByEvidence(evidenceId);
+                        int approvedCount = evidenceReportRepository.countApprovedReportsByEvidence(evidenceId);
+                        int rejectedCount = evidenceReportRepository.countRejectedReportsByEvidence(evidenceId);
+
+                        if (totalReviews >= 3) {
+                            // Đã đủ 3 người review
+                            if (approvedCount >= 2) {
+                                evidence.setStatus(EvidenceStatus.APPROVED);
+                            } else if (rejectedCount >= 2) {
+                                evidence.setStatus(EvidenceStatus.REJECTED);
+                            }
+                            evidence.setUpdatedAt(LocalDate.now().atStartOfDay());
+                            evidenceRepository.save(evidence);
+                            log.info("✅ Finalized evidence {} automatically by reviews", evidenceId);
+                        } else {
+                            // Chưa đủ 3 review
+                            boolean submitterHasReviewedOthers = evidenceReportRepository.hasReviewedOthersOnDate(submitterId, challenge.getId(), yesterday);
+                            if (submitterHasReviewedOthers) {
+                                evidence.setStatus(EvidenceStatus.APPROVED);
+                                evidence.setUpdatedAt(LocalDate.now().atStartOfDay());
+                                evidenceRepository.save(evidence);
+                                log.info("✅ Auto-approved evidence {} because submitter reviewed others", evidenceId);
+                            } else {
+                                evidence.setStatus(EvidenceStatus.REJECTED);
+                                evidence.setUpdatedAt(LocalDate.now().atStartOfDay());
+                                evidenceRepository.save(evidence);
+                                log.info("❌ Auto-rejected evidence {} because submitter did not review others", evidenceId);
+                            }
+                        }
+                    });
+        }
     }
 
 }

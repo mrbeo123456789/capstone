@@ -78,4 +78,48 @@ public interface EvidenceReportRepository extends JpaRepository<EvidenceReport, 
 """)
     List<Long> findEvidenceIdsReviewedByMember(@Param("reviewerId") Long reviewerId);
 
+
+
+    // Tìm các EvidenceReport chưa review xong cho 1 thử thách, 1 ngày cụ thể
+    @Query("""
+    SELECT r FROM EvidenceReport r
+    WHERE r.evidence.challenge.id = :challengeId
+      AND DATE(r.evidence.submittedAt) = :date
+      AND r.isApproved IS NULL
+""")
+    List<EvidenceReport> findUnfinishedReportsByChallengeAndDate(@Param("challengeId") Long challengeId, @Param("date") LocalDate date);
+
+    // Đếm số review đã hoàn thành (isApproved != NULL)
+    @Query("""
+    SELECT COUNT(r) FROM EvidenceReport r
+    WHERE r.evidence.id = :evidenceId
+      AND r.isApproved IS NOT NULL
+""")
+    int countFinishedReportsByEvidence(@Param("evidenceId") Long evidenceId);
+
+    // Đếm số review được approve
+    @Query("""
+    SELECT COUNT(r) FROM EvidenceReport r
+    WHERE r.evidence.id = :evidenceId
+      AND r.isApproved = true
+""")
+    int countApprovedReportsByEvidence(@Param("evidenceId") Long evidenceId);
+
+    // Đếm số review bị reject
+    @Query("""
+    SELECT COUNT(r) FROM EvidenceReport r
+    WHERE r.evidence.id = :evidenceId
+      AND r.isApproved = false
+""")
+    int countRejectedReportsByEvidence(@Param("evidenceId") Long evidenceId);
+
+    // Kiểm tra người nộp có đi review người khác hôm đó không
+    @Query("""
+    SELECT COUNT(r) > 0 FROM EvidenceReport r
+    WHERE r.reviewer.id = :reviewerId
+      AND r.evidence.challenge.id = :challengeId
+      AND DATE(r.reviewedAt) = :date
+""")
+    boolean hasReviewedOthersOnDate(@Param("reviewerId") Long reviewerId, @Param("challengeId") Long challengeId, @Param("date") LocalDate date);
+
 }
