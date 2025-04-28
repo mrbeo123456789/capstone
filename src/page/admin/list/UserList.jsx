@@ -60,7 +60,8 @@ const UserList = () => {
 
     const toggleUserStatus = async (userId, currentStatus) => {
         try {
-            if (currentStatus.toLowerCase() === "active") {
+            // Make sure we're checking against uppercase "ACTIVE"
+            if (currentStatus === "ACTIVE") {
                 await banUser({ id: userId });
             } else {
                 await unbanUser({ id: userId });
@@ -105,6 +106,7 @@ const UserList = () => {
             dob: user.dateOfBirth || "N/A",
             address: user.address || "N/A",
             role: user.role?.includes("ADMIN") ? "Admin" : "Member",
+            // Ensure status is always uppercase
             status: user.status ? user.status.toUpperCase() : "ACTIVE",
             avatar: user.avatar || "/assets/default-avatar.png"
         };
@@ -146,6 +148,8 @@ const UserList = () => {
             );
         }
 
+        // Ensure the status is uppercase for consistent comparison
+        const userStatus = userData.status ? userData.status.toUpperCase() : "ACTIVE";
         const displayName = (userData.firstName || "") + (userData.lastName ? " " + userData.lastName : "");
         const finalName = displayName.trim() ? displayName : userData.username;
 
@@ -228,14 +232,14 @@ const UserList = () => {
                                 </div>
                                 <div className="flex items-center justify-between pl-6">
                                     <div className="flex items-center">
-                                        {userData.status?.toLowerCase() === "active" ? (
+                                        {userStatus === "ACTIVE" ? (
                                             <FaCheckCircle className="text-green-500 mr-2" />
                                         ) : (
                                             <FaTimesCircle className="text-red-500 mr-2" />
                                         )}
-                                        <span className={`font-medium ${userData.status?.toLowerCase() === "active" ? "text-green-600" : "text-red-600"}`}>
-                                {userData.status?.toLowerCase() === "active" ? "ACTIVE" : "INACTIVE"}
-                            </span>
+                                        <span className={`font-medium ${userStatus === "ACTIVE" ? "text-green-600" : "text-red-600"}`}>
+                                            {userStatus}
+                                        </span>
                                     </div>
 
                                     {/* Toggle button moved up from footer */}
@@ -245,14 +249,14 @@ const UserList = () => {
                                                 id="toggleSwitch"
                                                 type="checkbox"
                                                 className="opacity-0 w-0 h-0"
-                                                checked={userData.status?.toLowerCase() === "active"}
-                                                onChange={() => onToggleStatus(userId, userData.status)}
+                                                checked={userStatus === "ACTIVE"}
+                                                onChange={() => onToggleStatus(userId, userStatus)}
                                             />
                                             <span
-                                                className={`absolute cursor-pointer top-0 left-0 right-0 bottom-0 rounded-full transition-all duration-300 ${userData.status?.toLowerCase() === "active" ? "bg-red-500" : "bg-green-500"}`}
+                                                className={`absolute cursor-pointer top-0 left-0 right-0 bottom-0 rounded-full transition-all duration-300 ${userStatus === "ACTIVE" ? "bg-red-500" : "bg-green-500"}`}
                                             ></span>
                                             <span
-                                                className={`absolute left-1 top-1 w-4 h-4 rounded-full bg-white transition-transform duration-300 ${userData.status?.toLowerCase() === "active" ? "translate-x-6" : "translate-x-0"}`}
+                                                className={`absolute left-1 top-1 w-4 h-4 rounded-full bg-white transition-transform duration-300 ${userStatus === "ACTIVE" ? "translate-x-6" : "translate-x-0"}`}
                                             ></span>
                                         </label>
                                     </div>
@@ -356,23 +360,20 @@ const UserList = () => {
                                                                 className="font-medium text-blue-600 hover:text-blue-800 cursor-pointer hover:underline"
                                                                 onClick={() => openUserDetail(user)}
                                                             >
-                                                                    {user.name}
-                                                                </span>
+                                                                {user.name}
+                                                            </span>
                                                         </div>
                                                     </td>
                                                     <td className="p-4 hidden md:table-cell text-gray-600">{user.email}</td>
                                                     <td className="p-4">
-                                                        {user.status.toLowerCase() === "inactive" ? (
-                                                            <div className="flex items-center text-red-500">
-                                                                <FaTimesCircle className="mr-2" />
-                                                                <span className="text-sm font-medium">INACTIVE</span>
-                                                            </div>
+                                                        {user.status === "ACTIVE" ? (
+                                                            <FaCheckCircle className="text-green-500 mr-2" />
                                                         ) : (
-                                                            <div className="flex items-center text-green-500">
-                                                                <FaCheckCircle className="mr-2" />
-                                                                <span className="text-sm font-medium">ACTIVE</span>
-                                                            </div>
+                                                            <FaTimesCircle className="text-red-500 mr-2" />
                                                         )}
+                                                        <span className={`font-medium ${user.status === "ACTIVE" ? "text-green-600" : "text-red-600"}`}>
+                                                            {user.status}
+                                                        </span>
                                                     </td>
                                                     <td className="p-4">
                                                         <div className="flex space-x-2">
@@ -385,19 +386,22 @@ const UserList = () => {
                                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                                                 </svg>
                                                             </button>
+                                                            {/* Updated button - red for active users, green for inactive users */}
                                                             <button
                                                                 className={`p-2 rounded-md transition-colors ${
-                                                                    user.status.toLowerCase() === "banned"
-                                                                        ? "bg-green-100 text-green-600 hover:bg-green-200"
-                                                                        : "bg-red-100 text-red-600 hover:bg-red-200"
+                                                                    user.status === "BANNED"
+                                                                        ? "bg-red-100 text-red-600 hover:bg-red-200"
+                                                                        : "bg-green-100 text-green-600 hover:bg-green-200"
                                                                 }`}
                                                                 onClick={() => toggleUserStatus(user.id, user.status)}
                                                             >
-                                                                {user.status.toLowerCase() === "banned" ? (
+                                                                {user.status === "BANNED" ? (
+                                                                    // Checkmark icon for activating inactive users
                                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                                     </svg>
                                                                 ) : (
+                                                                    // X icon for deactivating active users
                                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                                     </svg>
