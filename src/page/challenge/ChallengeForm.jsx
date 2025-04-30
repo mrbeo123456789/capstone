@@ -289,42 +289,59 @@ const CreateChallenge = () => {
                             <>
                                 <div>
                                     <label className="text-sm font-medium">{t("createChallenge.maxGroups")}</label>
-                                    <input type="number" {...register("maxParticipants")}
-                                           className="w-full p-2 border rounded-md"/>
+                                    <input
+                                        type="number"
+                                        {...register("maxParticipants")}
+                                        className="w-full p-2 border rounded-md"
+                                    />
                                     <p className="text-red-600">{errors.maxParticipants?.message}</p>
                                 </div>
                                 <div>
-                                    <label
-                                        className="text-sm font-medium">{t("createChallenge.maxMembersPerGroup")}</label>
-                                    <input type="number" {...register("maxMembersPerGroup")}
-                                           className="w-full p-2 border rounded-md"/>
+                                    <label className="text-sm font-medium">{t("createChallenge.maxMembersPerGroup")}</label>
+                                    <input
+                                        type="number"
+                                        {...register("maxMembersPerGroup")}
+                                        className="w-full p-2 border rounded-md"
+                                        placeholder={t("createChallenge.groupMinMemberNote")} // <-- thêm placeholder
+                                        min={2} // <-- thêm min=2 luôn để user không nhập bé hơn 2
+                                    />
                                     <p className="text-red-600">{errors.maxMembersPerGroup?.message}</p>
                                 </div>
                             </>
                         )}
 
+
                         {participationType === "GROUP" && isParticipating && (
                             <div>
                                 <label className="text-sm font-medium">{t("createChallenge.selectGroup")}</label>
-                                <select {...register("groupId", {required: true})}
-                                        onChange={(e) => {
-                                            const selectedGroup = availableGroups.find(g => g.groupId === Number(e.target.value));
-                                            if (selectedGroup) {
-                                                setValue("maxGroups", 1);
-                                                setValue("maxMembersPerGroup", selectedGroup.memberCount);
-                                            }
-                                        }}
-                                        className="w-full p-2 border rounded-md">
+                                <select
+                                    {...register("groupId", { required: true })}
+                                    onChange={(e) => {
+                                        const selectedGroup = availableGroups.find(g => g.groupId === Number(e.target.value));
+                                        if (selectedGroup) {
+                                            setValue("maxGroups", 1);
+                                            setValue("maxMembersPerGroup", selectedGroup.memberCount);
+                                        }
+                                    }}
+                                    className="w-full p-2 border rounded-md"
+                                    disabled={!watch("maxMembersPerGroup")} // Disable nếu chưa nhập maxMembersPerGroup
+                                >
                                     <option value="">{t("createChallenge.selectGroupPlaceholder")}</option>
-                                    {availableGroups.map(group => (
-                                        <option key={group.groupId} value={group.groupId}>
-                                            {group.groupName} ({group.memberCount} {t("createChallenge.members")})
-                                        </option>
-                                    ))}
+                                    {availableGroups
+                                        .filter(group =>
+                                            group.memberCount > 1 &&
+                                            group.memberCount === Number(watch("maxMembersPerGroup"))
+                                        )
+                                        .map(group => (
+                                            <option key={group.groupId} value={group.groupId}>
+                                                {group.groupName} ({group.memberCount} {t("createChallenge.members")})
+                                            </option>
+                                        ))}
                                 </select>
                                 <p className="text-red-600">{errors.groupId?.message}</p>
                             </div>
                         )}
+
                     </div>
 
                     <div>

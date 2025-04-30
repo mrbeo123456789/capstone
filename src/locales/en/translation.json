@@ -14,7 +14,6 @@
     "myChallenges": "My Challenges",
     "createChallenge": "Create Challenge"
   },
-
   "profileUpdated": "Profile updated successfully!",
   "updateFailed": "Failed to update profile.",
   "removed": "Removed",
@@ -48,6 +47,7 @@
   "updateProfile": "Update Profile",
   "selectChallengeType": "Select Challenge Type",
   "challengeInvite": {
+    "memberAlreadyJoined": "{{name}} has already joined this challenge.",
     "memberList": "Member List",
     "searchPlaceholder": "Search by name or email...",
     "search": "Search",
@@ -56,9 +56,14 @@
     "previous": "Previous",
     "next": "Next",
     "page": "Page",
+    "selectGroup": "Select a group to join",
+    "confirm": "Confirm",
+    "selectWarning": "Please select a group before proceeding.",
+    "successJoinGroupChallenge": "You have successfully joined the challenge with your selected group.",
+    "success": "Invitation accepted successfully.",
+    "inviteFailed": "An error occurred while processing the invitation. Please try again.",
     "selectAtLeastOne": "Please select at least one member.",
     "inviteSuccess": "Invitation sent successfully!",
-    "inviteFailed": "Failed to send invitation.",
     "searchFailed": "Failed to search members.",
     "title": "Invite to Challenge",
     "inviteMembers": "Invite Members",
@@ -202,7 +207,7 @@
     "selectChallengeType": "Select Challenge Type",
     "maxParticipants": "Max Participants",
     "maxGroups": "Max Groups",
-    "maxMembersPerGroup": "Max Members per Group",
+    "maxMembersPerGroup": "Members per Group",
     "selectGroup": "Select Group",
     "selectGroupPlaceholder": "Select a group to join",
     "members": "members",
@@ -212,8 +217,11 @@
     "creating": "Creating...",
     "success": "Challenge created successfully!",
     "fail": "Failed to create challenge: ",
-    "validationError": "Please fill all required fields."
+    "validationError": "Please fill all required fields.",
+    "groupMinMemberNote": "Each group must have at least 2 members"
+
   },
+
   "public": "Public",
   "private": "Private",
   "ProofUploads": {
@@ -240,10 +248,8 @@
   "notification.challengeStarted.content": "Get ready to conquer the challenge '{{challengeName}}' with GoBeyond!",
   "notification.evidence.approved.title": "Proof on {{day}} approved",
   "notification.evidence.approved.content": "Your proof submitted on {{day}} in the challenge '{{challengeName}}' has been approved. Feedback: {{feedback}}",
-
   "notification.evidence.rejected.title": "Proof on {{day}} rejected",
   "notification.evidence.rejected.content": "Your proof submitted on {{day}} in the challenge '{{challengeName}}' was rejected. Feedback: {{feedback}}. Please check and resubmit if needed.",
-
   "notification.invite.challenge.title": "Challenge Invitation",
   "notification.invite.challenge.content": "{{inviterName}} has invited you to join the challenge '{{challengeName}}'.",
   "notification.invite.group.title": "Group Invitation",
@@ -299,7 +305,6 @@
     "maxGroups": "Max Groups",
     "maxMembersPerGroup": "Max Members per Group"
   },
-
   "ProgressTracking": {
     "viewExplanation": "View explanation",
     "daysOfWeek": {
@@ -391,7 +396,6 @@
       }
     }
   },
-
   "JoinsChallengeDetail": {
     "confirmCancelTitle": "Confirm Cancellation",
     "confirmCancelMessage": "Are you sure you want to cancel this challenge?",
@@ -447,7 +451,6 @@
   "selectWarning": "Please select at least one group.",
   "success": "Groups invited successfully!",
   "searchPlaceholderGroup": "Enter group name...",
-
   "yourChallenge": {
     "create": "Create a challenge",
     "search": "Search",
@@ -493,233 +496,233 @@
     "success": "Groups invited successfully!",
     "searchPlaceholderGroup": "Enter group name..."
   },
-    "forgotPassword": {
-      "title": "Forgot Password?",
-      "subtitle": "Enter your email to receive an OTP.",
-      "email": "Email",
-      "emailPlaceholder": "Enter your email address",
-      "required": "*",
-      "sending": "Sending...",
-      "submit": "Get New Password",
-      "back": "Back to Login",
-      "errorEmpty": "Please enter your email.",
-      "success": "OTP sent to your email.",
-      "fail": "Something went wrong."
+  "forgotPassword": {
+    "title": "Forgot Password?",
+    "subtitle": "Enter your email to receive an OTP.",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email address",
+    "required": "*",
+    "sending": "Sending...",
+    "submit": "Get New Password",
+    "back": "Back to Login",
+    "errorEmpty": "Please enter your email.",
+    "success": "OTP sent to your email.",
+    "fail": "Something went wrong."
+  },
+  "changePassword": {
+    "title": "Change Password",
+    "old": "Current Password",
+    "oldPlaceholder": "Enter current password",
+    "new": "New Password",
+    "newPlaceholder": "Enter new password",
+    "confirm": "Confirm New Password",
+    "confirmPlaceholder": "Re-enter new password",
+    "submit": "Save Changes",
+    "forgot": "Forgot Password?",
+    "fail": "Failed to change password.",
+    "mismatch": "Passwords do not match!"
+  },
+  "AboutUs": {
+    "hero": {
+      "title": "About GoBeyond",
+      "subtitle": "Changing the world through meaningful challenges",
+      "learnMore": "Learn More"
     },
-    "changePassword": {
-      "title": "Change Password",
-      "old": "Current Password",
-      "oldPlaceholder": "Enter current password",
-      "new": "New Password",
-      "newPlaceholder": "Enter new password",
-      "confirm": "Confirm New Password",
-      "confirmPlaceholder": "Re-enter new password",
-      "submit": "Save Changes",
-      "forgot": "Forgot Password?",
-      "fail": "Failed to change password.",
-      "mismatch": "Passwords do not match!"
-    },
-    "AboutUs": {
-      "hero": {
-        "title": "About GoBeyond",
-        "subtitle": "Changing the world through meaningful challenges",
-        "learnMore": "Learn More"
-      },
-      "mission": {
-        "title": "Our Mission",
-        "description": "GoBeyond was created with the goal of connecting communities through challenges that bring positive value. We believe that small actions, when performed by many people, can create significant change for society and the environment.",
-        "pillars": {
-          "connect": {
-            "title": "Connect",
-            "description": "Build communities of people who share the same passion and desire to create positive impact"
-          },
-          "challenge": {
-            "title": "Challenge",
-            "description": "Create meaningful challenges to drive change and personal development"
-          },
-          "impact": {
-            "title": "Create Impact",
-            "description": "Transform challenges into concrete actions that improve communities and the environment"
-          }
-        }
-      },
-      "team": {
-        "title": "Our Team",
-        "description": "Passionate and dedicated people behind GoBeyond, constantly striving to bring the best experiences to the community.",
-        "roles": {
-          "analyst": "Business Analyst",
-          "backend": "Backend Developer",
-          "leader": "Leader",
-          "frontend": "Frontend Developer",
-          "tester": "Tester"
-        }
-      },
-      "values": {
-        "title": "Core Values",
-        "description": "The principles that guide all our decisions and actions",
-        "items": {
-          "responsibility": {
-            "title": "Social Responsibility",
-            "description": "We believe in creating positive impact for communities and the environment through all our activities."
-          },
-          "innovation": {
-            "title": "Innovation",
-            "description": "We continually seek new ways to solve problems and create value for users."
-          },
-          "transparency": {
-            "title": "Transparency",
-            "description": "We build trust through openness, honesty, and clarity in all our operations."
-          },
-          "collaboration": {
-            "title": "Collaboration",
-            "description": "We believe that strength comes from working together and learning from diverse perspectives."
-          }
-        }
-      },
-      "journey": {
-        "title": "Our Journey",
-        "description": "From the initial idea to a thriving growing community",
-        "milestones": {
-          "beginning": {
-            "title": "Beginning",
-            "description": "GoBeyond was formed from the idea of a group of young people passionate about creating positive change."
-          },
-          "development": {
-            "title": "Development",
-            "description": "The platform officially launched with basic features. The first user community was formed."
-          },
-          "expansion": {
-            "title": "Expansion",
-            "description": "GoBeyond grows strongly with many new features and an increasingly growing user community."
-          }
-        }
-      },
-      "contact": {
-        "title": "Connect With Us",
-        "description": "We are always ready to listen to your feedback and accompany you on your journey to create positive change",
-        "email": {
-          "title": "Email"
+    "mission": {
+      "title": "Our Mission",
+      "description": "GoBeyond was created with the goal of connecting communities through challenges that bring positive value. We believe that small actions, when performed by many people, can create significant change for society and the environment.",
+      "pillars": {
+        "connect": {
+          "title": "Connect",
+          "description": "Build communities of people who share the same passion and desire to create positive impact"
         },
-        "phone": {
-          "title": "Phone"
+        "challenge": {
+          "title": "Challenge",
+          "description": "Create meaningful challenges to drive change and personal development"
         },
-        "address": {
-          "title": "Address",
-          "value": "Hoa Lac Hi-tech Park, km 29, Thang Long Avenue, Hanoi"
-        },
-        "button": "Contact Now"
+        "impact": {
+          "title": "Create Impact",
+          "description": "Transform challenges into concrete actions that improve communities and the environment"
+        }
       }
     },
-    "VideoModal": {
-      "ratePerformance": "Rate Performance",
-      "rejectButton": "Disapprove",
-      "approveButton": "Approve",
-      "cancel": "Cancel",
-      "sendFeedback": "Submit Feedback",
-      "enterRejectionReason": "Why are you disapproving this?",
-      "reviewSubmitted": "Review submitted successfully!",
-      "approveMessage": "Good performance!",
-      "rejectMessage": "Needs improvement.",
-      "approveSuccess": "Evidence approved!",
-      "rejectSuccess": "Feedback submitted!",
-      "approveFail": "Failed to approve evidence.",
-      "rejectFail": "Failed to submit rejection."
-    },
-    "VoteOther": {
-      "title": "Vote for Others' Proof",
-      "loading": "Loading videos...",
-      "noEvidences": "No more evidences to review.",
-      "unknownUser": "Unknown User"
-    },
-    "hostEvidence": {
-      "members": "Members",
-      "searchMembers": "Search members...",
-      "memberName": "Member Name",
-      "joinedAt": "Joined At",
-      "evidenceCount": "Evidence Count",
-      "status": "Status",
-      "notAvailable": "N/A",
-      "pending": "Pending",
-      "done": "Done",
-      "showing": "Showing",
-      "to": "to",
-      "of": "of",
-      "evidence": "Evidence",
-      "forMember": "for {{name}}",
-      "filtering": "Filtering",
-      "showingAll": "Showing all evidence",
-      "memberStats": "Member Evidence Statistics",
-      "totalEvidence": "Total Evidence",
-      "date": "Date",
-      "noEvidence": "No evidence found",
-      "showAll": "Show all evidence",
-      "selectMember": "Select a member to view evidence",
-      "unknownUser": "Unknown User",
-      "noDescription": "No description provided.",
-      "challenge": "Challenge",
-      "memberChallenge": "{{name}}'s Challenge",
-      "evidenceDetails": "Evidence Details",
-      "modal": {
-        "approve": "I approve this evidence",
-        "reject": "I don't approve this evidence",
-        "close": "Close"
-      },
-      "logs": {
-        "acceptEvidence": "Accepting evidence with ID: {{id}}",
-        "rejectEvidence": "Rejecting evidence with ID: {{id}}"
-      },
-      "status": {
-        "approved": "Approved",
-        "waiting": "Pending",
-        "rejected": "Rejected"
+    "team": {
+      "title": "Our Team",
+      "description": "Passionate and dedicated people behind GoBeyond, constantly striving to bring the best experiences to the community.",
+      "roles": {
+        "analyst": "Business Analyst",
+        "backend": "Backend Developer",
+        "leader": "Leader",
+        "frontend": "Frontend Developer",
+        "tester": "Tester"
       }
     },
-    "suggest.reason.both": "Shares your interest and is nearby",
-    "suggest.reason.same_interest": "Shares your interest",
-    "suggest.reason.near_location": "Is nearby your location",
-    "rankingList": {
-      "top3Progress": "Top 3 Progress",
-      "rank": "Rank",
-      "noRankingData": "No ranking data",
-      "members": "Members",
-      "searchPlaceholder": "Search user...",
-      "loadingStarLeaderboard": "Loading star leaderboard...",
-      "noMembersFound": "No members found",
-      "avgStars": "Avg stars"
+    "values": {
+      "title": "Core Values",
+      "description": "The principles that guide all our decisions and actions",
+      "items": {
+        "responsibility": {
+          "title": "Social Responsibility",
+          "description": "We believe in creating positive impact for communities and the environment through all our activities."
+        },
+        "innovation": {
+          "title": "Innovation",
+          "description": "We continually seek new ways to solve problems and create value for users."
+        },
+        "transparency": {
+          "title": "Transparency",
+          "description": "We build trust through openness, honesty, and clarity in all our operations."
+        },
+        "collaboration": {
+          "title": "Collaboration",
+          "description": "We believe that strength comes from working together and learning from diverse perspectives."
+        }
+      }
     },
-    "challengeStatistic": {
-      "total": "Total Participants",
-      "completed": "Completed",
-      "notCompleted": "Not Completed",
-      "dailyOverview": "Daily progress overview",
-      "completionRate": "Daily completion rate"
+    "journey": {
+      "title": "Our Journey",
+      "description": "From the initial idea to a thriving growing community",
+      "milestones": {
+        "beginning": {
+          "title": "Beginning",
+          "description": "GoBeyond was formed from the idea of a group of young people passionate about creating positive change."
+        },
+        "development": {
+          "title": "Development",
+          "description": "The platform officially launched with basic features. The first user community was formed."
+        },
+        "expansion": {
+          "title": "Expansion",
+          "description": "GoBeyond grows strongly with many new features and an increasingly growing user community."
+        }
+      }
     },
-    "leaderboard": {
-      "individual": "Individual",
-      "group": "Group",
-      "achievements": "Achievements",
-      "searchPlaceholder": "Search users...",
-      "myRank": "My Rank",
-      "myGroupRank": "My Group Rank",
-      "user": "User",
-      "members": "Members",
-      "score": "Score",
-      "noUsersFound": "No users found matching \"{searchTerm}\"",
-      "noGroupsFound": "No groups found matching \"{searchTerm}\"",
-      "previous": "Previous",
-      "next": "Next",
-      "achievementsTitle": "Your Achievements",
-      "usersEarned": "users earned this",
-      "earned": "Earned on",
-      "notEarned": "Not yet earned",
-      "yourProgress": "Your Progress",
-      "achievementsCompleted": "Achievements Completed",
-      "completionRate": "Completion Rate",
-      "overallProgress": "Overall Progress",
-      "copyright": "Copyright © {year}",
-      "page": "Page",
-      "of": "/"
+    "contact": {
+      "title": "Connect With Us",
+      "description": "We are always ready to listen to your feedback and accompany you on your journey to create positive change",
+      "email": {
+        "title": "Email"
+      },
+      "phone": {
+        "title": "Phone"
+      },
+      "address": {
+        "title": "Address",
+        "value": "Hoa Lac Hi-tech Park, km 29, Thang Long Avenue, Hanoi"
+      },
+      "button": "Contact Now"
+    }
+  },
+  "VideoModal": {
+    "ratePerformance": "Rate Performance",
+    "rejectButton": "Disapprove",
+    "approveButton": "Approve",
+    "cancel": "Cancel",
+    "sendFeedback": "Submit Feedback",
+    "enterRejectionReason": "Why are you disapproving this?",
+    "reviewSubmitted": "Review submitted successfully!",
+    "approveMessage": "Good performance!",
+    "rejectMessage": "Needs improvement.",
+    "approveSuccess": "Evidence approved!",
+    "rejectSuccess": "Feedback submitted!",
+    "approveFail": "Failed to approve evidence.",
+    "rejectFail": "Failed to submit rejection."
+  },
+  "VoteOther": {
+    "title": "Vote for Others' Proof",
+    "loading": "Loading videos...",
+    "noEvidences": "No more evidences to review.",
+    "unknownUser": "Unknown User"
+  },
+  "hostEvidence": {
+    "members": "Members",
+    "searchMembers": "Search members...",
+    "memberName": "Member Name",
+    "joinedAt": "Joined At",
+    "evidenceCount": "Evidence Count",
+    "status": "Status",
+    "notAvailable": "N/A",
+    "pending": "Pending",
+    "done": "Done",
+    "showing": "Showing",
+    "to": "to",
+    "of": "of",
+    "evidence": "Evidence",
+    "forMember": "for {{name}}",
+    "filtering": "Filtering",
+    "showingAll": "Showing all evidence",
+    "memberStats": "Member Evidence Statistics",
+    "totalEvidence": "Total Evidence",
+    "date": "Date",
+    "noEvidence": "No evidence found",
+    "showAll": "Show all evidence",
+    "selectMember": "Select a member to view evidence",
+    "unknownUser": "Unknown User",
+    "noDescription": "No description provided.",
+    "challenge": "Challenge",
+    "memberChallenge": "{{name}}'s Challenge",
+    "evidenceDetails": "Evidence Details",
+    "modal": {
+      "approve": "I approve this evidence",
+      "reject": "I don't approve this evidence",
+      "close": "Close"
     },
+    "logs": {
+      "acceptEvidence": "Accepting evidence with ID: {{id}}",
+      "rejectEvidence": "Rejecting evidence with ID: {{id}}"
+    },
+    "status": {
+      "approved": "Approved",
+      "waiting": "Pending",
+      "rejected": "Rejected"
+    }
+  },
+  "suggest.reason.both": "Shares your interest and is nearby",
+  "suggest.reason.same_interest": "Shares your interest",
+  "suggest.reason.near_location": "Is nearby your location",
+  "rankingList": {
+    "top3Progress": "Top 3 Progress",
+    "rank": "Rank",
+    "noRankingData": "No ranking data",
+    "members": "Members",
+    "searchPlaceholder": "Search user...",
+    "loadingStarLeaderboard": "Loading star leaderboard...",
+    "noMembersFound": "No members found",
+    "avgStars": "Avg stars"
+  },
+  "challengeStatistic": {
+    "total": "Total Participants",
+    "completed": "Completed",
+    "notCompleted": "Not Completed",
+    "dailyOverview": "Daily progress overview",
+    "completionRate": "Daily completion rate"
+  },
+  "leaderboard": {
+    "individual": "Individual",
+    "group": "Group",
+    "achievements": "Achievements",
+    "searchPlaceholder": "Search users...",
+    "myRank": "My Rank",
+    "myGroupRank": "My Group Rank",
+    "user": "User",
+    "members": "Members",
+    "score": "Score",
+    "noUsersFound": "No users found matching \"{searchTerm}\"",
+    "noGroupsFound": "No groups found matching \"{searchTerm}\"",
+    "previous": "Previous",
+    "next": "Next",
+    "achievementsTitle": "Your Achievements",
+    "usersEarned": "users earned this",
+    "earned": "Earned on",
+    "notEarned": "Not yet earned",
+    "yourProgress": "Your Progress",
+    "achievementsCompleted": "Achievements Completed",
+    "completionRate": "Completion Rate",
+    "overallProgress": "Overall Progress",
+    "copyright": "Copyright © {year}",
+    "page": "Page",
+    "of": "/"
+  },
   "challenges": {
     "groupHistory": "Group Challenge History",
     "name": "Challenge Name",
@@ -751,114 +754,43 @@
     "last": "Last"
   },
   "achievement": {
-    "title": "Your Achievements",
-    "of": "of",
-    "achieved": "achievements unlocked",
-    "totalProgress": "Total Progress",
-    "progress": "Progress",
-    "earned": "Earned",
-    "community": "Community",
-    "users": "users",
-    "unlocked": "UNLOCKED",
-    "locked": "LOCKED",
-    "prev": "Prev",
-    "next": "Next",
-    "notYetEarned": "Not yet earned",
-
-    "fitnessChampion": "Fitness Champion",
-    "fitnessChampionDesc": "Ranked in the top 10 of a monthly challenge.",
-
-    "peakPerformer": "Peak Performer",
-    "peakPerformerDesc": "Completed an advanced intensity workout program.",
-
-    "perfectForm": "Perfect Form",
-    "perfectFormDesc": "Received a perfect score on workout technique.",
-
-    "risingAthlete": "Rising Athlete",
-    "risingAthleteDesc": "Improved fitness score by 50% in a month.",
-
-    "quickStarter": "Quick Starter",
-    "quickStarterDesc": "Completed 5 different workouts in a day.",
-
-    "trainingStreak": "Training Streak",
-    "trainingStreakDesc": "10-day streak of completing workouts.",
-
-    "hiitMaster": "HIIT Master",
-    "hiitMasterDesc": "Complete a HIIT workout with perfect timing.",
-
-    "teamPlayer": "Team Player",
-    "teamPlayerDesc": "Complete 10 group workouts.",
-
-    "workoutPlanner": "Workout Planner",
-    "workoutPlannerDesc": "Create a custom training plan and complete it.",
-
-    "eliteAthlete": "Elite Athlete",
-    "eliteAthleteDesc": "Maintain top 5% fitness rank for a month.",
-
-    "challengeCreator": "Challenge Creator",
-    "challengeCreatorDesc": "Create a workout challenge with 100+ participants.",
-
-    "fitnessMentor": "Fitness Mentor",
-    "fitnessMentorDesc": "Help 20 other users with their workout form.",
-
-    "cardioKing": "Cardio King",
-    "cardioKingDesc": "Win 3 consecutive cardio challenges.",
-
-    "calorieCrusher": "Calorie Crusher",
-    "calorieCrusherDesc": "Burn 5,000 calories in a week.",
-
-    "crossTrainer": "Cross-Trainer",
-    "crossTrainerDesc": "Complete workouts across 5 different fitness categories.",
-
-    "progressTracker": "Progress Tracker",
-    "progressTrackerDesc": "Log workouts for 30 consecutive days.",
-
-    "globalAthlete": "Global Athlete",
-    "globalAthleteDesc": "Join workouts with users from 5 different countries.",
-
-    "mindBodyMaster": "Mind-Body Master",
-    "mindBodyMasterDesc": "Complete 10 mindfulness and yoga sessions.",
-
-    "balancedDiet": "Balanced Diet",
-    "balancedDietDesc": "Log nutrition goals for 25 days.",
-
-    "strengthChampion": "Strength Champion",
-    "strengthChampionDesc": "Set 10 personal records in strength exercises.",
-
-    "enduranceBuilder": "Endurance Builder",
-    "enduranceBuilderDesc": "Complete a 2-hour endurance challenge.",
-
-    "goalCrusher": "Goal Crusher",
-    "goalCrusherDesc": "Achieve 5 personal fitness goals.",
-
-    "fitnessLegend": "Fitness Legend",
-    "fitnessLegendDesc": "Achieve the highest fitness level in the system.",
-
-    "fitnessExplorer": "Fitness Explorer",
-    "fitnessExplorerDesc": "Try workouts across all fitness categories.",
-
-    "activeLifestyle": "Active Lifestyle",
-    "activeLifestyleDesc": "Record physical activity for 60 days straight."
-  },
-
-  "SelectGroupModal": {
-    "title": "Select a Group",
-    "searchPlaceholder": "Search your groups...",
-    "filterExactMembers": "Only show groups with exactly {{number}} members",
-    "noGroups": "No matching groups found.",
-    "prev": "Previous",
-    "next": "Next",
-    "cancel": "Cancel",
-    "join": "Join Challenge",
-    "joining": "Joining...",
-    "joinSuccess": "Joined challenge successfully!",
-    "joinFail": "Failed to join challenge. Please try again.",
-    "selectGroupFirst": "Please select a group first!",
-    "yourRole": "Your Role",
-    "owner": "Leader",
-    "member": "Member",
-    "notLeaderTooltip": "You are not the leader of this group. Please select a group you own.",
-    "notExactMembersTooltip": "This group does not have exactly {{number}} members."
+    "label": {
+      "title": "Your Achievements",
+      "progress": "Progress",
+      "earned": "Earned:",
+      "notYetEarned": "Not yet earned",
+      "locked": "LOCKED",
+      "unlocked": "UNLOCKED",
+      "totalProgress": "Total Progress",
+      "of": "of",
+      "achievementsUnlocked": "achievements unlocked",
+      "next": "Next",
+      "prev": "Prev",
+      "loading": "Loading achievements...",
+      "error": "Failed to load achievements."
+    },
+    "description": {
+      "FIRST_TRY": "Joined your first challenge.",
+      "DAILY_WARRIOR": "Completed 7 daily submissions.",
+      "PROFILE_MASTER": "Completed all profile fields.",
+      "INVITER": "Successfully invited a member to join a challenge.",
+      "REVIEWER": "Reviewed 10 evidences from others.",
+      "PERFECT_ACCURACY": "Achieved 100% approval on one evidence.",
+      "COMEBACK_SUBMITTER": "Submitted a proof after 7+ days of inactivity.",
+      "RISING_STAR": "3 approved proofs in a row.",
+      "ACTIVE_VOTER": "Voted on 5 different challenges.",
+      "GROUP_HERO": "Led a group to complete a challenge.",
+      "CONTRIBUTOR": "Participated in 3 challenges.",
+      "STREAK_TRIPLE": "3-day submission streak.",
+      "STREAK_MASTER": "10-day submission streak.",
+      "NIGHT_OWL": "Submitted a proof between 00:00–04:00.",
+      "EARLY_BIRD": "Submitted before 06:00.",
+      "LONG_HAUL": "Completed a 30-day challenge.",
+      "FITNESS_CHAMPION": "Ranked in the top 10 of a challenge.",
+      "GROUP_LEGEND": "Group ranked first on the leaderboard.",
+      "CONSISTENT_TOPPER": "Top 3 in 3 consecutive challenges.",
+      "UNDERDOG": "Started slow but finished strong."
+    }
   },
   "MemberManagement": {
     "title": "Member Management",
@@ -879,6 +811,24 @@
     "confirmKickMessage": "Are you sure you want to kick {{name}} from the challenge?",
     "cancel": "Cancel",
     "confirm": "Confirm"
+  },
+  "Moderation": {
+    "unableToAnalyze": "Unable to analyze the content.",
+    "rejectedBySummary": "Rejected by rule.",
+    "fileTooLarge": "File is too large. Please select a file smaller than 100MB.",
+    "videoRejected": "Video Rejected!",
+    "uploadSuccess": "Evidence submitted successfully!",
+    "errorDuringSubmit": "Error occurred during submission.",
+    "submitEvidence": "Submit Evidence for",
+    "clickToUpload": "Click to upload",
+    "orDragDrop": "or drag and drop",
+    "acceptedFormats": "JPG, PNG, MP4, GIF (max 800x400px)",
+    "changeFile": "Change File",
+    "cancel": "Cancel",
+    "submit": "Submit",
+    "processing": "Processing..."
   }
 }
+
+
 

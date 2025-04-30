@@ -1,24 +1,26 @@
 import React, { useState, useEffect, useRef } from "react";
 import { IoCloudUploadOutline } from "react-icons/io5";
-import { useUploadEvidenceMutation } from "../../service/evidenceService.js";
-import { toast } from "react-toastify"; // ✅
+import { useModerateVideoMutation, useUploadEvidenceMutation } from "../../service/evidenceService.js";
+import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next"; // ✅ thêm i18next
 
 const MediaUpload = ({ date, onClose, challengeId, onUploadSuccess }) => {
+    const { t } = useTranslation(); // ✅ hook dịch
     const [selectedFile, setSelectedFile] = useState(null);
     const [preview, setPreview] = useState(null);
     const fileInputRef = useRef(null);
-    const [uploadEvidence, { isLoading }] = useUploadEvidenceMutation();
+
+    const [uploadEvidence, { isLoading: isUploadingEvidence }] = useUploadEvidenceMutation();
+    const [moderateVideo, { isLoading: isModerating }] = useModerateVideoMutation();
 
     const isVideo = selectedFile?.type.startsWith("video");
 
-    // Generate preview URL
     useEffect(() => {
         if (!selectedFile) return;
-
         const objectUrl = URL.createObjectURL(selectedFile);
         setPreview(objectUrl);
 
-        return () => URL.revokeObjectURL(objectUrl); // cleanup
+        return () => URL.revokeObjectURL(objectUrl);
     }, [selectedFile]);
 
     const handleFileChange = (e) => {
@@ -28,44 +30,105 @@ const MediaUpload = ({ date, onClose, challengeId, onUploadSuccess }) => {
         }
     };
 
+    const captureFrame = (videoElement, timeInSeconds) => {
+        return new Promise((resolve, reject) => {
+            const onSeeked = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = videoElement.videoWidth;
+                canvas.height = videoElement.videoHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+                canvas.toBlob((blob) => {
+                    if (blob) resolve(blob);
+                    else reject(new Error("Failed to capture frame"));
+                }, 'image/jpeg', 0.8);
+                videoElement.removeEventListener('seeked', onSeeked);
+            };
+
+            videoElement.addEventListener('seeked', onSeeked);
+            videoElement.currentTime = timeInSeconds;
+        });
+    };
+
+    const moderateImage = async (imageBlob) => {
+        const moderationResult = await moderateVideo(imageBlob).unwrap();
+
+        if (!moderationResult || moderationResult.status !== "success") {
+            return { approved: false, reason: t("Moderation.unableToAnalyze") };
+        }
+
+        const summary = moderationResult.summary;
+        if (summary?.action === "reject") {
+            return { approved: false, reason: t("Moderation.rejectedBySummary") };
+        }
+
+        return { approved: true };
+    };
+
     const handleSubmit = async () => {
         if (!selectedFile) return;
 
-        // Check if file size exceeds 100MB (100 * 1024 * 1024 bytes)
-        const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB in bytes
+        const MAX_FILE_SIZE = 100 * 1024 * 1024;
         if (selectedFile.size > MAX_FILE_SIZE) {
-            toast.error("❌ File của bạn đã quá 100MB, vui lòng chọn file với dung lượng nhỏ hơn");
+            toast.error(t("Moderation.fileTooLarge"));
             return;
         }
 
         try {
+            if (isVideo) {
+                const videoElement = document.createElement('video');
+                videoElement.src = URL.createObjectURL(selectedFile);
+                videoElement.crossOrigin = "anonymous";
+                videoElement.preload = "metadata";
+
+                await new Promise((resolve) => {
+                    videoElement.onloadedmetadata = resolve;
+                });
+
+                const duration = videoElement.duration;
+                const snapshotTimes = [
+                    Math.min(10, duration / 2),
+                    Math.min(20, duration - 1)
+                ];
+
+                for (let time of snapshotTimes) {
+                    const frameBlob = await captureFrame(videoElement, time);
+                    const result = await moderateImage(frameBlob);
+
+                    if (!result.approved) {
+                        toast.error(
+                            <div>
+                                <b>{t("Moderation.videoRejected")}</b><br />
+                                {result.reason}
+                            </div>
+                        );
+                        return;
+                    }
+                }
+            }
+
             await uploadEvidence({ file: selectedFile, challengeId }).unwrap();
-            toast.success("✅ Nộp bằng chứng thành công!");
+            toast.success(t("Moderation.uploadSuccess"));
             setSelectedFile(null);
             setPreview(null);
             onClose();
             setTimeout(() => {
                 if (onUploadSuccess) onUploadSuccess();
             }, 300);
-        } catch (err) {
-            console.error(err);
-            const errorMessage =
-                err?.data?.message ||
-                err?.data?.error ||
-                "❌ Đã xảy ra lỗi khi nộp bằng chứng.";
-            toast.error(errorMessage);
+
+        } catch (error) {
+            console.error("Error during submit:", error);
+            toast.error(t("Moderation.errorDuringSubmit"));
         }
     };
-
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg w-4/6 h-4/6 shadow-lg relative">
                 <h2 className="text-xl font-bold mb-4 text-center mt-3">
-                    Submit Evidence for {date?.toDateString()}
+                    {t("Moderation.submitEvidence")} {date?.toDateString()}
                 </h2>
 
-                {/* Upload Preview */}
                 <div
                     className="relative group w-full h-4/5 mb-4 cursor-pointer justify-items-center"
                     onClick={() => fileInputRef.current.click()}
@@ -98,29 +161,27 @@ const MediaUpload = ({ date, onClose, challengeId, onUploadSuccess }) => {
                         >
                             <IoCloudUploadOutline className="text-2xl" />
                             <p className="mb-2 text-sm text-gray-500">
-                                <span className="font-semibold">Click to upload</span> or drag and drop
+                                <span className="font-semibold">{t("Moderation.clickToUpload")}</span> {t("Moderation.orDragDrop")}
                             </p>
-                            <p className="text-xs text-gray-500">JPG, PNG, MP4, GIF (max 800x400px)</p>
+                            <p className="text-xs text-gray-500">{t("Moderation.acceptedFormats")}</p>
                         </div>
                     )}
 
-                    {/* Hover Overlay */}
                     {preview && !isVideo && (
                         <div
-                            className="w-11/12 h-full justify-self-center absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg"
+                            className="w-11/12 h-full absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg"
                         >
-                            <span className="text-white font-semibold">Change File</span>
+                            <span className="text-white font-semibold">{t("Moderation.changeFile")}</span>
                         </div>
                     )}
                 </div>
 
-                {/* Submit / Cancel */}
                 <div className="flex justify-end space-x-3 me-2.5">
                     <button
                         onClick={() => fileInputRef.current.click()}
                         className="text-sm text-blue-600 underline hover:text-blue-800"
                     >
-                        Thay đổi file
+                        {t("Moderation.changeFile")}
                     </button>
                     <button
                         className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
@@ -130,14 +191,14 @@ const MediaUpload = ({ date, onClose, challengeId, onUploadSuccess }) => {
                             onClose();
                         }}
                     >
-                        Hủy
+                        {t("Moderation.cancel")}
                     </button>
                     <button
                         className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
                         onClick={handleSubmit}
-                        disabled={!selectedFile || isLoading}
+                        disabled={!selectedFile || isUploadingEvidence || isModerating}
                     >
-                        {isLoading ? "Đang nộp bằng chứng..." : "Gửi"}
+                        {isUploadingEvidence || isModerating ? t("Moderation.processing") : t("Moderation.submit")}
                     </button>
                 </div>
             </div>

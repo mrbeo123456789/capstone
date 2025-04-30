@@ -37,12 +37,18 @@ export const invitationService = createApi({
         }),
 
         respondInvitation: builder.mutation({
-            query: ({ invitationId, invitationType, accept }) => ({
+            query: ({ invitationId, invitationType, accept, groupId = null }) => ({
                 url: `/member/invitations/respond`,
                 method: "POST",
-                body: { invitationId, invitationType, accept },
+                body: {
+                    invitationId,
+                    invitationType,
+                    accept,
+                    groupId, // ✅ bổ sung thêm field groupId vào body
+                },
             }),
         }),
+
 
         getMyInvitations: builder.query({
             query: () => ({

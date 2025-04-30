@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useLoginMutation } from "../../service/authService";
+import {authService, useLoginMutation} from "../../service/authService";
 import { useGetMyProfileQuery } from "../../service/memberService";
 import google_icon from "../../assets/google-icon.png";
 import { decode } from "jsonwebtoken-esm";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
-
+import { useDispatch } from "react-redux";
+import {resetAllApiStates} from "../../utils/resetAllApiStates.js";
 export default function Login() {
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -16,6 +17,7 @@ export default function Login() {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
     const [tokenReady, setTokenReady] = useState(false);
+    const dispatch = useDispatch();
 
     const [login] = useLoginMutation();
     const { data: userData } = useGetMyProfileQuery(undefined, {
@@ -51,12 +53,20 @@ export default function Login() {
             const token = response?.token;
             if (!token) throw new Error("No token returned");
 
-            // Lưu token nếu cần
-            localStorage.setItem("accessToken", token);
+            // ✅ Xoá toàn bộ localStorage trước khi set token mới
+            localStorage.clear();
 
+            // ✅ Decode và lưu thông tin user
             const decoded = decode(token);
             const role = Array.isArray(decoded?.roles) ? decoded.roles[0] : decoded?.roles;
             if (!role) throw new Error("No role found in token");
+
+            localStorage.setItem("accessToken", token);
+            localStorage.setItem("username", decoded.sub);
+            localStorage.setItem("exp", decoded.exp);
+
+            // ✅ Reset toàn bộ API slice cache
+            resetAllApiStates(dispatch);
 
             setTokenReady(true);
             toast.success(t("auth.login.success"));
@@ -87,7 +97,7 @@ export default function Login() {
     };
 
     const loginWithGoogle = () => {
-        window.location.href = "https://api.gobeyond.top/oauth2/authorization/google";
+        window.location.href = "http://localhost:8080/oauth2/authorization/google";
     };
 
     const handleForgotPassword = () => navigate("/forgotPassword");
