@@ -44,6 +44,9 @@ public class GroupChallenge {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "invited_member_id")
+    private Long invitedMemberId;
+
     @Column(name = "is_success", nullable = false)
     private boolean isSuccess;
 }
