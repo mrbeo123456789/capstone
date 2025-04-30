@@ -37,6 +37,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/notifications/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/member/**").hasAnyRole("ADMIN", "MEMBER")
+                        .requestMatchers("/api/achievements/").hasAnyRole("ADMIN", "MEMBER")
                         .requestMatchers("/api/groups/**").hasAnyRole("ADMIN", "MEMBER")
                         .requestMatchers("/api/challenges/**").permitAll()
                         .requestMatchers("/api/evidences/**").hasAnyRole("ADMIN", "MEMBER")
@@ -50,8 +51,9 @@ public class SecurityConfig {
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt ->
                         jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())
-                ))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                )) .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+
 
         return http.build();
     }

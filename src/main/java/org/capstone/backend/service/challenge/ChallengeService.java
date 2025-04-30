@@ -32,6 +32,7 @@ public interface ChallengeService {
     Page<ChallengeResponse> getUpcomingApprovedChallenges(int page, int size);
     String updateChallenge(Long challengeId, ChallengeRequest request, MultipartFile picture, MultipartFile banner, String pictureUrl, String bannerUrl);
     List<ChallengeSummaryDTO> getCompletedChallenges();
+    Integer getMaxMembersPerGroup(Long challengeId);
 
     ChallengeStatisticDTO getChallengeStatistics(Long challengeId);
     Page<ChallengeDashboardDTO> getAdminChallengeTable(String keyword, ChallengeStatus status, Pageable pageable);
