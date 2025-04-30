@@ -63,7 +63,7 @@ function ForgotPassword() {
                         {t("forgotPassword.subtitle")}
                     </p>
                     <form onSubmit={handleForgotPassword} className="space-y-4">
-                        <div className="relative">
+                        <div>
                             <label className="block text-sm font-medium text-black mb-1">
                                 {t("forgotPassword.email")}
                                 <span className="text-red-500"> *</span>
@@ -75,13 +75,8 @@ function ForgotPassword() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                             />
-                            <div
-                                className="absolute right-3 top-[38px] cursor-pointer text-gray-500"
-                                onClick={() => setShowEmail(!showEmail)}
-                            >
-                                {showEmail ? <FaEyeSlash/> : <FaEye/>}
-                            </div>
                         </div>
+
                         <button
                             type="submit"
                             className="w-full bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition"
