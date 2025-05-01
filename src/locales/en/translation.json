@@ -70,7 +70,8 @@
     "inviteGroups": "Invite Groups",
     "suggestedTitle": "Suggested members to invite",
     "noResults": "No results found.",
-    "searchLeaderPlaceholder": "Enter group leader's name..."
+    "searchLeaderPlaceholder": "Enter group leader's name...",
+    "notLeaderFound": "Not found any leaders"
   },
   "sidebar": {
     "myChallenge": "My Challenge",
@@ -480,7 +481,9 @@
       "approved": "Approved",
       "pending": "Pending",
       "rejected": "Rejected",
-      "canceled": "Canceled"
+      "canceled": "Canceled",
+      "ongoing": "On Going",
+      "banned": "Banned"
     },
     "members": "members",
     "inviteGroups": "Invite Groups",
@@ -723,12 +726,16 @@
     "page": "Page",
     "of": "/"
   },
+  "status": "Status",
+  "progress": "Progress",
   "challenges": {
     "groupHistory": "Group Challenge History",
+    "progress": {
+      "inProgress": "In Progress"
+    },
     "name": "Challenge Name",
     "period": "Period",
     "participants": "Participants",
-    "status": "Status",
     "actions": "Actions",
     "viewDetails": "View Details",
     "noHistory": "No challenge history found",
@@ -933,6 +940,19 @@
   },
   "images": {
     "notAvailable": "No image"
+  },
+  "common": {
+    "loading": "Loading"
+  },
+  "member": {
+    "top3": "Top 3",
+    "user": "User",
+    "you": "You",
+    "stars": "Stars",
+    "topRanking": "Top Ranking",
+    "searchUser": "Search user...",
+    "totalStars": "Total Stars",
+    "kickMember": "Kick Member"
   }
 }
 

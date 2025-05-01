@@ -70,7 +70,8 @@
     "inviteMembers": "メンバーを招待",
     "noResults": "結果が見つかりませんでした。",
     "inviteGroups": "グループを招待",
-    "suggestedTitle": "招待のおすすめメンバー"
+    "suggestedTitle": "招待のおすすめメンバー",
+    "noLeadersFound": "リーダーが見つかりませんでした"
   },
   "sidebar": {
     "myChallenge": "マイチャレンジ",
@@ -338,7 +339,8 @@
       "approved": "承認済み",
       "pending": "保留中",
       "rejected": "却下",
-      "canceled": "キャンセル済み"
+      "canceled": "キャンセル済み",
+      "ongoing": "すべて"
     }
   },
   "inviteGroups": "グループを招待する",
@@ -708,12 +710,16 @@
       "registerFailed": "登録に失敗しました。もう一度お試しください。"
     }
   },
+  "status": "ステータス",
+  "progress": "進捗",
   "challenges": {
     "groupHistory": "グループチャレンジ履歴",
     "name": "チャレンジ名",
+    "progress": {
+      "inProgress": "進行中"
+    },
     "period": "期間",
     "participants": "参加者",
-    "status": "ステータス",
     "actions": "アクション",
     "viewDetails": "詳細を見る",
     "noHistory": "チャレンジ履歴がありません",
@@ -939,6 +945,19 @@
   },
   "images": {
     "notAvailable": "画像なし"
+  },
+  "common": {
+    "loading": "読み込み中"
+  },
+  "member": {
+    "top3": "トップ3",
+    "user": "ユーザー",
+    "you": "あなた",
+    "stars": "スター",
+    "topRanking": "トップランキング",
+    "searchUser": "ユーザーを検索...",
+    "totalStars": "合計スター",
+    "kickMember": "メンバーを退会させる"
   }
 
 

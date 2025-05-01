@@ -63,8 +63,11 @@
     "inviteSuccess": "Gửi lời mời thành công!",
     "inviteFailed": "Gửi lời mời thất bại.",
     "title": "Mời tham gia thử thách",
+    "inviteMembers": "Mời thành viên",
+    "inviteGroups": "Mời nhóm",
     "noResults": "Không tìm thấy kết quả nào.",
-    "searchFailed": "Tìm kiếm thất bại."
+    "searchFailed": "Tìm kiếm thất bại.",
+    "noLeadersFound": "Không tìm thấy người dùng nào"
   },
   "sidebar": {
     "myChallenge": "Thử thách của tôi",
@@ -344,10 +347,12 @@
       "approved": "Đã duyệt",
       "pending": "Đang chờ",
       "rejected": "Bị từ chối",
-      "canceled": "Đã hủy"
+      "canceled": "Đã hủy",
+      "ongoing": "Đang diễn ra",
+      "banned": "Bị ban"
     }
   },
-  "member": "thành viên",
+  "members": "thành viên",
   "inviteGroups": "Mời nhóm",
   "searchPlaceholder": "Tìm kiếm tên nhóm...",
   "noResults": "Không tìm thấy nhóm nào.",
@@ -716,16 +721,20 @@
         "registerFailed": "Đăng ký thất bại. Vui lòng thử lại."
       }
     },
+  "status": "Trạng thái",
+  "progress": "Tiến độ",
   "challenges": {
     "groupHistory": "Lịch sử thử thách nhóm",
     "name": "Tên thử thách",
     "period": "Thời gian",
     "participants": "Người tham gia",
-    "status": "Trạng thái",
     "actions": "Hành động",
     "viewDetails": "Xem chi tiết",
     "noHistory": "Không tìm thấy lịch sử thử thách",
     "searchPlaceholder": "Tìm kiếm thử thách...",
+    "progress": {
+      "inProgress": "Đang hoàn thiện"
+    },
     "filter": {
       "allStatuses": "Tất cả trạng thái"
     },
@@ -883,7 +892,19 @@
   "images": {
     "notAvailable": "Không có ảnh"
   }
-
+  },
+  "common": {
+    "loading": "Đang tải"
+  },
+  "member": {
+    "top3": "Top 3",
+    "user": "Người dùng",
+    "you": "Bạn",
+    "stars": "Sao",
+    "topRanking": "Xếp hạng cao nhất",
+    "searchUser": "Tìm kiếm người dùng...",
+    "totalStars": "Tổng số sao",
+    "kickMember": "Loại thành viên"
   }
 }
 

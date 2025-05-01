@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {authService, useLoginMutation} from "../../service/authService";
+import { useLoginMutation } from "../../service/authService";
 import { useGetMyProfileQuery } from "../../service/memberService";
 import google_icon from "../../assets/google-icon.png";
-import { decode } from "jsonwebtoken-esm";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
-import {resetAllApiStates} from "../../utils/resetAllApiStates.js";
+import { resetAllApiStates } from "../../utils/resetAllApiStates.js";
+
 export default function Login() {
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -48,24 +48,31 @@ export default function Login() {
         setLoading(true);
 
         try {
-            const response = await login({ username, password });
+            const result = await login({ username, password });
 
-            const token = response?.token;
+            // RTK Query returns result with either 'data' or 'error' property
+            if (result.error) {
+                throw result.error;
+            }
+
+            // If successful, data property will contain the response
+            const token = result.data?.token;
             if (!token) throw new Error("No token returned");
 
-            // ✅ Xoá toàn bộ localStorage trước khi set token mới
-            localStorage.clear();
+            // The token should be saved in localStorage by the transformResponse function
+            // We need to get the role from the decoded token
+            // Make sure the token exists in localStorage in case the transformResponse didn't run
+            if (!localStorage.getItem("jwt_token")) {
+                localStorage.setItem("jwt_token", token);
+            }
 
-            // ✅ Decode và lưu thông tin user
-            const decoded = decode(token);
-            const role = Array.isArray(decoded?.roles) ? decoded.roles[0] : decoded?.roles;
+            // Decode token to get user role
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const role = Array.isArray(payload?.roles) ? payload.roles[0] : payload?.roles;
+
             if (!role) throw new Error("No role found in token");
 
-            localStorage.setItem("accessToken", token);
-            localStorage.setItem("username", decoded.sub);
-            localStorage.setItem("exp", decoded.exp);
-
-            // ✅ Reset toàn bộ API slice cache
+            // Reset all API slice cache
             resetAllApiStates(dispatch);
 
             setTokenReady(true);
@@ -75,11 +82,14 @@ export default function Login() {
                 navigate(role.toUpperCase() === "ADMIN" ? "/admin/dashboard" : "/homepage");
             }, 100);
         } catch (err) {
-            const errorCode = err?.data?.message; // ✅ Đây mới đúng
+            console.error("Login error:", err);
+
+            // Handle RTK Query error structure
+            const errorCode = err?.data?.message;
 
             if (errorCode === "ACCOUNT_NOT_VERIFIED") {
-                sessionStorage.setItem("otpEmail", username); // có thể là email hoặc username
-                sessionStorage.setItem("otpType", "register"); // hoặc "forgot" tùy luồng
+                sessionStorage.setItem("otpEmail", username);
+                sessionStorage.setItem("otpType", "register");
                 navigate("/enter-otp");
                 return;
             }

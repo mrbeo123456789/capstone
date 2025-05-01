@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { FaSearch, FaUserMinus, FaCrown } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 import { useGetGroupRankingQuery } from "../../service/groupService";
 import { useGetCurrentMemberIdQuery } from "../../service/memberService";
 import clsx from "clsx";
@@ -15,7 +16,7 @@ const MemberTable = ({
                          onResetHandled = () => {},
                      }) => {
     const [currentPage, setCurrentPage] = useState(0);
-
+    const { t } = useTranslation();
     const { data: currentMemberData } = useGetCurrentMemberIdQuery();
     const currentMemberId = currentMemberData;
     const { data, isLoading, refetch } = useGetGroupRankingQuery(
@@ -44,7 +45,7 @@ const MemberTable = ({
     };
 
     if (isLoading) {
-        return <div className="text-center text-gray-500 py-10">Loading members...</div>;
+        return <div className="text-center text-gray-500 py-10">{t("common.loading")}</div>;
     }
 
     return (
@@ -52,7 +53,7 @@ const MemberTable = ({
             {/* 🏆 Top Podium */}
             <div className="bg-white p-6 rounded-lg shadow-md">
                 <h2 className="text-xl font-bold text-center mb-6 text-orange-600">
-                    <FaCrown className="inline mr-2 text-yellow-500" /> Top 3 Active Members
+                    <FaCrown className="inline mr-2 text-yellow-500" /> {t("member.top3")}
                 </h2>
                 <div className="flex justify-center items-end gap-6 min-h-[300px]">
                     {top3.map((user, index) => {
@@ -72,7 +73,7 @@ const MemberTable = ({
                                 <div className="relative">
                                     <img
                                         src={user.avatar || "https://via.placeholder.com/150"}
-                                        alt={user.name || "User"}
+                                        alt={user.name || t("member.user")}
                                         className={`${sizeClass} rounded-full mb-2 ${borderClass} shadow-sm`}
                                     />
                                     <span className="absolute -top-3 -right-3 bg-white rounded-full shadow px-2 py-0.5 text-xs font-bold">
@@ -85,9 +86,9 @@ const MemberTable = ({
                                     #{index + 1}
                                 </div>
                                 <p className="mt-1 font-semibold text-center">
-                                    {user.name} {isCurrentUser && <span className="text-sm text-gray-400">(You)</span>}
+                                    {user.name} {isCurrentUser && <span className="text-sm text-gray-400">({t("member.you")})</span>}
                                 </p>
-                                <p className="text-sm text-gray-600 text-center">⭐ {user.totalStars} Stars</p>
+                                <p className="text-sm text-gray-600 text-center">⭐ {user.totalStars} {t("member.stars")}</p>
                             </div>
                         );
                     })}
@@ -96,14 +97,14 @@ const MemberTable = ({
 
             {/* 📋 Ranking List */}
             <div className="bg-white p-6 rounded-lg shadow-md transition-all duration-300">
-                <h2 className="text-xl font-bold text-center mb-4">Top Ranking</h2>
+                <h2 className="text-xl font-bold text-center mb-4">{t("member.topRanking")}</h2>
 
                 {/* Search box */}
                 <div className="mb-4 flex items-center border border-gray-300 rounded px-2 py-1">
                     <FaSearch className="text-gray-500 mr-2" />
                     <input
                         type="text"
-                        placeholder="Search user..."
+                        placeholder={t("member.searchUser")}
                         className="w-full outline-none"
                         value={searchTerm}
                         onChange={(e) => {
@@ -132,23 +133,23 @@ const MemberTable = ({
                                 <div className="flex items-center space-x-3">
                                     <img
                                         src={user.avatar || "https://via.placeholder.com/150"}
-                                        alt={user.name || "User"}
+                                        alt={user.name || t("member.user")}
                                         className="w-12 h-12 rounded-full transition-transform hover:scale-105"
                                     />
                                     <div>
                                         <p className="font-semibold">
-                                            {user.name} {isCurrentUser && <span className="text-sm text-gray-400">(You)</span>}
+                                            {user.name} {isCurrentUser && <span className="text-sm text-gray-400">({t("member.you")})</span>}
                                         </p>
-                                        <p className="text-sm text-gray-600">Total Stars: {user.totalStars}</p>
+                                        <p className="text-sm text-gray-600">{t("member.totalStars")}: {user.totalStars}</p>
                                     </div>
                                 </div>
 
-                                {/* 🔐 Không hiển thị nút kick nếu là chính mình */}
+                                {/* 🔐 Don't show kick button for current user */}
                                 {showKick && (
                                     <button
                                         onClick={() => handleKick(user.memberId)}
                                         className="text-red-500 hover:text-white hover:bg-red-500 border border-red-500 rounded-full p-2"
-                                        title="Kick Member"
+                                        title={t("member.kickMember")}
                                     >
                                         <FaUserMinus />
                                     </button>
