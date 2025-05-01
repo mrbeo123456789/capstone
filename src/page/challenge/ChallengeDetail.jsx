@@ -7,7 +7,7 @@ import { HiUsers } from "react-icons/hi";
 import { useGetChallengeDetailQuery, useJoinChallengeMutation } from "../../service/challengeService";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
-import SelectGroupModal from "./modal/SelectGroupModal.jsx";
+import JoinedGroup from "./modal/JoinedChallengeGroup.jsx";
 
 const ChallengeDetail = () => {
     const [activeTab, setActiveTab] = useState("description");
@@ -15,7 +15,7 @@ const ChallengeDetail = () => {
     const { t } = useTranslation();
     const navigate = useNavigate(); // 🆙 cần navigate
     const [joinChallenge, { isLoading }] = useJoinChallengeMutation();
-    const [showGroupModal, setShowGroupModal] = useState(false);
+    const [selectedInvitation, setSelectedInvitation] = useState(null);
 
     const {
         data: challenge,
@@ -49,7 +49,13 @@ const ChallengeDetail = () => {
         }
 
         if (challenge.participationType === "GROUP") {
-            setShowGroupModal(true); // 👉 Open chọn nhóm
+            setSelectedInvitation({
+                challengeId: challenge.id,
+                invitationId: -1, // dùng -1 để phân biệt là không phải lời mời thật
+                invitationType: "GROUP",
+            });
+
+
         } else {
             try {
                 await joinChallenge(parseInt(id));
@@ -60,6 +66,7 @@ const ChallengeDetail = () => {
                 toast.error(t("ChallengeDetail.joinFail"));
             }
         }
+
     };
 
     const formatDate = (isoString) => {
@@ -214,13 +221,17 @@ const ChallengeDetail = () => {
                     )}
                 </div>
             </div>
-            {showGroupModal && (
-                <SelectGroupModal
-                    challengeId={challenge.id}
-                    onClose={() => setShowGroupModal(false)}
-                    requiredMembers={challenge.maxMembersPerGroup}
-                />
+            {selectedInvitation && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl overflow-hidden">
+                        <JoinedGroup
+                            invitation={selectedInvitation}
+                            onClose={() => setSelectedInvitation(null)}
+                        />
+                    </div>
+                </div>
             )}
+
 
         </div>
     );

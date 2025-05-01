@@ -14,7 +14,6 @@ export const evidenceService = createApi({
         },
     }),
     endpoints: (builder) => ({
-        // POST: /evidences/upload
         uploadEvidence: builder.mutation({
             query: ({ file, challengeId }) => {
                 const formData = new FormData();
@@ -28,19 +27,15 @@ export const evidenceService = createApi({
             },
         }),
 
-        // POST: /evidences/review
         reviewEvidence: builder.mutation({
             query: (reviewData) => ({
                 url: "/evidences/review",
                 method: "POST",
                 body: reviewData,
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
             }),
         }),
 
-        // GET: /evidences/get-list-for-host/{challengeId}?page=0&size=10
         getEvidenceByChallengeForHost: builder.query({
             query: ({ challengeId, page = 0, size = 10 }) => ({
                 url: `/evidences/get-list-for-host/${challengeId}`,
@@ -49,7 +44,6 @@ export const evidenceService = createApi({
             }),
         }),
 
-        // GET: /evidences/{challengeId}/to-review
         getEvidencesToReview: builder.query({
             query: (challengeId) => ({
                 url: `/evidences/${challengeId}/to-review`,
@@ -57,7 +51,6 @@ export const evidenceService = createApi({
             }),
         }),
 
-        // GET: /evidences/{challengeId}/my-evidences
         getMyEvidencesByChallenge: builder.query({
             query: (challengeId) => ({
                 url: `/evidences/${challengeId}/my-evidences`,
@@ -67,7 +60,6 @@ export const evidenceService = createApi({
 
         getEvidencesForHost: builder.query({
             query: ({ challengeId, memberId, status, page = 0, size = 10 }) => {
-                // Build params matching backend @GetMapping("/host/evidences")
                 const params = { challengeId, page, size };
                 if (memberId != null) params.memberId = memberId;
                 if (status) params.status = status;
@@ -78,6 +70,7 @@ export const evidenceService = createApi({
                 };
             },
         }),
+
         getEvidenceCountByStatus: builder.query({
             query: ({ challengeId, memberId }) => ({
                 url: "/evidences/count",
@@ -88,10 +81,8 @@ export const evidenceService = createApi({
 
         getTasksForDate: builder.query({
             query: (date) => {
-                // If date is not provided, the backend will use current date
                 const params = {};
                 if (date) {
-                    // Ensure date is in ISO format (YYYY-MM-DD)
                     if (date instanceof Date) {
                         params.date = date.toISOString().split('T')[0];
                     } else {
@@ -105,6 +96,33 @@ export const evidenceService = createApi({
                 };
             },
         }),
+
+        moderateVideo: builder.mutation({
+            queryFn: async (file) => {
+                try {
+                    const formData = new FormData();
+                    formData.append('media', file);
+                    formData.append('workflow', 'wfl_imxfyZCkPIDEUH4ufI9TB'); // ✅ gửi workflow id
+                    formData.append('api_user', '1576831988');
+                    formData.append('api_secret', '8nvmRXAxL5y7mUYWoZbNGPbVATdDSZWQ');
+
+                    const response = await fetch("https://api.sightengine.com/1.0/check-workflow.json", {
+                        method: "POST",
+                        headers: {
+                            "Accept": "application/json", // cho chắc chắn
+                        },
+                        body: formData,
+                    });
+
+                    const data = await response.json();
+                    return { data };
+                } catch (error) {
+                    return { error };
+                }
+            }
+        }),
+
+
     }),
 });
 
@@ -116,5 +134,6 @@ export const {
     useGetMyEvidencesByChallengeQuery,
     useGetEvidencesForHostQuery,
     useGetEvidenceCountByStatusQuery,
-    useGetTasksForDateQuery
+    useGetTasksForDateQuery,
+    useModerateVideoMutation,
 } = evidenceService;

@@ -97,9 +97,6 @@ const VoteOther = () => {
                             <div className="absolute top-2 left-2 bg-black bg-opacity-50 text-white rounded-full p-1">
                                 <FaPlayCircle className="text-xl" />
                             </div>
-                            <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded">
-                                {item?.uploaderName || t("VoteOther.unknownUser")}
-                            </div>
                         </div>
                     ))}
                 </div>
@@ -111,15 +108,13 @@ const VoteOther = () => {
                     onClose={handleCloseModal}
                     videoSrc={evidencesToReview[activeIndex]?.evidenceUrl}
                     onPrevious={handlePrevious}
-                    onNext={() => {
-                        // The VideoModal component already has its own logic for the next functionality
-                        // This is just a fallback if needed
-                        handleNext();
-                    }}
+                    onNext={handleNext}
                     uploader={evidencesToReview[activeIndex]?.uploaderName || t("VoteOther.unknownUser")}
                     evidenceId={evidencesToReview[activeIndex]?.evidenceId}
-                    isLastEvidence
+                    isLastEvidence={activeIndex === evidencesToReview.length - 1}
+                    onReviewed={handleVideoReviewed} // <<< ✨ Thêm dòng này
                 />
+
             )}
         </div>
     );

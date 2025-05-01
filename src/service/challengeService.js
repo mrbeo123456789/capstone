@@ -153,6 +153,9 @@ export const challengeService = createApi({
                 return `/challenges/${challengeId}/member-management?${params.toString()}`;
             },
         }),
+        getMaxMembersPerGroup: builder.query({
+            query: (challengeId) => `/challenges/${challengeId}/max-members-per-group`,
+        }),
     }),
 });
 
@@ -177,5 +180,6 @@ export const {
     useLazyGetCompletedChallengesQuery ,
     useGetChallengeStatisticsQuery,
     useGetChallengeMembersForManagementQuery,
+    useGetMaxMembersPerGroupQuery, // ✅ thêm dòng này
 } = challengeService;
 
