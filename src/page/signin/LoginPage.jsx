@@ -48,7 +48,7 @@ export default function Login() {
         setLoading(true);
 
         try {
-            const response = await login({ username, password }).unwrap();
+            const response = await login({ username, password });
 
             const token = response?.token;
             if (!token) throw new Error("No token returned");

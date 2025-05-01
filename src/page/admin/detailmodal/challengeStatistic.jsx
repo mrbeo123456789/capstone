@@ -25,7 +25,7 @@ const ChallengeStats = () => {
     // Derive statistics from API data
     const totalCreatedChallenges = data?.totalElements || 0;
     const activeChallenges = Array.isArray(createdChallengesData) ?
-        createdChallengesData.filter(challenge => challenge.status === "Active").length : 0;
+        createdChallengesData.filter(challenge => challenge.status === "ONGOING").length : 0;
     const totalParticipants = Array.isArray(memberParticipationData) ?
         memberParticipationData.reduce((total, challenge) => total + (challenge.members || 0), 0) : 0;
 

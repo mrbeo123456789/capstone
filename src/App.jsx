@@ -7,8 +7,6 @@ import "react-toastify/dist/ReactToastify.css";
 import useTokenExpirationCheck from "./hook/useTokenExpirationCheck.js";
 
 import router from './router/router.jsx';
-import SplashScreen from "./component/SplashScreen.jsx";
-import ChatBox from "./page/ui/ChatBox.jsx";
 
 
 const App = () => {
