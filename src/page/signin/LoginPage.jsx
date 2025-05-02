@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useLoginMutation } from "../../service/authService";
+import {authService, useLoginMutation} from "../../service/authService";
 import { useGetMyProfileQuery } from "../../service/memberService";
 import google_icon from "../../assets/google-icon.png";
+import { decode } from "jsonwebtoken-esm";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
-import { resetAllApiStates } from "../../utils/resetAllApiStates.js";
-
+import {resetAllApiStates} from "../../utils/resetAllApiStates.js";
 export default function Login() {
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -48,44 +48,33 @@ export default function Login() {
         setLoading(true);
 
         try {
-            const result = await login({ username, password });
+            // ✅ Gọi login & unwrap kết quả
+            const { token } = await login({ username, password }).unwrap(); // ✅
 
-            // RTK Query returns result with either 'data' or 'error' property
-            if (result.error) {
-                throw result.error;
-            }
-
-            // If successful, data property will contain the response
-            const token = result.data?.token;
             if (!token) throw new Error("No token returned");
 
-            // The token should be saved in localStorage by the transformResponse function
-            // We need to get the role from the decoded token
-            // Make sure the token exists in localStorage in case the transformResponse didn't run
-            if (!localStorage.getItem("jwt_token")) {
-                localStorage.setItem("jwt_token", token);
-            }
+            // ✅ Xoá localStorage cũ, chỉ lưu token
+            localStorage.clear();
+            localStorage.setItem("jwt_token", token);
 
-            // Decode token to get user role
-            const payload = JSON.parse(atob(token.split('.')[1]));
-            const role = Array.isArray(payload?.roles) ? payload.roles[0] : payload?.roles;
-
+            // ✅ Decode token để lấy vai trò điều hướng
+            const decoded = decode(token);
+            const role = Array.isArray(decoded?.roles) ? decoded.roles[0] : decoded?.roles;
             if (!role) throw new Error("No role found in token");
 
-            // Reset all API slice cache
+            // ✅ Reset toàn bộ RTK Query cache để xoá dữ liệu người dùng cũ
             resetAllApiStates(dispatch);
 
+            // ✅ Cho phép gọi `useGetMyProfileQuery`
             setTokenReady(true);
             toast.success(t("auth.login.success"));
 
+            // ✅ Điều hướng
             setTimeout(() => {
                 navigate(role.toUpperCase() === "ADMIN" ? "/admin/dashboard" : "/homepage");
             }, 100);
         } catch (err) {
-            console.error("Login error:", err);
-
-            // Handle RTK Query error structure
-            const errorCode = err?.data?.message;
+            const errorCode = err?.message || err?.data?.message;
 
             if (errorCode === "ACCOUNT_NOT_VERIFIED") {
                 sessionStorage.setItem("otpEmail", username);
@@ -94,17 +83,18 @@ export default function Login() {
                 return;
             }
 
-            const errorMessage = errorCode
-                ? t(`auth.login.errors.${errorCode}`, { defaultValue: errorCode })
-                : err.message === "No role found in token"
-                    ? t("auth.login.errors.invalidToken")
-                    : t("auth.login.errors.loginFailed");
+            const errorMessage = errorCode?.startsWith("No role") || errorCode?.startsWith("No token")
+                ? t("auth.login.errors.invalidToken")
+                : t(`auth.login.errors.${errorCode}`, { defaultValue: t("auth.login.errors.loginFailed") });
+
             setError(errorMessage);
             toast.error(errorMessage, { autoClose: 4000 });
         } finally {
             setLoading(false);
         }
     };
+
+
 
     const loginWithGoogle = () => {
         window.location.href = "http://localhost:8080/oauth2/authorization/google";
