@@ -204,12 +204,10 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
     FROM Challenge c
     JOIN ChallengeMember cm ON cm.challenge.id = c.id
     WHERE c.createdBy = :creator
-      AND cm.isParticipate = true
-      AND cm.status = :status
     GROUP BY c.id
 """)
-    List<Object[]> countActiveParticipantsPerAdminChallenge(@Param("creator") String creator,
-                                                            @Param("status") ChallengeMemberStatus status);
+    List<Object[]> countActiveParticipantsPerAdminChallenge(@Param("creator") String creator)
+            ;
     @Query("SELECT cr.challenge.name, COUNT(cr) " +
             "FROM ChallengeReport cr " +
             "WHERE cr.challenge.createdBy = :creator " +

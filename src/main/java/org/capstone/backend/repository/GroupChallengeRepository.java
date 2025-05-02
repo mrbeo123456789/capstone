@@ -57,6 +57,7 @@ public interface GroupChallengeRepository extends JpaRepository<GroupChallenge, 
      * Check if a specific group has joined a challenge with a given status
      */
     boolean existsByGroupAndChallengeAndStatus(Groups group, Challenge challenge, GroupChallengeStatus status);
+    Optional<GroupChallenge> findByChallengeIdAndInvitedMemberId(Long challengeId, Long invitedMemberId);
 
     /**
      * Find an ongoing group-challenge record for update/lookup

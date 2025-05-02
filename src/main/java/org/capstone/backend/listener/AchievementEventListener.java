@@ -1,19 +1,5 @@
 package org.capstone.backend.listener;
 
-import lombok.RequiredArgsConstructor;
-import org.capstone.backend.entity.ChallengeMember;
-import org.capstone.backend.entity.Member;
-import org.capstone.backend.event.AchievementTriggerEvent;
-import org.capstone.backend.repository.ChallengeMemberRepository;
-import org.capstone.backend.repository.ChallengeRepository;
-import org.capstone.backend.repository.MemberRepository;
-import org.capstone.backend.service.achivement.AchievementService;
-import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
-
-import java.util.List;
-
 
 public class AchievementEventListener {
 

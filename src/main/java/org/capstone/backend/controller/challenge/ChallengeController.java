@@ -173,5 +173,10 @@ public class ChallengeController {
         Page<ChallengeMemberManagementDTO> result = challengeService.getChallengeMembersForManagement(challengeId, keyword, page, size);
         return ResponseEntity.ok(result);
     }
-
+    @GetMapping("/{challengeId}/max-members-per-group")
+    public ResponseEntity<Integer> getMaxMembersPerGroup(@PathVariable Long challengeId) {
+        Integer maxMembers = challengeService.getMaxMembersPerGroup(challengeId);
+        return ResponseEntity.ok(maxMembers);
+    }
 }
+
