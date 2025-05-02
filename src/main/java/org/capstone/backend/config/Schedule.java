@@ -39,7 +39,7 @@ public class Schedule {
     // ==== 00:00 – Roll UPCOMING → ONGOING & ONGOING → FINISH ====
     @Transactional
 //    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Bangkok")
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 6000000)
     public void rollChallengeStatuses() {
         LocalDate today = LocalDate.now();
 
