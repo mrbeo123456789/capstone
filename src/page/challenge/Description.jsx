@@ -56,8 +56,9 @@ const Description = ({ content }) => {
 
             <div className="mt-6 mx-auto w-3/4 bg-white rounded-2xl">
                 <div>
-                    <img src={content?.banner} alt={content?.name} className="w-full h-[450px] object-cover"/>
-
+                    {content?.banner && content.banner.trim() !== "" && (
+                        <img src={content.banner} alt={content?.name} className="w-full h-[450px] object-cover"/>
+                    )}
                 </div>
                 <div className="p-10" dangerouslySetInnerHTML={{__html: content?.description}}/>
             </div>

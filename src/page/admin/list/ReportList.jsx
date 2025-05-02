@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate, Routes, Route } from "react-router-dom";
 import Sidebar from "../../navbar/AdminNavbar.jsx";
-import { ChevronLeft, ChevronRight, Check, X, ExternalLink } from "lucide-react";
+import { ChevronLeft, ChevronRight, Check, X, ExternalLink, AlertTriangle } from "lucide-react";
 import { useFilterReportsQuery, useUpdateReportStatusMutation } from "../../../service/adminService.js";
-import ReportDetail from "../detailmodal/ReportDetail.jsx"; // Import the ReportDetail component
+import ReportDetail from "../detailmodal/ReportDetail.jsx";
 
 const ReportList = () => {
     // Navigation and state management
@@ -12,11 +12,17 @@ const ReportList = () => {
     const [reportTypeFilter, setReportTypeFilter] = useState("");
     const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-    const [selectedReport, setSelectedReport] = useState(null); // For storing selected report data
+    const [selectedReport, setSelectedReport] = useState(null);
+
+    // Confirmation modal states
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [confirmAction, setConfirmAction] = useState(null);
+    const [reportToUpdate, setReportToUpdate] = useState(null);
+
     const itemsPerPage = 10;
 
     // API hooks
-    const { data: reportsData, isLoading, isError } = useFilterReportsQuery({
+    const { data: reportsData, isLoading, isError, refetch } = useFilterReportsQuery({
         reportType: reportTypeFilter.trim(),
         page: currentPage - 1,
         size: itemsPerPage,
@@ -37,7 +43,7 @@ const ReportList = () => {
 
     // Navigate to details page and pass report data
     const openDetailPage = (report) => {
-        setSelectedReport(report); // Store the selected report
+        setSelectedReport(report);
         navigate(`/admin/reports/${report.id}/detail`);
     };
 
@@ -61,47 +67,71 @@ const ReportList = () => {
         }
     };
 
+    // Show confirmation modal
+    const showConfirmationModal = (action, reportId) => {
+        setReportToUpdate(reportId);
+        setConfirmAction(action);
+        setShowConfirmModal(true);
+    };
+
+    // Close confirmation modal
+    const closeConfirmModal = () => {
+        setShowConfirmModal(false);
+        setReportToUpdate(null);
+        setConfirmAction(null);
+    };
+
     // Report action handlers with API integration
-    const handleAgree = async (reportId) => {
+    const handleConfirmAction = async () => {
+        if (!reportToUpdate || !confirmAction) return;
+
         try {
-            await updateReportStatus({
-                reportId: reportId,
-                status: "APPROVED"
-            }).unwrap();
-            // You could add a toast notification here to show success
-            console.log(`Agreed to report ${reportId}`);
+            const status = confirmAction === 'approve' ? "APPROVED" : "REJECTED";
+
+            // Call the API but handle the response manually
+            const result = await updateReportStatus({
+                reportId: reportToUpdate,
+                status: status
+            });
+
+            // Check if we have a successful response despite the parsing error
+            if (result.error && result.error.originalStatus === 200) {
+                // This is actually a successful response, but the parser couldn't handle it
+                console.log(`Successfully ${confirmAction}d report ${reportToUpdate}`);
+
+                // Close the modal and refresh the data
+                closeConfirmModal();
+                refetch();
+            } else if (!result.error) {
+                // Normal success case
+                console.log(`Successfully ${confirmAction}d report ${reportToUpdate}`);
+
+                // Close the modal and refresh the data
+                closeConfirmModal();
+                refetch();
+            } else {
+                // Real error case
+                throw new Error(`Failed to ${confirmAction} report: ${JSON.stringify(result.error)}`);
+            }
         } catch (error) {
-            console.error("Failed to approve report:", error);
+            console.error(`Failed to ${confirmAction} report:`, error);
+            closeConfirmModal();
             // You could add error handling/notification here
         }
     };
 
-    const handleDisagree = async (reportId) => {
-        try {
-            await updateReportStatus({
-                reportId: reportId,
-                status: "REJECTED"
-            }).unwrap();
-            // You could add a toast notification here to show success
-            console.log(`Disagreed with report ${reportId}`);
-        } catch (error) {
-            console.error("Failed to reject report:", error);
-            // You could add error handling/notification here
-        }
-    };
-
-    // Hàm định dạng ngày từ dữ liệu backend
+    // Format date from backend data
     const formatDate = (dateValue) => {
         if (!dateValue) return "Invalid date";
 
         let dateObj;
 
-        // Xử lý trường hợp dữ liệu là mảng (kiểu cũ)
+        // Handle array format (old format)
         if (Array.isArray(dateValue) && dateValue.length >= 3) {
             const [year, month, day] = dateValue;
             dateObj = new Date(year, month - 1, day);
         }
-        // Xử lý trường hợp dữ liệu là timestamp hoặc chuỗi ngày tháng
+        // Handle timestamp or date string
         else {
             try {
                 dateObj = new Date(dateValue);
@@ -111,12 +141,12 @@ const ReportList = () => {
             }
         }
 
-        // Kiểm tra xem dateObj có phải là ngày hợp lệ không
+        // Check if dateObj is a valid date
         if (isNaN(dateObj.getTime())) {
             return "Invalid date";
         }
 
-        // Format thành dd/mm/yyyy
+        // Format as dd/mm/yyyy
         const day = String(dateObj.getDate()).padStart(2, '0');
         const month = String(dateObj.getMonth() + 1).padStart(2, '0');
         const year = dateObj.getFullYear();
@@ -290,7 +320,7 @@ const ReportList = () => {
                                                                 {report.status === "PENDING" && (
                                                                     <>
                                                                         <button
-                                                                            onClick={() => handleAgree(report.id)}
+                                                                            onClick={() => showConfirmationModal('approve', report.id)}
                                                                             className="p-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors disabled:opacity-50"
                                                                             title="Approve"
                                                                             disabled={isUpdating}
@@ -298,7 +328,7 @@ const ReportList = () => {
                                                                             <Check size={16} />
                                                                         </button>
                                                                         <button
-                                                                            onClick={() => handleDisagree(report.id)}
+                                                                            onClick={() => showConfirmationModal('reject', report.id)}
                                                                             className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors disabled:opacity-50"
                                                                             title="Reject"
                                                                             disabled={isUpdating}
@@ -356,6 +386,50 @@ const ReportList = () => {
                             </div>
                         </div>
                     </div>
+
+                    {/* Confirmation Modal */}
+                    {showConfirmModal && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                            <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full animate-fadeIn">
+                                <div className="flex items-center text-amber-500 mb-4">
+                                    <AlertTriangle className="mr-2" size={24} />
+                                    <h3 className="text-lg font-bold">Confirm Action</h3>
+                                </div>
+                                <p className="mb-6">
+                                    Are you sure you want to {confirmAction} this report? This action cannot be undone.
+                                </p>
+                                <div className="flex justify-end space-x-3">
+                                    <button
+                                        onClick={closeConfirmModal}
+                                        className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={handleConfirmAction}
+                                        className={`px-4 py-2 rounded-md text-white ${
+                                            confirmAction === 'approve'
+                                                ? 'bg-green-500 hover:bg-green-600'
+                                                : 'bg-red-500 hover:bg-red-600'
+                                        } disabled:opacity-50`}
+                                        disabled={isUpdating}
+                                    >
+                                        {isUpdating ? (
+                                            <span className="flex items-center">
+                                                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                </svg>
+                                                Processing...
+                                            </span>
+                                        ) : (
+                                            `${confirmAction === 'approve' ? 'Approve' : 'Reject'}`
+                                        )}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             } />
 

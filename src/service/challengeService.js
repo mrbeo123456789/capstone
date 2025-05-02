@@ -142,6 +142,20 @@ export const challengeService = createApi({
             query: (challengeId) => `/challenges/${challengeId}/statistics`,
             providesTags: ["Challenge"],
         }),
+        getChallengeMembersForManagement: builder.query({
+            query: ({ challengeId, keyword = "", page = 0, size = 10 } = {}) => {
+                const params = new URLSearchParams();
+                if (keyword.trim()) {
+                    params.append("keyword", keyword.trim());
+                }
+                params.append("page", page);
+                params.append("size", size);
+                return `/challenges/${challengeId}/member-management?${params.toString()}`;
+            },
+        }),
+        getMaxMembersPerGroup: builder.query({
+            query: (challengeId) => `/challenges/${challengeId}/max-members-per-group`,
+        }),
     }),
 });
 
@@ -165,5 +179,7 @@ export const {
     useGetJoinedMembersWithPendingEvidenceQuery,
     useLazyGetCompletedChallengesQuery ,
     useGetChallengeStatisticsQuery,
+    useGetChallengeMembersForManagementQuery,
+    useGetMaxMembersPerGroupQuery, // ✅ thêm dòng này
 } = challengeService;
 

@@ -14,7 +14,6 @@
     "myChallenges": "マイチャレンジ",
     "createChallenge": "チャレンジ作成"
   },
-
   "profileUpdated": "プロフィールが正常に更新されました！",
   "updateFailed": "プロフィールの更新に失敗しました。",
   "removed": "削除されました",
@@ -57,15 +56,22 @@
     "previous": "前へ",
     "next": "次へ",
     "page": "ページ",
+    "selectGroup": "参加するグループを選択",
+    "memberAlreadyJoined": "{{name}} はすでにこのチャレンジに参加しています。",
+    "confirm": "確認する",
+    "selectWarning": "続行する前にグループを選択してください。",
+    "successJoinGroupChallenge": "選択したグループでチャレンジに参加しました。",
+    "success": "招待を正常に承認しました。",
+    "inviteFailed": "招待の処理中にエラーが発生しました。もう一度お試しください。",
     "selectAtLeastOne": "少なくとも1人のメンバーを選択してください。",
     "inviteSuccess": "招待が正常に送信されました！",
-    "inviteFailed": "招待の送信に失敗しました。",
     "searchFailed": "メンバーの検索に失敗しました。",
     "title": "チャレンジへの招待",
     "inviteMembers": "メンバーを招待",
     "noResults": "結果が見つかりませんでした。",
     "inviteGroups": "グループを招待",
-    "suggestedTitle": "招待のおすすめメンバー"
+    "suggestedTitle": "招待のおすすめメンバー",
+    "noLeadersFound": "リーダーが見つかりませんでした"
   },
   "sidebar": {
     "myChallenge": "マイチャレンジ",
@@ -127,7 +133,7 @@
     "kickFailed": "メンバーを削除できませんでした。もう一度お試しください。",
     "confirmDelete": "グループ削除の確認",
     "deleteWarning": "本当にこのグループを削除してよろしいですか？この操作は取り消せず、チャレンジやメンバー関係を含むすべてのグループデータが永久に削除されます。"
-},
+  },
   "yourGroup": {
     "createGroup": "グループを作成",
     "searchPlaceholder": "グループを検索",
@@ -174,39 +180,59 @@
     "successUpdate": "チャレンジが正常に更新されました！",
     "updating": "更新中...",
     "update": "更新",
+    "updating": "更新中...",
+    "successUpdate": "チャレンジが正常に更新されました！",
+    "editFail": "チャレンジの更新に失敗しました: ",
+    "editValidationError": "必須項目をすべて入力してください。",
     "generalInfo": "基本情報",
     "details": "チャレンジの詳細",
     "name": "チャレンジ名",
-    "namePlaceholder": "チャレンジ名を入力",
+    "namePlaceholder": "チャレンジ名を入力してください",
     "summary": "概要",
-    "summaryPlaceholder": "チャレンジの簡単な説明",
-    "banner": "バナー（任意）",
-    "picture": "チャレンジ画像",
-    "pictureNote": "対応形式：JPG、PNG。最大サイズ：2MB。",
+    "summaryPlaceholder": "簡単な説明",
+    "banner": "バナー（オプション）",
     "clickUpload": "クリックまたはドラッグしてアップロード",
+    "picture": "チャレンジ画像",
+    "pictureNote": "推奨サイズ：800x400px",
+    "details": "チャレンジ詳細",
     "startDate": "開始日",
     "endDate": "終了日",
-    "privacy": "公開範囲",
+    "privacy": "プライバシー設定",
+    "isParticipate": "参加オプション",
+    "joinCheckbox": "作成後に参加したい",
     "verificationType": {
       "label": "認証方法",
-      "hostReview": "ホストによる確認",
-      "memberReview": "メンバーによる確認"
+      "memberReview": "メンバー審査",
+      "hostReview": "ホスト審査"
     },
     "participationType": {
-      "label": "参加形式",
+      "label": "参加タイプ",
       "individual": "個人",
       "group": "グループ"
     },
-    "challengeType": "チャレンジの種類",
-    "selectChallengeType": "チャレンジの種類を選択",
-    "maxParticipants": "最大参加人数",
-    "description": "チャレンジの説明",
+    "challengeType": "チャレンジタイプ",
+    "selectChallengeType": "チャレンジタイプを選択",
+    "maxParticipants": "最大参加者数",
+    "maxGroups": "最大グループ数",
+    "maxMembersPerGroup": "グループあたりの最大メンバー数",
+    "selectGroup": "グループを選択",
+    "selectGroupPlaceholder": "グループを選んでください",
+    "members": "メンバー",
+    "description": "説明",
+    "create": "作成",
     "cancel": "キャンセル",
-    "validationError": "すべてのエラーを修正してください。",
-    "fail": "チャレンジの更新に失敗しました: "
+    "creating": "作成中...",
+    "success": "チャレンジが正常に作成されました！",
+    "fail": "チャレンジ作成に失敗しました：",
+    "validationError": "必須項目をすべて入力してください。"
   },
-
+  "public": "公開",
+  "private": "非公開",
   "JoinsChallengeDetail": {
+    "confirmCancelTitle": "チャレンジのキャンセル確認",
+    "confirmCancelMessage": "このチャレンジをキャンセルしてもよろしいですか？",
+    "confirmCancelNo": "いいえ、維持します",
+    "confirmCancelYes": "はい、キャンセルします",
     "reportTab": "フィードバックと報告",
     "groups": "グループ",
     "disabledDuringChallenge": "チャレンジ中または終了後はこの操作はできません。",
@@ -253,10 +279,8 @@
     "challengeStarted.content": "GoBeyond と一緒に「{{challengeName}}」に挑戦しましょう！",
     "notification.evidence.approved.title": "{{day}}の証拠が承認されました",
     "notification.evidence.approved.content": "チャレンジ「{{challengeName}}」の{{day}}に提出した証拠が承認されました。フィードバック: {{feedback}}",
-
     "notification.evidence.rejected.title": "{{day}}の証拠が却下されました",
     "notification.evidence.rejected.content": "チャレンジ「{{challengeName}}」の{{day}}に提出した証拠は却下されました。フィードバック: {{feedback}}。内容を確認して再提出してください。",
-
     "invite.challenge.title": "チャレンジへの招待",
     "invite.challenge.content": "{{inviterName}} さんがあなたをチャレンジ「{{challengeName}}」に招待しました。",
     "invite.group.title": "グループへの招待",
@@ -281,12 +305,10 @@
     "challengeStatusUpdated.title": "チャレンジのステータスが更新されました",
     "notification.challengeStatusUpdated.content": "チャレンジ「{{challengeName}}」のステータスが {{status}} に更新されました。{{#adminNote}} 管理者メモ: {{adminNote}}{{/adminNote}}"
   },
-
   "suggest.reason.both": "共通の興味があり、近くにいます",
   "suggest.reason.same_interest": "共通の興味があります",
   "suggest.reason.near_location": "近くにいます",
-
-"yourChallenge": {
+  "yourChallenge": {
     "create": "チャレンジを作成",
     "search": "検索",
     "filter": "フィルター",
@@ -317,7 +339,8 @@
       "approved": "承認済み",
       "pending": "保留中",
       "rejected": "却下",
-      "canceled": "キャンセル済み"
+      "canceled": "キャンセル済み",
+      "ongoing": "すべて"
     }
   },
   "inviteGroups": "グループを招待する",
@@ -366,7 +389,6 @@
     "maxGroups": "最大グループ数",
     "maxMembersPerGroup": "グループあたりの最大メンバー数"
   },
-
   "forgotPassword": {
     "title": "パスワードをお忘れですか？",
     "subtitle": "OTPを受け取るためにメールアドレスを入力してください。",
@@ -380,7 +402,6 @@
     "success": "OTPをメールに送信しました。",
     "fail": "エラーが発生しました。"
   },
-
   "changePassword": {
     "title": "パスワードを変更",
     "old": "現在のパスワード",
@@ -394,7 +415,6 @@
     "fail": "パスワードの変更に失敗しました。",
     "mismatch": "パスワードが一致しません！"
   },
-
   "ProgressTracking": {
     "viewExplanation": "説明を表示",
     "daysOfWeek": {
@@ -440,7 +460,6 @@
       "close": "閉じる"
     }
   },
-
   "ProofUploads": {
     "loading": "データを読み込み中...",
     "viewEvidence": "証拠を確認する",
@@ -453,7 +472,6 @@
     "fullEvidence": "証拠の詳細",
     "close": "閉じる"
   },
-
   "AboutUs": {
     "hero": {
       "title": "GoBeyondについて",
@@ -565,7 +583,6 @@
     "noEvidences": "レビューする証拠はありません。",
     "unknownUser": "不明なユーザー"
   },
-
   "hostEvidence": {
     "members": "メンバー",
     "searchMembers": "メンバーを検索...",
@@ -609,7 +626,6 @@
       "rejected": "拒否"
     }
   },
-
   "rankingList": {
     "top3Progress": "トップ3の進捗",
     "rank": "ランク",
@@ -646,7 +662,6 @@
     "page": "ページ",
     "of": "の"
   },
-
   "auth": {
     "login": {
       "title": "ログイン",
@@ -694,14 +709,17 @@
       "passwordMismatch": "確認用パスワードが一致しません。",
       "registerFailed": "登録に失敗しました。もう一度お試しください。"
     }
-
   },
+  "status": "ステータス",
+  "progress": "進捗",
   "challenges": {
     "groupHistory": "グループチャレンジ履歴",
     "name": "チャレンジ名",
+    "progress": {
+      "inProgress": "進行中"
+    },
     "period": "期間",
     "participants": "参加者",
-    "status": "ステータス",
     "actions": "アクション",
     "viewDetails": "詳細を見る",
     "noHistory": "チャレンジ履歴がありません",
@@ -712,22 +730,75 @@
     "status": {
       "completed": "完了",
       "inProgress": "進行中",
-      "failed": "失敗"
+      "failed": "失敗",
+      "success": "成功率"
     },
-    "success": "成功率"
+    "pagination": {
+      "showing": "表示中",
+      "to": "から",
+      "of": "の",
+      "results": "結果",
+      "previous": "前へ",
+      "next": "次へ",
+      "first": "最初",
+      "last": "最後"
+    }
   },
-  "pagination": {
-    "showing": "表示中",
-    "to": "から",
-    "of": "の",
-    "results": "結果",
-    "previous": "前へ",
-    "next": "次へ",
-    "first": "最初",
-    "last": "最後"
-  },
-
   "achievement": {
+    "label": {
+      "title": "あなたの実績",
+      "progress": "進捗状況",
+      "earned": "獲得日:",
+      "notYetEarned": "まだ獲得していません",
+      "locked": "ロック中",
+      "unlocked": "解除済み",
+      "totalProgress": "合計進捗率",
+      "of": "/",
+      "achievementsUnlocked": "個の実績を達成",
+      "next": "次へ",
+      "prev": "前へ",
+      "loading": "実績を読み込んでいます...",
+      "error": "実績の読み込みに失敗しました。"
+    },
+    "description": {
+      "FIRST_TRY": "初めてチャレンジに参加しました。",
+      "DAILY_WARRIOR": "7日連続で提出を完了しました。",
+      "PROFILE_MASTER": "プロフィール情報をすべて入力しました。",
+      "INVITER": "チャレンジにメンバーを1人招待して成功しました。",
+      "REVIEWER": "10件の証拠を審査しました。",
+      "PERFECT_ACCURACY": "1件の証拠が100%承認されました。",
+      "COMEBACK_SUBMITTER": "7日以上の休止後に提出しました。",
+      "RISING_STAR": "3つの証拠が連続で承認されました。",
+      "ACTIVE_VOTER": "5つの異なるチャレンジで投票しました。",
+      "GROUP_HERO": "グループを導いてチャレンジを達成しました。",
+      "CONTRIBUTOR": "3つ以上のチャレンジに参加しました。",
+      "STREAK_TRIPLE": "3日連続で提出しました。",
+      "STREAK_MASTER": "10日連続で提出しました。",
+      "NIGHT_OWL": "午前0時〜4時に提出しました。",
+      "EARLY_BIRD": "午前6時前に提出しました。",
+      "LONG_HAUL": "30日間のチャレンジを完了しました。",
+      "FITNESS_CHAMPION": "チャレンジでトップ10にランクインしました。",
+      "GROUP_LEGEND": "グループがランキング1位を獲得しました。",
+      "CONSISTENT_TOPPER": "3つの連続チャレンジでトップ3に入りました。",
+      "UNDERDOG": "遅れてスタートしましたが、強くゴールしました。"
+    }
+  },
+    "Moderation": {
+      "unableToAnalyze": "コンテンツを分析できませんでした。",
+      "rejectedBySummary": "モデレーションにより拒否されました。",
+      "fileTooLarge": "ファイルサイズが大きすぎます。100MB未満のファイルを選択してください。",
+      "videoRejected": "ビデオが拒否されました！",
+      "uploadSuccess": "証拠の提出に成功しました！",
+      "errorDuringSubmit": "提出中にエラーが発生しました。",
+      "submitEvidence": "証拠を提出する日付",
+      "clickToUpload": "クリックしてアップロード",
+      "orDragDrop": "またはドラッグ＆ドロップ",
+      "acceptedFormats": "JPG、PNG、MP4、GIF（最大800x400px）",
+      "changeFile": "ファイルを変更",
+      "cancel": "キャンセル",
+      "submit": "送信",
+      "processing": "処理中..."
+    },
     "title": "あなたの実績",
     "of": "中",
     "achieved": "件の実績を獲得",
@@ -815,8 +886,7 @@
     "fitnessExplorerDesc": "すべてのフィットネスカテゴリーでワークアウトを試す",
 
     "activeLifestyle": "アクティブなライフスタイル",
-    "activeLifestyleDesc": "60日間連続で身体活動を記録"
-  },
+    "activeLifestyleDesc": "60日間連続で身体活動を記録",
 
   "SelectGroupModal": {
     "title": "グループを選択",
@@ -836,7 +906,62 @@
     "member": "メンバー",
     "notLeaderTooltip": "このグループのリーダーではありません。リーダーのグループを選択してください。",
     "notExactMembersTooltip": "このグループは{{number}}人ぴったりではありません。"
+  },
+  "MemberManagement": {
+    "title": "メンバー管理",
+    "searchPlaceholder": "名前またはメールで検索...",
+    "member": "メンバー",
+    "role": "役割",
+    "participate": "参加",
+    "coHost": "共同ホスト",
+    "actions": "アクション",
+    "me": "自分",
+    "prev": "前へ",
+    "next": "次へ",
+    "kickSuccess": "メンバーを削除しました！",
+    "kickFail": "メンバーの削除に失敗しました。",
+    "toggleSuccess": "役割を更新しました！",
+    "toggleFail": "役割の更新に失敗しました。",
+    "confirmKickTitle": "削除の確認",
+    "confirmKickMessage": "{{name}} をチャレンジから削除してもよろしいですか？",
+    "cancel": "キャンセル",
+    "confirm": "確認"
+  },
+  "title": "今日のスポーツニュース",
+  "search": {
+    "placeholder": "ニュースを検索...",
+    "noResults": "該当するニュースがありません"
+  },
+  "viewMode": {
+    "grid": "グリッド",
+    "list": "リスト"
+  },
+  "errors": {
+    "loading": "ニュースの読み込みエラー",
+    "network": "サーバーに接続できません"
+  },
+  "buttons": {
+    "retry": "再試行"
+  },
+  "images": {
+    "notAvailable": "画像なし"
+  },
+  "common": {
+    "loading": "読み込み中"
+  },
+  "member": {
+    "top3": "トップ3",
+    "user": "ユーザー",
+    "you": "あなた",
+    "stars": "スター",
+    "topRanking": "トップランキング",
+    "searchUser": "ユーザーを検索...",
+    "totalStars": "合計スター",
+    "kickMember": "メンバーを退会させる"
   }
+
+
+
 
 }
 

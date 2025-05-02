@@ -9,14 +9,31 @@ export default function ProgressTracking({ challenge, evidence, onUploadSuccess 
     const evidenceMap = {};
     const { t } = useTranslation();
 
+    // Helper function to parse dates consistently without timezone issues
+    const parseDate = (dateStr) => {
+        const date = new Date(dateStr);
+        // Create date in local timezone without time portion
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    };
+
+    // Helper function to get consistent date key format (YYYY-MM-DD)
+    const getDateKey = (date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
     evidence?.forEach((e) => {
-        // Use standard ISO format to ensure consistency with ProofUploads
-        const date = new Date(e.submittedAt);
-        const dateISO = date.toISOString().split('T')[0]; // YYYY-MM-DD format
-        evidenceMap[dateISO] = {
-            evidence: e,
-            status: e.status // Get evidence status (approved or pending)
-        };
+        if (e.submittedAt) {
+            // Parse the submittedAt date, handling timezone consistently
+            const date = parseDate(e.submittedAt);
+            const dateKey = getDateKey(date);
+            evidenceMap[dateKey] = {
+                evidence: e,
+                status: e.status // Get evidence status (approved or pending)
+            };
+        }
     });
 
     // Debug to view evidence data and current date
@@ -29,6 +46,9 @@ export default function ProgressTracking({ challenge, evidence, onUploadSuccess 
     today.setHours(0, 0, 0, 0); // Remove time portion
     console.log("After setting time - Today:", today.toLocaleString());
 
+    // Get today's key for easy comparison
+    const todayKey = getDateKey(today);
+
     const challengeId = challenge?.id;
     const [currentMonth, setCurrentMonth] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
 
@@ -38,8 +58,8 @@ export default function ProgressTracking({ challenge, evidence, onUploadSuccess 
 
     const isValidDate = (d) => d instanceof Date && !isNaN(d);
 
-    const startDate = isValidDate(new Date(challenge?.startDate)) ? new Date(challenge.startDate) : null;
-    const endDate = isValidDate(new Date(challenge?.endDate)) ? new Date(challenge.endDate) : null;
+    const startDate = isValidDate(new Date(challenge?.startDate)) ? parseDate(challenge.startDate) : null;
+    const endDate = isValidDate(new Date(challenge?.endDate)) ? parseDate(challenge.endDate) : null;
 
     const getCalendarGrid = () => {
         const startDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
@@ -79,18 +99,6 @@ export default function ProgressTracking({ challenge, evidence, onUploadSuccess 
         return d;
     };
 
-    const getLocalISODate = (date) => {
-        // Convert date to YYYY-MM-DD string in local timezone
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    };
-
-    // Create local ISO date string for today
-    const todayLocalISO = getLocalISODate(today);
-    console.log("Today local ISO:", todayLocalISO);
-
     return (
         <div className="bg-white shadow-md rounded-lg p-4 mx-auto">
             <div className="flex items-center justify-between mb-4">
@@ -124,15 +132,15 @@ export default function ProgressTracking({ challenge, evidence, onUploadSuccess 
 
             <div className="grid grid-cols-7 gap-1 text-center text-sm">
                 {calendarDays.map((date, idx) => {
-                    // Use local ISO format to avoid timezone issues
-                    const dateLocalISO = getLocalISODate(date);
+                    // Use local date key format to avoid timezone issues
+                    const dateKey = getDateKey(date);
 
-                    const isToday = dateLocalISO === todayLocalISO;
+                    const isToday = dateKey === todayKey;
                     const isCurrentMonth = date.getMonth() === currentMonth.getMonth();
                     const isWithinChallenge = normalizeDate(date) >= normalizeDate(startDate) &&
                         normalizeDate(date) <= normalizeDate(endDate);
 
-                    const evidenceInfo = evidenceMap[dateLocalISO];
+                    const evidenceInfo = evidenceMap[dateKey];
                     const hasEvidence = Boolean(evidenceInfo);
                     const isApproved = hasEvidence && (evidenceInfo.status === "APPROVED" || evidenceInfo.evidence.status === "APPROVED");
                     const isRejected = hasEvidence && (evidenceInfo.status === "REJECTED" || evidenceInfo.evidence.status === "REJECTED");
@@ -187,10 +195,7 @@ export default function ProgressTracking({ challenge, evidence, onUploadSuccess 
                                     const todayDate = new Date();
                                     todayDate.setHours(0, 0, 0, 0);
 
-                                    const isSameDate =
-                                        clickedDate.getFullYear() === todayDate.getFullYear() &&
-                                        clickedDate.getMonth() === todayDate.getMonth() &&
-                                        clickedDate.getDate() === todayDate.getDate();
+                                    const isSameDate = getDateKey(clickedDate) === getDateKey(todayDate);
 
                                     const isInChallengeRange =
                                         normalizeDate(todayDate) >= normalizeDate(startDate) &&
@@ -234,7 +239,7 @@ export default function ProgressTracking({ challenge, evidence, onUploadSuccess 
                     onClose={() => setShowModal(false)}
                     onUploadSuccess={() => {
                         setShowModal(false);
-                        if (onUploadSuccess) onUploadSuccess(); // 👈 gọi callback nếu có
+                        if (onUploadSuccess) onUploadSuccess(); // Call callback if exists
                     }}
                 />
             )}

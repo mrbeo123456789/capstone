@@ -56,7 +56,7 @@ const InviteSuggestions = ({ onClose }) => {
                         <div className="flex items-center space-x-4">
                             <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-orange-300">
                                 <img
-                                    src={member.avatar || "/default-avatar.png"}
+                                    src={member.avatar || "https://firebasestorage.googleapis.com/v0/b/bookstore-f9ac2.appspot.com/o/avatar%2Fillustration-of-human-icon-user-symbol-icon-modern-design-on-blank-background-free-vector.jpg?alt=media&token=f5c7e08a-9e7d-467f-8eff-3c321824edcd"}
                                     alt={member.name}
                                     className="w-full h-full object-cover"
                                 />

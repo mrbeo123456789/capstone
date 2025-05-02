@@ -1,119 +1,96 @@
+import React from 'react';
+import { useGetChallengeStatisticsQuery } from '../../service/challengeService.js';
 import {
-    Chart as ChartJS,
-    ArcElement,
-    BarElement,
-    LinearScale,
-    CategoryScale,
-    Tooltip,
-    Legend,
-} from "chart.js";
-import { Pie } from "react-chartjs-2";
-import { useTranslation } from "react-i18next";
-import { motion } from "framer-motion";
+    UsersIcon,
+    GroupIcon,
+    FileTextIcon,
+    ThumbsUpIcon,
+    HourglassIcon,
+    BanIcon,
+    TrendingUpIcon,
+    CalendarDaysIcon,
+    CircleDotIcon
+} from 'lucide-react';
 
-ChartJS.register(ArcElement, BarElement, LinearScale, CategoryScale, Tooltip, Legend);
+const ChallengeStatistic = ({ challengeId }) => {
+    const { data, isLoading, error } = useGetChallengeStatisticsQuery(challengeId);
 
-const ChallengeStatistic = ({
-                                challengeName,
-                                totalParticipants,
-                                totalGroups,
-                                totalEvidenceSubmitted,
-                                approvedEvidence,
-                                pendingEvidence,
-                                rejectedEvidence,
-                                participationRate,
-                                completionRate,
-                                evidenceSubmittedToday,
-                                pendingReviewToday,
-                                today,
-                            }) => {
-    const { t } = useTranslation();
+    if (isLoading) {
+        return (
+            <div className="flex justify-center items-center h-64">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                <p className="ml-4 text-blue-500 font-medium">Loading statistics...</p>
+            </div>
+        );
+    }
 
-    const pieData = {
-        labels: ["Approved", "Pending", "Rejected"],
-        datasets: [
-            {
-                label: "Evidence",
-                data: [approvedEvidence, pendingEvidence, rejectedEvidence],
-                backgroundColor: ["#10b981", "#f59e0b", "#ef4444"],
-                hoverOffset: 8,
-            },
-        ],
-    };
+    if (error || !data) {
+        return (
+            <div className="text-center text-red-600 py-6">
+                Failed to load challenge statistics.
+            </div>
+        );
+    }
+
+    // Helper for bar visual
+    const ProgressBar = ({ value, label, color = 'blue' }) => (
+        <div className="mb-4">
+            <div className="flex justify-between mb-1">
+                <span className="text-sm font-medium text-gray-700">{label}</span>
+                <span className="text-sm font-medium text-gray-700">{value}%</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2.5">
+                <div
+                    className={`h-2.5 rounded-full bg-${color}-500`}
+                    style={{ width: `${value}%` }}
+                ></div>
+            </div>
+        </div>
+    );
 
     return (
-        <div className="p-4 space-y-8">
-            <motion.h2
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-                className="text-2xl font-bold text-center"
-            >
-                {t("Challenge Statistics")}: {challengeName}
-            </motion.h2>
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">📊 Challenge Progress Dashboard</h2>
 
-            {/* Summary Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                {[
-                    { label: "Participants", value: totalParticipants },
-                    { label: "Groups", value: totalGroups },
-                    {
-                        label: "Participation Rate",
-                        value: `${(participationRate * 100).toFixed(0)}%`,
-                    },
-                    {
-                        label: "Completion Rate",
-                        value: `${(completionRate * 100).toFixed(0)}%`,
-                    },
-                ].map((item, idx) => (
-                    <motion.div
-                        key={idx}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1 * idx }}
-                        className="p-4 bg-white rounded shadow"
-                    >
-                        <p className="text-sm text-gray-500">{item.label}</p>
-                        <p className="text-xl font-bold">{item.value}</p>
-                    </motion.div>
-                ))}
+            {/* Overview Section */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <InfoCard label="Challenge Name" value={data.challengeName} icon={<FileTextIcon />} />
+                <InfoCard label="Total Participants" value={data.totalParticipants} icon={<UsersIcon />} />
+                <InfoCard label="Total Groups" value={data.totalGroups} icon={<GroupIcon />} />
             </div>
 
-            {/* Evidence Status Pie Chart */}
-            <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4 }}
-                className="bg-white rounded shadow p-6"
-            >
-                <h3 className="text-center font-semibold mb-4">Evidence Status</h3>
-                <div className="w-full max-w-sm mx-auto">
-                    <Pie data={pieData} />
-                </div>
-            </motion.div>
+            {/* Evidence Status */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <InfoCard label="Evidence Submitted" value={data.totalEvidenceSubmitted} icon={<FileTextIcon />} />
+                <InfoCard label="Approved Evidence" value={data.approvedEvidence} icon={<ThumbsUpIcon />} />
+                <InfoCard label="Pending Evidence" value={data.pendingEvidence} icon={<HourglassIcon />} />
+                <InfoCard label="Rejected Evidence" value={data.rejectedEvidence} icon={<BanIcon />} />
+            </div>
 
-            {/* Today's Overview */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                {[
-                    { label: "Evidence Submitted Today", value: evidenceSubmittedToday },
-                    { label: "Pending Reviews Today", value: pendingReviewToday },
-                    { label: "Date", value: today },
-                    { label: "Total Evidence", value: totalEvidenceSubmitted },
-                ].map((item, idx) => (
-                    <motion.div
-                        key={idx}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1 * idx }}
-                        className="p-4 bg-white rounded shadow"
-                    >
-                        <p className="text-sm text-gray-500">{item.label}</p>
-                        <p className="text-xl font-bold">{item.value}</p>
-                    </motion.div>
-                ))}
+            {/* Visual Progress */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div className="bg-gray-50 p-4 rounded shadow">
+                    <ProgressBar value={data.participationRate} label="Participation Rate" color="green" />
+                    <ProgressBar value={data.completionRate} label="Completion Rate" color="indigo" />
+                </div>
+                <div className="bg-gray-50 p-4 rounded shadow grid grid-cols-2 gap-4">
+                    <InfoCard label="Today" value={data.today} icon={<CalendarDaysIcon />} />
+                    <InfoCard label="Submitted Today" value={data.evidenceSubmittedToday} icon={<FileTextIcon />} />
+                    <InfoCard label="Pending Review Today" value={data.pendingReviewToday} icon={<CircleDotIcon />} />
+                </div>
             </div>
         </div>
     );
 };
+
+const InfoCard = ({ label, value, icon }) => (
+    <div className="flex items-center bg-blue-50 rounded-lg p-4 shadow-sm space-x-4">
+        <div className="text-blue-600">{icon}</div>
+        <div>
+            <p className="text-sm text-gray-500">{label}</p>
+            <p className="text-xl font-semibold text-blue-800">{value}</p>
+        </div>
+    </div>
+);
 
 export default ChallengeStatistic;

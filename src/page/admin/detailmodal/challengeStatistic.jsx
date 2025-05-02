@@ -25,7 +25,7 @@ const ChallengeStats = () => {
     // Derive statistics from API data
     const totalCreatedChallenges = data?.totalElements || 0;
     const activeChallenges = Array.isArray(createdChallengesData) ?
-        createdChallengesData.filter(challenge => challenge.status === "Active").length : 0;
+        createdChallengesData.filter(challenge => challenge.status === "ONGOING").length : 0;
     const totalParticipants = Array.isArray(memberParticipationData) ?
         memberParticipationData.reduce((total, challenge) => total + (challenge.members || 0), 0) : 0;
 
@@ -151,9 +151,9 @@ const ChallengeStats = () => {
                                     <ResponsiveContainer width="100%" height="100%">
                                         <BarChart
                                             data={Array.isArray(reportCountsData) ? reportCountsData.map(item => ({
-                                                name: item.name.length > 15 ? item.name.substring(0, 15) + '...' : item.name,
-                                                reports: item.reportCount || 0,
-                                                fullName: item.name
+                                                name: item?.challengeName ? (item.challengeName.length > 15 ? item.challengeName.substring(0, 15) + '...' : item.challengeName) : 'Unknown',
+                                                reports: item?.reportCount ?? 0,
+                                                fullName: item?.challengeName ?? 'Unknown'
                                             })) : []}
                                             margin={{ top: 10, right: 10, left: 10, bottom: 40 }}
                                         >
@@ -197,10 +197,11 @@ const ChallengeStats = () => {
                                 <ResponsiveContainer width="100%" height="100%">
                                     <BarChart
                                         data={Array.isArray(memberParticipationData) ? memberParticipationData.map(item => ({
-                                            name: item.name.length > 15 ? item.name.substring(0, 15) + '...' : item.name,
-                                            members: item.members || 0,
-                                            fullName: item.name
+                                            name: item?.challengeName ? (item.challengeName.length > 15 ? item.challengeName.substring(0, 15) + '...' : item.challengeName) : 'Unknown',
+                                            members: item?.participatedMembers ?? 0,
+                                            fullName: item?.challengeName ?? 'Unknown'
                                         })) : []}
+
                                         margin={{ top: 10, right: 10, left: 10, bottom: 40 }}
                                     >
                                         <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />

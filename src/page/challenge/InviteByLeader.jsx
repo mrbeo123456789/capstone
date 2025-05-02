@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { IoSearch, IoCheckboxOutline, IoCheckbox } from "react-icons/io5";
-import { useSearchAvailableGroupLeadersMutation } from "../../service/invitationService";
+import { IoSearch } from "react-icons/io5";
+import { useSearchAvailableGroupLeadersMutation, useSendInvitationMutation } from "../../service/invitationService"; // ✅ import thêm sendInvitation
 import { useTranslation } from "react-i18next";
 
 const InviteByLeader = ({ onClose }) => {
@@ -11,6 +11,7 @@ const InviteByLeader = ({ onClose }) => {
     const [keyword, setKeyword] = useState("");
     const [selected, setSelected] = useState([]);
     const [search, { data = [], isLoading }] = useSearchAvailableGroupLeadersMutation();
+    const [sendInvitation, { isLoading: isInviting }] = useSendInvitationMutation(); // ✅ hook mutation gửi invite
 
     const handleSearch = () => {
         if (!keyword.trim()) {
@@ -26,14 +27,28 @@ const InviteByLeader = ({ onClose }) => {
         );
     };
 
-    const handleInvite = () => {
-        if (selected.length === 0) {
+    const handleInvite = async () => {
+        if (selected.length === 0 || selected.some(id => id == null)) {
             toast.warning(t("challengeInvite.selectAtLeastOne"));
             return;
         }
-        toast.success(`🎉 Invited ${selected.length} group leader(s)!`);
-        onClose();
+
+        try {
+            await sendInvitation({
+                challengeId: Number(challengeId),
+                memberIds: selected.filter(id => id != null),
+                type: "LEADER"
+            }).unwrap();
+
+            toast.success(t("challengeInvite.inviteSuccess"));
+            onClose();
+        } catch (err) {
+            const message = err?.data?.message || err?.data || "Something went wrong.";
+            toast.info(message);
+            onClose();
+        }
     };
+
 
     return (
         <div className="space-y-6">
@@ -59,20 +74,20 @@ const InviteByLeader = ({ onClose }) => {
 
             {/* Result */}
             {isLoading ? (
-                <p className="text-center text-gray-500">Loading group leaders...</p>
+                <p className="text-center text-gray-500">{t("challengeInvite.loadingLeaders")}</p>
             ) : data.length === 0 ? (
-                <p className="text-center text-gray-500">No group leaders found</p>
+                <p className="text-center text-gray-500">{t("challengeInvite.noLeadersFound")}</p>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto pr-2">
                     {data.map((leader) => (
                         <div
-                            key={leader.memberId}
-                            className={`flex items-center gap-4 p-4 border rounded-lg shadow-sm bg-white hover:bg-orange-50 transition`}
+                            key={leader.id}
+                            className="flex items-center gap-4 p-4 border rounded-lg shadow-sm bg-white hover:bg-orange-50 transition"
                         >
                             <input
                                 type="checkbox"
-                                checked={selected.includes(leader.memberId)}
-                                onChange={() => toggleSelect(leader.memberId)}
+                                checked={selected.includes(leader.id)}
+                                onChange={() => toggleSelect(leader.id)}
                                 className="w-5 h-5 accent-orange-500"
                             />
                             <div className="flex items-center gap-4 w-full">
@@ -101,9 +116,10 @@ const InviteByLeader = ({ onClose }) => {
                 </button>
                 <button
                     onClick={handleInvite}
-                    className="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600"
+                    disabled={isInviting} // ✅ disable khi đang gửi
+                    className={`px-4 py-2 rounded text-white ${isInviting ? "bg-gray-400" : "bg-orange-500 hover:bg-orange-600"}`}
                 >
-                    {t("challengeInvite.invite")} ({selected.length})
+                    {isInviting ? t("challengeInvite.sending") : `${t("challengeInvite.invite")} (${selected.length})`}
                 </button>
             </div>
         </div>

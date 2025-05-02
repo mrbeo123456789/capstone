@@ -245,7 +245,7 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
     const isLoading = isLoadingMembers || isFetchingMembers;
 
     return (
-        <div className="bg-blue-50 min-h-screen flex flex-col">
+        <div className="bg-blue-50 flex flex-col">
             <div className="flex-1 flex flex-col overflow-hidden">
                 <div className="container mx-auto p-4 flex-grow">
                     {isLoading ? (
@@ -461,7 +461,6 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                             <table className="min-w-full divide-y divide-gray-200">
                                                 <thead className="bg-blue-50">
                                                 <tr>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Evidence</th>
                                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Date</th>
                                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Status</th>
                                                 </tr>
@@ -477,13 +476,10 @@ const MemberAndEvidenceManagement = ({ challengeId }) => {
                                                             className="hover:bg-blue-50 cursor-pointer"
                                                             onClick={() => handleEvidenceClick(evidence)}
                                                         >
-                                                            <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
-                                                                {evidence.memberName || `Evidence #${evidence.evidenceId}`}
-                                                            </td>
-                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                            <td className="px-6 py-4 text-sm text-gray-500 text-left">
                                                                 {formatDate(evidence.submittedAt)}
                                                             </td>
-                                                            <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                                            <td className="px-6 py-4 text-sm text-left">
                                                                 <span className={getEvidenceStatusColor(displayStatus)}>
                                                                     {getEvidenceStatusIcon(displayStatus)}
                                                                     {displayStatus.charAt(0).toUpperCase() + displayStatus.slice(1)}

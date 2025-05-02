@@ -11,11 +11,19 @@ const ProofUploads = ({ challenge, evidence }) => {
 
     if (!challenge || !evidence) return <p>{t("ProofUploads.loading")}</p>;
 
-    // ✅ correct
-    const startDate = new Date(challenge.startDate);
-    const endDate = new Date(challenge.endDate);
+    // Parse dates and ensure they're treated as UTC to avoid timezone issues
+    const parseDate = (dateStr) => {
+        const date = new Date(dateStr);
+        // Create date in local timezone without time portion
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    };
+
+    const startDate = parseDate(challenge.startDate);
+    const endDate = parseDate(challenge.endDate);
+
+    // Get today's date without time portion
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // remove time portion
+    today.setHours(0, 0, 0, 0);
 
     // Log dates for debugging
     console.log('Start date:', startDate.toLocaleDateString());
@@ -23,30 +31,37 @@ const ProofUploads = ({ challenge, evidence }) => {
     console.log('Today:', today.toLocaleDateString());
 
     // Calculate duration up to today (inclusive) or end date, whichever comes first
-    // Include today by using setHours(23, 59, 59, 999) to get the end of today
     const todayEnd = new Date(today);
     todayEnd.setHours(23, 59, 59, 999);
     const displayEndDate = todayEnd < endDate ? todayEnd : endDate;
     const duration = Math.floor((displayEndDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
 
+    // Helper function to get consistent date key format (YYYY-MM-DD)
+    const getDateKey = (date) => {
+        return date.toISOString().split('T')[0];
+    };
+
+    // Create map of evidence by date
     const evidenceMap = {};
     evidence?.forEach((e) => {
-        // Use standard ISO format to ensure consistency
-        const parsedDate = new Date(e.submittedAt);
-        if (!isNaN(parsedDate)) {
-            // Format date to YYYY-MM-DD for easy comparison
-            const dateKey = parsedDate.toISOString().split('T')[0];
+        if (e.submittedAt) {
+            // Parse the submittedAt date, handling timezone consistently
+            const parsedDate = parseDate(e.submittedAt);
+            // Format to YYYY-MM-DD
+            const dateKey = getDateKey(parsedDate);
             if (!evidenceMap[dateKey]) evidenceMap[dateKey] = e;
         }
     });
 
+    // Generate days array
     const days = Array.from({ length: duration }, (_, i) => {
         const date = new Date(startDate);
         date.setDate(startDate.getDate() + i);
+        const dateKey = getDateKey(date);
         return {
             day: i + 1,
             date,
-            evidence: evidenceMap[date.toISOString().split('T')[0]],
+            evidence: evidenceMap[dateKey],
         };
     });
 
@@ -73,11 +88,7 @@ const ProofUploads = ({ challenge, evidence }) => {
                     const { date, evidence } = dayInfo;
                     const isUploaded = Boolean(evidence);
                     const isVideo = isUploaded && evidence.evidenceUrl?.includes(".mp4");
-                    const isApproved = isUploaded && evidence.status === "approved"; // Check if approved
-
-                    // Use ISO format for date comparison
-                    const dateISO = date.toISOString().split('T')[0];
-                    const todayISO = today.toISOString().split('T')[0];
+                    const isApproved = isUploaded && evidence.status === "APPROVED";
 
                     // Check if date is today or past
                     const isPast = date < today;
@@ -178,7 +189,7 @@ const ProofUploads = ({ challenge, evidence }) => {
                     onClick={() => setSelectedProof(null)}
                 >
                     <div
-                        className="bg-white p-4 rounded-lg max-w-3xl w-full max-h-[90vh] overflow-auto"
+                        className="bg-white p-4 rounded-lg max-w-3xl max-h-[90vh] overflow-auto"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {selectedProof.evidenceUrl.includes(".mp4") ? (
@@ -186,7 +197,7 @@ const ProofUploads = ({ challenge, evidence }) => {
                                 src={selectedProof.evidenceUrl}
                                 controls
                                 autoPlay
-                                className="w-full h-auto rounded-lg"
+                                className="h-full rounded-lg"
                             />
                         ) : (
                             <img

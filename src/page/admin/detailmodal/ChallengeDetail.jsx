@@ -6,7 +6,6 @@ import { IoIosPeople } from "react-icons/io";
 import { HiUsers } from "react-icons/hi";
 import { CheckCircle, XCircle, ArrowLeft, Ban, UserX } from "lucide-react";
 import toast from "react-hot-toast";
-import Footer from "../../../component/footer.jsx";
 import { useGetChallengeDetailQuery } from "../../../service/challengeService.js";
 import { useReviewChallengeMutation } from "../../../service/adminService.js";
 import {
@@ -471,8 +470,6 @@ const ChallengeDetail = () => {
                     </div>
                 </div>
             )}
-
-            <Footer/>
         </div>
     );
 };

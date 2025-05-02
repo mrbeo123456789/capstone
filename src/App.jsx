@@ -7,7 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import useTokenExpirationCheck from "./hook/useTokenExpirationCheck.js";
 
 import router from './router/router.jsx';
-import SplashScreen from "./component/SplashScreen.jsx";
+
 
 const App = () => {
     const [loading, setLoading] = useState(true);
@@ -17,7 +17,7 @@ const App = () => {
     useEffect(() => {
         const timer = setTimeout(() => {
             setLoading(false);
-        }, 500); // show splash for 1.5s
+        }, 500);
 
         return () => clearTimeout(timer);
     }, []);
@@ -45,9 +45,11 @@ const App = () => {
             {/* Layout */}
             <SidebarProvider>
                 <RouterProvider router={router} />
+                {/* ChatBox Assistant luôn hiện ngoài cùng */}
+
             </SidebarProvider>
         </>
     );
-}
+};
 
 export default App;

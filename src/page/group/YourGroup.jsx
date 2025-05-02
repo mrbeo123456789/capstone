@@ -86,8 +86,8 @@ const YourGroup = () => {
                         {invitationsData.map((invite) => (
                             <div
                                 key={invite.id}
-                                onClick={() => navigate(`/groups/detail/${invite.id}`)}
-                                className="cursor-pointer min-w-[200px] p-4 border rounded-lg space-y-2 flex-shrink-0 hover:shadow-lg transition">
+                                className="min-w-[200px] p-4 border rounded-lg space-y-2 flex-shrink-0 bg-white"
+                            >
                                 <p className="text-sm">
                                     {t("yourGroup.inviteLine", {name: invite.invitedBy})}
                                 </p>
@@ -128,10 +128,10 @@ const YourGroup = () => {
             {/* Tabs lọc vai trò */}
             <div className="flex gap-4">
                 {[
-                    { value: "All", labelKey: "All" },
-                    { value: "OWNER", labelKey: "leader" },
-                    { value: "MEMBER", labelKey: "member" },
-                ].map(({ value, labelKey }) => (
+                    {value: "All", labelKey: "All"},
+                    {value: "OWNER", labelKey: "leader"},
+                    {value: "MEMBER", labelKey: "member"},
+                ].map(({value, labelKey}) => (
                     <button
                         key={value}
                         onClick={() => setActiveTab(value)}

@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useLoginMutation } from "../../service/authService";
+import {authService, useLoginMutation} from "../../service/authService";
 import { useGetMyProfileQuery } from "../../service/memberService";
 import google_icon from "../../assets/google-icon.png";
 import { decode } from "jsonwebtoken-esm";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
-
+import { useDispatch } from "react-redux";
+import {resetAllApiStates} from "../../utils/resetAllApiStates.js";
 export default function Login() {
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -16,6 +17,7 @@ export default function Login() {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
     const [tokenReady, setTokenReady] = useState(false);
+    const dispatch = useDispatch();
 
     const [login] = useLoginMutation();
     const { data: userData } = useGetMyProfileQuery(undefined, {
@@ -46,39 +48,45 @@ export default function Login() {
         setLoading(true);
 
         try {
-            const response = await login({ username, password }).unwrap();
+            // ✅ Gọi login & unwrap kết quả
+            const { token } = await login({ username, password }).unwrap(); // ✅
 
-            const token = response?.token;
             if (!token) throw new Error("No token returned");
 
-            // Lưu token nếu cần
-            localStorage.setItem("accessToken", token);
+            // ✅ Xoá localStorage cũ, chỉ lưu token
+            localStorage.clear();
+            localStorage.setItem("jwt_token", token);
 
+            // ✅ Decode token để lấy vai trò điều hướng
             const decoded = decode(token);
             const role = Array.isArray(decoded?.roles) ? decoded.roles[0] : decoded?.roles;
             if (!role) throw new Error("No role found in token");
 
+            // ✅ Reset toàn bộ RTK Query cache để xoá dữ liệu người dùng cũ
+            resetAllApiStates(dispatch);
+
+            // ✅ Cho phép gọi `useGetMyProfileQuery`
             setTokenReady(true);
             toast.success(t("auth.login.success"));
 
+            // ✅ Điều hướng
             setTimeout(() => {
                 navigate(role.toUpperCase() === "ADMIN" ? "/admin/dashboard" : "/homepage");
             }, 100);
         } catch (err) {
-            const errorCode = err?.data?.message; // ✅ Đây mới đúng
+            const errorCode = err?.message || err?.data?.message;
 
             if (errorCode === "ACCOUNT_NOT_VERIFIED") {
-                sessionStorage.setItem("otpEmail", username); // có thể là email hoặc username
-                sessionStorage.setItem("otpType", "register"); // hoặc "forgot" tùy luồng
+                sessionStorage.setItem("otpEmail", username);
+                sessionStorage.setItem("otpType", "register");
                 navigate("/enter-otp");
                 return;
             }
 
-            const errorMessage = errorCode
-                ? t(`auth.login.errors.${errorCode}`, { defaultValue: errorCode })
-                : err.message === "No role found in token"
-                    ? t("auth.login.errors.invalidToken")
-                    : t("auth.login.errors.loginFailed");
+            const errorMessage = errorCode?.startsWith("No role") || errorCode?.startsWith("No token")
+                ? t("auth.login.errors.invalidToken")
+                : t(`auth.login.errors.${errorCode}`, { defaultValue: t("auth.login.errors.loginFailed") });
+
             setError(errorMessage);
             toast.error(errorMessage, { autoClose: 4000 });
         } finally {
@@ -86,8 +94,10 @@ export default function Login() {
         }
     };
 
+
+
     const loginWithGoogle = () => {
-        window.location.href = "https://api.gobeyond.top/oauth2/authorization/google";
+        window.location.href = "http://localhost:8080/oauth2/authorization/google";
     };
 
     const handleForgotPassword = () => navigate("/forgotPassword");

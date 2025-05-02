@@ -5,6 +5,7 @@ import { useGetMyChallengesMutation } from "../../service/challengeService.js";
 import { useGetMyInvitationsQuery, useRespondInvitationMutation } from "../../service/invitationService.js";
 import NoInvitationsIllustration from "../../component/NoInvitationsIllustration.jsx";
 import { toast } from "react-toastify";
+import JoinedGroup from "./modal/JoinedChallengeGroup.jsx";
 
 const YourChallenge = () => {
     const navigate = useNavigate();
@@ -12,13 +13,11 @@ const YourChallenge = () => {
     const [activeTab, setActiveTab] = useState("All");
     const [filterType, setFilterType] = useState("ALL");
     const [searchTerm, setSearchTerm] = useState("");
+    const [isJoinedGroupOpen, setIsJoinedGroupOpen] = useState(false); // ✅ popup chọn nhóm
+    const [selectedInvitation, setSelectedInvitation] = useState(null); // ✅ lời mời đang chọn
 
     const [getMyChallenges, { data: joinedChallenges = [], isLoading }] = useGetMyChallengesMutation();
-    const {
-        data: invitations = [],
-        isLoading: isInvitationsLoading,
-        refetch: refetchInvitations,
-    } = useGetMyInvitationsQuery();
+    const { data: invitations = [], isLoading: isInvitationsLoading, refetch: refetchInvitations } = useGetMyInvitationsQuery();
     const [respondInvitation] = useRespondInvitationMutation();
 
     const themeColor = "#FF5733";
@@ -27,59 +26,50 @@ const YourChallenge = () => {
         getMyChallenges(activeTab.toUpperCase());
     }, [activeTab]);
 
-    const handleRespond = async (invitationId, invitationType, accept) => {
-        try {
-            await respondInvitation({
-                invitationId,
-                invitationType,
-                accept,
-            });
-
-            toast.success(
-                accept
-                    ? t("yourChallenge.accepted")
-                    : t("yourChallenge.declined")
-            );
-
-            // ✅ Reload lại cả lời mời và danh sách thử thách
-            if (typeof refetchInvitations === "function") {
+    const handleRespond = async (invitationId, invitationType, accept, challengeId) => {
+        if (invitationType === "GROUP" && accept) {
+            // ✅ Nếu Accept nhóm → mở popup chọn nhóm
+            setSelectedInvitation({ invitationId, invitationType, challengeId });
+            setIsJoinedGroupOpen(true);
+        } else {
+            // ✅ Nếu cá nhân hoặc decline → gửi API luôn
+            try {
+                await respondInvitation({ invitationId, invitationType, accept });
+                toast.success(accept ? t("yourChallenge.accepted") : t("yourChallenge.declined"));
                 refetchInvitations();
+                getMyChallenges(activeTab.toUpperCase());
+            } catch (error) {
+                console.error("Failed to respond to invitation:", error);
+                toast.error(t("yourChallenge.failedResponse"));
             }
-            getMyChallenges(activeTab.toUpperCase());
-        } catch (error) {
-            console.error("Failed to respond to invitation:", error);
-            toast.error(t("yourChallenge.failedResponse"));
         }
     };
 
-
-
-
-    const getStatusStyle = (status) => {
-        switch (status) {
-            case "PENDING":
-                return { text: t("yourChallenge.status.pending"), bg: "bg-gray-100", textColor: "text-gray-600" };
-            case "ACCEPTED":
-                return { text: t("yourChallenge.status.approved"), bg: "bg-green-100", textColor: "text-green-700" };
-            case "DECLINED":
-            case "REJECTED":
-                return { text: t("yourChallenge.status.rejected"), bg: "bg-red-100", textColor: "text-red-700" };
-            case "CANCELED":
-                return { text: t("yourChallenge.status.canceled"), bg: "bg-yellow-100", textColor: "text-yellow-800" };
-            default:
-                return { text: status, bg: "bg-gray-100", textColor: "text-gray-700" };
-        }
-    };
-
-    const filteredChallenges = joinedChallenges.filter(challenge =>
+    const filteredChallenges = joinedChallenges.filter((challenge) =>
         challenge.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const filteredInvitations = invitations.filter(invite => {
+    const filteredInvitations = invitations.filter((invite) => {
         if (filterType === "PERSONAL") return invite.invitationType === "PERSONAL";
         if (filterType === "GROUP") return invite.invitationType === "GROUP";
         return true;
     });
+    const getStatusStyle = (status) => {
+        switch (status) {
+            case "PENDING":
+                return { text: t("yourChallenge.status.pending"), bg: "bg-yellow-100", textColor: "text-yellow-800" };
+            case "ACCEPTED":
+                return { text: t("yourChallenge.status.accepted"), bg: "bg-green-100", textColor: "text-green-700" };
+            case "REJECTED":
+                return { text: t("yourChallenge.status.rejected"), bg: "bg-red-100", textColor: "text-red-700" };
+            case "ONGOING":
+                return { text: t("yourChallenge.status.ongoing"), bg: "bg-blue-100", textColor: "text-blue-700" };
+            case "COMPLETED":
+                return { text: t("yourChallenge.status.completed"), bg: "bg-gray-100", textColor: "text-gray-800" };
+            default:
+                return { text: status, bg: "bg-gray-100", textColor: "text-gray-600" };
+        }
+    };
 
     return (
         <div className="p-6 space-y-6 bg-white rounded-lg shadow-lg overflow-hidden">
@@ -107,14 +97,14 @@ const YourChallenge = () => {
                         <option value="GROUP">{t("yourChallenge.filterGroup")}</option>
                     </select>
                 </div>
+
                 {isInvitationsLoading ? (
                     <p>{t("yourChallenge.loadingInvitations")}</p>
                 ) : filteredInvitations.length === 0 ? (
-                    <div className="h-52 w-full flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-lg bg-gray-50 text-gray-500 text-center">
+                    <div className="h-52 flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-lg bg-gray-50 text-gray-500">
                         <NoInvitationsIllustration themeColor={themeColor} />
                         <p className="font-semibold text-sm mt-2">{t("yourChallenge.noInvitations")}</p>
                     </div>
-
                 ) : (
                     <div className="flex gap-6 overflow-x-auto pb-2">
                         {filteredInvitations.map((invite) => (
@@ -123,7 +113,16 @@ const YourChallenge = () => {
                                 className="cursor-pointer min-w-[200px] p-4 border rounded-lg space-y-2 flex-shrink-0 hover:shadow-lg transition"
                                 onClick={() => navigate(`/challenges/detail/${invite.challengeId}`)}
                             >
-                                <p className="text-sm">{invite.inviterInfo} {t("yourChallenge.inviteText")}</p>
+                                {/* Icon + Text */}
+                                <div className="flex items-center gap-2">
+                                    {invite.invitationType === "PERSONAL" ? (
+                                        <span className="text-blue-500 text-lg">📩</span>
+                                    ) : (
+                                        <span className="text-green-500 text-lg">👥</span>
+                                    )}
+                                    <p className="text-sm">{invite.inviterInfo} {t("yourChallenge.inviteText")}</p>
+                                </div>
+
                                 <div className="h-24 bg-gray-200 rounded overflow-hidden">
                                     <img
                                         src={invite.challengeImage || "https://via.placeholder.com/300x200"}
@@ -132,12 +131,13 @@ const YourChallenge = () => {
                                     />
                                 </div>
                                 <p className="font-medium">{invite.challengeName}</p>
+
                                 <div className="flex gap-2">
                                     <button
                                         className="bg-green-600 text-white px-3 py-1 rounded"
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            handleRespond(invite.invitationId, invite.invitationType, true);
+                                            handleRespond(invite.invitationId, invite.invitationType, true, invite.challengeId);
                                         }}
                                     >
                                         {t("yourChallenge.accept")}
@@ -146,7 +146,7 @@ const YourChallenge = () => {
                                         className="border px-3 py-1 rounded"
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            handleRespond(invite.invitationId, invite.invitationType, false);
+                                            handleRespond(invite.invitationId, invite.invitationType, false, invite.challengeId);
                                         }}
                                     >
                                         {t("yourChallenge.decline")}
@@ -157,6 +157,21 @@ const YourChallenge = () => {
                     </div>
                 )}
             </div>
+
+            {/* Popup chọn nhóm khi accept GROUP invitation */}
+            {isJoinedGroupOpen && selectedInvitation && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl overflow-hidden">
+                        <JoinedGroup
+                            invitation={selectedInvitation}
+                            onClose={() => {
+                                setIsJoinedGroupOpen(false);
+                                setSelectedInvitation(null);
+                            }}
+                        />
+                    </div>
+                </div>
+            )}
 
             {/* Filter Tabs */}
             <div className="flex gap-4">
@@ -183,10 +198,11 @@ const YourChallenge = () => {
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
+
                 {isLoading ? (
                     <p>{t("yourChallenge.loadingChallenges")}</p>
                 ) : filteredChallenges.length === 0 ? (
-                    <div className="h-52 w-full flex items-center justify-center border border-dashed border-gray-300 rounded-lg bg-gray-50 text-gray-500 text-center">
+                    <div className="h-52 flex items-center justify-center border border-dashed border-gray-300 rounded-lg bg-gray-50 text-gray-500">
                         <p className="font-semibold">{t("yourChallenge.noJoined")}</p>
                     </div>
                 ) : (
@@ -203,37 +219,27 @@ const YourChallenge = () => {
                                         alt={challenge.name}
                                         className="w-full h-full object-cover rounded"
                                     />
-
-                                    {/* 👑 Host icon on the top-left */}
                                     {challenge.role === "HOST" && (
-                                        <span
-                                            className="absolute top-2 left-2 text-yellow-400 text-xl drop-shadow-md">👑</span>
+                                        <span className="absolute top-2 left-2 text-yellow-400 text-xl">👑</span>
                                     )}
-
-                                    {/* 🧍/👥 Participation icon on the top-right */}
                                     <span
-                                        className="absolute top-2 right-2 text-white text-xl px-1.5 py-0.5"
+                                        className="absolute top-2 right-2 text-white text-xl"
                                         title={challenge.participationType === "INDIVIDUAL" ? "Individual" : "Group"}
                                     >
                                         {challenge.participationType === "INDIVIDUAL" ? "🧍" : "👥"}
                                     </span>
-                                    {/* 🕓 Remaining days at bottom-right */}
-                                    {challenge.remainingDays > 0 && challenge.remainingDays < 7 && (
-                                        <div className="absolute bottom-1 right-2 text-xs text-orange-500 bg-white/80 px-2 py-0.5 rounded shadow">
-                                            🕓 {challenge.remainingDays} day{challenge.remainingDays > 1 ? "s" : ""} left
-                                        </div>
-                                    )}
                                 </div>
 
                                 <div className="flex items-center justify-center gap-1 mb-2 w-full px-2">
                                     {challenge.role === "HOST" && (
                                         <span className="text-gray-600 hover:text-blue-600 text-sm cursor-pointer"
-                                              title="Edit challenge" onClick={(e) => {
-                                            e.stopPropagation();
-                                            navigate(`/challenges/edit/${challenge.id}`);
-                                        }}>
-      ✏️
-    </span>
+                                              title="Edit challenge"
+                                              onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  navigate(`/challenges/edit/${challenge.id}`);
+                                              }}>
+                                            ✏️
+                                        </span>
                                     )}
                                     <p className="font-medium text-center truncate">{challenge.name}</p>
                                 </div>
@@ -246,7 +252,6 @@ const YourChallenge = () => {
                                         </div>
                                     );
                                 })()}
-
 
                                 <div className="bg-gray-200 text-gray-800 text-xs px-2 py-1 rounded mt-auto mb-2">
                                     {t(`yourChallenge.tabs.${challenge.role.toLowerCase()}`)}

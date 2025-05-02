@@ -135,13 +135,13 @@ const ChallengeEdit = () => {
             toast.success(t("createChallenge.successUpdate"));
             navigate("/challenges/joins");
         } catch (e) {
-            toast.error(e?.data?.message || t("createChallenge.fail"));
+            toast.error(e?.data?.message || t("createChallenge.editFail"));
         }
     };
 
     const onError = (errorList) => {
         const firstError = Object.values(errorList)[0]?.message;
-        toast.error(firstError || t("createChallenge.validationError"));
+        toast.error(firstError || t("createChallenge.editValidationError"));
     };
 
     return (

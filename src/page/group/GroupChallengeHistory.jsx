@@ -26,8 +26,8 @@ const GroupChallengeHistory = ({ groupId }) => {
     // Filter challenges based on search term
     const filteredChallenges = challenges.filter(challenge => {
         return searchTerm === "" ||
-            challenge.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            challenge.description.toLowerCase().includes(searchTerm.toLowerCase());
+            challenge.challengeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (challenge.description && challenge.description.toLowerCase().includes(searchTerm.toLowerCase()));
     });
 
     // Reset to first page when status filter changes
@@ -58,7 +58,7 @@ const GroupChallengeHistory = ({ groupId }) => {
                         <FaCheckCircle className="mr-1" /> {t("challenges.status.completed")}
                     </span>
                 );
-            case "IN_PROGRESS":
+            case "ONGOING":
                 return (
                     <span className="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800 flex items-center">
                         <FaClock className="mr-1" /> {t("challenges.status.inProgress")}
@@ -79,12 +79,46 @@ const GroupChallengeHistory = ({ groupId }) => {
         }
     };
 
+    // Format date to dd/mm/yyyy
     const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString(undefined, {
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit"
-        });
+        const date = new Date(dateString);
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+    };
+
+    // Progress indicator component based on isSuccess
+    const getProgressIndicator = (isSuccess, status) => {
+        if (status === "COMPLETED") {
+            return isSuccess ? (
+                <div className="flex items-center">
+                    <FaCheckCircle className="text-green-500 mr-2" />
+                    <span className="text-green-600 font-medium">{t("challenges.progress.success")}</span>
+                </div>
+            ) : (
+                <div className="flex items-center">
+                    <FaTimesCircle className="text-red-500 mr-2" />
+                    <span className="text-red-600 font-medium">{t("challenges.progress.failed")}</span>
+                </div>
+            );
+        } else if (status === "ONGOING") {
+            return (
+                <div className="relative pt-1">
+                    <div className="overflow-hidden h-2 mb-1 text-xs flex rounded bg-blue-100">
+                        <div className="w-1/2 shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-500"></div>
+                    </div>
+                    <span className="text-xs text-blue-600">{t("challenges.progress.inProgress")}</span>
+                </div>
+            );
+        } else {
+            return (
+                <div className="flex items-center">
+                    <FaTimesCircle className="text-gray-400 mr-2" />
+                    <span className="text-gray-500">{t("challenges.progress.notStarted")}</span>
+                </div>
+            );
+        }
     };
 
     if (isLoading) {
@@ -145,26 +179,34 @@ const GroupChallengeHistory = ({ groupId }) => {
                                 {t("challenges.participants")}
                             </th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                {t("challenges.status")}
+                                {t("status")}
                             </th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                {t("challenges.actions")}
+                                {t("progress")}
                             </th>
                         </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
                         {displayedChallenges.map((challenge) => (
-                            <tr key={challenge.id} className="hover:bg-gray-50">
+                            <tr key={challenge.groupChallengeId || challenge.id} className="hover:bg-gray-50">
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="flex items-center">
                                         <div className="flex-shrink-0 h-10 w-10">
-                                            <div className="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center">
-                                                <FaTrophy className="text-orange-500" />
-                                            </div>
+                                            {challenge.challengePicture ? (
+                                                <img
+                                                    src={challenge.challengePicture}
+                                                    alt={challenge.challengeName || challenge.name}
+                                                    className="h-10 w-10 rounded-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center">
+                                                    <FaTrophy className="text-orange-500" />
+                                                </div>
+                                            )}
                                         </div>
                                         <div className="ml-4">
                                             <div className="text-sm font-medium text-gray-900">
-                                                {challenge.name}
+                                                {challenge.challengeName || challenge.name}
                                             </div>
                                             <div className="text-sm text-gray-500">
                                                 {challenge.description?.substring(0, 30)}
@@ -176,28 +218,31 @@ const GroupChallengeHistory = ({ groupId }) => {
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="text-sm text-gray-900 flex items-center">
                                         <FaCalendarAlt className="mr-2 text-gray-400" />
-                                        {formatDate(challenge.startDate)} - {formatDate(challenge.endDate)}
+                                        {challenge.joinDate ? (
+                                            formatDate(challenge.joinDate)
+                                        ) : (
+                                            <>
+                                                {formatDate(challenge.startDate)} - {formatDate(challenge.endDate)}
+                                            </>
+                                        )}
                                     </div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="text-sm text-gray-900 flex items-center">
                                         <FaUsers className="mr-2 text-gray-400" />
                                         {challenge.participantCount || 0}
-                                        <span className="ml-2 text-xs text-gray-500">
-                                            ({challenge.successRate}% {t("challenges.success")})
-                                        </span>
+                                        {challenge.successRate && (
+                                            <span className="ml-2 text-xs text-gray-500">
+                                                ({challenge.successRate}% {t("challenges.success")})
+                                            </span>
+                                        )}
                                     </div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     {getStatusBadge(challenge.status)}
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <button
-                                        onClick={() => navigate(`/challenges/${challenge.id}`)}
-                                        className="text-orange-600 hover:text-orange-900 mr-3"
-                                    >
-                                        {t("challenges.viewDetails")}
-                                    </button>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    {getProgressIndicator(challenge.isSuccess, challenge.status)}
                                 </td>
                             </tr>
                         ))}

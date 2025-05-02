@@ -11,10 +11,24 @@ import { useTranslation } from "react-i18next";
 
 const renderStars = (rating) => {
     const stars = [];
+    let fullStars = Math.floor(rating);
+    console.log("Full statr", fullStars)// full stars (ex: 3 from 3.8)
+    const hasHalfStar = rating - fullStars >= 0.25 && rating - fullStars < 0.75; // half if between 0.25 - 0.75
+    console.log("hasHalfStar", hasHalfStar)
+    const totalStars = hasHalfStar ? fullStars + 1 : Math.round(rating);  // total stars filled (full + half)
+    console.log("totalStars", totalStars)
+
     for (let i = 1; i <= 5; i++) {
-        if (i <= rating) stars.push(<FaStar key={i} className="text-yellow-400" />);
-        else if (i - 0.5 === rating) stars.push(<FaStarHalfAlt key={i} className="text-yellow-400" />);
-        else stars.push(<FaRegStar key={i} className="text-gray-300" />);
+        if (!hasHalfStar) {
+            fullStars = totalStars;
+        }
+        if (i <= fullStars) {
+            stars.push(<FaStar key={i} className="text-yellow-400" />);
+        } else if (i === fullStars + 1 && hasHalfStar) {
+            stars.push(<FaStarHalfAlt key={i} className="text-yellow-400" />);
+        } else {
+            stars.push(<FaRegStar key={i} className="text-gray-300" />);
+        }
     }
     return stars;
 };
@@ -81,13 +95,19 @@ const RankingList = () => {
                         filtered.map((user, i) => (
                             <div key={i} className="flex items-center justify-between bg-gray-50 rounded p-3 shadow-sm">
                                 <div className="flex items-center space-x-3">
-                                    <img src={user.avatar} alt={user.memberName} className="w-12 h-12 rounded-full" />
+                                    <img
+                                        src={user.avatar || "https://firebasestorage.googleapis.com/v0/b/bookstore-f9ac2.appspot.com/o/avatar%2Fillustration-of-human-icon-user-symbol-icon-modern-design-on-blank-background-free-vector.jpg?alt=media&token=f5c7e08a-9e7d-467f-8eff-3c321824edcd"}
+                                        alt={user.memberName}
+                                        className="w-12 h-12 rounded-full object-cover"
+                                    />
                                     <div>
                                         <p className="font-semibold">{user.memberName}</p>
-                                        <p className="text-sm text-gray-600">{t('rankingList.avgStars')}: {user.averageStar?.toFixed(2) || 0}</p>
+                                        <p className="text-sm text-gray-600">
+                                            {t('rankingList.avgStars')}: {((user.averageStar || 0)/10).toFixed(2)}
+                                        </p>
                                     </div>
                                 </div>
-                                <div className="flex space-x-1">{renderStars(user.averageStar)}</div>
+                                <div className="flex space-x-1">{renderStars((user.averageStar || 0) / 10)}</div>
                             </div>
                         ))
                     )}
