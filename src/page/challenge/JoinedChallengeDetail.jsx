@@ -155,10 +155,10 @@ const JoinedChallengeDetail = () => {
     ];
 
     // 👉 Thêm tab Report nếu là HOST
-    if (challenge.role === "HOST") {
+    if (["HOST", "CO_HOST"].includes(challenge?.role)) {
         tabItems.push({
             key: "report",
-            label: t("JoinsChallengeDetail.reportTab"), // 🔁 nhớ thêm key vào i18n
+            label: t("JoinsChallengeDetail.reportTab"),
             icon: <FaFlag />
         });
     }
@@ -181,7 +181,7 @@ const JoinedChallengeDetail = () => {
                                     const isOngoing = now >= start && now <= end;
                                     return (
                                         <>
-                                            {challenge?.role === "HOST" && (
+                                            {["HOST", "CO_HOST"].includes(challenge?.role) && (
                                                 <button
                                                     title={t("JoinsChallengeDetail.memberManagement")}
                                                     onClick={openMemberModal}
@@ -190,7 +190,6 @@ const JoinedChallengeDetail = () => {
                                                     <FaUsers />
                                                 </button>
                                             )}
-
                                             {/* Invite Button */}
                                             <button
                                                 title={
@@ -353,6 +352,7 @@ const JoinedChallengeDetail = () => {
                         show={showMemberModal}
                         onClose={closeMemberModal}
                         challengeId={challenge.id}
+                        currentUserRole={challenge?.role}
                     />
                 )}
                 {showConfirmCancelModal && (

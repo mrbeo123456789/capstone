@@ -189,7 +189,7 @@ const ProofUploads = ({ challenge, evidence }) => {
                     onClick={() => setSelectedProof(null)}
                 >
                     <div
-                        className="bg-white p-4 rounded-lg max-w-3xl w-full max-h-[90vh] overflow-auto"
+                        className="bg-white p-4 rounded-lg max-w-3xl max-h-[90vh] overflow-auto"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {selectedProof.evidenceUrl.includes(".mp4") ? (
@@ -197,7 +197,7 @@ const ProofUploads = ({ challenge, evidence }) => {
                                 src={selectedProof.evidenceUrl}
                                 controls
                                 autoPlay
-                                className="w-full h-auto rounded-lg"
+                                className="h-full rounded-lg"
                             />
                         ) : (
                             <img

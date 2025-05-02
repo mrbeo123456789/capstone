@@ -95,16 +95,16 @@ const VideoModal = ({
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg relative flex flex-col sm:flex-row h-[90%] w-[80%] overflow-hidden">
+            <div className="bg-white rounded-lg relative flex flex-col h-[90%] w-[80%] overflow-y-scroll sm:overflow-hidden sm:grid grid-cols-3">
                 {/* Close Button */}
                 <button
-                    className="absolute top-2 right-4 text-gray-300 text-3xl hover:text-white"
+                    className="absolute top-2 right-4 text-gray-300 text-3xl hover:text-white z-50"
                     onClick={onClose}>
                     ×
                 </button>
 
                 {/* Video Player */}
-                <div className="flex-1 bg-black flex justify-center items-center">
+                <div className="flex-1 bg-black flex justify-center items-center col-span-2">
                     <video key={videoSrc} controls className="h-full rounded">
                         <source src={videoSrc} type="video/mp4" />
                         {t("VideoModal.browserNotSupported")}
@@ -129,13 +129,13 @@ const VideoModal = ({
                         {/* If reviewing rejection, show textarea */}
                         {isReviewingReject ? (
                             <div className="w-full flex flex-col items-center gap-2">
-            <textarea
-                className="w-full p-2 border border-gray-300 rounded resize-none"
-                placeholder={t("VideoModal.enterRejectionReason")}
-                rows={3}
-                value={feedbackText}
-                onChange={(e) => setFeedbackText(e.target.value)}
-            />
+                                <textarea
+                                    className="w-full p-2 border border-gray-300 rounded resize-none"
+                                    placeholder={t("VideoModal.enterRejectionReason")}
+                                    rows={3}
+                                    value={feedbackText}
+                                    onChange={(e) => setFeedbackText(e.target.value)}
+                                />
                                 <div className="flex gap-4">
                                     <button
                                         className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded"
@@ -155,7 +155,7 @@ const VideoModal = ({
                                 </div>
                             </div>
                         ) : (
-                            <div className="flex justify-center gap-4 mt-2">
+                            <div className="flex justify-center mt-2">
                                 <button
                                     className={`flex items-center gap-2 font-bold py-3 px-6 rounded-lg ${isReviewingReject ? "bg-red-300 cursor-not-allowed" : "bg-red-500 hover:bg-red-600 text-white"}`}
                                     onClick={() => setIsReviewingReject(true)}

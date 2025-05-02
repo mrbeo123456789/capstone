@@ -10,9 +10,9 @@ import {
     useToggleCoHostMutation
 } from "../../../service/challengeService.js";
 
-const DEFAULT_AVATAR = "/default-avatar.png";
+const DEFAULT_AVATAR = "https://firebasestorage.googleapis.com/v0/b/bookstore-f9ac2.appspot.com/o/avatar%2Fillustration-of-human-icon-user-symbol-icon-modern-design-on-blank-background-free-vector.jpg?alt=media&token=f5c7e08a-9e7d-467f-8eff-3c321824edcd";
 
-const MemberManagementModal = ({ show, onClose, challengeId }) => {
+const MemberManagementModal = ({ show, onClose, challengeId, currentUserRole }) => {
     const { t } = useTranslation();
     const [currentPage, setCurrentPage] = useState(0);
     const [keyword, setKeyword] = useState("");
@@ -103,7 +103,6 @@ const MemberManagementModal = ({ show, onClose, challengeId }) => {
                         <tr className="border-b">
                             <th className="py-2">{t("MemberManagement.member")}</th>
                             <th>{t("MemberManagement.role")}</th>
-                            <th>{t("MemberManagement.participate")}</th>
                             <th>{t("MemberManagement.coHost")}</th>
                             <th>{t("MemberManagement.actions")}</th>
                         </tr>
@@ -147,21 +146,16 @@ const MemberManagementModal = ({ show, onClose, challengeId }) => {
                                     </span>
                                 </td>
                                 <td className="text-center">
-                                    {member.isParticipate ? (
-                                        <FaUserCheck className="text-green-500" />
-                                    ) : (
-                                        <FaTimes className="text-gray-400" />
-                                    )}
-                                </td>
-                                <td className="text-center">
                                     <Toggle
                                         isOn={member.role === "CO_HOST"}
                                         onToggle={() => handleToggle(member.memberId)}
-                                        disabled={member.role === "HOST"}
+                                        disabled={
+                                            member.role === "HOST" || currentUserRole === "CO_HOST"
+                                        }
                                     />
                                 </td>
                                 <td className="flex items-center gap-2 py-2">
-                                    {member.role !== "HOST" && (
+                                    {member.role !== "HOST" && (currentUserRole !== "CO_HOST" || member.role === "MEMBER") && (
                                         <button
                                             onClick={() => handleConfirmKick(member.memberId, member.fullName)}
                                             className="text-red-500 hover:text-red-700"
