@@ -5,6 +5,8 @@ import { FiLogOut } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 import {NotificationDropdown} from "../../component/NotificationDropdown.jsx";
 import { Link } from "react-router-dom";
+import {resetAllApiStates} from "../../utils/resetAllApiStates.js";
+import {useDispatch} from "react-redux";
 
 const Header = ({ toggleSidebar }) => {
     const navigate = useNavigate();
@@ -13,6 +15,7 @@ const Header = ({ toggleSidebar }) => {
     const [authChanged, setAuthChanged] = useState(0); // Used to force re-render when auth changes
     const [avatarUrl, setAvatarUrl] = useState("");
     const token = localStorage.getItem("jwt_token");
+    const dispatch = useDispatch();
 
     const menuItems = [
         { href: "/homepage", title: t('menu.homepage'), text: t('menu.homepage') },
@@ -29,7 +32,9 @@ const Header = ({ toggleSidebar }) => {
 
     const handleLogout = () => {
         localStorage.clear();
-        setAuthChanged(prev => prev + 1); // 👈 trigger re-render
+        setAuthChanged(prev => prev + 1);
+        resetAllApiStates(dispatch);
+// 👈 trigger re-render
         navigate("/login");
     };
 
