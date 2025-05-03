@@ -12,9 +12,18 @@ export const guestService = createApi({
                 params: { page, size },
             }),
         }),
+        getChallengesByStatus: builder.query({
+            query: ({ status = null, page = 0, size = 10 }) => ({
+                url: "/challenges/public/challenges",
+                method: "GET",
+                params: { status, page, size },
+            }),
+        }),
     }),
 });
 
 export const {
-    useGetUpcomingChallengesQuery 
+    useGetUpcomingChallengesQuery ,
+    useGetChallengesByStatusQuery,
+    useLazyGetChallengesByStatusQuery
 } = guestService;

@@ -1,31 +1,32 @@
-import React from 'react';
-import GameSwiper from "../../heroBanner/GameSwiper.jsx";
-import ChallengeSwiper from "../ui/ChallengeSwiper/ChallengeSwiper.jsx";
+import { useGetChallengesByStatusQuery } from "../../service/guestService.js";
 import ChallengeCardDisplay from "./challengepage/ChallengeCardDisplay.jsx";
+import ChallengeSwiper from "../ui/ChallengeSwiper/ChallengeSwiper.jsx";
+
 function ChallengePage() {
+    const upcoming = useGetChallengesByStatusQuery({ status: "UPCOMING" });
+    const ongoing = useGetChallengesByStatusQuery({ status: "ONGOING" });
+    const finished = useGetChallengesByStatusQuery({ status: "FINISHED" });
+
     return (
         <section id="home" className="home active">
-            <div className="container-fluid">
-                <div className="row">
-                    <ChallengeSwiper />
+            <ChallengeSwiper/>
+            <div className="container-fluid p-4">
+                <div className="flex flex-row ">
+                    <div className="bg-black/50 rounded-lg w-full h-[10px]">
+                    </div>
+                    <div className="flex flex-col">
+                        <h2 className="text-2xl font-bold">📅 Upcoming Challenges</h2>
+                    </div>
+                    <div className="bg-black/50 rounded-lg w-full h-[10px]">
+                    </div>
                 </div>
-                {/*<div>*/}
-                {/*    <div className="relative flex min-h-screen flex-col justify-center">*/}
-                {/*        <div className="mx-auto flex w-96 flex-col justify-center bg-white rounded-2xl shadow-xl shadow-slate-300/60">*/}
-                {/*            <img className="aspect-video w-96 rounded-t-2xl object-cover object-center" src="https://images.pexels.com/photos/3311574/pexels-photo-3311574.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" />*/}
-                {/*            <div className="p-4">*/}
-                {/*                <small className="text-blue-400 text-xs">Automobile company</small>*/}
-                {/*                <h1 className="text-2xl font-medium text-slate-600 pb-2">Dodge Car</h1>*/}
-                {/*                <p className="text-sm tracking-tight font-light text-slate-400 leading-6">Dodge is an American brand of automobiles and a division of Stellantis, based in Auburn Hills, Michigan..</p>*/}
-                {/*            </div>*/}
-                {/*        </div>*/}
-                {/*    </div>*/}
-                {/*</div>*/}
-                <div>
-                    <ChallengeCardDisplay/>
-                </div>
-            </div>
+                <ChallengeCardDisplay data={upcoming.data} isLoading={upcoming.isLoading} isError={upcoming.isError}/>
+                <h2 className="text-2xl font-bold bg-black/50 p-3 rounded-lg">🔥 Ongoing Challenges</h2>
+                <ChallengeCardDisplay data={ongoing.data} isLoading={ongoing.isLoading} isError={ongoing.isError}/>
+                <h2 className="text-2xl font-bold bg-black/50 p-3 rounded-lg">✅ Finished Challenges</h2>
+                <ChallengeCardDisplay data={finished.data} isLoading={finished.isLoading} isError={finished.isError}/>
 
+            </div>
         </section>
     );
 }

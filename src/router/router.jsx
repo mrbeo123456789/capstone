@@ -6,7 +6,6 @@ import AuthCallBack from "../page/signin/AuthCallBack.jsx";
 import LoginPage from "../page/signin/LoginPage.jsx";
 import ChallengeForm from "../page/challenge/ChallengeForm.jsx";
 import ChangePassword from "../page/signin/ChangePassword.jsx";
-import HomePage from "../page/ui/HomePage.jsx";
 import AdminDashboard from "../page/admin/dashboard/AdminDashboard.jsx";
 import ForgotPassword from "../page/signin/ForgotPassword.jsx";
 import EnterOTP from "../page/signin/EnterOtp.jsx";
@@ -37,6 +36,7 @@ import Leaderboard from "../page/ui/Leaderboard.jsx";
 import ChallengeEdit from "../page/challenge/ChallengeEdit.jsx";
 import ChallengeStatistics from "../page/admin/detailmodal/challengeStatistic.jsx";
 import News from "../page/ui/News.jsx"
+import UserDashBoard from "../page/ui/UserDashBoard.jsx";
 const router = createBrowserRouter([
     { path: "/", element: <Navigate to="/homepage" /> },
     { path: "*", element: <NotFoundPage /> },
@@ -46,7 +46,8 @@ const router = createBrowserRouter([
         path: "/",
         element: <Layout />, // ✅ Layout wraps all main pages
         children: [
-            { path: "homepage", element: <HomePage/> },
+            { path: "homepage", element: <ChallengePage/> },
+            { path: "dashboard", element: <UserDashBoard/> },
             { path: "aboutus", element: <AboutUsPage /> },
             { path: "news", element: <News /> },
             { path: "profile", element: <MemberRoute><MemberProfile /></MemberRoute> },
