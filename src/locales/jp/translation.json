@@ -303,7 +303,7 @@
     "kickedFromChallenge.content": "あなたはチャレンジ「{{challengeName}}」から管理者により削除されました。",
     "empty": "新しい通知はありません。",
     "challengeStatusUpdated.title": "チャレンジのステータスが更新されました",
-    "notification.challengeStatusUpdated.content": "チャレンジ「{{challengeName}}」のステータスが {{status}} に更新されました。{{#adminNote}} 管理者メモ: {{adminNote}}{{/adminNote}}"
+    "notification.challengeStatusUpdated.content": "チャレンジ「{{challengeName}}」のステータスが {{status}} に更新されました。{{#adminNote}} メモ: {{adminNote}}{{/adminNote}}"
   },
   "suggest.reason.both": "共通の興味があり、近くにいます",
   "suggest.reason.same_interest": "共通の興味があります",

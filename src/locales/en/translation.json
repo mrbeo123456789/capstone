@@ -244,7 +244,7 @@
   "notification.challengeRoleUpdated.title": "Challenge Role Updated",
   "notification.challengeRoleUpdated.content": "Your role in the challenge '{{challengeName}}' has been updated to: {{role}}",
   "notification.challengeStatusUpdated.title": "Your challenge status has been updated",
-  "notification.challengeStatusUpdated.content": "The challenge '{{challengeName}}' has been updated to: {{status}}.{{#adminNote}} Note: {{adminNote}}{{/adminNote}}",
+  "notification.challengeStatusUpdated.content": "The challenge '{{challengeName}}' has been updated to status: {{status}}.{{#adminNote}} Note: {{adminNote}}{{/adminNote}}",
   "notification.challengeStarted.title": "The challenge '{{challengeName}}' has started!",
   "notification.challengeStarted.content": "Get ready to conquer the challenge '{{challengeName}}' with GoBeyond!",
   "notification.evidence.approved.title": "Proof on {{day}} approved",
