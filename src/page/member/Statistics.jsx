@@ -144,7 +144,7 @@ const Statistics = () => {
                 </div>
                 <div className="bg-white rounded-lg p-4 shadow">
                     <h3 className="text-center font-semibold mb-4">Completion Rate</h3>
-                    <div className="flex h-[430px]">
+                    <div className="flex h-[430px] flex-col lg:flex-row">
                         <Pie data={completionData} />
                         <div className="justify-center gap-4 mt-4 text-sm w-full">
                             <div className="flex items-center gap-2">
