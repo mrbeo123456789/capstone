@@ -251,6 +251,6 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
             Pageable pageable
     );
 
-
+    Page<Challenge> findByStatus(ChallengeStatus status, Pageable pageable);
 
 }

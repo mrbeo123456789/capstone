@@ -133,6 +133,16 @@ public class ChallengeController {
         return ResponseEntity.ok(upcomingChallenges);
     }
 
+    @GetMapping("/public/challenges")
+    public ResponseEntity<Page<ChallengeResponse>> getChallengesByStatus(
+            @RequestParam(required = false) String status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Page<ChallengeResponse> challenges = challengeService.getChallengesByStatus(status, page, size);
+        return ResponseEntity.ok(challenges);
+    }
+
     @PutMapping(value = "/{challengeId}/update", consumes = {"multipart/form-data"})
     public ResponseEntity<String> updateChallenge(
             @PathVariable Long challengeId,

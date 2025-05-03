@@ -24,9 +24,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -733,6 +731,44 @@ public class ChallengeServiceImpl implements ChallengeService {
         Pageable pageable = PageRequest.of(page, size);
         return challengeRepository.findChallengeMembersForManagement(challengeId, keyword, currentMemberId, pageable);
     }
+
+    @Override
+    public Page<ChallengeResponse> getChallengesByStatus(String status, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        if (status == null) {
+            // Lấy tất cả challenge theo từng trạng thái
+            List<Challenge> allChallenges = new ArrayList<>();
+            allChallenges.addAll(challengeRepository.findByStatus(ChallengeStatus.UPCOMING));
+            allChallenges.addAll(challengeRepository.findByStatus(ChallengeStatus.ONGOING));
+            allChallenges.addAll(challengeRepository.findByStatus(ChallengeStatus.FINISH));
+
+            // Sort theo startDate (nếu cần)
+            allChallenges.sort(Comparator.comparing(Challenge::getStartDate));
+
+            // Pagination thủ công
+            int start = (int) pageable.getOffset();
+            int end = Math.min(start + pageable.getPageSize(), allChallenges.size());
+
+            List<ChallengeResponse> content = allChallenges.subList(start, end)
+                    .stream()
+                    .map(this::convertToResponse)
+                    .collect(Collectors.toList());
+
+            return new PageImpl<>(content, pageable, allChallenges.size());
+        }
+
+        Page<Challenge> challengePage = switch (status.toUpperCase()) {
+            case "UPCOMING" -> challengeRepository.findByStatus(ChallengeStatus.UPCOMING, pageable);
+            case "ONGOING" -> challengeRepository.findByStatus(ChallengeStatus.ONGOING, pageable);
+            case "FINISHED" -> challengeRepository.findByStatus(ChallengeStatus.FINISH, pageable);
+            default -> Page.empty();
+        };
+
+        return challengePage.map(this::convertToResponse);
+    }
+
+
     @Override
     public Integer getMaxMembersPerGroup(Long challengeId) {
         Challenge challenge = challengeRepository.findById(challengeId)

@@ -94,7 +94,8 @@ public class Schedule {
     }
 
     // ===== 🕓 00:10 – Tính điểm sao và tiến độ cá nhân cho tất cả thử thách đang diễn ra =====
-    @Scheduled(cron = "0 10 0 * * *", zone = "Asia/Bangkok")
+//    @Scheduled(cron = "0 10 0 * * *", zone = "Asia/Bangkok")
+    @Scheduled(fixedRate = 30000)
     public void updateStarRatingsAndGlobalRankings() {
         rankingService.updateChallengeStarRatings();
         rankingService.recalculateAllChallengeProgressRankings();
