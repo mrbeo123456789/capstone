@@ -167,7 +167,7 @@ const YourGroup = () => {
                             <div
                                 key={group.id}
                                 onClick={() => navigate(`/groups/joins/${group.id}`)}
-                                className="cursor-pointer min-w-[150px] border rounded-lg flex flex-col items-center relative flex-shrink-0 hover:shadow-lg transition">
+                                className="cursor-pointer w-[150px] border rounded-lg flex flex-col items-center relative flex-shrink-0 hover:shadow-lg transition">
                                 <div className="relative w-full h-24 mb-2">
                                     <img
                                         src={group.picture || "https://via.placeholder.com/300x200"}
@@ -175,7 +175,7 @@ const YourGroup = () => {
                                         className="w-full h-full object-cover rounded"
                                     />
                                 </div>
-                                <p className="font-medium text-center mb-2">{group.name}</p>
+                                <p className="font-medium text-center mb-2 line-clamp-1">{group.name}</p>
                                 <div className="bg-gray-100 text-sm px-2 py-1 rounded mb-1">
                                     {group.currentParticipants || group.members?.length || 0} {t("yourGroup.members")}
                                 </div>

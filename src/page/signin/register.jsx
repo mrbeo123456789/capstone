@@ -90,14 +90,14 @@ const RegisterForm = () => {
             <div className="relative z-10 w-full max-w-md">
                 <div className="bg-black bg-opacity-90 p-8 rounded-xl shadow-2xl border border-gray-800">
                     <h2 className="text-2xl font-bold text-center text-white mb-6">
-                        {t("auth.register.title")}
+                        {t("register.title")}
                     </h2>
 
                     <form onSubmit={handleRegister} className="space-y-5">
                         <div className="space-y-4">
                             <input
                                 type="email"
-                                placeholder={t("auth.register.email")}
+                                placeholder={t("register.email")}
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 className="w-full px-4 py-3 bg-gray-800 text-white placeholder-gray-400 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200"
@@ -105,7 +105,7 @@ const RegisterForm = () => {
 
                             <input
                                 type="text"
-                                placeholder={t("auth.register.username")}
+                                placeholder={t("register.username")}
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
                                 className="w-full px-4 py-3 bg-gray-800 text-white placeholder-gray-400 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200"
@@ -113,7 +113,7 @@ const RegisterForm = () => {
 
                             <input
                                 type="password"
-                                placeholder={t("auth.register.password")}
+                                placeholder={t("register.password")}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 className="w-full px-4 py-3 bg-gray-800 text-white placeholder-gray-400 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200"
@@ -121,7 +121,7 @@ const RegisterForm = () => {
 
                             <input
                                 type="password"
-                                placeholder={t("auth.register.confirmPassword")}
+                                placeholder={t("register.confirmPassword")}
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                 className="w-full px-4 py-3 bg-gray-800 text-white placeholder-gray-400 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200"
@@ -133,15 +133,15 @@ const RegisterForm = () => {
                             disabled={isLoading}
                             className="w-full bg-gradient-to-r from-red-600 to-red-700 text-white font-medium py-3 px-4 rounded-lg hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition duration-200 shadow-lg shadow-red-500/20 disabled:opacity-70 disabled:cursor-not-allowed"
                         >
-                            {isLoading ? t("auth.register.registering") : t("auth.register.registerButton")}
+                            {isLoading ? t("register.registering") : t("register.registerButton")}
                         </button>
                     </form>
 
                     {/* Footer text */}
                     <p className="text-center text-gray-400 mt-6">
-                        {t("auth.register.haveAccount")}{" "}
+                        {t("register.haveAccount")}{" "}
                         <a href="/login" className="text-red-500 hover:text-red-400 hover:underline transition duration-200">
-                            {t("auth.register.loginNow")}
+                            {t("register.loginNow")}
                         </a>
                     </p>
                 </div>
