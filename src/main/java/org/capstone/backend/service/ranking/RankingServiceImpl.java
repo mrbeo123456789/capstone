@@ -305,16 +305,18 @@ private  final GroupRepository groupRepository;
         globalGroupRankingRepository.deleteAllInBatch();
 
         List<GlobalGroupRanking> rankings = dtos.stream()
+                .filter(dto -> dto.getGroupId() != null) // ✅ Bỏ qua các bản ghi thiếu groupId
                 .map(dto -> GlobalGroupRanking.builder()
                         .groupId(dto.getGroupId())
                         .groupName(dto.getGroupName())
                         .totalStars(dto.getTotalStars())
                         .lastUpdated(LocalDateTime.now())
                         .build())
-                .collect(Collectors.toList());
+                .toList();
 
         globalGroupRankingRepository.saveAll(rankings);
     }
+
 
     @Override
     @Transactional(readOnly = true)

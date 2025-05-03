@@ -13,26 +13,26 @@ public interface GlobalGroupRankingRepository extends JpaRepository<GlobalGroupR
 
     @Query(value = """
     SELECT 
-        cm.group_id AS groupId,
+        g.group_id AS groupId,
         g.group_name AS groupName,
         g.picture AS groupPicture,
-        SUM(group_avg_star) AS totalStars
-    FROM (
-        SELECT 
+        SUM(COALESCE(cgs.group_avg_star, 0)) AS totalStars
+    FROM `groups` g
+    LEFT JOIN (
+        SELECT
             cm.group_id,
             cm.challenge_id,
             AVG(csr.average_star) AS group_avg_star
         FROM challenge_member cm
         JOIN challenge c ON cm.challenge_id = c.challenge_id
-        JOIN challenge_star_rating csr 
+        LEFT JOIN challenge_star_rating csr
             ON csr.member_id = cm.member_id AND csr.challenge_id = cm.challenge_id
         WHERE cm.group_id IS NOT NULL
           AND cm.is_participate = true
           AND c.participation_type = 'GROUP'
         GROUP BY cm.group_id, cm.challenge_id
-    ) AS challenge_group_score
-    JOIN `groups` g ON g.group_id = challenge_group_score.group_id
-    GROUP BY challenge_group_score.group_id, g.group_name, g.picture
+    ) AS cgs ON g.group_id = cgs.group_id
+    GROUP BY g.group_id, g.group_name, g.picture
     ORDER BY totalStars DESC
     """, nativeQuery = true)
     List<GlobalGroupRankingDto> calculateGlobalGroupRanking();
