@@ -263,38 +263,15 @@ public class EvidenceServiceImpl implements EvidenceService {
                 pageable
         );
 
-        return evidencePage.map(evidence -> {
-            try {
-                EvidenceReport report = evidenceReportRepository.findByEvidenceId(evidence.getId()).orElse(null);
-                boolean canEdit = report != null && isTimeEligibleForReview(evidence)
-                        && isUserAllowedToReview(evidence, report, currentReviewerId);
-
-                return new EvidenceToReviewDTO(
-                        evidence.getId(),
-                        evidence.getMember().getId(),
-                        evidence.getMember().getFullName(),
-                        evidence.getEvidenceUrl(),
-                        evidence.getStatus(),
-                        canEdit,
-                        evidence.getSubmittedAt()
-                );
-            } catch (Exception ex) {
-                // Log lỗi nếu cần
-                System.err.println("Lỗi khi xử lý evidence ID: " + evidence.getId() + " - " + ex.getMessage());
-                ex.printStackTrace();
-
-                // Trả về object với trạng thái mặc định hoặc null
-                return new EvidenceToReviewDTO(
-                        evidence.getId(),
-                        null,
-                        "Không xác định",
-                        evidence.getEvidenceUrl(),
-                        evidence.getStatus(),
-                        false,
-                        evidence.getSubmittedAt()
-                );
-            }
-        });
+        return evidencePage.map(evidence -> new EvidenceToReviewDTO(
+                evidence.getId(),
+                evidence.getMember().getId(),
+                evidence.getMember().getFullName(),
+                evidence.getEvidenceUrl(),
+                evidence.getStatus(),
+                true, // Mặc định có thể review (hoặc bạn có thể set false nếu cần hạn chế)
+                evidence.getSubmittedAt()
+        ));
     }
 
         /**

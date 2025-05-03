@@ -55,10 +55,6 @@ public interface EvidenceRepository extends JpaRepository<Evidence, Long> {
     SELECT e FROM Evidence e
     WHERE e.challenge.id = :challengeId
     AND e.member.id = :memberId
-    AND (
-        e.submittedAt < :today
-        OR (e.submittedAt >= :endDateStart AND e.submittedAt <= :endDateEnd)
-    )
     AND (:status IS NULL OR e.status = :status)
     ORDER BY\s
         CASE\s
