@@ -93,7 +93,13 @@ public class Schedule {
                 });
     }
 
-
+    // ===== 🕓 00:10 – Tính điểm sao và tiến độ cá nhân cho tất cả thử thách đang diễn ra =====
+    @Scheduled(cron = "0 10 0 * * *", zone = "Asia/Bangkok")
+    public void updateStarRatingsAndGlobalRankings() {
+        rankingService.updateChallengeStarRatings();
+        rankingService.recalculateAllChallengeProgressRankings();
+        log.debug("Updated star ratings & global ranking");
+    }
 
     // ===== 🕔 00:15 – Gán reviewer tự động cho thử thách MEMBER_REVIEW trong ngày =====
 //    @Scheduled(cron = "0 15 0 * * *", zone = "Asia/Bangkok")
