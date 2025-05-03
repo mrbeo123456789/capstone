@@ -39,7 +39,7 @@ public class Schedule {
     // ==== 00:00 – Roll UPCOMING → ONGOING & ONGOING → FINISH ====
     @Transactional
 //    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Bangkok")
-    @Scheduled(fixedRate = 6000000)
+    @Scheduled(fixedRate = 30000)
     public void rollChallengeStatuses() {
         LocalDate today = LocalDate.now();
 
@@ -94,12 +94,13 @@ public class Schedule {
     }
 
     // ===== 🕓 00:10 – Tính điểm sao và tiến độ cá nhân cho tất cả thử thách đang diễn ra =====
-
-    @Scheduled(cron = "*/10 * * * * *", zone = "Asia/Bangkok")
+    @Scheduled(cron = "0 10 0 * * *", zone = "Asia/Bangkok")
     public void updateStarRatingsAndGlobalRankings() {
+        rankingService.updateChallengeStarRatings();
         rankingService.recalculateAllChallengeProgressRankings();
         log.debug("Updated star ratings & global ranking");
     }
+
     // ===== 🕔 00:15 – Gán reviewer tự động cho thử thách MEMBER_REVIEW trong ngày =====
 //    @Scheduled(cron = "0 15 0 * * *", zone = "Asia/Bangkok")
 //    public void assignDailyReviewers() {
@@ -109,7 +110,7 @@ public class Schedule {
 //    }
 
     // ===== 🗓 Chủ Nhật hàng tuần lúc 01:00 – Cập nhật bảng xếp hạng tổng thể (cá nhân + nhóm) =====
-    @Scheduled(cron = "*/15 * * * * *", zone = "Asia/Bangkok")
+    @Scheduled(cron = "0 0 1 * * SUN", zone = "Asia/Bangkok")
     public void updateWeeklyGlobalRankings() {
         rankingService.updateGlobalRanking();                  // xếp hạng cá nhân
         rankingService.calculateAndSaveGlobalGroupRanking();   // xếp hạng nhóm
