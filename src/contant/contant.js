@@ -1,1 +1,1 @@
-export const BASE_URL = "http://api.gobeyond.top/api/"
+export const BASE_URL = "https://api.gobeyond.top/api/"
