@@ -1,11 +1,10 @@
 package org.capstone.backend.service.vote;
 
 import lombok.RequiredArgsConstructor;
+import org.capstone.backend.dto.evidence.EvidenceVoteHistoryResponse;
 import org.capstone.backend.dto.vote.EvidenceVoteRequest;
 import org.capstone.backend.dto.vote.EvidenceVoteResponse;
-import org.capstone.backend.entity.ChallengeStarRating;
-import org.capstone.backend.entity.Evidence;
-import org.capstone.backend.entity.EvidenceVote;
+import org.capstone.backend.entity.*;
 import org.capstone.backend.repository.*;
 import org.capstone.backend.service.auth.AuthService;
 import org.capstone.backend.utils.enums.EvidenceStatus;
@@ -17,7 +16,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -126,4 +124,37 @@ public class EvidenceVoteServiceImpl implements EvidenceVoteService {
                         .build())
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<EvidenceVoteResponse> getVoteHistoryForChallenge(Long challengeId) {
+        return List.of();
+    }
+
+    @Override
+    public List<EvidenceVoteHistoryResponse> getMyVotedEvidence(Long challengeId) {
+        Long voterId = authService.getMemberIdFromAuthentication();
+
+        List<EvidenceVote> votes = (challengeId != null)
+                ? evidenceVoteRepository.findByVoterIdAndChallengeId(voterId, challengeId)
+                : evidenceVoteRepository.findByVoterId(voterId);
+
+        return votes.stream()
+                .map(vote -> {
+                    Evidence evidence = vote.getEvidence();
+                    Member submitter = evidence.getMember();
+                    Challenge challenge = evidence.getChallenge();
+
+                    return EvidenceVoteHistoryResponse.builder()
+                            .evidenceId(evidence.getId())
+                            .evidenceUrl(evidence.getEvidenceUrl())
+                            .submittedAt(evidence.getSubmittedAt())
+                            .challengeId(challenge.getId())
+                            .challengeName(challenge.getName())
+                            .score(vote.getScore())
+                            .votedAt(vote.getCreatedAt())
+                            .build();
+                })
+                .toList();
+    }
+
 }

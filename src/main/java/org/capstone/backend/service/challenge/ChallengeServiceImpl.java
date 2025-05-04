@@ -744,7 +744,7 @@ public class ChallengeServiceImpl implements ChallengeService {
     public Page<ChallengeResponse> getChallengesByStatus(String status, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
-        if (status == null) {
+        if (Objects.equals(status, "null")) {
             // Lấy tất cả challenge theo từng trạng thái
             List<Challenge> allChallenges = new ArrayList<>();
             allChallenges.addAll(challengeRepository.findByStatus(ChallengeStatus.UPCOMING));

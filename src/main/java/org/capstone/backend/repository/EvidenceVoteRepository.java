@@ -38,4 +38,22 @@ public interface EvidenceVoteRepository extends JpaRepository<EvidenceVote, Long
     int countVotesGivenByMemberInChallenge(@Param("memberId") Long memberId,
                                            @Param("challengeId") Long challengeId);
 
+    @Query("""
+    SELECT ev FROM EvidenceVote ev
+    WHERE ev.voter.id = :reviewerId
+    AND ev.evidence.challenge.id = :challengeId
+""")
+    List<EvidenceVote> findByReviewerIdAndChallengeId(@Param("reviewerId") Long reviewerId,
+                                                      @Param("challengeId") Long challengeId);
+
+    List<EvidenceVote> findByVoterId(Long voterId);
+
+    @Query("""
+    SELECT ev FROM EvidenceVote ev
+    WHERE ev.voter.id = :voterId
+    AND ev.evidence.challenge.id = :challengeId
+""")
+    List<EvidenceVote> findByVoterIdAndChallengeId(@Param("voterId") Long voterId,
+                                                   @Param("challengeId") Long challengeId);
+
 }
