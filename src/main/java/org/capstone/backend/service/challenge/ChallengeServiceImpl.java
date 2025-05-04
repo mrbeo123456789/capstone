@@ -275,7 +275,7 @@ public class ChallengeServiceImpl implements ChallengeService {
         challengeRepository.save(challenge);
 
         String statusMessage = status.name();
-        if ((status == ChallengeStatus.UPCOMING || status == ChallengeStatus.REJECTED)
+        if ((status == ChallengeStatus.UPCOMING || status == ChallengeStatus.REJECTED || status ==  ChallengeStatus.BANNED)
                 && request.getAdminNote() != null && !request.getAdminNote().isBlank()) {
             statusMessage += " - " + request.getAdminNote();  // ✅ gộp note vào chuỗi status
         }

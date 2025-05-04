@@ -57,7 +57,7 @@ public class AchievementEventListener {
 
 
         notificationService.sendNotification(
-                member.getAccount().getId().toString(),
+                String.valueOf(member.getId()),
                 "notification.achievementUnlock.title",
                 "notification.achievementUnlock.content",
                 NotificationType.ACHIEVEMENT,
@@ -100,7 +100,7 @@ public class AchievementEventListener {
             // ✅ Gửi thông báo khi vừa đạt
 
             notificationService.sendNotification(
-                    member.getAccount().getId().toString(),
+                    String.valueOf(member.getId()),
                     "notification.achievementUnlock.title",
                     "notification.achievementUnlock.content",
                     NotificationType.ACHIEVEMENT,
