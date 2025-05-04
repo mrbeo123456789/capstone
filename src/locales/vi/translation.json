@@ -278,8 +278,9 @@
   "notification.kickedFromChallenge.title": "Bạn đã bị kick khỏi thử thách",
   "notification.kickedFromChallenge.content": "Bạn đã bị quản trị viên xóa khỏi thử thách '{{challengeName}}'.",
   "notification.empty": "Không có thông báo mới.",
-  "notification.challengeStatusUpdated.title": "Trạng thái thử thách của bạn đã được cập nhật",
-  "notification.challengeStatusUpdated.content": "Thử thách '{{challengeName}}' đã được cập nhật trạng thái: {{status}}.{{#adminNote}} Ghi chú: {{adminNote}}{{/adminNote}}",
+  "notification.challengeStatusUpdated.title": "Cập nhật trạng thái thử thách",
+  "notification.challengeStatusUpdated.content": "Thử thách '{{challengeName}}' đã được cập nhật trạng thái: {{status}}.",
+  "notification.adminNote": "Ghi chú: {{adminNote}}",
   "JoinsChallengeDetail": {
     "confirmCancelTitle": "Xác nhận hủy thử thách",
     "confirmCancelMessage": "Bạn có chắc chắn muốn hủy thử thách này không?",

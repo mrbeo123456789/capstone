@@ -307,7 +307,8 @@
     "challengeStatusUpdated.title": "チャレンジのステータスが更新されました",
     "achievementUnlock.title": "🎉 新しい実績！",
     "achievementUnlock.content": "実績「{{achievementName}}」を達成しました。",
-    "challengeStatusUpdated.content": "チャレンジ「{{challengeName}}」のステータスが {{status}} に更新されました。{{#adminNote}} メモ: {{adminNote}}{{/adminNote}}"
+    "challengeStatusUpdated.content": "チャレンジ「{{challengeName}}」のステータスが {{status}} に更新されました。",
+    "adminNote": "メモ: {{adminNote}}"
   },
   "suggest.reason.both": "共通の興味があり、近くにいます",
   "suggest.reason.same_interest": "共通の興味があります",
