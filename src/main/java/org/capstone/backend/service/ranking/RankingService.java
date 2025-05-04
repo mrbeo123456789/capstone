@@ -6,6 +6,7 @@ import org.capstone.backend.entity.GlobalGroupRanking;
 import org.capstone.backend.entity.GlobalMemberRanking;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -19,7 +20,9 @@ public interface RankingService {
     void updateChallengeStarRatings();
     GlobalMemberRankingResponse getCurrentUserRanking();
     List<GroupProgressRankingDTO> getTop3GroupProgress(Long challengeId);
-    Page<GroupStarRatingResponse> getGroupStarRatingsByChallengeId(Long challengeId, Pageable pageable);
+
+    @Transactional(readOnly = true)
+    Page<GroupStarRatingProjection> getGroupStarRatingsByChallengeId(Long challengeId, Pageable pageable) ;
     void calculateAndSaveGlobalGroupRanking(); // ✅ dùng cho schedule
-    Page<GlobalGroupRanking> getGlobalGroupRanking(Pageable pageable, String keyword);
+    Page<GlobalGroupRankingDto> getGlobalGroupRanking(Pageable pageable, String keyword);
 }

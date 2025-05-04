@@ -2,6 +2,7 @@ package org.capstone.backend.repository;
 
 import org.capstone.backend.entity.Evidence;
 import org.capstone.backend.entity.EvidenceReport;
+import org.capstone.backend.entity.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -121,5 +122,7 @@ public interface EvidenceReportRepository extends JpaRepository<EvidenceReport, 
       AND DATE(r.reviewedAt) = :date
 """)
     boolean hasReviewedOthersOnDate(@Param("reviewerId") Long reviewerId, @Param("challengeId") Long challengeId, @Param("date") LocalDate date);
+    @Query("SELECT COUNT(r) FROM EvidenceReport r WHERE r.reviewer = :reviewer")
+    long countByReviewer(@Param("reviewer") Member reviewer);
 
 }

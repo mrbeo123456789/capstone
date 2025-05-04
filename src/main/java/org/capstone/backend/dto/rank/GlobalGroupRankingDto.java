@@ -5,4 +5,5 @@ public interface GlobalGroupRankingDto {
     String getGroupName();
     String getGroupPicture();
     Double getTotalStars();
+    Integer getMemberCount(); // 👈 Thêm dòng này
 }

@@ -2,6 +2,7 @@ package org.capstone.backend.repository;
 
 import org.capstone.backend.dto.evidence.EvidenceStatusCountDTO;
 import org.capstone.backend.entity.Evidence;
+import org.capstone.backend.entity.Member;
 import org.capstone.backend.utils.enums.EvidenceStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,16 +18,6 @@ import java.util.Optional;
 
 @Repository
 public interface EvidenceRepository extends JpaRepository<Evidence, Long> {
-    @Query("""
-    SELECT e FROM Evidence e
-    WHERE e.challenge.id = :challengeId
-    AND NOT EXISTS (
-        SELECT r FROM EvidenceReport r
-        WHERE r.evidence = e
-    )
-    ORDER BY e.submittedAt ASC
-""")
-    List<Evidence> findAllUnassignedEvidenceByChallengeOrderBySubmittedAtAsc(@Param("challengeId") Long challengeId);
 
     @Query("SELECT COUNT(e) FROM Evidence e WHERE e.member.id = :memberId AND e.challenge.id = :challengeId")
     long countTotalEvidence(@Param("memberId") Long memberId, @Param("challengeId") Long challengeId);
@@ -49,6 +40,7 @@ public interface EvidenceRepository extends JpaRepository<Evidence, Long> {
             @Param("challengeId") Long challengeId,
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end);
+    long countByMember(Member member);
 
 
     @Query("""
@@ -123,6 +115,8 @@ public interface EvidenceRepository extends JpaRepository<Evidence, Long> {
     ORDER BY e.submittedAt ASC
 """)
     List<Evidence> findPendingEvidenceByChallengeOrderBySubmittedAtAsc(@Param("challengeId") Long challengeId);
+    boolean existsByMemberAndSubmittedAtBetween(Member member, LocalDateTime start, LocalDateTime end);
+
 
 }
 

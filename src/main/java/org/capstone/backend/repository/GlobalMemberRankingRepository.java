@@ -15,19 +15,21 @@ import java.util.Optional;
 @Repository
 public interface GlobalMemberRankingRepository extends JpaRepository<GlobalMemberRanking, Long> {
     @Query("""
-        SELECT new org.capstone.backend.dto.rank.GlobalRankingDto(
-            m.id,
-            m.fullName,
-            SUM(csr.totalStar)
-        )
-        FROM ChallengeStarRating csr
-        JOIN Challenge c ON csr.challengeId = c.id
-        JOIN Member m ON csr.memberId = m.id
-        WHERE c.status <> 'BANNED'
-        GROUP BY m.id, m.fullName
-        ORDER BY SUM(csr.totalStar) DESC
-        """)
+    SELECT new org.capstone.backend.dto.rank.GlobalRankingDto(
+        m.id,
+        m.fullName,
+        SUM(csr.totalStar)
+    )
+    FROM ChallengeStarRating csr
+    JOIN Challenge c ON csr.challengeId = c.id
+    JOIN Member m ON csr.memberId = m.id
+    WHERE c.status <> 'BANNED'
+      AND c.privacy = 'PUBLIC'
+    GROUP BY m.id, m.fullName
+    ORDER BY SUM(csr.totalStar) DESC
+""")
     List<GlobalRankingDto> calculateGlobalRanking();
+
 
     @Query("SELECT g FROM GlobalMemberRanking g WHERE LOWER(g.fullName) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     Page<GlobalMemberRanking> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);

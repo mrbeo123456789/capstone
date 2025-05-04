@@ -64,17 +64,17 @@ public class RankingController {
         return rankingService.getCurrentUserRanking();
     }
     @GetMapping("/{challengeId}/group-star-ratings")
-    public ResponseEntity<Page<GroupStarRatingResponse>> getGroupStarRatingsByChallenge(
+    public ResponseEntity<Page<GroupStarRatingProjection>> getGroupStarRatingsByChallenge(
             @PathVariable Long challengeId,
-            @PageableDefault(size = 10, sort = "averageStar", direction = Sort.Direction.DESC) Pageable pageable) {
+            @PageableDefault(size = 10) Pageable pageable) {
 
-        Page<GroupStarRatingResponse> result =
-                rankingService.getGroupStarRatingsByChallengeId(challengeId, pageable);
-
-        return ResponseEntity.ok(result);
+        // Gọi service đã dùng native query và convert projection -> DTO
+        Page<GroupStarRatingProjection> response = rankingService.getGroupStarRatingsByChallengeId(challengeId, pageable);
+        return ResponseEntity.ok(response);
     }
+
     @GetMapping("/ranking/groups/global")
-    public ResponseEntity<Page<GlobalGroupRanking>> getGlobalGroupRanking(
+    public ResponseEntity<Page<GlobalGroupRankingDto>> getGlobalGroupRanking(
             @RequestParam(required = false) String keyword,
             @PageableDefault(size = 10, sort = "totalStars", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(rankingService.getGlobalGroupRanking(pageable, keyword));

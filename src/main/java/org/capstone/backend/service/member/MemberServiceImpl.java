@@ -1,16 +1,19 @@
 package org.capstone.backend.service.member;
 
+import lombok.RequiredArgsConstructor;
 import org.capstone.backend.dto.member.ChangePasswordRequest;
 import org.capstone.backend.dto.member.MemberStatisticDTO;
 import org.capstone.backend.dto.member.UserProfileRequest;
 import org.capstone.backend.dto.member.UserProfileResponse;
 import org.capstone.backend.entity.Account;
 import org.capstone.backend.entity.Member;
+import org.capstone.backend.event.ProfileUpdatedEvent;
 import org.capstone.backend.repository.AccountRepository;
 import org.capstone.backend.repository.MemberRepository;
 import org.capstone.backend.service.auth.AuthService;
 import org.capstone.backend.utils.enums.InvitePermission;
 import org.capstone.backend.utils.upload.FirebaseUpload;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,29 +25,16 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-
+@RequiredArgsConstructor
 @Service
 public class MemberServiceImpl implements MemberService {
-
+    private final ApplicationEventPublisher eventPublisher; // Dùng để đẩy notification event
     private final MemberRepository memberRepository;
     private final AccountRepository accountRepository;
     private final FirebaseUpload firebaseUpload;
     private final PasswordEncoder passwordEncoder;
     private final AuthService authService;
 
-    public MemberServiceImpl(
-            MemberRepository memberRepository,
-            AccountRepository accountRepository,
-            FirebaseUpload firebaseUpload,
-            PasswordEncoder passwordEncoder,
-            AuthService authService
-    ) {
-        this.memberRepository = memberRepository;
-        this.accountRepository = accountRepository;
-        this.firebaseUpload = firebaseUpload;
-        this.passwordEncoder = passwordEncoder;
-        this.authService = authService;
-    }
 
     @Override
     public UserProfileResponse getMemberProfile() {
@@ -78,6 +68,8 @@ public class MemberServiceImpl implements MemberService {
         member.setInvitePermission(request.getInvitePermission());
 
         Member updatedMember = memberRepository.save(member);
+        eventPublisher.publishEvent(new ProfileUpdatedEvent(updatedMember));
+
         return mapToDto(updatedMember);
     }
 

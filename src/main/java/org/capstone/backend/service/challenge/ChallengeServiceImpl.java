@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.capstone.backend.dto.challenge.*;
 import org.capstone.backend.dto.member.MemberSubmissionProjection;
 import org.capstone.backend.entity.*;
-import org.capstone.backend.event.ChallengeRoleUpdatedEvent;
-import org.capstone.backend.event.ChallengeStatusUpdatedEvent;
-import org.capstone.backend.event.FirstChallengeJoinedEvent;
-import org.capstone.backend.event.InvitationSentEvent;
+import org.capstone.backend.event.*;
 import org.capstone.backend.repository.*;
 import org.capstone.backend.service.auth.AuthService;
 import org.capstone.backend.utils.enums.*;
@@ -142,8 +139,16 @@ public class ChallengeServiceImpl implements ChallengeService {
                 .joinBy(member.getId())
                 .createdAt(LocalDateTime.now())
                 .build();
+
         challengeMemberRepository.save(challengeMember);
+        long count = challengeMemberRepository.countJoinedByChallenge(challenge.getId());
+        Member host = memberRepository.findByUsername(challenge.getCreatedBy())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy host từ username"));
+        eventPublisher.publishEvent(new TrendingChallengeReachedEvent(host, count));
+        // ✅ Bắn sự kiện để listener xử lý thành tựu
+        eventPublisher.publishEvent(new FirstJoinChallengeEvent(member));
     }
+
 
     /**
      * Kiểm tra quyền kick: nếu caller cố gắng kick chính mình hoặc không đủ quyền thì ném lỗi.
@@ -180,9 +185,9 @@ public class ChallengeServiceImpl implements ChallengeService {
         if (challenge.getChallengeMembers().size() >= challenge.getMaxParticipants()) {
             return CHALLENGE_FULL;
         }
-        eventPublisher.publishEvent(new FirstChallengeJoinedEvent(member));
 
         addParticipantAsChallengeMember(challenge, member, null);
+
         return "Tham gia thử thách thành công.";
     }
 
@@ -209,8 +214,8 @@ public class ChallengeServiceImpl implements ChallengeService {
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
                 .maxParticipants(request.getMaxParticipants())
-                .maxGroups(request.getMaxGroups())                      // ✅ THÊM DÒNG NÀY
-                .maxMembersPerGroup(request.getMaxMembersPerGroup())    // ✅ THÊM DÒNG NÀY
+                .maxGroups(request.getMaxGroups())
+                .maxMembersPerGroup(request.getMaxMembersPerGroup())
                 .challengeType(challengeType)
                 .picture(pictureUrl)
                 .banner(bannerUrl)
@@ -218,22 +223,22 @@ public class ChallengeServiceImpl implements ChallengeService {
 
         challengeRepository.save(challenge);
 
-        // Nếu user có groupId -> tự động join group vào challenge
-
-
-        // Nếu đang login, thì add người tạo làm Host (CO_HOST)
         if (isMember) {
             Member member = memberRepository.findById(memberId)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MEMBER_NOT_FOUND_MSG));
-            addHostAsChallengeMember(challenge, member, request.getIsParticipate());
-            if (request.getGroupId() != null){
-                joinGroupToChallengeExcludingCreator(request.getGroupId(), challenge.getId() , member.getId());
 
+            // Gán người tạo làm Host và tham gia nếu có
+            addHostAsChallengeMember(challenge, member, request.getIsParticipate());
+
+            // Nếu user có groupId → tự động join group vào challenge (trừ người tạo)
+            if (request.getGroupId() != null) {
+                joinGroupToChallengeExcludingCreator(request.getGroupId(), challenge.getId(), member.getId());
             }
         }
 
         return "Thử thách đã được tạo thành công.";
     }
+
     @Transactional
     public void joinGroupToChallengeExcludingCreator(Long groupId, Long challengeId, Long creatorId) {
         joinGroupToChallengeInternal(groupId, challengeId, creatorId);
@@ -408,7 +413,10 @@ public class ChallengeServiceImpl implements ChallengeService {
                 .createdAt(now)
                 .build();
         groupChallengeRepository.save(gc);
-
+        long count = challengeMemberRepository.countJoinedByChallenge(challenge.getId());
+        Member host = memberRepository.findByUsername(challenge.getCreatedBy())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy host từ username"));
+        eventPublisher.publishEvent(new TrendingChallengeReachedEvent(host, count));
         return "Nhóm đã tham gia thử thách thành công.";
     }
 
@@ -445,7 +453,7 @@ public class ChallengeServiceImpl implements ChallengeService {
         boolean isAdmin = (memberId == null);
         Challenge challenge = getChallenge(challengeId);
 
-        if (challenge.getStatus() != ChallengeStatus.UPCOMING) {
+        if (challenge.getStatus() != ChallengeStatus.UPCOMING  && challenge.getStatus() != ChallengeStatus.PENDING) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Chỉ có thể huỷ thử thách khi chưa bắt đầu.");
         }
         if (!isAdmin) {

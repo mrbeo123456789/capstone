@@ -5,7 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.capstone.backend.dto.challenge.*;
 import org.capstone.backend.dto.group.MemberSearchResponse;
 import org.capstone.backend.entity.*;
+import org.capstone.backend.event.FirstJoinChallengeEvent;
 import org.capstone.backend.event.InvitationSentEvent;
+import org.capstone.backend.event.TrendingChallengeReachedEvent;
 import org.capstone.backend.repository.*;
 import org.capstone.backend.service.auth.AuthService;
 import org.capstone.backend.utils.enums.*;
@@ -22,7 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
 @RequiredArgsConstructor
 @Service
 public class InvitationServiceImpl implements InvitationService {
@@ -222,6 +224,14 @@ public class InvitationServiceImpl implements InvitationService {
             // Cho phép JOINED khi UPCOMING hoặc PENDING
             if (st == ChallengeStatus.UPCOMING || st == ChallengeStatus.PENDING) {
                 invitation.setStatus(ChallengeMemberStatus.JOINED);
+                eventPublisher.publishEvent(new FirstJoinChallengeEvent(member));
+                Member host = memberRepository.findByUsername(invitation.getChallenge().getCreatedBy())
+                        .orElseThrow(() -> new RuntimeException("Không tìm thấy host từ username"));
+
+                long count = challengeMemberRepository.countJoinedByChallenge(invitation.getChallenge().getId());
+
+                eventPublisher.publishEvent(new TrendingChallengeReachedEvent(host, count));
+
             } else {
                 invitation.setStatus(ChallengeMemberStatus.EXPIRED);
             }
@@ -299,6 +309,8 @@ public class InvitationServiceImpl implements InvitationService {
         invitation.setStatus(ChallengeMemberStatus.JOINED);
         invitation.setGroupId(group.getId());
         invitation.setUpdatedAt(LocalDateTime.now());
+        eventPublisher.publishEvent(new FirstJoinChallengeEvent(invitation.getMember()));
+
         challengeMemberRepository.save(invitation);
 
         // 🔁 Tạo ChallengeMember cho các thành viên nhóm chưa có
@@ -317,7 +329,14 @@ public class InvitationServiceImpl implements InvitationService {
                 .toList();
 
         challengeMemberRepository.saveAll(newCms);
-
+// 🔔 Bắn sự kiện FirstJoinChallenge cho từng thành viên
+        newCms.forEach(cm -> {
+            eventPublisher.publishEvent(new FirstJoinChallengeEvent(cm.getMember()));
+        });
+        long count = challengeMemberRepository.countJoinedByChallenge(invitation.getChallenge().getId());
+        Member host = memberRepository.findByUsername(invitation.getChallenge().getCreatedBy())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy host từ username"));
+        eventPublisher.publishEvent(new TrendingChallengeReachedEvent(host, count));
         // 🔔 Gửi thông báo
         newCms.forEach(cm -> eventPublisher.publishEvent(
                 new InvitationSentEvent(

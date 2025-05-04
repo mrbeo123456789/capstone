@@ -1,24 +1,21 @@
 package org.capstone.backend.utils.enums;
 
 public enum AchievementType {
+    // SINGLE_CONDITION
     FIRST_TRY,
-    DAILY_WARRIOR,
     PROFILE_MASTER,
-    INVITER,
-    REVIEWER,
-    PERFECT_ACCURACY,
-    COMEBACK_SUBMITTER,
-    RISING_STAR,
+    TRENDING_CREATOR,
+
+    // CUMULATIVE
     ACTIVE_VOTER,
-    GROUP_HERO,
     CONTRIBUTOR,
-    STREAK_TRIPLE,
+    RISING_STAR,
+
+    // TIME_BASED
     STREAK_MASTER,
     NIGHT_OWL,
-    EARLY_BIRD,
-    LONG_HAUL,
+
+    // RANKING_BASED
     FITNESS_CHAMPION,
-    GROUP_LEGEND,
-    CONSISTENT_TOPPER,
-    UNDERDOG
+    GROUP_LEGEND
 }

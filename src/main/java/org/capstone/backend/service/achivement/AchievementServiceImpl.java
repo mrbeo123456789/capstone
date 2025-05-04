@@ -56,25 +56,5 @@ public class AchievementServiceImpl implements AchievementService {
                 })
                 .collect(Collectors.toList());
     }
-    @Override
-    public void unlockAchievementIfEligible(Long memberId, AchievementType type) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found"));
 
-        Achievement achievement = achievementRepository.findByType(type)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Achievement not found"));
-
-
-        boolean alreadyUnlocked = userAchievementRepository.existsByMemberAndAchievement(member, achievement);
-
-        if (!alreadyUnlocked) {
-            UserAchievement newUserAchievement = UserAchievement.builder()
-                    .member(member)
-                    .achievement(achievement)
-                    .achievedAt(LocalDateTime.now())
-                    .build();
-
-            userAchievementRepository.save(newUserAchievement);
-        }
-    }
 }

@@ -14,7 +14,9 @@ import org.capstone.backend.entity.EvidenceReport;
 import org.capstone.backend.entity.Member;
 import org.capstone.backend.entity.Groups;
 import org.capstone.backend.entity.GroupMember;
+import org.capstone.backend.event.DailyEvidenceSubmittedEvent;
 import org.capstone.backend.event.EvidenceReviewedEvent;
+import org.capstone.backend.event.EvidenceVotedEvent;
 import org.capstone.backend.repository.ChallengeMemberRepository;
 import org.capstone.backend.repository.ChallengeRepository;
 import org.capstone.backend.repository.EvidenceReportRepository;
@@ -119,6 +121,8 @@ public class EvidenceServiceImpl implements EvidenceService {
                         .submittedAt(LocalDateTime.now())
                         .build();
                 evidenceRepository.save(newEvidence);
+                eventPublisher.publishEvent(new DailyEvidenceSubmittedEvent(member));
+
             }
         } catch (ResponseStatusException e) {
             throw e; // Don't wrap if it's already a proper status!
@@ -658,6 +662,12 @@ public class EvidenceServiceImpl implements EvidenceService {
             evidence.setUpdatedBy(reviewerId);
 
             evidenceRepository.save(evidence);
+            // ✅ Gửi sự kiện vote để xử lý thành tựu
+            Member reviewer = memberRepository.findById(reviewerId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy người chấm."));
+
+            eventPublisher.publishEvent(new EvidenceVotedEvent(reviewer));
+
         }
     }
 

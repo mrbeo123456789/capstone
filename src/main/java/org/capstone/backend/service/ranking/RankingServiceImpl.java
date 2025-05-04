@@ -4,11 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.capstone.backend.dto.rank.*;
 import org.capstone.backend.entity.*;
+import org.capstone.backend.event.GlobalRankingTopGroupUpdatedEvent;
+import org.capstone.backend.event.GlobalRankingTopMembersUpdatedEvent;
 import org.capstone.backend.repository.*;
 import org.capstone.backend.service.auth.AuthService;
 import org.capstone.backend.utils.enums.ChallengeStatus;
 import org.capstone.backend.utils.enums.EvidenceStatus;
 import org.capstone.backend.utils.key.ChallengeProgressRankingId;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -37,7 +40,8 @@ public class RankingServiceImpl implements RankingService {
  private  final   ChallengeStarRatingRepository challengeStarRatingRepository;
     private final GlobalMemberRankingRepository globalMemberRankingRepository;
     private final AuthService   authService;
-private  final GroupRepository groupRepository;
+    private final ApplicationEventPublisher eventPublisher;
+ private final GroupMemberRepository groupMemberRepository;
     @Override
     @Transactional // Đảm bảo tất cả hành động xóa và insert nằm trong 1 transaction
     public void recalculateAllChallengeProgressRankings() {
@@ -180,6 +184,7 @@ private  final GroupRepository groupRepository;
 
 
 
+
     private double roundTo1Decimal(double value) {
         return Math.round(value * 10.0) / 10.0;
     }
@@ -198,13 +203,23 @@ private  final GroupRepository groupRepository;
                         .memberId(dto.getMemberId())
                         .fullName(dto.getFullName())
                         .totalStars(dto.getTotalStars())
-                        .lastUpdated(java.time.LocalDateTime.now())
+                        .lastUpdated(LocalDateTime.now())
                         .build())
-                .collect(Collectors.toList());
+                .toList();
 
         // Save bảng xếp hạng mới
         globalMemberRankingRepository.saveAll(newRankings);
+
+        // ✅ Gán thành tựu FITNESS_CHAMPION cho top 10
+        List<Member> top10 = rankingDtos.stream()
+                .limit(10)
+                .map(dto -> memberRepository.findById(dto.getMemberId()).orElse(null))
+                .filter(Objects::nonNull)
+                .toList();
+
+        eventPublisher.publishEvent(new GlobalRankingTopMembersUpdatedEvent(top10));
     }
+
     @Override
     public Page<GlobalMemberRankingResponse> getGlobalRanking(Pageable pageable, String keyword) {
         Page<GlobalMemberRanking> page;
@@ -251,50 +266,8 @@ private  final GroupRepository groupRepository;
     }
     @Override
     @Transactional(readOnly = true)
-    public Page<GroupStarRatingResponse> getGroupStarRatingsByChallengeId(Long challengeId, Pageable pageable) {
-        List<ChallengeMember> members = challengeMemberRepository.findJoinedMembersByChallengeId(challengeId);
-
-        // Group by groupId
-        Map<Long, List<ChallengeMember>> groupMap = members.stream()
-                .filter(cm -> cm.getGroupId() != null)
-                .collect(Collectors.groupingBy(ChallengeMember::getGroupId));
-
-        // Load tất cả Groups 1 lần để tránh gọi DB nhiều lần
-        Map<Long, Groups> groupInfoMap = groupRepository.findAllById(groupMap.keySet()).stream()
-                .collect(Collectors.toMap(Groups::getId, g -> g));
-
-        List<GroupStarRatingResponse> result = groupMap.entrySet().stream()
-                .map(entry -> {
-                    Long groupId = entry.getKey();
-                    List<ChallengeMember> groupMembers = entry.getValue();
-                    Groups group = groupInfoMap.get(groupId);
-
-                    double averageStar = groupMembers.stream()
-                            .map(cm -> challengeStarRatingRepository
-                                    .findByChallengeIdAndMemberId(challengeId, cm.getMember().getId()))
-                            .filter(Optional::isPresent)
-                            .map(Optional::get)
-                            .mapToDouble(ChallengeStarRating::getAverageStar)
-                            .average().orElse(0.0);
-
-                    return GroupStarRatingResponse.builder()
-                            .groupId(groupId)
-                            .groupName(group != null ? group.getName() : "Unknown")
-                            .picture(group != null ? group.getPicture() : null)
-                            .averageStar(Math.round(averageStar * 10.0) / 10.0)
-                            .memberCount(groupMembers.size())
-                            .build();
-                })
-                .sorted(Comparator.comparing(GroupStarRatingResponse::getAverageStar).reversed()
-                        .thenComparing(GroupStarRatingResponse::getGroupName))
-                .toList();
-
-        // Manual pagination
-        int start = (int) pageable.getOffset();
-        int end = Math.min(start + pageable.getPageSize(), result.size());
-        List<GroupStarRatingResponse> paged = result.subList(start, end);
-
-        return new PageImpl<>(paged, pageable, result.size());
+    public Page<GroupStarRatingProjection> getGroupStarRatingsByChallengeId(Long challengeId, Pageable pageable) {
+        return challengeStarRatingRepository.getGroupStarRatingsByChallengeIdNative(challengeId, pageable);
     }
 
     @Override
@@ -313,6 +286,10 @@ private  final GroupRepository groupRepository;
                         .lastUpdated(LocalDateTime.now())
                         .build())
                 .toList();
+        if (!rankings.isEmpty()) {
+            Long topGroupId = rankings.get(0).getGroupId();
+            eventPublisher.publishEvent(new GlobalRankingTopGroupUpdatedEvent(topGroupId));
+        }
 
         globalGroupRankingRepository.saveAll(rankings);
     }
@@ -320,11 +297,12 @@ private  final GroupRepository groupRepository;
 
     @Override
     @Transactional(readOnly = true)
-    public Page<GlobalGroupRanking> getGlobalGroupRanking(Pageable pageable, String keyword) {
+    public Page<GlobalGroupRankingDto> getGlobalGroupRanking(Pageable pageable, String keyword) {
         if (keyword == null || keyword.isBlank()) {
-            return globalGroupRankingRepository.findAllByOrderByTotalStarsDesc(pageable);
+            return globalGroupRankingRepository.findAllWithPicture(pageable);
         }
-        return globalGroupRankingRepository.findByGroupNameContainingIgnoreCaseOrderByTotalStarsDesc(keyword, pageable);
+        return globalGroupRankingRepository.searchByGroupNameWithPicture(keyword, pageable);
     }
+
 
 }

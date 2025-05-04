@@ -2,7 +2,7 @@ package org.capstone.backend.utils.enums;
 
 public enum NotificationType {
 
-
+    ACHIEVEMENT,
     INVITATION, // 📩 Gộp chung nếu bạn chỉ cần một loại "Lời mời" chung
 
     // ===== CHALLENGE FLOW =====

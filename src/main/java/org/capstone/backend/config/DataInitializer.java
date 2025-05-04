@@ -297,34 +297,25 @@ public class DataInitializer implements CommandLineRunner {
         if (achievementRepository.count() > 0) return;
 
         List<Achievement> achievements = List.of(
-                // SINGLE_CONDITION (7)
+                // SINGLE_CONDITION
                 new Achievement(null, AchievementType.FIRST_TRY, AchievementCategory.SINGLE_CONDITION, "First Try", "Tham gia thử thách đầu tiên", false),
-                new Achievement(null, AchievementType.DAILY_WARRIOR, AchievementCategory.SINGLE_CONDITION, "Daily Warrior", "Nộp bằng chứng trong 1 ngày bất kỳ", false),
                 new Achievement(null, AchievementType.PROFILE_MASTER, AchievementCategory.SINGLE_CONDITION, "All Set!", "Cập nhật hồ sơ cá nhân đầy đủ", false),
-                new Achievement(null, AchievementType.INVITER, AchievementCategory.SINGLE_CONDITION, "Inviter", "Gửi lời mời thành công cho 1 người", false),
-                new Achievement(null, AchievementType.REVIEWER, AchievementCategory.SINGLE_CONDITION, "Reviewer", "Chấm 1 bằng chứng của người khác", false),
-                new Achievement(null, AchievementType.PERFECT_ACCURACY, AchievementCategory.SINGLE_CONDITION, "Perfect Accuracy", "Đạt 100% bằng chứng được duyệt trong 1 thử thách", false),
-                new Achievement(null, AchievementType.COMEBACK_SUBMITTER, AchievementCategory.SINGLE_CONDITION, "Comeback Submitter", "Nộp bài trở lại sau hơn 7 ngày không hoạt động", false),
+                new Achievement(null, AchievementType.TRENDING_CREATOR, AchievementCategory.SINGLE_CONDITION, "Trending Creator", "Tạo thử thách có hơn 100 người tham gia", false),
 
-                // CUMULATIVE (5)
-                new Achievement(null, AchievementType.RISING_STAR, AchievementCategory.CUMULATIVE, "Rising Star", "Tham gia 5 thử thách", true),
+                // CUMULATIVE
                 new Achievement(null, AchievementType.ACTIVE_VOTER, AchievementCategory.CUMULATIVE, "Active Voter", "Chấm 10 bằng chứng", true),
-                new Achievement(null, AchievementType.GROUP_HERO, AchievementCategory.CUMULATIVE, "Group Hero", "Thắng 10 trận nhóm", true),
-                new Achievement(null, AchievementType.CONTRIBUTOR, AchievementCategory.CUMULATIVE, "Contributor", "Đăng 20 bằng chứng", true),
-                new Achievement(null, AchievementType.STREAK_TRIPLE, AchievementCategory.CUMULATIVE, "Challenger", "Hoàn thành 3 thử thách liên tiếp không bỏ ngày nào", true),
+                new Achievement(null, AchievementType.CONTRIBUTOR, AchievementCategory.CUMULATIVE, "Contributor", "Nộp 20 bằng chứng", true),
+                new Achievement(null, AchievementType.RISING_STAR, AchievementCategory.CUMULATIVE, "Rising Star", "Tham gia 5 thử thách", true),
 
-                // TIME_BASED (4)
+                // TIME_BASED
                 new Achievement(null, AchievementType.STREAK_MASTER, AchievementCategory.TIME_BASED, "Streak Master", "Nộp bằng chứng 30 ngày liên tiếp", true),
                 new Achievement(null, AchievementType.NIGHT_OWL, AchievementCategory.TIME_BASED, "Night Owl", "Nộp bằng chứng sau 10h tối", false),
-                new Achievement(null, AchievementType.EARLY_BIRD, AchievementCategory.TIME_BASED, "Early Bird", "Nộp bằng chứng trước 7h sáng", false),
-                new Achievement(null, AchievementType.LONG_HAUL, AchievementCategory.TIME_BASED, "Long Haul", "Hoàn thành 3 thử thách kéo dài hơn 14 ngày", true),
 
-                // RANKING_BASED (4)
+                // RANKING_BASED
                 new Achievement(null, AchievementType.FITNESS_CHAMPION, AchievementCategory.RANKING_BASED, "Fitness Champion", "Vào top 10 bảng xếp hạng thử thách", false),
-                new Achievement(null, AchievementType.GROUP_LEGEND, AchievementCategory.RANKING_BASED, "Group Legend", "Nhóm đứng đầu bảng xếp hạng", false),
-                new Achievement(null, AchievementType.CONSISTENT_TOPPER, AchievementCategory.RANKING_BASED, "Consistent Topper", "Vào top 3 trong 3 thử thách liên tiếp", true),
-                new Achievement(null, AchievementType.UNDERDOG, AchievementCategory.RANKING_BASED, "Underdog to Top", "Từ cuối bảng lên top 10 trong 1 thử thách", false)
+                new Achievement(null, AchievementType.GROUP_LEGEND, AchievementCategory.RANKING_BASED, "Group Legend", "Nhóm đứng đầu bảng xếp hạng", false)
         );
+
 
         achievementRepository.saveAll(achievements);
         System.out.println("✅ Seeded achievements.");

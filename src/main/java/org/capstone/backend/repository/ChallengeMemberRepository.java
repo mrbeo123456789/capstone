@@ -159,5 +159,11 @@ public interface ChallengeMemberRepository extends JpaRepository<ChallengeMember
 
     @Query("SELECT COUNT(cm) > 0 FROM ChallengeMember cm WHERE cm.member.id = :memberId AND cm.status = 'JOINED'")
     boolean hasJoinedAnyChallengeBefore(@Param("memberId") Long memberId);
+    @Query("SELECT COUNT(cm) FROM ChallengeMember cm WHERE cm.member = :member AND cm.status = 'JOINED'")
+    long countJoinedChallengesByMember(@Param("member") Member member);
+    @Query("SELECT COUNT(cm) " +
+            "FROM ChallengeMember cm " +
+            "WHERE cm.challenge.id = :challengeId AND cm.status = 'JOINED'")
+    Long countJoinedByChallenge(@Param("challengeId") Long challengeId);
 
 }

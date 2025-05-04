@@ -8,6 +8,5 @@ import java.util.List;
 
 public interface AchievementService {
     List<UserAchievementResponse> getMyAchievements();
-    void unlockAchievementIfEligible(Long memberId, AchievementType type);
 
 }
