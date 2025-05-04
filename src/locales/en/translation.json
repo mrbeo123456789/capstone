@@ -74,6 +74,7 @@
     "notLeaderFound": "Not found any leaders"
   },
   "sidebar": {
+    "dashboard": "My Dashboard",
     "myChallenge": "My Challenge",
     "myGroup": "My Group",
     "profile": "Profile",

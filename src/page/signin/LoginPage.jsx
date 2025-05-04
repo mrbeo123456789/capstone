@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import {resetAllApiStates} from "../../utils/resetAllApiStates.js";
+import {BASE_URL} from "../../contant/contant.js";
 export default function Login() {
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -97,7 +98,7 @@ export default function Login() {
 
 
     const loginWithGoogle = () => {
-        window.location.href = "http://localhost:8080/oauth2/authorization/google";
+        window.location.href= `${BASE_URL}oauth2/authorization/google`
     };
 
     const handleForgotPassword = () => navigate("/forgotPassword");

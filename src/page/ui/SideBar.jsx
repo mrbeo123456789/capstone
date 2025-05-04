@@ -14,6 +14,7 @@ import {
 const Sidebar = ({ isOpen }) => {
     const { t } = useTranslation();
 
+    // Sidebar menu items (always shown)
     const menuItems = [
         { key: "dashboard", icon: <FaRunning />, link: "/dashboard" },
         { key: "myChallenge", icon: <FaRunning />, link: "/challenges/joins" },
@@ -24,10 +25,19 @@ const Sidebar = ({ isOpen }) => {
         { key: "statistics", icon: <FaChartBar />, link: "/statistics" },
     ];
 
+    // Header links for small screens
+    const headerLinks = [
+        { href: "/homepage", text: t("menu.homepage") },
+        { href: "/aboutus", text: t("menu.about") },
+        { href: "/challenges", text: t("menu.challenges") },
+        { href: "/ranking", text: t("menu.leaderboard") },
+        { href: "/news", text: t("menu.news") },
+    ];
+
     return (
         <aside
             className={clsx(
-                "fixed top-20 bottom-0 left-0 w-14 lg:w-64 z-40 transition-transform duration-300 overflow-y-auto",
+                "fixed top-20 bottom-0 left-0 w-64 z-40 transition-transform duration-300 overflow-y-auto",
                 {
                     "-translate-x-full": !isOpen,
                     "translate-x-0": isOpen,
@@ -35,17 +45,31 @@ const Sidebar = ({ isOpen }) => {
             )}
         >
             <div className="p-2 flex flex-col h-full justify-between backdrop-blur-md bg-black/50 sm:bg-white/10 shadow-lg border-r border-white/20">
-                {/* Menu Section */}
+                {/* Main Menu Section */}
                 <nav className="flex-1">
                     <ul className="space-y-4">
                         {menuItems.map((item, index) => (
                             <li key={index}>
                                 <Link
                                     to={item.link}
-                                    className="flex md:flex-row flex-col items-center md:items-start space-y-1 md:space-y-0 md:space-x-3 p-2 rounded-md hover:bg-orange-600 hover:text-white transition text-white"
+                                    className="flex flex-row items-center md:items-start space-y-1 md:space-y-0 space-x-3 p-2 rounded-md hover:bg-orange-600 hover:text-white transition text-white"
                                 >
                                     <span className="text-lg">{item.icon}</span>
-                                    <span className="hidden lg:inline">{t(`sidebar.${item.key}`)}</span>
+                                    <span className="">{t(`sidebar.${item.key}`)}</span>
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+
+                    {/* Header links visible only on small screens */}
+                    <ul className="space-y-4 mt-8 block lg:hidden border-t border-white/20 pt-4">
+                        {headerLinks.map((link, index) => (
+                            <li key={`header-link-${index}`}>
+                                <Link
+                                    to={link.href}
+                                    className="block text-sm text-white hover:text-orange-300 px-2"
+                                >
+                                    {link.text}
                                 </Link>
                             </li>
                         ))}
