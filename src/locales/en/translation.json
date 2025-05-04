@@ -244,8 +244,9 @@
   "notification.groupChallengeResult.content": "Your group '{{groupName}}' has completed the challenge '{{challengeName}}'! View your group achievement now!",
   "notification.challengeRoleUpdated.title": "Challenge Role Updated",
   "notification.challengeRoleUpdated.content": "Your role in the challenge '{{challengeName}}' has been updated to: {{role}}",
-  "notification.challengeStatusUpdated.title": "Your challenge status has been updated",
-  "notification.challengeStatusUpdated.content": "The challenge '{{challengeName}}' has been updated to status: {{status}}.{{#adminNote}} Note: {{adminNote}}{{/adminNote}}",
+  "notification.challengeStatusUpdated.title": "Challenge Status Updated",
+  "notification.challengeStatusUpdated.content": "The challenge '{{challengeName}}' has been updated to status: {{status}}.",
+  "notification.adminNote": "Note: {{adminNote}}",
   "notification.challengeStarted.title": "The challenge '{{challengeName}}' has started!",
   "notification.challengeStarted.content": "Get ready to conquer the challenge '{{challengeName}}' with GoBeyond!",
   "notification.evidence.approved.title": "Proof on {{day}} approved",
@@ -273,6 +274,8 @@
   "notification.kickedFromChallenge.title": "You were removed from the challenge",
   "notification.kickedFromChallenge.content": "You were removed from the challenge '{{challengeName}}' by the admin.",
   "notification.empty": "No new notifications.",
+  "notification.achievementUnlock.title": "New Achievement!",
+  "notification.achievementUnlock.content": "You have unlocked the achievement: '{{achievementName}}'.",
   "ChallengeDetail": {
     "joinedStatus": "Joined",
     "joining": "Joining...",
@@ -633,10 +636,20 @@
     "rejectFail": "Failed to submit rejection."
   },
   "VoteOther": {
-    "title": "Vote for Others' Proof",
-    "loading": "Loading videos...",
-    "noEvidences": "No more evidences to review.",
-    "unknownUser": "Unknown User"
+    "title": "Vote for Others",
+    "loading": "Loading evidences...",
+    "noEvidences": "No evidences available for review.",
+    "unknownUser": "Unknown User",
+    "historyTitle": "Your Voting History",
+    "noPendingProofs": "No pending proofs found for this challenge.",
+    "tooltip": "If no one votes on your evidence, but you have reviewed at least one other member’s proof, your submission can still be marked as completed. Otherwise, it will be automatically rejected.",
+    "table": {
+      "submittedAt": "Submitted At",
+      "reviewedAt": "Reviewed At",
+      "score": "Score",
+      "video": "Video",
+      "view": "View"
+    }
   },
   "hostEvidence": {
     "members": "Members",
@@ -779,113 +792,17 @@
     },
     "description": {
       "FIRST_TRY": "Joined your first challenge.",
-      "DAILY_WARRIOR": "Completed 7 daily submissions.",
       "PROFILE_MASTER": "Completed all profile fields.",
-      "INVITER": "Successfully invited a member to join a challenge.",
-      "REVIEWER": "Reviewed 10 evidences from others.",
-      "PERFECT_ACCURACY": "Achieved 100% approval on one evidence.",
-      "COMEBACK_SUBMITTER": "Submitted a proof after 7+ days of inactivity.",
-      "RISING_STAR": "3 approved proofs in a row.",
-      "ACTIVE_VOTER": "Voted on 5 different challenges.",
-      "GROUP_HERO": "Led a group to complete a challenge.",
-      "CONTRIBUTOR": "Participated in 3 challenges.",
-      "STREAK_TRIPLE": "3-day submission streak.",
-      "STREAK_MASTER": "10-day submission streak.",
-      "NIGHT_OWL": "Submitted a proof between 00:00–04:00.",
-      "EARLY_BIRD": "Submitted before 06:00.",
-      "LONG_HAUL": "Completed a 30-day challenge.",
-      "FITNESS_CHAMPION": "Ranked in the top 10 of a challenge.",
-      "GROUP_LEGEND": "Group ranked first on the leaderboard.",
-      "CONSISTENT_TOPPER": "Top 3 in 3 consecutive challenges.",
-      "UNDERDOG": "Started slow but finished strong.",
-      "of": "of",
-      "achieved": "achievements unlocked",
-      "totalProgress": "Total Progress",
-      "progress": "Progress",
-      "earned": "Earned",
-      "community": "Community",
-      "users": "users",
-      "unlocked": "UNLOCKED",
-      "locked": "LOCKED",
-      "prev": "Prev",
-      "next": "Next",
-      "notYetEarned": "Not yet earned",
-
-      "fitnessChampion": "Fitness Champion",
-      "fitnessChampionDesc": "Ranked in the top 10 of a monthly challenge.",
-
-      "peakPerformer": "Peak Performer",
-      "peakPerformerDesc": "Completed an advanced intensity workout program.",
-
-      "perfectForm": "Perfect Form",
-      "perfectFormDesc": "Received a perfect score on workout technique.",
-
-      "risingAthlete": "Rising Athlete",
-      "risingAthleteDesc": "Improved fitness score by 50% in a month.",
-
-      "quickStarter": "Quick Starter",
-      "quickStarterDesc": "Completed 5 different workouts in a day.",
-
-      "trainingStreak": "Training Streak",
-      "trainingStreakDesc": "10-day streak of completing workouts.",
-
-      "hiitMaster": "HIIT Master",
-      "hiitMasterDesc": "Complete a HIIT workout with perfect timing.",
-
-      "teamPlayer": "Team Player",
-      "teamPlayerDesc": "Complete 10 group workouts.",
-
-      "workoutPlanner": "Workout Planner",
-      "workoutPlannerDesc": "Create a custom training plan and complete it.",
-
-      "eliteAthlete": "Elite Athlete",
-      "eliteAthleteDesc": "Maintain top 5% fitness rank for a month.",
-
-      "challengeCreator": "Challenge Creator",
-      "challengeCreatorDesc": "Create a workout challenge with 100+ participants.",
-
-      "fitnessMentor": "Fitness Mentor",
-      "fitnessMentorDesc": "Help 20 other users with their workout form.",
-
-      "cardioKing": "Cardio King",
-      "cardioKingDesc": "Win 3 consecutive cardio challenges.",
-
-      "calorieCrusher": "Calorie Crusher",
-      "calorieCrusherDesc": "Burn 5,000 calories in a week.",
-
-      "crossTrainer": "Cross-Trainer",
-      "crossTrainerDesc": "Complete workouts across 5 different fitness categories.",
-
-      "progressTracker": "Progress Tracker",
-      "progressTrackerDesc": "Log workouts for 30 consecutive days.",
-
-      "globalAthlete": "Global Athlete",
-      "globalAthleteDesc": "Join workouts with users from 5 different countries.",
-
-      "mindBodyMaster": "Mind-Body Master",
-      "mindBodyMasterDesc": "Complete 10 mindfulness and yoga sessions.",
-
-      "balancedDiet": "Balanced Diet",
-      "balancedDietDesc": "Log nutrition goals for 25 days.",
-
-      "strengthChampion": "Strength Champion",
-      "strengthChampionDesc": "Set 10 personal records in strength exercises.",
-
-      "enduranceBuilder": "Endurance Builder",
-      "enduranceBuilderDesc": "Complete a 2-hour endurance challenge.",
-
-      "goalCrusher": "Goal Crusher",
-      "goalCrusherDesc": "Achieve 5 personal fitness goals.",
-
-      "fitnessLegend": "Fitness Legend",
-      "fitnessLegendDesc": "Achieve the highest fitness level in the system.",
-
-      "fitnessExplorer": "Fitness Explorer",
-      "fitnessExplorerDesc": "Try workouts across all fitness categories.",
-
-      "activeLifestyle": "Active Lifestyle",
-      "activeLifestyleDesc": "Record physical activity for 60 days straight."
+      "ACTIVE_VOTER": "Voted on 10 different proofs.",
+      "CONTRIBUTOR": "Submitted 20 evidences.",
+      "RISING_STAR": "Joined 5 challenges.",
+      "STREAK_MASTER": "Submitted evidence 30 days in a row.",
+      "NIGHT_OWL": "Submitted a proof after 10:00 PM.",
+      "FITNESS_CHAMPION": "Ranked in the top 10 of the global leaderboard.",
+      "GROUP_LEGEND": "Led your group to #1 on the leaderboard.",
+      "TRENDING_CREATOR": "Created a challenge with over 100 participants."
     }
+
   },
   "MemberManagement": {
     "title": "Member Management",

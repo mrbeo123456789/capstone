@@ -31,10 +31,21 @@ export const evidenceVoteService = createApi({
             query: (challengeId) => `/evidence-votes/tasks/${challengeId}`,
             providesTags: ["EvidenceVote"],
         }),
+
+        // ✅ Add to endpoints:
+        getMyVotedEvidence: builder.query({
+            query: (challengeId) => ({
+                url: "/evidence-votes/my-votes",
+                method: "GET",
+                params: challengeId ? { challengeId } : undefined,
+            }),
+            providesTags: ["EvidenceVote"],
+        }),
     }),
 });
 
 export const {
     useVoteEvidenceMutation,
     useGetEvidenceToVoteByChallengeQuery,
+    useGetMyVotedEvidenceQuery,
 } = evidenceVoteService;

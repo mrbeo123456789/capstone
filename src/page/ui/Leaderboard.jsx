@@ -83,13 +83,12 @@ const GlobalLeaderboard = () => {
         if (globalGroupRankingData) {
             // Process API response to match our component's data structure
             const processedGroups = globalGroupRankingData.content.map((group, index) => ({
-                id: group.id,
-                name: group.name,
-                members: group.memberCount || 0,
-                score: group.score,
-                avatar: group.avatar || '/api/placeholder/100/100',
-                rank: group.rank || index + 1 + (groupPage * usersPerPage),
-                isCurrentUser: group.isCurrentGroup || false
+                id: group.groupId,
+                name: group.groupName,
+                score: group.totalStars,
+                avatar: group.groupPicture || '/api/placeholder/100/100',
+                members: group.memberCount || 0, // Nếu có
+                rank: index + 1 + (groupPage * usersPerPage),
             }));
 
             setGroups(processedGroups);

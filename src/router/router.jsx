@@ -47,7 +47,7 @@ const router = createBrowserRouter([
         element: <Layout />, // ✅ Layout wraps all main pages
         children: [
             { path: "homepage", element: <ChallengePage/> },
-            { path: "dashboard", element: <UserDashBoard/> },
+            { path: "dashboard", element: <MemberRoute><UserDashBoard/></MemberRoute> },
             { path: "aboutus", element: <AboutUsPage /> },
             { path: "news", element: <News /> },
             { path: "profile", element: <MemberRoute><MemberProfile /></MemberRoute> },
