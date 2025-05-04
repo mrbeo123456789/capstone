@@ -3,31 +3,23 @@ import ChallengeCardDisplay from "./challengepage/ChallengeCardDisplay.jsx";
 import ChallengeSwiper from "../ui/ChallengeSwiper/ChallengeSwiper.jsx";
 
 function ChallengePage() {
-    const upcoming = useGetChallengesByStatusQuery({ status: "UPCOMING" });
-    const ongoing = useGetChallengesByStatusQuery({ status: "ONGOING" });
-    const finished = useGetChallengesByStatusQuery({ status: "FINISHED" });
+    //const upcoming = useGetChallengesByStatusQuery({ status: "UPCOMING" });
+    //const ongoing = useGetChallengesByStatusQuery({ status: "ONGOING" });
+    //const finished = useGetChallengesByStatusQuery({ status: "FINISHED" });
+    const all = useGetChallengesByStatusQuery({status: null});
 
     return (
         <section id="home" className="home active">
             <ChallengeSwiper/>
             <div className="container-fluid p-4">
-                <div className="flex flex-row ">
-                    <div className="bg-black/50 rounded-lg w-full h-[10px]">
-                    </div>
+                <div className="flex flex-row items-center">
                     <div className="flex items-center gap-4 mb-2">
-                        <h2 className="text-2xl font-bold whitespace-nowrap">📅 Upcoming Challenges</h2>
-                        <div className="flex-1 h-[2px] bg-black/30 rounded"></div>
+                        <h2 className="text-2xl font-bold whitespace-nowrap text-white">🔥 Challenges</h2>
                     </div>
-
-                    <div className="bg-black/50 rounded-lg w-full h-[10px]">
+                    <div className="bg-white/50 rounded-lg w-full h-[5px]">
                     </div>
                 </div>
-                <ChallengeCardDisplay data={upcoming.data} isLoading={upcoming.isLoading} isError={upcoming.isError}/>
-                <h2 className="text-2xl font-bold bg-black/50 p-3 rounded-lg">🔥 Ongoing Challenges</h2>
-                <ChallengeCardDisplay data={ongoing.data} isLoading={ongoing.isLoading} isError={ongoing.isError}/>
-                <h2 className="text-2xl font-bold bg-black/50 p-3 rounded-lg">✅ Finished Challenges</h2>
-                <ChallengeCardDisplay data={finished.data} isLoading={finished.isLoading} isError={finished.isError}/>
-
+                <ChallengeCardDisplay data={all.data} isLoading={all.isLoading} isError={all.isError}/>
             </div>
         </section>
     );

@@ -9,7 +9,7 @@ const ChallengeCardDisplay = ({ data, isLoading, isError }) => {
     const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString("en-CA");
 
     return (
-        <div className="flex flex-row justify-center gap-6">
+        <div className="flex flex-col sm:flex-row gap-6 justify-self-center sm:justify-normal w-full items-center">
             {data.content.map((challenge) => (
                 <Link key={challenge.id} to={`/challenges/detail/${challenge.id}`} className="group">
                     <div className="w-[320px] h-[340px] bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col">
