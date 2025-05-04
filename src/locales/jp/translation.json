@@ -305,7 +305,9 @@
     "kickedFromChallenge.content": "あなたはチャレンジ「{{challengeName}}」から管理者により削除されました。",
     "empty": "新しい通知はありません。",
     "challengeStatusUpdated.title": "チャレンジのステータスが更新されました",
-    "notification.challengeStatusUpdated.content": "チャレンジ「{{challengeName}}」のステータスが {{status}} に更新されました。{{#adminNote}} メモ: {{adminNote}}{{/adminNote}}"
+    "achievementUnlock.title": "🎉 新しい実績！",
+    "achievementUnlock.content": "実績「{{achievementName}}」を達成しました。",
+    "challengeStatusUpdated.content": "チャレンジ「{{challengeName}}」のステータスが {{status}} に更新されました。{{#adminNote}} メモ: {{adminNote}}{{/adminNote}}"
   },
   "suggest.reason.both": "共通の興味があり、近くにいます",
   "suggest.reason.same_interest": "共通の興味があります",
@@ -764,26 +766,17 @@
     },
     "description": {
       "FIRST_TRY": "初めてチャレンジに参加しました。",
-      "DAILY_WARRIOR": "7日連続で提出を完了しました。",
       "PROFILE_MASTER": "プロフィール情報をすべて入力しました。",
-      "INVITER": "チャレンジにメンバーを1人招待して成功しました。",
-      "REVIEWER": "10件の証拠を審査しました。",
-      "PERFECT_ACCURACY": "1件の証拠が100%承認されました。",
-      "COMEBACK_SUBMITTER": "7日以上の休止後に提出しました。",
-      "RISING_STAR": "3つの証拠が連続で承認されました。",
-      "ACTIVE_VOTER": "5つの異なるチャレンジで投票しました。",
-      "GROUP_HERO": "グループを導いてチャレンジを達成しました。",
-      "CONTRIBUTOR": "3つ以上のチャレンジに参加しました。",
-      "STREAK_TRIPLE": "3日連続で提出しました。",
-      "STREAK_MASTER": "10日連続で提出しました。",
-      "NIGHT_OWL": "午前0時〜4時に提出しました。",
-      "EARLY_BIRD": "午前6時前に提出しました。",
-      "LONG_HAUL": "30日間のチャレンジを完了しました。",
-      "FITNESS_CHAMPION": "チャレンジでトップ10にランクインしました。",
-      "GROUP_LEGEND": "グループがランキング1位を獲得しました。",
-      "CONSISTENT_TOPPER": "3つの連続チャレンジでトップ3に入りました。",
-      "UNDERDOG": "遅れてスタートしましたが、強くゴールしました。"
+      "ACTIVE_VOTER": "10件の証拠に投票しました。",
+      "CONTRIBUTOR": "20件の証拠を提出しました。",
+      "RISING_STAR": "5つのチャレンジに参加しました。",
+      "STREAK_MASTER": "30日連続で証拠を提出しました。",
+      "NIGHT_OWL": "夜10時以降に証拠を提出しました。",
+      "FITNESS_CHAMPION": "グローバルランキングでトップ10に入りました。",
+      "GROUP_LEGEND": "グループがランキング1位を達成しました。",
+      "TRENDING_CREATOR": "100人以上が参加したチャレンジを作成しました。"
     }
+
   },
     "Moderation": {
       "unableToAnalyze": "コンテンツを分析できませんでした。",
