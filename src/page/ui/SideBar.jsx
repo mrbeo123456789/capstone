@@ -15,6 +15,7 @@ const Sidebar = ({ isOpen }) => {
     const { t } = useTranslation();
 
     const menuItems = [
+        { key: "dashboard", icon: <FaRunning />, link: "/dashboard" },
         { key: "myChallenge", icon: <FaRunning />, link: "/challenges/joins" },
         { key: "myGroup", icon: <FaUsers />, link: "/groups/joins" },
         { key: "profile", icon: <FaUser />, link: "/profile" },

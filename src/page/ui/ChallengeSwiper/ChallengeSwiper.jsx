@@ -1,4 +1,4 @@
-import  { useState } from 'react';
+import React, { useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/effect-coverflow';
@@ -44,21 +44,13 @@ function ChallengeSwiper() {
                             <h2>{game.title}</h2>
                             <p>{game.description}</p>
                             <div className="buttons">
-                                <a href="#" className="orderBtn">
-                                    Order Now
-                                </a>
-                                <a
-                                    href="#"
-                                    className={`playBtn ${active ? 'active' : ''}`}
-                                    onClick={handleToggleVideo}
+                                <button
+                                    className="orderBtn"
+                                    onClick={() => navigate(`/challenges/${game._id}`)}
                                 >
-                              <span className="pause">
-                                <i className="bi bi-pause-fill"></i>
-                              </span>
-                                <span className="play">
-                                    <i className="bi bi-play-fill"></i>
-                                </span>
-                                </a>
+                                    Join now
+                                </button>
+
                             </div>
                         </div>
                     </div>
