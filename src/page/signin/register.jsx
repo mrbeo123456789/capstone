@@ -53,7 +53,7 @@ const RegisterForm = () => {
 
         try {
             await register({ email, username, password }).unwrap();
-            toast.success(t("auth.register.success"));
+            // toast.success(t("auth.register.success"));
             sessionStorage.setItem("otpEmail", email);
             sessionStorage.setItem("otpType", "register");
             navigate("/enter-otp");

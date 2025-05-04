@@ -583,11 +583,22 @@
     "next": "次へ"
   },
   "VoteOther": {
-    "title": "他の参加者の証拠に投票する",
-    "loading": "ビデオを読み込み中...",
-    "noEvidences": "レビューする証拠はありません。",
-    "unknownUser": "不明なユーザー"
+    "title": "他人の証拠を評価",
+    "loading": "証拠を読み込み中...",
+    "noEvidences": "レビューする証拠が見つかりません。",
+    "unknownUser": "不明なユーザー",
+    "historyTitle": "あなたの評価履歴",
+    "noPendingProofs": "このチャレンジには保留中の証拠が見つかりませんでした。",
+    "tooltip": "誰もあなたの証拠をレビューしていなくても、他の参加者の証拠を1つ以上レビューしていれば、完了とみなされます。そうでない場合、自動的に却下されます。",
+    "table": {
+      "submittedAt": "提出日時",
+      "reviewedAt": "レビュー日時",
+      "score": "スコア",
+      "video": "ビデオ",
+      "view": "表示"
+    }
   },
+
   "hostEvidence": {
     "members": "メンバー",
     "searchMembers": "メンバーを検索...",

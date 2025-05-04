@@ -636,10 +636,20 @@
     "rejectFail": "Failed to submit rejection."
   },
   "VoteOther": {
-    "title": "Vote for Others' Proof",
-    "loading": "Loading videos...",
-    "noEvidences": "No more evidences to review.",
-    "unknownUser": "Unknown User"
+    "title": "Vote for Others",
+    "loading": "Loading evidences...",
+    "noEvidences": "No evidences available for review.",
+    "unknownUser": "Unknown User",
+    "historyTitle": "Your Voting History",
+    "noPendingProofs": "No pending proofs found for this challenge.",
+    "tooltip": "If no one votes on your evidence, but you have reviewed at least one other member’s proof, your submission can still be marked as completed. Otherwise, it will be automatically rejected.",
+    "table": {
+      "submittedAt": "Submitted At",
+      "reviewedAt": "Reviewed At",
+      "score": "Score",
+      "video": "Video",
+      "view": "View"
+    }
   },
   "hostEvidence": {
     "members": "Members",

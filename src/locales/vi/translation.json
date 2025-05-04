@@ -593,11 +593,22 @@
     "next": "Sau"
   },
   "VoteOther": {
-    "title": "Đánh giá bằng chứng của người khác",
-    "loading": "Đang tải video...",
-    "noEvidences": "Không còn bằng chứng nào để đánh giá.",
-    "unknownUser": "Người dùng không xác định"
+    "title": "Chấm điểm bằng chứng",
+    "loading": "Đang tải bằng chứng...",
+    "noEvidences": "Không có bằng chứng nào để chấm.",
+    "unknownUser": "Người dùng ẩn danh",
+    "historyTitle": "Lịch sử chấm điểm",
+    "noPendingProofs": "Không tìm thấy bằng chứng nào đang chờ chấm trong thử thách này.",
+    "tooltip": "Nếu không ai chấm điểm bằng chứng của bạn, nhưng bạn đã chấm ít nhất một bằng chứng khác, hệ thống vẫn tính là hoàn thành. Ngược lại, bằng chứng sẽ tự động bị từ chối.",
+    "table": {
+      "submittedAt": "Thời gian nộp",
+      "reviewedAt": "Thời gian chấm",
+      "score": "Điểm",
+      "video": "Video",
+      "view": "Xem"
+    }
   },
+
   "hostEvidence": {
     "members": "Thành viên",
     "searchMembers": "Tìm kiếm thành viên...",
