@@ -74,6 +74,7 @@
     "noLeadersFound": "リーダーが見つかりませんでした"
   },
   "sidebar": {
+    "dashboard": "マイダッシュボード",
     "myChallenge": "マイチャレンジ",
     "myGroup": "マイグループ",
     "profile": "プロフィール",
@@ -81,6 +82,7 @@
     "achievement": "実績",
     "statistics": "統計"
   },
+
   "invitePermission": {
     "select": "招待権限を選択",
     "everyone": "全員が招待できる",

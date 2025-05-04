@@ -70,13 +70,15 @@
     "noLeadersFound": "Không tìm thấy người dùng nào"
   },
   "sidebar": {
+    "dashboard": "Bảng điều khiển",
     "myChallenge": "Thử thách của tôi",
     "myGroup": "Nhóm của tôi",
-    "profile": "Hồ sơ",
+    "profile": "Hồ sơ cá nhân",
     "password": "Mật khẩu",
     "achievement": "Thành tựu",
     "statistics": "Thống kê"
   },
+
   "invitePermission": {
     "select": "Chọn quyền mời",
     "everyone": "Mọi người đều có thể mời",
