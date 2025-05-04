@@ -14,9 +14,11 @@ function ChallengePage() {
                 <div className="flex flex-row ">
                     <div className="bg-black/50 rounded-lg w-full h-[10px]">
                     </div>
-                    <div className="flex flex-col">
-                        <h2 className="text-2xl font-bold">📅 Upcoming Challenges</h2>
+                    <div className="flex items-center gap-4 mb-2">
+                        <h2 className="text-2xl font-bold whitespace-nowrap">📅 Upcoming Challenges</h2>
+                        <div className="flex-1 h-[2px] bg-black/30 rounded"></div>
                     </div>
+
                     <div className="bg-black/50 rounded-lg w-full h-[10px]">
                     </div>
                 </div>
