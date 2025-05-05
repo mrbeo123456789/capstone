@@ -72,7 +72,7 @@ export default function Login() {
 
             // ✅ Điều hướng
             setTimeout(() => {
-                navigate(role.toUpperCase() === "ADMIN" ? "/admin/dashboard" : "/homepage");
+                navigate(role.toUpperCase() === "ADMIN" ? "/admin/dashboard" : "/dashboard");
             }, 100);
         } catch (err) {
             const errorCode = err?.message || err?.data?.message;

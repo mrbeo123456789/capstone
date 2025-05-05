@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import NewsDetailModal from './NewsDetail.jsx'; // Import modal component
 
 export default function SportsNewsPage() {
     const [articles, setArticles] = useState([]);
@@ -9,9 +8,6 @@ export default function SportsNewsPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [viewMode, setViewMode] = useState('grid');
     const { t, i18n } = useTranslation();
-    // States for modal
-    const [selectedArticle, setSelectedArticle] = useState(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
 
     // Object chứa các URL RSS theo ngôn ngữ
     const RSS_SOURCES = {
@@ -57,9 +53,11 @@ export default function SportsNewsPage() {
                 }
 
                 // Xử lý kết quả và tìm hình ảnh
+                console.log("Original data items:", data.items);
+
                 const processedItems = data.items.map(item => {
                     // Debug log để xem cấu trúc của mỗi item
-                    console.log("Processing item:", item.title);
+                    console.log("Processing item:", item.title, item);
 
                     // Khởi tạo URL hình ảnh là null
                     let imageUrl = null;
@@ -67,17 +65,23 @@ export default function SportsNewsPage() {
                     // Xác định source của RSS để có xử lý phù hợp
                     const isVnExpress = item.link && item.link.includes('vnexpress.net');
 
-                    // 1. Kiểm tra thumbnail từ API
-                    if (item.thumbnail && item.thumbnail !== '') {
+                    // PHƯƠNG PHÁP CHÍNH: Kiểm tra enclosure (dựa vào dữ liệu API thật)
+                    if (item.enclosure && item.enclosure.link) {
+                        console.log("Found image in enclosure:", item.enclosure.link);
+                        imageUrl = item.enclosure.link;
+
+                        // Xử lý đặc biệt cho các ký tự HTML entity trong URL
+                        if (imageUrl.includes('&amp;')) {
+                            imageUrl = imageUrl.replace(/&amp;/g, '&');
+                            console.log("Fixed enclosure URL:", imageUrl);
+                        }
+                    }
+                    // Kiểm tra thumbnail từ API
+                    else if (item.thumbnail && item.thumbnail !== '') {
                         console.log("Found thumbnail in API response:", item.thumbnail);
                         imageUrl = item.thumbnail;
                     }
-                    // 2. Tìm trong enclosure (phổ biến trong RSS)
-                    else if (item.enclosure && item.enclosure.link) {
-                        console.log("Found image in enclosure:", item.enclosure.link);
-                        imageUrl = item.enclosure.link;
-                    }
-                    // 3. Xử lý đặc biệt cho VnExpress
+                    // Xử lý đặc biệt cho VnExpress
                     else if (isVnExpress) {
                         // VnExpress thường có ảnh trong thẻ <img> trong description hoặc content
                         const contentToCheck = item.description || item.content || '';
@@ -87,16 +91,11 @@ export default function SportsNewsPage() {
                         const imgMatch = contentToCheck.match(imgRegex);
 
                         if (imgMatch && imgMatch[1]) {
-                            console.log("Found VnExpress image:", imgMatch[1]);
+                            console.log("Found VnExpress image in content:", imgMatch[1]);
                             imageUrl = imgMatch[1];
-
-                            // Xử lý trường hợp URL có chứa các ký tự đặc biệt HTML entity
-                            if (imageUrl.includes('&amp;')) {
-                                imageUrl = imageUrl.replace(/&amp;/g, '&');
-                            }
                         }
                     }
-                    // 4. Xử lý chung cho các nguồn khác
+                    // Xử lý chung cho các nguồn khác
                     else {
                         // Kiểm tra trong content và description với regex tổng quát
                         const contentToCheck = item.content || '';
@@ -126,15 +125,29 @@ export default function SportsNewsPage() {
                         }
                     }
 
+                    // Xử lý các ký tự HTML entity trong URL nếu có
+                    if (imageUrl && imageUrl.includes('&amp;')) {
+                        imageUrl = imageUrl.replace(/&amp;/g, '&');
+                        console.log("Fixed image URL with HTML entities:", imageUrl);
+                    }
+
                     // Đảm bảo URL hình ảnh là hợp lệ và tuyệt đối (không phải relative)
                     if (imageUrl && !imageUrl.startsWith('http')) {
                         // Nếu là đường dẫn tương đối, chuyển thành tuyệt đối
                         try {
                             const baseUrl = new URL(item.link).origin;
                             imageUrl = new URL(imageUrl, baseUrl).href;
+                            console.log("Converted to absolute URL:", imageUrl);
                         } catch (e) {
                             console.error("Error converting relative URL to absolute:", e);
+                            imageUrl = null; // Reset imageUrl if conversion fails
                         }
+                    }
+
+                    // Kiểm tra xem URL có hợp lệ không
+                    if (imageUrl) {
+                        // Thêm log để kiểm tra URL hình ảnh
+                        console.log("Final image URL:", imageUrl);
                     }
 
                     // Trích xuất văn bản tóm tắt (nếu không có trong item)
@@ -222,19 +235,33 @@ export default function SportsNewsPage() {
     // Hàm kiểm tra URL hình ảnh hợp lệ
     const isValidImageUrl = (url) => {
         if (!url) return false;
-        return true; // Chấp nhận tất cả URL vì hình ảnh có thể đến từ nhiều nguồn khác nhau
+        // Thêm kiểm tra cơ bản cho URL
+        try {
+            new URL(url);
+            return true;
+        } catch (e) {
+            console.error("Invalid URL:", url, e);
+            return false;
+        }
     };
 
-    // Xử lý khi người dùng click vào một bài viết
-    const handleArticleClick = (e, article) => {
-        e.preventDefault(); // Ngăn chặn chuyển hướng mặc định
-        setSelectedArticle(article);
-        setIsModalOpen(true);
+    // Hàm xử lý URL có chứa HTML entities
+    const decodeHtmlEntities = (url) => {
+        if (!url) return url;
+        // Xử lý các entity phổ biến
+        return url
+            .replace(/&amp;/g, '&')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, "'");
     };
 
-    // Đóng modal
-    const handleCloseModal = () => {
-        setIsModalOpen(false);
+    // Handle image loading error with better fallback
+    const handleImageError = (e) => {
+        console.log("Image failed to load:", e.target.src);
+        e.target.onerror = null; // Prevent infinite error loop
+        e.target.src = `https://placehold.co/600x400/f3f4f6/a1a1aa?text=${encodeURIComponent(t('images.notAvailable'))}`;
     };
 
     if (loading) {
@@ -321,19 +348,18 @@ export default function SportsNewsPage() {
                         >
                             <a
                                 href={article.link}
-                                onClick={(e) => handleArticleClick(e, article)}
+                                target="_blank"
+                                rel="noopener noreferrer"
                                 className={`block ${viewMode === 'list' ? 'flex' : 'flex-col'} w-full cursor-pointer`}
                             >
                                 <div className={`${viewMode === 'list' ? 'w-40 min-w-40 mr-4' : 'w-full h-48'}`}>
                                     {article.thumbnail && isValidImageUrl(article.thumbnail) ? (
                                         <img
-                                            src={article.thumbnail}
+                                            src={decodeHtmlEntities(article.thumbnail)}
                                             alt=""
                                             className="w-full h-full object-cover"
-                                            onError={(e) => {
-                                                e.target.onerror = null;
-                                                e.target.src = `https://placehold.co/600x400/f3f4f6/a1a1aa?text=${encodeURIComponent(t('images.notAvailable'))}`;
-                                            }}
+                                            onError={handleImageError}
+                                            loading="lazy"
                                         />
                                     ) : (
                                         <div className="w-full h-full bg-gray-200 flex items-center justify-center">
@@ -368,13 +394,6 @@ export default function SportsNewsPage() {
                     ))}
                 </div>
             )}
-
-            {/* Modal */}
-            <NewsDetailModal
-                article={selectedArticle}
-                isOpen={isModalOpen}
-                onClose={handleCloseModal}
-            />
         </div>
     );
 }

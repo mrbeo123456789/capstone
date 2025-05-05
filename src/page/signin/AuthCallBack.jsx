@@ -11,7 +11,7 @@ const AuthCallback = () => {
 
         if (token) {
             localStorage.setItem("jwt_token", token);
-            navigate("/homepage", { replace: true });
+            navigate("/dashboard", { replace: true });
         } else {
             navigate("/login?error=true");
         }

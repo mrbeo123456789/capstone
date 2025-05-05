@@ -85,7 +85,7 @@ const JoinedChallengeDetail = () => {
 
     const handleLeave = async () => {
         try {
-            await leaveChallenge(challenge.id).unwrap();
+            await leaveChallenge(challenge.id);
             toast.success(t("JoinsChallengeDetail.leaveSuccess"));
             navigate("/challenges/joins");
         } catch (e) {

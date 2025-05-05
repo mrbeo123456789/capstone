@@ -871,6 +871,26 @@
     "searchUser": "Search user...",
     "totalStars": "Total Stars",
     "kickMember": "Kick Member"
+  },
+  "SelectGroupModal": {
+    "title": "Select a Group to Join",
+    "searchPlaceholder": "Search by group name...",
+    "filterExactMembers": "Only show groups with exactly {{number}} members",
+    "noGroups": "No matching groups found.",
+    "notLeaderTooltip": "You are not the group leader.",
+    "notExactMembersTooltip": "Group must have exactly {{number}} members.",
+    "yourRole": "Your role",
+    "owner": "Leader",
+    "member": "Member",
+    "members": "members",
+    "prev": "Previous",
+    "next": "Next",
+    "cancel": "Cancel",
+    "join": "Join",
+    "joining": "Joining...",
+    "joinSuccess": "Successfully joined the challenge with your group!",
+    "joinFail": "Failed to join the challenge with the group.",
+    "selectGroupFirst": "Please select a group before joining."
   }
 }
 

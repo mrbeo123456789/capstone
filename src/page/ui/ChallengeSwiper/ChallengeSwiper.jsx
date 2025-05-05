@@ -5,11 +5,15 @@ import 'swiper/css/effect-coverflow';
 import 'swiper/css/navigation';
 import './ChallengeSwiper.css';
 import { EffectCoverflow, Navigation, Autoplay } from 'swiper/modules';
+import { useTranslation } from 'react-i18next';
 
 import gameData from '../../../../gamesData.json';
 
 function ChallengeSwiper() {
     const [active, setActive] = useState(false);
+    const { i18n } = useTranslation(); // lấy ngôn ngữ hiện tại
+    const currentLang = i18n.language || 'en';
+
     const handleToggleVideo = () => {
         setActive(!active);
     };
@@ -30,8 +34,8 @@ function ChallengeSwiper() {
                 slideShadows: true,
             }}
             autoplay={{
-              delay: 2500,
-              disableOnInteraction: false,
+                delay: 2500,
+                disableOnInteraction: false,
             }}
             modules={[EffectCoverflow, Navigation, Autoplay]}
             className="gameSwiper">
@@ -41,17 +45,9 @@ function ChallengeSwiper() {
                     <div className="gameSlider">
                         <img src={game.img} alt="Game Image" />
                         <div className="content">
-                            <h2>{game.title}</h2>
-                            <p>{game.description}</p>
-                            <div className="buttons">
-                                <button
-                                    className="orderBtn"
-                                    onClick={() => navigate(`/challenges/${game._id}`)}
-                                >
-                                    Join now
-                                </button>
-
-                            </div>
+                            <h2 className="hidden lg:block">{game.title}</h2>
+                            <h3 className="block lg:hidden">{game.title}</h3>
+                            <p>{game.description?.[currentLang] || game.description?.en}</p>
                         </div>
                     </div>
                 </SwiperSlide>

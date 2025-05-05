@@ -94,11 +94,53 @@ export const challengeValidation = yup.object({
             return value && new Date(value) > new Date(startDate);
         }),
 
+    participationType: yup.string().oneOf(["INDIVIDUAL", "GROUP"]).required(),
+
     maxParticipants: yup
         .number()
         .typeError(() => i18n.t("challenge.maxParticipantsType", { ns: "validation" }))
-        .positive(() => i18n.t("challenge.maxParticipantsPositive", { ns: "validation" }))
-        .integer(() => i18n.t("challenge.maxParticipantsInteger", { ns: "validation" })),
+        .integer(() => i18n.t("challenge.maxParticipantsInteger", { ns: "validation" }))
+        .when("participationType", {
+            is: "INDIVIDUAL",
+            then: (schema) =>
+                schema
+                    .required(() => i18n.t("challenge.maxParticipantsRequired", { ns: "validation" }))
+                    .min(2, () => i18n.t("challenge.minParticipantsIndividual", { ns: "validation" })),
+            otherwise: (schema) => schema.notRequired().strip() // ❗ Loại bỏ nếu không dùng
+        }),
+
+
+    maxGroups: yup
+        .number()
+        .typeError(() => i18n.t("challenge.maxGroupsType", { ns: "validation" }))
+        .integer(() => i18n.t("challenge.maxGroupsInteger", { ns: "validation" }))
+        .when("participationType", {
+            is: "GROUP",
+            then: (schema) =>
+                schema
+                    .required(() => i18n.t("challenge.maxGroupsRequired", { ns: "validation" }))
+                    .min(2, () => i18n.t("challenge.minGroups", { ns: "validation" })),
+            otherwise: (schema) => schema.notRequired().strip()
+        }),
+
+
+    maxMembersPerGroup: yup
+        .number()
+        .transform((value, originalValue) =>
+            originalValue === "" ? undefined : value
+        )
+        .typeError(() => i18n.t("challenge.maxMembersPerGroupType", { ns: "validation" }))
+        .positive(() => i18n.t("challenge.maxMembersPerGroupPositive", { ns: "validation" }))
+        .integer(() => i18n.t("challenge.maxMembersPerGroupInteger", { ns: "validation" }))
+        .min(2, () => i18n.t("challenge.groupMinMember", { ns: "validation" }))
+        .when("participationType", {
+            is: "GROUP",
+            then: (schema) =>
+                schema.required(() =>
+                    i18n.t("challenge.maxMembersPerGroupRequired", { ns: "validation" })
+                ),
+            otherwise: (schema) => schema.notRequired(),
+        }),
 
     description: yup
         .string()

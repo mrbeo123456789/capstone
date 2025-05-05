@@ -1,224 +1,350 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { FaWindowClose } from "react-icons/fa";
-import { IoCloudUploadOutline } from "react-icons/io5";
-import { toast } from "react-toastify";
-import { useNavigate, useParams } from "react-router-dom";
-import { groupValidation } from "../../utils/validation.js";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useTranslation } from "react-i18next";
-import {
-    useCreateGroupMutation,
-    useUpdateGroupMutation,
-    useGetGroupDetailQuery,
-} from "../../service/groupService.js";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import {useCreateChallengeMutation, useGetChallengeTypesQuery} from "../../service/challengeService.js";
+import {FaWindowClose} from "react-icons/fa";
+import {IoCloudUploadOutline} from "react-icons/io5";
+import {challengeValidation} from "../../utils/validation.js";
+import {yupResolver} from "@hookform/resolvers/yup";
+import RichTextEditor from "../ui/RichTextEditor.jsx";
+import {useTranslation} from "react-i18next";
 
-// ... (imports như cũ)
-const GroupForm = () => {
+const ChallengeForm = () => {
     const { t } = useTranslation();
-    const navigate = useNavigate();
-    const { id: groupId } = useParams();
-    const isEditing = Boolean(groupId);
+    const [createChallenge, { isLoading }] = useCreateChallengeMutation();
+    const { data: challengeTypes, challengeTypeLoading, isError } = useGetChallengeTypesQuery();
 
+    const navigate = useNavigate();
     const [preview, setPreview] = useState("");
-    const {
-        register,
+    const [bannerPreview, setBannerPreview] = useState("");
+
+
+    const today = new Date();
+    const tomorrow = new Date();
+    today.setDate(today.getDate() + 1);
+    tomorrow.setDate(today.getDate() + 1);
+
+    const getFormattedDate = (date) => {
+        return date.toISOString().split('T')[0]; // lấy phần YYYY-MM-DD
+    };
+
+    // Find the "Other" challenge type ID when data is available
+    const getOtherChallengeTypeId = () => {
+        if (challengeTypes && challengeTypes.length > 0) {
+            const otherType = challengeTypes.find(type => type.name === "Other");
+            return otherType ? otherType.id.toString() : "";
+        }
+        return "";
+    };
+
+    const {register,
         handleSubmit,
         setValue,
+        getValues,
+        watch,
         reset,
-        formState: { errors },
+        trigger,
+        formState:{ errors, isValid, isDirty}
     } = useForm({
-        resolver: yupResolver(groupValidation),
-        context: { isEditing }, // 👈 Truyền context ở đây
+        mode: "all",
+        resolver: yupResolver(challengeValidation),
+        defaultValues: {
+            startDate: getFormattedDate(today),
+            endDate: getFormattedDate(tomorrow),
+            privacy: "PUBLIC" // Always set default privacy to PUBLIC
+        }
     });
 
-    const [createGroup, { isLoading }] = useCreateGroupMutation();
-    const [updateGroup, { isLoading: isUpdating }] = useUpdateGroupMutation();
-    const { data: groupDetail } = useGetGroupDetailQuery(groupId, { skip: !isEditing });
-
-    useEffect(() => {
-        if (isEditing && groupDetail) {
-            reset({
-                name: groupDetail.name || "",
-                description: groupDetail.description || "",
-                picture: null,
-            });
-            setPreview(groupDetail.picture || "");
+    // Set the challenge type to "Other" when data is loaded
+    useState(() => {
+        if (challengeTypes) {
+            const otherTypeId = getOtherChallengeTypeId();
+            if (otherTypeId) {
+                setValue("challengeTypeId", otherTypeId, { shouldValidate: true });
+            }
         }
-    }, [isEditing, groupDetail, reset]);
+    }, [challengeTypes]);
 
     const onSubmit = async (data) => {
-        try {
-            if (isEditing) {
-                const formData = new FormData();
-                formData.append("id", groupId);
-                formData.append("name", data.name);
-                formData.append("description", data.description);
+        const formData = new FormData();
 
-                await updateGroup(formData); // ✅ Gửi multipart/form-data
+        // Format date fields
+        const formatDate = (dateString) => {
+            const date = new Date(dateString);
+            const offset = date.getTimezoneOffset();
+            date.setMinutes(date.getMinutes() - offset);
+            return date.toISOString().split('T')[0];
+        };
 
-                toast.success(t("updateSuccess"), { autoClose: 2000 });
-                navigate(`/groups/joins/${groupId}`); // ✅ Quay lại trang chi tiết nhóm
+        // Pre-process
+        const processedData = {
+            ...data,
+            privacy: "PUBLIC", // Always use PUBLIC for privacy
+            maxParticipants: parseInt(data.maxParticipants),
+            challengeTypeId: parseInt(data.challengeTypeId),
+            startDate: formatDate(data.startDate),
+            endDate: formatDate(data.endDate),
+        };
+
+        // Append all fields dynamically
+        Object.keys(processedData).forEach((key) => {
+            if (key === "picture" || key === "banner") {
+                if (processedData[key]) {
+                    formData.append(key, processedData[key]); // File
+                }
             } else {
-                const formData = new FormData();
-                formData.append("name", data.name);
-                formData.append("description", data.description);
-                if (data.picture) {
-                    formData.append("picture", data.picture);
+                formData.append(key, processedData[key] ?? ""); // Avoid null/undefined
+            }
+        });
+
+        if (isValid) {
+            const toastId = toast.loading("Creating challenge...");
+            try {
+                console.log("Submitting FormData...");
+                for (let pair of formData.entries()) {
+                    console.log(pair[0] + ": ", pair[1]);
                 }
 
-                const res = await createGroup(formData);
-                const message = typeof res === "string" ? res : res.message;
-                toast.success(message || t("groupForm.createSuccess"), { autoClose: 2000 });
-                navigate("/groups/joins");
+                await createChallenge(formData).unwrap();
+                toast.success("Challenge created successfully!", { id: toastId });
+                reset();
+                setPreview(null);
+                // Navigate to challenge list page
+                navigate("/admin/challengemanagement");
+            } catch (err) {
+                console.log(err);
+                toast.error("Failed to create challenge: " + (err?.data?.message || "Unknown error"), { id: toastId });
             }
-
-            reset();
-            setPreview("");
-        } catch (err) {
-            console.error(err);
-            toast.error(
-                isEditing ? t("groupForm.updateFailed") : t("groupForm.createFailed"),
-                { autoClose: 2000 }
-            );
         }
+    };
+
+    const handleCancel = () => {
+        // Navigate to challenge list page when canceling
+        console.log("Canceling challenge...");
+        navigate(-1);
     };
 
     const handleFileChange = (event) => {
         const file = event.target.files[0];
-        setValue("picture", file, { shouldValidate: true });
+        setValue("picture", file,{ shouldValidate: true });// Đặt giá trị cho field avatar
         setPreview(URL.createObjectURL(file));
     };
 
-    const handleClosePreview = (e) => {
-        e.stopPropagation();
+    const handleClosePreview = (e)=>{
+        e.stopPropagation()
         setPreview(null);
-        setValue("picture", null, { shouldValidate: true });
+        setValue("avatar", null,{ shouldValidate: true });
+    }
+
+    const handleEditorChange = (content) => {
+        setValue("description", content, { shouldValidate: true });
     };
 
     return (
-        <div className="w-full">
-            <div className="bg-white rounded-lg w-full p-1">
+        <div className="bg-white p-6 h-full w-full relative box-border rounded-xl border-4 border-transparent z-[1]">
+            {/* Left Section: Challenge Image & Basic Info */}
+            <div className="rounded-lg w-full p-1">
                 <div className="p-6 flex flex-col rounded-lg">
-                    {/* ✅ Tiêu đề đơn giản hóa */}
-                    <h3 className="mb-4 text-xl font-bold text-red-600">
-                        {isEditing ? t("groupForm.editTitle") : t("groupForm.title")}
-                    </h3>
-
-
+                    <h3 className="mb-4 text-xl font-bold ">Challenge's General Information</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            {/* Group Name */}
-                            <div className="w-full mb-4">
-                                <label className="text-sm font-medium text-black">
-                                    {t("groupForm.groupName")} <span className="text-red-500">*</span>
-                                </label>
+                            {/* Challenge Name */}
+                            <div className="w-full mt-6">
+                                <label className="text-sm font-medium ">Challenge Name</label>
+                                <span className="text-red-500">*</span>
                                 <input
                                     type="text"
                                     {...register("name")}
                                     className="w-full text-black p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                                    placeholder={t("groupForm.groupNamePlaceholder")}
+                                    placeholder="Give it a short distinct name"
                                 />
+                                <p className="text-red-600">{errors.name?.message}</p>
                             </div>
 
-                            {/* Description */}
-                            <div className="w-full mb-4">
-                                <label className="text-sm font-medium text-black">
-                                    {t("groupForm.description")} <span className="text-red-500">*</span>
-                                </label>
-                                <textarea
-                                    {...register("description")}
-                                    className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                                    placeholder={t("groupForm.descriptionPlaceholder")}
+                            {/* Challenge Name */}
+                            <div className="w-full mt-6">
+                                <label className="text-sm font-medium ">Summary (Optional)</label>
+                                <input
+                                    type="text"
+                                    {...register("summary", {required: "Challenge name is required"})}
+                                    className="w-full text-black p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                                    placeholder="Add a few words under the name of the challenge to inspire guest, e.g ... An unforgettable challenge"
                                 />
+                                <p className="text-red-600">{errors.summary?.message}</p>
                             </div>
+                            {/* Banner Upload */}
+                            <div className="w-full mt-6">
+                                <label className="text-sm font-medium">Banner (Optional)</label>
+                                <label htmlFor="banner-upload" className="relative group cursor-pointer flex items-center justify-center">
+                                    <div className="w-full h-40 flex items-center justify-center relative border-2 border-dashed rounded-lg bg-gray-50">
+                                        {bannerPreview ? (
+                                            <img src={bannerPreview} alt="Banner Preview" className="w-full h-full object-cover rounded-lg" />
+                                        ) : (
+                                            <div className="text-center text-gray-400">
+                                                <IoCloudUploadOutline className="text-3xl mx-auto mb-2" />
+                                                <p className="text-sm">Click to upload Banner Image</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </label>
+                                <input
+                                    id="banner-upload"
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                        const file = e.target.files[0];
+                                        if (file) {
+                                            setBannerPreview(URL.createObjectURL(file));
+                                            setValue("banner", file, { shouldValidate: true });
+                                        }
+                                    }}
+                                />
+                                <input type="hidden" {...register("banner")} />
+                            </div>
+
                         </div>
 
-                        {/* Group Image Upload */}
-                        <label htmlFor="group-image"
-                               className="relative group cursor-pointer flex items-center justify-center">
-                            <div className="w-full h-[400px] flex items-center justify-center relative m-2">
+                        {/* Challenge Image */}
+                        <label htmlFor="dropzone-file"
+                               className="relative group cursor-pointer items-center justify-center md:m-2">
+                            <label className="text-sm font-medium ">Add a picture</label>
+                            <span className="text-red-500">*</span>
+                            <div className="w-full h-[400px] flex items-center justify-center relative">
+                                {/* Close Button */}
                                 {preview && (
                                     <FaWindowClose
-                                        className="text-2xl text-red-500 absolute right-2 top-2 z-10"
+                                        className="text-2xl  absolute right-2 top-2 z-10"
                                         onClick={handleClosePreview}
                                         style={{cursor: "pointer", backgroundColor: "white"}}
                                     />
                                 )}
+                                {/* Avatar Image OR Placeholder */}
                                 {preview ? (
                                     <img className="w-full h-full object-cover rounded-lg" src={preview}
-                                         alt="Group Avatar"/>
+                                         alt="Uploaded Avatar"/>
                                 ) : (
                                     <div
                                         className="w-full h-full flex flex-col items-center justify-center border-2 border-gray-300 border-dashed rounded-lg bg-gray-50">
                                         <IoCloudUploadOutline className="text-2xl"/>
                                         <p className="mb-2 text-sm text-gray-500">
-                                            <span className="font-semibold">{t("groupForm.uploadHint")}</span>
+                                            <span className="font-semibold">Click to upload</span> or drag and drop
                                         </p>
-                                        <p className="text-xs text-gray-500">{t("groupForm.uploadSubHint")}</p>
+                                        <p className="text-xs text-gray-500">SVG, PNG, JPG, or GIF (MAX. 800x400px)</p>
                                     </div>
                                 )}
+                                {/* Hover Overlay */}
                                 {preview && (
                                     <div
                                         className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
-                                        <span className="text-white font-semibold">{t("groupForm.changePicture")}</span>
+                                        <span className="text-white font-semibold">Change Picture</span>
                                     </div>
                                 )}
                             </div>
+                            <p className="text-red-600">{errors.picture?.message}</p>
                         </label>
-                        <input
-                            {...register("picture")}
-                            id="group-image"
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={handleFileChange}
-                        />
+                        <input {...register("picture")} id="dropzone-file" type="file" accept="image/*"
+                               className="hidden"
+                               onChange={handleFileChange}/>
                     </div>
+                </div>
+            </div>
 
-                    {/* Buttons */}
-                    <div className="flex justify-center gap-6 mt-6">
-                        <button
-                            type="button"
-                            className="bg-red-600 px-6 py-2 rounded text-white hover:bg-red-700"
-                            disabled={isLoading || isUpdating}
-                            onClick={() =>
-                                handleSubmit(onSubmit, (formErrors) => {
-                                    const firstError = Object.values(formErrors)?.[0];
-                                    if (firstError?.message) {
-                                        toast.error(firstError.message);
-                                    }
-                                })()
-                            }
-                        >
-                            {isEditing
-                                ? isUpdating
-                                    ? t("groupForm.updating")
-                                    : t("groupForm.updateButton")
-                                : isLoading
-                                    ? t("groupForm.creating")
-                                    : t("groupForm.createButton")}
-                        </button>
+            {/* Right Section: Challenge Details Form */}
+            <div className="bg-gradient-to-r from-red-700 to-blue-600 rounded-lg w-full p-px">
+                <div className="bg-white flex flex-col rounded-lg shadow-md h-full">
+                </div>
+            </div>
+            {/* Below Section: Challenge Details Form */}
+            <div className="rounded-lg w-full p-1">
+                <div className="flex flex-col rounded-lg p-6 h-full">
+                    <h3 className="mb-4 text-xl font-bold ">Challenge Details</h3>
 
+                    <form onSubmit={handleSubmit(onSubmit)} autoComplete="false">
+                        {/* Hidden input for privacy - always set to PUBLIC */}
+                        <input type="hidden" {...register("privacy")} value="PUBLIC" />
+                        {/* Hidden input for challenge type - set to Other */}
+                        <input type="hidden" {...register("challengeTypeId")} value={getOtherChallengeTypeId()} />
 
-                        <button
-                            type="button"
-                            className="bg-gray-500 px-6 py-2 rounded text-white hover:bg-gray-600"
-                            onClick={() => {
-                                reset();
-                                setPreview("");
-                                navigate(isEditing ? `/groups/joins/${groupId}` : "/groups/joins");
-                            }}
-                        >
-                            {t("groupForm.cancelButton")}
-                        </button>
+                        <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* Start & End Date */}
+                            <div>
+                                <label className="text-sm font-medium ">Start Date</label>
+                                <span className="text-red-500">*</span>
+                                <input
+                                    type="date"
+                                    {...register("startDate")}
+                                    className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                                />
+                                <p className="text-red-600">{errors.startDate?.message}</p>
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium ">End Date</label>
+                                <span className="text-red-500">*</span>
+                                <input
+                                    type="date"
+                                    {...register("endDate")}
+                                    className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                                />
+                                <p className="text-red-600">{errors.endDate?.message}</p>
+                            </div>
 
-                    </div>
+                            {/* Participation Type */}
+                            <div>
+                                <label className="text-sm font-medium ">Participation Type</label>
+                                <select {...register("participationType")}
+                                        className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+                                    <option value="INDIVIDUAL">Individual</option>
+                                    <option value="GROUP">Group</option>
+                                </select>
+                            </div>
+
+                            {/* Max Participants */}
+                            <div>
+                                <label className="text-sm font-medium ">Max Participants</label>
+                                <span className="text-red-500">*</span>
+                                <input
+                                    type="number"
+                                    {...register("maxParticipants")}
+                                    className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                                />
+                                <p className="text-red-600">{errors.maxParticipants?.message}</p>
+                            </div>
+                        </div>
+
+                        {/* Description */}
+                        <div>
+                            <label className="text-sm font-medium ">Description</label>
+                            <span className="text-red-500">*</span>
+                            <RichTextEditor
+                                onChange={(content) => {
+                                    setValue("description", content, {shouldValidate: true});
+                                    trigger("description"); // Optional: trigger validation
+                                }}
+                            />
+                            <input type="hidden" {...register("description")} />
+                            <p className="text-red-600">{errors.description?.message}</p>
+                        </div>
+
+                        {/* Buttons */}
+                        <div className="flex justify-center gap-6 mt-6">
+                            <button type="submit" className="bg-red-600 px-6 py-2 rounded text-white hover:bg-red-700"
+                                    disabled={isLoading}>
+                                {isLoading ? "Creating..." : "Create"}
+                            </button>
+                            <button
+                                type="button"
+                                className="bg-gray-500 px-6 py-2 rounded text-white hover:bg-gray-600"
+                                onClick={handleCancel}>
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     );
-
 };
 
-export default GroupForm;
+export default ChallengeForm;

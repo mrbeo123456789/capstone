@@ -895,25 +895,6 @@
     "activeLifestyle": "アクティブなライフスタイル",
     "activeLifestyleDesc": "60日間連続で身体活動を記録",
 
-  "SelectGroupModal": {
-    "title": "グループを選択",
-    "searchPlaceholder": "あなたのグループを検索...",
-    "filterExactMembers": "{{number}}人ぴったりのグループのみ表示",
-    "noGroups": "一致するグループが見つかりません。",
-    "prev": "前へ",
-    "next": "次へ",
-    "cancel": "キャンセル",
-    "join": "チャレンジに参加",
-    "joining": "参加中...",
-    "joinSuccess": "チャレンジに参加しました！",
-    "joinFail": "チャレンジへの参加に失敗しました。再試行してください。",
-    "selectGroupFirst": "まずグループを選択してください！",
-    "yourRole": "あなたの役割",
-    "owner": "リーダー",
-    "member": "メンバー",
-    "notLeaderTooltip": "このグループのリーダーではありません。リーダーのグループを選択してください。",
-    "notExactMembersTooltip": "このグループは{{number}}人ぴったりではありません。"
-  },
   "MemberManagement": {
     "title": "メンバー管理",
     "searchPlaceholder": "名前またはメールで検索...",
@@ -965,9 +946,29 @@
     "searchUser": "ユーザーを検索...",
     "totalStars": "合計スター",
     "kickMember": "メンバーを退会させる"
+  },
+
+
+  "SelectGroupModal": {
+    "title": "参加するグループを選択",
+    "searchPlaceholder": "グループ名で検索...",
+    "filterExactMembers": "{{number}}人のグループのみ表示",
+    "noGroups": "該当するグループが見つかりません。",
+    "notLeaderTooltip": "あなたはグループリーダーではありません。",
+    "notExactMembersTooltip": "{{number}}人のメンバーが必要です。",
+    "yourRole": "あなたの役割",
+    "owner": "リーダー",
+    "member": "メンバー",
+    "members": "人",
+    "prev": "前へ",
+    "next": "次へ",
+    "cancel": "キャンセル",
+    "join": "参加する",
+    "joining": "参加中...",
+    "joinSuccess": "グループでチャレンジに参加しました！",
+    "joinFail": "グループでチャレンジに参加できませんでした。",
+    "selectGroupFirst": "参加する前にグループを選択してください。"
   }
-
-
 
 
 }

@@ -44,7 +44,7 @@ const Sidebar = ({ isOpen }) => {
                 }
             )}
         >
-            <div className="p-2 flex flex-col h-full justify-between backdrop-blur-md bg-black/50 sm:bg-white/10 shadow-lg border-r border-white/20">
+            <div className="p-2 flex flex-col h-full justify-between backdrop-blur-md bg-black/50 shadow-lg border-r border-white/20">
                 {/* Main Menu Section */}
                 <nav className="flex-1">
                     <ul className="space-y-4">
