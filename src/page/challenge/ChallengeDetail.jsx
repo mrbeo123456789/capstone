@@ -172,54 +172,21 @@ const ChallengeDetail = () => {
 
             {/* Tabs */}
             <div className="mt-6 w-full">
-                <div className="flex border-b">
-                    {[
-                        { key: "description", label: t("ChallengeDetail.tab.info") },
-                        {
-                            key: "ranking",
-                            label: challenge.participationType === "GROUP"
-                                ? t("ChallengeDetail.tab.team")
-                                : t("ChallengeDetail.tab.individual")
-                        }
-                    ].map(tab => (
-                        <button
-                            key={tab.key}
-                            onClick={() => setActiveTab(tab.key)}
-                            className={`flex-1 text-center py-3 font-semibold ${
-                                activeTab === tab.key
-                                    ? "text-orange-500 border-b-4 border-orange-500"
-                                    : "text-gray-500 hover:text-gray-800"
-                            }`}
-                        >
-                            {tab.label}
-                        </button>
-                    ))}
-                </div>
-
                 <div className="p-6 bg-white shadow-md rounded-lg mt-4">
-                    {activeTab === "description" && (
-                        <div>
-                            <h2 className="text-2xl font-bold text-gray-900">{challenge.name}</h2>
-                            <p className="text-gray-500 mt-2">
-                                {formatDate(challenge.startDate)} - {formatDate(challenge.endDate)}
-                            </p>
-                            <p className="text-sm text-gray-700 mt-2">
-                                {t("ChallengeDetail.category")}:{" "}
-                                <span className="text-orange-500 font-semibold">{challenge.challengeType}</span>
-                            </p>
-                            <div
-                                className="mt-6 border-t pt-4 text-gray-700"
-                                dangerouslySetInnerHTML={{ __html: challenge.description }}
-                            />
-                        </div>
-                    )}
-                    {activeTab === "ranking" && (
-                        <p className="text-gray-700">
-                            {challenge.participationType === "GROUP"
-                                ? t("ChallengeDetail.teamRanking")
-                                : t("ChallengeDetail.individualRanking")}
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-900">{challenge.name}</h2>
+                        <p className="text-gray-500 mt-2">
+                            {formatDate(challenge.startDate)} - {formatDate(challenge.endDate)}
                         </p>
-                    )}
+                        <p className="text-sm text-gray-700 mt-2">
+                            {t("ChallengeDetail.category")}:{" "}
+                            <span className="text-orange-500 font-semibold">{challenge.challengeType}</span>
+                        </p>
+                        <div
+                            className="mt-6 border-t pt-4 text-gray-700"
+                            dangerouslySetInnerHTML={{ __html: challenge.description }}
+                        />
+                    </div>
                 </div>
             </div>
             {selectedInvitation && (

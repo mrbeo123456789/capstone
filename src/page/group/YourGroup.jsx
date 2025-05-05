@@ -88,7 +88,7 @@ const YourGroup = () => {
                                 key={invite.id}
                                 className="min-w-[200px] p-4 border rounded-lg space-y-2 flex-shrink-0 bg-white"
                             >
-                                <p className="text-sm">
+                                <p className="text-sm font-medium text-center mb-2">
                                     {t("yourGroup.inviteLine", {name: invite.invitedBy})}
                                 </p>
                                 <div className="h-24 bg-gray-200 rounded">
@@ -98,7 +98,7 @@ const YourGroup = () => {
                                         className="w-full h-full object-cover rounded"
                                     />
                                 </div>
-                                <p className="font-medium">{invite.groupName}</p>
+                                <p className="font-medium text-center mb-2 line-clamp-3">{invite.groupName}</p>
                                 <div className="flex gap-2">
                                     <button
                                         className="bg-green-600 text-white px-3 py-1 rounded"
