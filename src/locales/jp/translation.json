@@ -746,8 +746,10 @@
     "status": {
       "completed": "完了",
       "inProgress": "進行中",
-      "failed": "失敗",
-      "success": "成功率"
+      "cancelled": "キャンセル済み",
+      "rejected": "拒否されました",
+      "notApplicable": "該当なし"
+
     },
     "pagination": {
       "showing": "表示中",

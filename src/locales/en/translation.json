@@ -759,8 +759,10 @@
     },
     "status": {
       "completed": "Completed",
-      "inProgress": "In Progress",
-      "failed": "Failed"
+      "inProgress": "Ongoing",
+      "cancelled": "Cancelled",
+      "rejected": "Rejected",
+      "notApplicable": "Not Applicable"
     },
     "success": "success"
   },

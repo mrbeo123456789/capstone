@@ -759,7 +759,9 @@
     "status": {
       "completed": "Hoàn thành",
       "inProgress": "Đang tiến hành",
-      "failed": "Thất bại"
+      "cancelled": "Đã huỷ",
+      "rejected": "Đã từ chối",
+      "notApplicable": "Không áp dụng"
     },
     "success": "thành công"
   },
