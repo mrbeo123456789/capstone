@@ -120,7 +120,7 @@ const YourChallenge = () => {
                                     ) : (
                                         <span className="text-green-500 text-lg">👥</span>
                                     )}
-                                    <p className="text-sm">{invite.inviterInfo} {t("yourChallenge.inviteText")}</p>
+                                    <p className="text-sm">{t("yourChallenge.inviteGeneric")}</p>
                                 </div>
 
                                 <div className="h-24 bg-gray-200 rounded overflow-hidden">
