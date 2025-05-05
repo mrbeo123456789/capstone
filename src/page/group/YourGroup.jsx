@@ -86,7 +86,7 @@ const YourGroup = () => {
                         {invitationsData.map((invite) => (
                             <div
                                 key={invite.id}
-                                className="w-[200px] p-4 border rounded-lg space-y-2 flex-shrink-0 bg-white"
+                                className="w-[210px] p-4 border rounded-lg space-y-2 flex-shrink-0 bg-white"
                             >
                                 <p className="text-sm font-medium text-center mb-2">
                                     {t("yourGroup.inviteLine", {name: invite.invitedBy})}
