@@ -457,6 +457,7 @@
   "success": "Groups invited successfully!",
   "searchPlaceholderGroup": "Enter group name...",
   "yourChallenge": {
+    "inviteGeneric": "You have an invitation to join a challenge",
     "create": "Create a challenge",
     "search": "Search",
     "filter": "Filter",
