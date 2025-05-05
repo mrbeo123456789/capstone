@@ -98,7 +98,7 @@ const YourGroup = () => {
                                         className="w-full h-full object-cover rounded"
                                     />
                                 </div>
-                                <p className="font-medium text-center mb-2 line-clamp-3">{invite.groupName}</p>
+                                <p className="font-medium text-center mb-2 line-clamp-1">{invite.groupName}</p>
                                 <div className="flex gap-2">
                                     <button
                                         className="bg-green-600 text-white px-3 py-1 rounded"

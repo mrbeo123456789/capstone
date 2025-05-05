@@ -17,7 +17,7 @@ const VoteOther = () => {
 
     const { id } = useParams(); // Get challenge ID from URL
     const { data = [], isLoading, refetch } = useGetEvidencesToReviewQuery(id);
-    const { data: votedHistory = [], isLoading: isVotedLoading, isError: isVotedError } = useGetMyVotedEvidenceQuery();
+    const { data: votedHistory = [], isLoading: isVotedLoading, isError: isVotedError } = useGetMyVotedEvidenceQuery(id);
 
 
     // Filter out evidences that have already been reviewed
