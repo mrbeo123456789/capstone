@@ -52,32 +52,39 @@ const GroupChallengeHistory = ({ groupId }) => {
 
     const getStatusBadge = (status) => {
         switch (status) {
-            case "COMPLETED":
+            case "ENDED":
                 return (
                     <span className="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800 flex items-center">
-                        <FaCheckCircle className="mr-1" /> {t("challenges.status.completed")}
-                    </span>
+                    <FaCheckCircle className="mr-1" /> {t("challenges.status.completed")}
+                </span>
                 );
             case "ONGOING":
                 return (
                     <span className="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800 flex items-center">
-                        <FaClock className="mr-1" /> {t("challenges.status.inProgress")}
-                    </span>
+                    <FaClock className="mr-1" /> {t("challenges.status.inProgress")}
+                </span>
                 );
-            case "FAILED":
+            case "CANCELLED":
+                return (
+                    <span className="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800 flex items-center">
+                    <FaTimesCircle className="mr-1" /> {t("challenges.status.cancelled")}
+                </span>
+                );
+            case "REJECTED":
                 return (
                     <span className="px-2 py-1 rounded-full text-xs bg-red-100 text-red-800 flex items-center">
-                        <FaTimesCircle className="mr-1" /> {t("challenges.status.failed")}
-                    </span>
+                    <FaTimesCircle className="mr-1" /> {t("challenges.status.rejected")}
+                </span>
                 );
             default:
                 return (
                     <span className="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-800">
-                        {status}
-                    </span>
+                    {status}
+                </span>
                 );
         }
     };
+
 
     // Format date to dd/mm/yyyy
     const formatDate = (dateString) => {
@@ -88,38 +95,35 @@ const GroupChallengeHistory = ({ groupId }) => {
         return `${day}/${month}/${year}`;
     };
 
-    // Progress indicator component based on isSuccess
     const getProgressIndicator = (isSuccess, status) => {
-        if (status === "COMPLETED") {
+        if (status === "ENDED") {
             return isSuccess ? (
-                <div className="flex items-center">
-                    <FaCheckCircle className="text-green-500 mr-2" />
-                    <span className="text-green-600 font-medium">{t("challenges.progress.success")}</span>
-                </div>
+                <span className="text-green-600 font-medium flex items-center">
+                <FaCheckCircle className="mr-1" />
+                    {t("challenges.progress.success")}
+            </span>
             ) : (
-                <div className="flex items-center">
-                    <FaTimesCircle className="text-red-500 mr-2" />
-                    <span className="text-red-600 font-medium">{t("challenges.progress.failed")}</span>
-                </div>
-            );
-        } else if (status === "ONGOING") {
-            return (
-                <div className="relative pt-1">
-                    <div className="overflow-hidden h-2 mb-1 text-xs flex rounded bg-blue-100">
-                        <div className="w-1/2 shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-500"></div>
-                    </div>
-                    <span className="text-xs text-blue-600">{t("challenges.progress.inProgress")}</span>
-                </div>
-            );
-        } else {
-            return (
-                <div className="flex items-center">
-                    <FaTimesCircle className="text-gray-400 mr-2" />
-                    <span className="text-gray-500">{t("challenges.progress.notStarted")}</span>
-                </div>
+                <span className="text-red-600 font-medium flex items-center">
+                <FaTimesCircle className="mr-1" />
+                    {t("challenges.progress.failed")}
+            </span>
             );
         }
+
+        if (status === "ONGOING") {
+            return (
+                <span className="text-blue-600 text-sm font-medium flex items-center">
+                <FaClock className="mr-1" />
+                    {t("challenges.progress.inProgress")}
+            </span>
+            );
+        }
+
+        // Với các trạng thái CANCELLED, REJECTED hoặc khác
+        return <span className="text-gray-500 text-sm">{t("challenges.status.notApplicable")}</span>;
     };
+
+
 
     if (isLoading) {
         return (
@@ -155,9 +159,10 @@ const GroupChallengeHistory = ({ groupId }) => {
                             onChange={handleStatusFilterChange}
                         >
                             <option value="">{t("challenges.filter.allStatuses")}</option>
-                            <option value="COMPLETED">{t("challenges.status.completed")}</option>
-                            <option value="IN_PROGRESS">{t("challenges.status.inProgress")}</option>
-                            <option value="FAILED">{t("challenges.status.failed")}</option>
+                            <option value="ONGOING">{t("challenges.status.inProgress")}</option>
+                            <option value="ENDED">{t("challenges.status.completed")}</option>
+                            <option value="CANCELLED">{t("challenges.status.cancelled")}</option>
+                            <option value="REJECTED">{t("challenges.status.rejected")}</option>
                         </select>
                     </div>
                 </div>

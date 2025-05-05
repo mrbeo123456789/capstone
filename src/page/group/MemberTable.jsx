@@ -19,14 +19,34 @@ const MemberTable = ({
     const { t } = useTranslation();
     const { data: currentMemberData } = useGetCurrentMemberIdQuery();
     const currentMemberId = currentMemberData;
+
+    // Member list with pagination
     const { data, isLoading, refetch } = useGetGroupRankingQuery(
         { groupId, keyword: searchTerm, page: currentPage, size: 4 },
         { skip: !groupId }
     );
-
     const members = data?.content || [];
     const totalPages = data?.totalPages || 0;
-    const top3 = members.slice(0, 3);
+
+    // Top 3 logic (from first page)
+    const {
+        data: top3Data,
+        isLoading: isLoadingTop3,
+    } = useGetGroupRankingQuery(
+        { groupId, keyword: "", page: 0, size: 3 },
+        { skip: !groupId }
+    );
+
+    const top3 = (top3Data?.content || []).map((u, i) => ({ ...u, rankIndex: i }));
+    const adjustedTop3 = [...top3];
+    if (adjustedTop3.length === 3) {
+        // Swap Top 1 to center
+        [adjustedTop3[0], adjustedTop3[1], adjustedTop3[2]] = [
+            adjustedTop3[1], // 🥈 left
+            adjustedTop3[0], // 🥇 center
+            adjustedTop3[2], // 🥉 right
+        ];
+    }
 
     useEffect(() => {
         if (resetTable) {
@@ -37,14 +57,13 @@ const MemberTable = ({
 
     const handleKick = async (memberId) => {
         if (!onKick || typeof onKick !== "function") return;
-
         await onKick(memberId);
         setCurrentPage(0);
         await onAfterKick?.();
         await refetch();
     };
 
-    if (isLoading) {
+    if (isLoading || isLoadingTop3) {
         return <div className="text-center text-gray-500 py-10">{t("common.loading")}</div>;
     }
 
@@ -56,13 +75,13 @@ const MemberTable = ({
                     <FaCrown className="inline mr-2 text-yellow-500" /> {t("member.top3")}
                 </h2>
                 <div className="flex justify-center items-end gap-6 min-h-[300px]">
-                    {top3.map((user, index) => {
-                        const heightClass = ["h-40", "h-28", "h-20"][index] || "h-20";
-                        const bgColor = ["bg-yellow-400", "bg-gray-300", "bg-orange-300"][index] || "bg-gray-200";
-                        const borderClass = index === 0 ? "border-4 border-yellow-400" : "border-2 border-gray-300";
-                        const sizeClass = index === 0 ? "w-20 h-20" : "w-16 h-16";
-                        const rankLabel = ["🥇", "🥈", "🥉"][index];
-
+                    {adjustedTop3.map((user, index) => {
+                        const rank = user.rankIndex;
+                        const heightClass = ["h-40", "h-28", "h-20"][rank];
+                        const bgColor = ["bg-yellow-400", "bg-gray-300", "bg-orange-300"][rank];
+                        const borderClass = rank === 0 ? "border-4 border-yellow-400" : "border-2 border-gray-300";
+                        const sizeClass = rank === 0 ? "w-20 h-20" : "w-16 h-16";
+                        const rankLabel = ["🥇", "🥈", "🥉"][rank];
                         const isCurrentUser = String(user.memberId) === String(currentMemberId);
 
                         return (
@@ -77,13 +96,13 @@ const MemberTable = ({
                                         className={`${sizeClass} rounded-full mb-2 ${borderClass} shadow-sm`}
                                     />
                                     <span className="absolute -top-3 -right-3 bg-white rounded-full shadow px-2 py-0.5 text-xs font-bold">
-                                    {rankLabel}
-                                </span>
+                                        {rankLabel}
+                                    </span>
                                 </div>
                                 <div
                                     className={`${bgColor} w-16 ${heightClass} rounded-t-lg flex items-end justify-center text-white text-lg font-bold shadow-inner`}
                                 >
-                                    #{index + 1}
+                                    #{rank + 1}
                                 </div>
                                 <p className="mt-1 font-semibold text-center">
                                     {user.name} {isCurrentUser && <span className="text-sm text-gray-400">({t("member.you")})</span>}
@@ -99,7 +118,7 @@ const MemberTable = ({
             <div className="bg-white p-6 rounded-lg shadow-md transition-all duration-300">
                 <h2 className="text-xl font-bold text-center mb-4">{t("member.topRanking")}</h2>
 
-                {/* Search box */}
+                {/* Search */}
                 <div className="mb-4 flex items-center border border-gray-300 rounded px-2 py-1">
                     <FaSearch className="text-gray-500 mr-2" />
                     <input
@@ -114,16 +133,11 @@ const MemberTable = ({
                     />
                 </div>
 
-                {/* Member List */}
+                {/* Members */}
                 <div className="space-y-4">
                     {members.map((user) => {
                         const showKick = isHost && String(user.memberId) !== String(currentMemberId);
                         const isCurrentUser = String(user.memberId) === String(currentMemberId);
-
-                        console.log(
-                            `%c[Debug Kick Icon] user.name = ${user.name} | currentMemberId = ${currentMemberId}, user.memberId = ${user.memberId}, showKick = ${showKick}`,
-                            "color: orange; font-weight: bold;"
-                        );
 
                         return (
                             <div
@@ -144,7 +158,6 @@ const MemberTable = ({
                                     </div>
                                 </div>
 
-                                {/* 🔐 Don't show kick button for current user */}
                                 {showKick && (
                                     <button
                                         onClick={() => handleKick(user.memberId)}
@@ -179,7 +192,6 @@ const MemberTable = ({
             </div>
         </div>
     );
-
 };
 
 export default MemberTable;
