@@ -65,7 +65,8 @@ const ProofUploads = ({ challenge, evidence }) => {
         };
     });
 
-    const totalPages = Math.ceil(days.length / ITEMS_PER_PAGE);
+    // Fixed: Ensure totalPages is at least 1 even when days.length is 0
+    const totalPages = Math.max(1, Math.ceil(days.length / ITEMS_PER_PAGE));
     const currentPageDays = days.slice(
         (currentPage - 1) * ITEMS_PER_PAGE,
         currentPage * ITEMS_PER_PAGE
