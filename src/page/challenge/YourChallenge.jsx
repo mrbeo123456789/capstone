@@ -120,7 +120,7 @@ const YourChallenge = () => {
                                     ) : (
                                         <span className="text-green-500 text-lg">👥</span>
                                     )}
-                                    <p className="text-sm">{invite.inviterInfo} {t("yourChallenge.inviteText")}</p>
+                                    <p className="text-sm">{t("yourChallenge.inviteGeneric")}</p>
                                 </div>
 
                                 <div className="h-24 bg-gray-200 rounded overflow-hidden">
@@ -130,7 +130,7 @@ const YourChallenge = () => {
                                         className="w-full h-full object-cover rounded"
                                     />
                                 </div>
-                                <p className="font-medium text-center mb-2 line-clamp-3">{invite.challengeName}</p>
+                                <p className="font-medium text-center mb-2 line-clamp-1">{invite.challengeName}</p>
 
                                 <div className="flex gap-2">
                                     <button

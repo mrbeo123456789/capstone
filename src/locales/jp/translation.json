@@ -314,6 +314,7 @@
   "suggest.reason.same_interest": "共通の興味があります",
   "suggest.reason.near_location": "近くにいます",
   "yourChallenge": {
+    "inviteGeneric": "チャレンジへの招待があります",
     "create": "チャレンジを作成",
     "search": "検索",
     "filter": "フィルター",

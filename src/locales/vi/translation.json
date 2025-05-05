@@ -324,6 +324,7 @@
     "cancel": "Hủy"
   },
   "yourChallenge": {
+    "inviteGeneric": "Bạn có lời mời vào thử thách",
     "create": "Tạo thử thách",
     "search": "Tìm kiếm",
     "filter": "Bộ lọc",
