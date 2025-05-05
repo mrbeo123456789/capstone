@@ -366,14 +366,16 @@ const UserList = () => {
                                                     </td>
                                                     <td className="p-4 hidden md:table-cell text-gray-600">{user.email}</td>
                                                     <td className="p-4">
-                                                        {user.status === "ACTIVE" ? (
-                                                            <FaCheckCircle className="text-green-500 mr-2" />
-                                                        ) : (
-                                                            <FaTimesCircle className="text-red-500 mr-2" />
-                                                        )}
-                                                        <span className={`font-medium ${user.status === "ACTIVE" ? "text-green-600" : "text-red-600"}`}>
-                                                            {user.status}
-                                                        </span>
+                                                        <div className="flex items-center">
+                                                            {user.status === "ACTIVE" ? (
+                                                                <FaCheckCircle className="text-green-500 mr-2" />
+                                                            ) : (
+                                                                <FaTimesCircle className="text-red-500 mr-2" />
+                                                            )}
+                                                            <span className={`font-medium ${user.status === "ACTIVE" ? "text-green-600" : "text-red-600"}`}>
+                                                                {user.status}
+                                                            </span>
+                                                        </div>
                                                     </td>
                                                     <td className="p-4">
                                                         <div className="flex space-x-2">

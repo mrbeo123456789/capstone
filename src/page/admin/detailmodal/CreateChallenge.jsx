@@ -29,6 +29,15 @@ const ChallengeForm = () => {
         return date.toISOString().split('T')[0]; // lấy phần YYYY-MM-DD
     };
 
+    // Find the "Other" challenge type ID when data is available
+    const getOtherChallengeTypeId = () => {
+        if (challengeTypes && challengeTypes.length > 0) {
+            const otherType = challengeTypes.find(type => type.name === "Other");
+            return otherType ? otherType.id.toString() : "";
+        }
+        return "";
+    };
+
     const {register,
         handleSubmit,
         setValue,
@@ -43,9 +52,20 @@ const ChallengeForm = () => {
         defaultValues: {
             startDate: getFormattedDate(today),
             endDate: getFormattedDate(tomorrow),
-            privacy: "PUBLIC" // Always set default privacy to PUBLIC
+            privacy: "PUBLIC", // Always set default privacy to PUBLIC
+            verificationType: "MEMBER_REVIEW" // Setting default verification type
         }
     });
+
+    // Set the challenge type to "Other" when data is loaded
+    useState(() => {
+        if (challengeTypes) {
+            const otherTypeId = getOtherChallengeTypeId();
+            if (otherTypeId) {
+                setValue("challengeTypeId", otherTypeId, { shouldValidate: true });
+            }
+        }
+    }, [challengeTypes]);
 
     const onSubmit = async (data) => {
         const formData = new FormData();
@@ -62,6 +82,7 @@ const ChallengeForm = () => {
         const processedData = {
             ...data,
             privacy: "PUBLIC", // Always use PUBLIC for privacy
+            verificationType: "MEMBER_REVIEW", // Always use MEMBER_REVIEW for verification type
             maxParticipants: parseInt(data.maxParticipants),
             challengeTypeId: parseInt(data.challengeTypeId),
             startDate: formatDate(data.startDate),
@@ -245,6 +266,10 @@ const ChallengeForm = () => {
                     <form onSubmit={handleSubmit(onSubmit)} autoComplete="false">
                         {/* Hidden input for privacy - always set to PUBLIC */}
                         <input type="hidden" {...register("privacy")} value="PUBLIC" />
+                        {/* Hidden input for verification type - always set to MEMBER_REVIEW */}
+                        <input type="hidden" {...register("verificationType")} value="MEMBER_REVIEW" />
+                        {/* Hidden input for challenge type - set to Other */}
+                        <input type="hidden" {...register("challengeTypeId")} value={getOtherChallengeTypeId()} />
 
                         <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                             {/* Start & End Date */}
@@ -269,17 +294,7 @@ const ChallengeForm = () => {
                                 <p className="text-red-600">{errors.endDate?.message}</p>
                             </div>
 
-                            {/* Verification Type */}
-                            <div>
-                                <label className="text-sm font-medium ">Verification Type</label>
-                                <select {...register("verificationType")}
-                                        className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
-                                    <option value="MEMBER_REVIEW">Peer to Peer</option>
-                                    <option value="HOST_REVIEW">Host review</option>
-                                </select>
-                            </div>
-
-                            {/* Verification Type */}
+                            {/* Participation Type */}
                             <div>
                                 <label className="text-sm font-medium ">Participation Type</label>
                                 <select {...register("participationType")}
@@ -288,26 +303,6 @@ const ChallengeForm = () => {
                                     <option value="GROUP">Group</option>
                                 </select>
                             </div>
-
-
-                            {/* Challenge Type */}
-                            <div>
-                                <label className="text-sm font-medium">Challenge Type</label>
-                                <select
-                                    {...register("challengeTypeId", {required: true})}
-                                    className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                                >
-                                    {/* Option placeholder bắt buộc chọn */}
-                                    <option value="">{t('selectChallengeType')}</option>
-                                    {challengeTypes?.map((type) => (
-                                        <option key={type.id} value={type.id}>
-                                            {type.name}
-                                        </option>
-                                    ))}
-                                </select>
-                                <p className="text-red-600">{errors.challengeTypeId?.message}</p>
-                            </div>
-
 
                             {/* Max Participants */}
                             <div>
@@ -322,7 +317,7 @@ const ChallengeForm = () => {
                             </div>
                         </div>
 
-                        {/* Challenge Type ID */}
+                        {/* Description */}
                         <div>
                             <label className="text-sm font-medium ">Description</label>
                             <span className="text-red-500">*</span>
