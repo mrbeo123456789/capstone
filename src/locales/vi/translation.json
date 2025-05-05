@@ -243,7 +243,9 @@
     "noGroups": "Bạn chưa tham gia nhóm nào",
     "loadingGroups": "Đang tải danh sách nhóm...",
     "errorGroups": "Không thể tải danh sách nhóm.",
-    "members": "thành viên"
+    "members": "thành viên",
+    "owner": "Trưởng nhóm",
+    "member": "Thành viên"
   },
   "notification.achievementUnlock.title": "🎉 Thành tựu mới!",
   "notification.achievementUnlock.content": "Bạn đã mở khóa thành tựu: '{{achievementName}}'.",
@@ -356,7 +358,8 @@
       "rejected": "Bị từ chối",
       "canceled": "Đã hủy",
       "ongoing": "Đang diễn ra",
-      "banned": "Bị ban"
+      "banned": "Bị ban",
+      "upcoming": "Sắp diễn ra"
     }
   },
   "members": "thành viên",

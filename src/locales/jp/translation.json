@@ -157,7 +157,9 @@
     "noGroups": "参加しているグループがありません",
     "loadingGroups": "グループを読み込み中...",
     "errorGroups": "グループの読み込みに失敗しました。",
-    "members": "メンバー"
+    "members": "メンバー",
+    "owner": "チームリーダー",
+    "member": "メンバー"
   },
   "groupInvite": {
     "title": "グループに招待",
@@ -345,7 +347,8 @@
       "pending": "保留中",
       "rejected": "却下",
       "canceled": "キャンセル済み",
-      "ongoing": "すべて"
+      "ongoing": "すべて",
+      "upcoming": "近日公開"
     }
   },
   "inviteGroups": "グループを招待する",

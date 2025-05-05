@@ -156,7 +156,9 @@
     "noGroups": "You haven't joined any group",
     "loadingGroups": "Loading groups...",
     "errorGroups": "Failed to load groups.",
-    "members": "members"
+    "members": "members",
+    "owner": "Owner",
+    "member": "Member"
   },
   "groupInvite": {
     "title": "Invite to Group",
@@ -487,7 +489,8 @@
       "rejected": "Rejected",
       "canceled": "Canceled",
       "ongoing": "On Going",
-      "banned": "Banned"
+      "banned": "Banned",
+      "upcoming": "Up Coming"
     },
     "members": "members",
     "inviteGroups": "Invite Groups",
