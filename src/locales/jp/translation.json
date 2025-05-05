@@ -968,6 +968,29 @@
     "joinSuccess": "グループでチャレンジに参加しました！",
     "joinFail": "グループでチャレンジに参加できませんでした。",
     "selectGroupFirst": "参加する前にグループを選択してください。"
+  },
+  "statistics": {
+    "title": "統計情報",
+    "memberSince": "メンバー登録日",
+    "performanceOverview": "あなたのパフォーマンス概要",
+    "challengesJoined": "参加したチャレンジ",
+    "challengesHosted": "主催したチャレンジ",
+    "achievements": "実績",
+    "groupsJoined": "参加したグループ",
+    "evidenceSubmitted": "提出された証拠",
+    "evidenceApproved": "承認された証拠",
+    "votesGiven": "与えた投票数",
+    "starsEarned": "獲得したスター",
+    "evidenceReviewOutcome": "証拠レビューの結果",
+    "challengeCompletion": "チャレンジの完了状況",
+    "completedChallenges": "完了したチャレンジ",
+    "loadingChallenges": "完了したチャレンジを読み込み中...",
+    "noCompletedChallenges": "まだ完了したチャレンジがありません。",
+    "loading": "統計情報を読み込み中...",
+    "completed": "完了",
+    "incomplete": "未完了",
+    "approved": "承認済み",
+    "rejected": "却下済み"
   }
 
 

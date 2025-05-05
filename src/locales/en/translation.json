@@ -891,6 +891,29 @@
     "joinSuccess": "Successfully joined the challenge with your group!",
     "joinFail": "Failed to join the challenge with the group.",
     "selectGroupFirst": "Please select a group before joining."
+  },
+  "statistics": {
+    "title": "Statistics",
+    "memberSince": "Member since",
+    "performanceOverview": "Your performance overview",
+    "challengesJoined": "Challenges joined",
+    "challengesHosted": "Challenges hosted",
+    "achievements": "Achievements",
+    "groupsJoined": "Groups joined",
+    "evidenceSubmitted": "Evidence submitted",
+    "evidenceApproved": "Evidence approved",
+    "votesGiven": "Votes given",
+    "starsEarned": "Stars earned",
+    "evidenceReviewOutcome": "Evidence Review Outcome",
+    "challengeCompletion": "Challenge Completion",
+    "completedChallenges": "Completed Challenges",
+    "loadingChallenges": "Loading completed challenges...",
+    "noCompletedChallenges": "You have not completed any challenges yet.",
+    "loading": "Loading your statistics...",
+    "completed": "Completed",
+    "incomplete": "Incomplete",
+    "approved": "Approved",
+    "rejected": "Rejected"
   }
 }
 

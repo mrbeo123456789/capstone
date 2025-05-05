@@ -34,10 +34,15 @@ const CompletedChallengeCard = ({ challenge, index }) => {
                 <p className="font-medium text-center truncate">{challenge.name}</p>
             </div>
 
-            {/* End date */}
-            <div className="text-gray-500 text-xs mb-1">
-                🗓 Ended: {endDate}
+            {/* Star rating */}
+            <div className="text-gray-500 text-xl mb-1">
+                <span className="text-yellow-400">
+                    {"★".repeat(Math.max(0, Math.round(challenge.rating / 10)))}
+                    {"☆".repeat(Math.max(0, 5 - Math.round(challenge.rating / 10)))}
+                </span>{" "}
+                            ({challenge.rating?.toFixed(2) || "0.00"})
             </div>
+
 
             {/* Role */}
             <div className="bg-gray-200 text-gray-800 text-xs px-2 py-1 rounded mt-auto mb-2 capitalize">

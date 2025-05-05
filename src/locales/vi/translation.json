@@ -872,9 +872,30 @@
     "joinSuccess": "Tham gia nhóm vào thử thách thành công!",
     "joinFail": "Không thể tham gia nhóm vào thử thách.",
     "selectGroupFirst": "Vui lòng chọn một nhóm trước khi tham gia."
+  },
+  "statistics": {
+    "title": "Thống kê",
+    "memberSince": "Thành viên từ",
+    "performanceOverview": "Tổng quan hiệu suất của bạn",
+    "challengesJoined": "Thử thách đã tham gia",
+    "challengesHosted": "Thử thách đã tổ chức",
+    "achievements": "Thành tựu",
+    "groupsJoined": "Nhóm đã tham gia",
+    "evidenceSubmitted": "Bằng chứng đã nộp",
+    "evidenceApproved": "Bằng chứng được duyệt",
+    "votesGiven": "Lượt đánh giá đã thực hiện",
+    "starsEarned": "Sao đã nhận",
+    "evidenceReviewOutcome": "Kết quả đánh giá bằng chứng",
+    "challengeCompletion": "Hoàn thành thử thách",
+    "completedChallenges": "Thử thách đã hoàn thành",
+    "loadingChallenges": "Đang tải thử thách đã hoàn thành...",
+    "noCompletedChallenges": "Bạn chưa hoàn thành thử thách nào.",
+    "loading": "Đang tải thống kê của bạn...",
+    "completed": "Hoàn thành",
+    "incomplete": "Chưa hoàn thành",
+    "approved": "Được duyệt",
+    "rejected": "Bị từ chối"
   }
-
-
 }
 
 
