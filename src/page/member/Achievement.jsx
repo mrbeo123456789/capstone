@@ -9,13 +9,10 @@ const Achievement = () => {
     const { data: achievementsData = [], isLoading, isError } = useGetMyAchievementsQuery();
 
     const getItemsPerPage = () => {
-        if (typeof window !== "undefined") {
-            if (window.innerWidth < 640) return 1;
-            if (window.innerWidth < 1024) return 2;
-            if (window.innerWidth < 1280) return 3;
-            return 4;
-        }
-        return 4;
+        if (window.matchMedia("(max-width: 639px)").matches) return 1; // sm
+        if (window.matchMedia("(max-width: 1023px)").matches) return 2; // md
+        if (window.matchMedia("(max-width: 1279px)").matches) return 3; // lg
+        return 4; // xl+
     };
 
     const formatDate = (dateString) => {
@@ -30,6 +27,7 @@ const Achievement = () => {
     useEffect(() => {
         const handleResize = () => {
             setItemsPerPage(getItemsPerPage());
+            setCurrentPage(1); // reset về trang đầu để không bị "trống"
         };
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
