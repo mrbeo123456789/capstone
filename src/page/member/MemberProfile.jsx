@@ -14,7 +14,7 @@ import { useTranslation } from "react-i18next";
 function MemberProfile() {
     const { t } = useTranslation();
     const [user, setUser] = useState(null);
-    const { data: userData } = useGetMyProfileQuery();
+    const { data: userData, refetch: refetchProfile } = useGetMyProfileQuery();
     const [updateUser, { isLoading }] = useUpdateMemberMutation();
     const [provinces, setProvinces] = useState([]);
     const [districts, setDistricts] = useState([]);
@@ -120,9 +120,8 @@ function MemberProfile() {
             try {
                 await updateUser(formData);
                 await updateMemberInterests(data.interests);
+                await refetchProfile(); // ✅ Bổ sung
                 toast.success(t("profileUpdated"), { transition: Slide });
-                reset();
-                setPreview(null);
                 navigate("/profile");
             } catch (err) {
                 console.error(err);
