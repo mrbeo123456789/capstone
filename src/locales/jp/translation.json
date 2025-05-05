@@ -47,6 +47,10 @@
   "updateProfile": "プロフィールを更新",
   "selectChallengeType": "チャレンジタイプを選択",
   "challengeInvite": {
+    "loading": "グループリストを読み込み中...",
+    "loadError": "グループリストを読み込めませんでした",
+    "searchPlaceholderGroup": "グループ名で検索",
+    "members": "メンバー",
     "memberList": "メンバーリスト",
     "searchLeaderPlaceholder": "グループリーダー名を入力してください...",
     "searchPlaceholder": "名前またはメールアドレスで検索...",
@@ -606,6 +610,10 @@
   },
 
   "hostEvidence": {
+    "showStats": "チャレンジ統計を表示",
+    "hideStats": "チャレンジ統計を非表示",
+    "showPanel": "メンバーと証拠を表示",
+    "hidePanel": "メンバーと証拠を非表示",
     "members": "メンバー",
     "searchMembers": "メンバーを検索...",
     "memberName": "メンバー名",
@@ -999,8 +1007,59 @@
     "incomplete": "未完了",
     "approved": "承認済み",
     "rejected": "却下済み"
+  },
+  "evidence": {
+    "title": "証拠",
+    "members": "メンバー",
+    "for": "対象者",
+    "searchMembers": "メンバーを検索...",
+    "memberName": "メンバー名",
+    "evidenceCount": "証拠数",
+    "status": {
+      "title": "ステータス",
+      "approved": "承認済み",
+      "rejected": "却下",
+      "pending": "保留中",
+      "done": "完了"
+    },
+    "date": "日付",
+    "pagination": {
+      "showing": "表示中",
+      "to": "から",
+      "of": "件中",
+      "previous": "前へ",
+      "next": "次へ"
+    },
+    "statistics": "統計",
+    "totalEvidence": "証拠の合計",
+    "filtering": "フィルター中",
+    "showingAll": "全ての証拠を表示中",
+    "noEvidenceFound": "証拠が見つかりません",
+    "showAllEvidence": "全ての証拠を表示",
+    "selectMember": "証拠を表示するメンバーを選択してください",
+    "invalidDate": "無効な日付",
+    "evidenceNumber": "証拠",
+    "challenge": "チャレンジ",
+    "unknown": "不明",
+    "noDescription": "説明なし"
+  },
+  "challengeStats": {
+    "loading": "統計を読み込み中...",
+    "loadError": "チャレンジの統計を読み込めませんでした。",
+    "dashboardTitle": "チャレンジ進捗ダッシュボード",
+    "challengeName": "チャレンジ名",
+    "totalParticipants": "参加者数",
+    "totalGroups": "グループ数",
+    "evidenceSubmitted": "提出された証拠",
+    "approvedEvidence": "承認された証拠",
+    "pendingEvidence": "保留中の証拠",
+    "rejectedEvidence": "却下された証拠",
+    "participationRate": "参加率",
+    "completionRate": "達成率",
+    "today": "今日",
+    "submittedToday": "本日提出",
+    "pendingToday": "本日保留"
   }
-
 
 }
 

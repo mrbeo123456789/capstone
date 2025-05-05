@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import ChallengeStatistic from "./ChallengeStatistic.jsx";
 import MemberAndEvidenceManagement from "../admin/list/EvidenceList.jsx";
 
 const HostEvidenceManagement = ({ challengeId }) => {
+    const { t } = useTranslation();
     const [showStatistics, setShowStatistics] = useState(false);
     const [showManagementPanel, setShowManagementPanel] = useState(false);
 
@@ -17,7 +19,7 @@ const HostEvidenceManagement = ({ challengeId }) => {
                             : "bg-blue-600 hover:bg-blue-700 text-white"
                     }`}
                 >
-                    📊 {showStatistics ? "Hide" : "Show"} Challenge Statistics
+                    📊 {showStatistics ? t("hostEvidence.hideStats") : t("hostEvidence.showStats")}
                 </button>
                 <button
                     onClick={() => setShowManagementPanel(!showManagementPanel)}
@@ -27,7 +29,7 @@ const HostEvidenceManagement = ({ challengeId }) => {
                             : "bg-green-600 hover:bg-green-700 text-white"
                     }`}
                 >
-                    🧑‍🤝‍🧑 {showManagementPanel ? "Hide" : "Show"} Member & Evidence
+                    🧑‍🤝‍🧑 {showManagementPanel ? t("hostEvidence.hidePanel") : t("hostEvidence.showPanel")}
                 </button>
             </div>
 

@@ -48,6 +48,12 @@
   "updateProfile": "Cập nhật hồ sơ",
   "selectChallengeType": "Chọn kiểu thử thách",
   "challengeInvite": {
+    "selectWarning": "Vui lòng chọn ít nhất một nhóm để mời",
+    "success": "Mời nhóm thành công",
+    "loading": "Đang tải danh sách nhóm...",
+    "loadError": "Không thể tải danh sách nhóm",
+    "searchPlaceholderGroup": "Tìm kiếm nhóm theo tên",
+    "members": "thành viên",
     "memberAlreadyJoined": "{{name}} đã tham gia thử thách này rồi.",
     "memberList": "Danh sách thành viên",
     "searchPlaceholder": "Tìm kiếm theo tên hoặc email...",
@@ -327,8 +333,10 @@
     "submit": "Gửi báo cáo",
     "cancel": "Hủy"
   },
+  "suggest.reason.both": "Có cùng sở thích và ở gần bạn",
+  "suggest.reason.same_interest": "Có cùng sở thích với bạn",
+  "suggest.reason.near_location": "Ở gần vị trí của bạn",
   "yourChallenge": {
-    "inviteGeneric": "Bạn có lời mời vào thử thách",
     "create": "Tạo thử thách",
     "search": "Tìm kiếm",
     "filter": "Bộ lọc",
@@ -618,6 +626,10 @@
   },
 
   "hostEvidence": {
+    "showStats": "Hiện thống kê thử thách",
+    "hideStats": "Ẩn thống kê thử thách",
+    "showPanel": "Hiện thành viên & bằng chứng",
+    "hidePanel": "Ẩn thành viên & bằng chứng",
     "members": "Thành viên",
     "searchMembers": "Tìm kiếm thành viên...",
     "memberName": "Tên thành viên",
@@ -903,7 +915,61 @@
     "incomplete": "Chưa hoàn thành",
     "approved": "Được duyệt",
     "rejected": "Bị từ chối"
+  },
+  "evidence": {
+    "title": "Bằng chứng",
+    "members": "Thành viên",
+    "for": "cho",
+    "searchMembers": "Tìm kiếm thành viên...",
+    "memberName": "Tên thành viên",
+    "evidenceCount": "Số lượng bằng chứng",
+    "status": {
+      "title": "Trạng thái",
+      "approved": "Đã duyệt",
+      "rejected": "Từ chối",
+      "pending": "Đang chờ",
+      "done": "Hoàn thành"
+    },
+    "date": "Ngày",
+    "pagination": {
+      "showing": "Hiển thị",
+      "to": "đến",
+      "of": "của",
+      "previous": "Trước",
+      "next": "Tiếp"
+    },
+    "statistics": "Thống kê",
+    "totalEvidence": "Tổng số bằng chứng",
+    "filtering": "Đang lọc",
+    "showingAll": "Hiển thị tất cả bằng chứng",
+    "noEvidenceFound": "Không tìm thấy bằng chứng nào",
+    "showAllEvidence": "Hiển thị tất cả bằng chứng",
+    "selectMember": "Chọn thành viên để xem bằng chứng",
+    "invalidDate": "Ngày không hợp lệ",
+    "evidenceNumber": "Bằng chứng",
+    "challenge": "Thử thách",
+    "unknown": "Không xác định",
+    "noDescription": "Không có mô tả"
+  },
+  "challengeStats": {
+    "loading": "Đang tải thống kê...",
+    "loadError": "Không thể tải thống kê thử thách.",
+    "dashboardTitle": "Bảng điều khiển tiến độ thử thách",
+    "challengeName": "Tên thử thách",
+    "totalParticipants": "Tổng số người tham gia",
+    "totalGroups": "Tổng số nhóm",
+    "evidenceSubmitted": "Bằng chứng đã nộp",
+    "approvedEvidence": "Bằng chứng được duyệt",
+    "pendingEvidence": "Bằng chứng chờ xét duyệt",
+    "rejectedEvidence": "Bằng chứng bị từ chối",
+    "participationRate": "Tỷ lệ tham gia",
+    "completionRate": "Tỷ lệ hoàn thành",
+    "today": "Hôm nay",
+    "submittedToday": "Đã nộp hôm nay",
+    "pendingToday": "Chờ xét hôm nay"
   }
+
+
 }
 
 

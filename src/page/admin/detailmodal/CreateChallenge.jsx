@@ -39,10 +39,9 @@ const ChallengeForm = () => {
             endDate: getFormattedDate(tomorrow),
             privacy: "PUBLIC",
             participationType: "INDIVIDUAL",
-            isParticipate: true
+            isParticipate: false
         }
     });
-    const isParticipating = watch("isParticipate", true);
 
     const onSubmit = async (data) => {
         if (!isValid) {
@@ -210,18 +209,10 @@ const ChallengeForm = () => {
                             <p className="text-red-600">{errors.endDate?.message}</p>
                         </div>
 
-                        {/* Hidden inputs for privacy and participationType */}
+                        {/* Hidden inputs for privacy, participationType, and isParticipate */}
                         <input type="hidden" {...register("privacy")} value="PUBLIC" />
                         <input type="hidden" {...register("participationType")} value="INDIVIDUAL" />
-
-                        <div>
-                            <label
-                                className="text-sm font-medium block mb-1">Join this challenge?</label>
-                            <label className="flex items-center gap-2">
-                                <input type="checkbox" defaultChecked {...register("isParticipate")} />
-                                Join this challenge as soon as it's created
-                            </label>
-                        </div>
+                        <input type="hidden" {...register("isParticipate")} value="false" />
                         <div>
                             <label className="text-sm font-medium">Verification Type</label>
                             <select {...register("verificationType")} className="w-full p-2 border rounded-md">

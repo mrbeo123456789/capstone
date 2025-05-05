@@ -277,7 +277,7 @@ const GroupDetailModal = ({ groupId, onClose, onDisbandSuccess }) => {
                                 </svg>
                                 <span className="text-sm font-medium">Current member count</span>
                             </div>
-                            <div className="text-gray-800 pl-6">{group.currentParticipants}</div>
+                            <div className="text-gray-800 pl-6">{group.members.length}</div>
                         </div>
                         <div className="bg-blue-50 p-3 rounded-lg">
                             <div className="flex items-center mb-1 text-blue-700">

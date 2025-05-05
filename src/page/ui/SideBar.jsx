@@ -8,7 +8,7 @@ import {
     FaUser,
     FaLock,
     FaTrophy,
-    FaChartBar,
+    FaChartBar, FaBookOpen,
 } from "react-icons/fa";
 
 const Sidebar = ({ isOpen }) => {
@@ -16,7 +16,7 @@ const Sidebar = ({ isOpen }) => {
 
     // Sidebar menu items (always shown)
     const menuItems = [
-        { key: "dashboard", icon: <FaRunning />, link: "/dashboard" },
+        { key: "dashboard", icon: <FaBookOpen />, link: "/dashboard" },
         { key: "myChallenge", icon: <FaRunning />, link: "/challenges/joins" },
         { key: "myGroup", icon: <FaUsers />, link: "/groups/joins" },
         { key: "profile", icon: <FaUser />, link: "/profile" },
