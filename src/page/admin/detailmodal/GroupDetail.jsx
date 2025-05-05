@@ -221,7 +221,8 @@ const GroupDetailModal = ({ groupId, onClose, onDisbandSuccess }) => {
                 </div>
             )}
 
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl overflow-hidden animate-fadeIn">
+            {/* Main Modal - Now with 90% height of screen */}
+            <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl h-[90vh] flex flex-col overflow-hidden animate-fadeIn">
                 <div className="bg-gradient-to-r from-blue-500 to-red-500 text-white p-4 flex justify-between items-center">
                     <h2 className="text-xl font-bold">Group detail</h2>
                     <button
@@ -231,9 +232,11 @@ const GroupDetailModal = ({ groupId, onClose, onDisbandSuccess }) => {
                         Close
                     </button>
                 </div>
-                <div className="p-6">
+
+                {/* Using flex-1 to make the content area take up remaining space */}
+                <div className="flex-1 overflow-y-auto p-6">
                     <div className="flex flex-col md:flex-row items-center mb-6">
-                        <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-blue-200 flex-shrink-0 mb-4 md:mb-0">
+                        <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-4 border-blue-200 flex-shrink-0 mb-4 md:mb-0">
                             <img
                                 src={group.picture || "/api/placeholder/100/100"}
                                 alt={group.name || "Group"}
@@ -247,6 +250,7 @@ const GroupDetailModal = ({ groupId, onClose, onDisbandSuccess }) => {
                             </span>
                         </div>
                     </div>
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="bg-blue-50 p-3 rounded-lg">
                             <div className="flex items-center mb-1 text-blue-700">
@@ -285,7 +289,8 @@ const GroupDetailModal = ({ groupId, onClose, onDisbandSuccess }) => {
                             <div className="text-gray-800 pl-6">{getCreatorName()}</div>
                         </div>
                     </div>
-                    <div className={"mt-6"}>
+
+                    <div className="mt-6">
                         <div className="bg-blue-50 p-3 rounded-lg">
                             <div className="flex items-center mb-1 text-blue-700">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -300,30 +305,46 @@ const GroupDetailModal = ({ groupId, onClose, onDisbandSuccess }) => {
                     {group.members && group.members.length > 0 && (
                         <div className="mt-6">
                             <h4 className="text-lg font-semibold text-gray-700 mb-3">Group Members</h4>
-                            <div className="bg-blue-50 p-4 rounded-lg max-h-60 overflow-y-auto">
-                                <ul className="divide-y divide-blue-100">
-                                    {group.members.map((member, index) => (
-                                        <li key={index} className="py-2 flex justify-between items-center">
-                                            <div className="flex items-center">
-                                                <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-blue-200 mr-3">
-                                                    <img
-                                                        src={member.avatar || "/api/placeholder/100/100"}
-                                                        alt={member.memberName || "Member"}
-                                                        className="w-full h-full object-cover"
-                                                    />
-                                                </div>
-                                                <span className="text-gray-800">{member.memberName || "Unknown"}</span>
-                                            </div>
-                                            <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
-                                                {member.role || "Member"}
-                                            </span>
-                                        </li>
-                                    ))}
-                                </ul>
+                            <div className="overflow-hidden bg-blue-50 rounded-lg">
+                                <div className="overflow-x-auto">
+                                    <table className="min-w-full divide-y divide-blue-200">
+                                        <thead className="bg-blue-100">
+                                        <tr>
+                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">Avatar</th>
+                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">Member Name</th>
+                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">Role</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody className="bg-blue-50 divide-y divide-blue-100">
+                                        {group.members.map((member, index) => (
+                                            <tr key={index} className="hover:bg-blue-100">
+                                                <td className="px-6 py-3 whitespace-nowrap">
+                                                    <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-blue-200">
+                                                        <img
+                                                            src={member.avatar || "/api/placeholder/100/100"}
+                                                            alt={member.memberName || "Member"}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-800">
+                                                    {member.memberName || "Unknown"}
+                                                </td>
+                                                <td className="px-6 py-3 whitespace-nowrap">
+                                                        <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
+                                                            {member.role || "Member"}
+                                                        </span>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     )}
                 </div>
+
                 <div className="bg-gray-50 px-6 py-4 flex justify-end items-center border-t border-gray-200 space-x-3">
                     <button
                         onClick={handleToggleBan}
