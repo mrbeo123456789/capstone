@@ -922,6 +922,41 @@
     "incomplete": "Incomplete",
     "approved": "Approved",
     "rejected": "Rejected"
+  },
+  "evidence": {
+    "title": "Evidence",
+    "members": "Members",
+    "for": "for",
+    "searchMembers": "Search members...",
+    "memberName": "Member Name",
+    "evidenceCount": "Evidence Count",
+    "status": {
+      "title": "Status",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "pending": "Pending",
+      "done": "Done"
+    },
+    "date": "Date",
+    "pagination": {
+      "showing": "Showing",
+      "to": "to",
+      "of": "of",
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "statistics": "Statistics",
+    "totalEvidence": "Total Evidence",
+    "filtering": "Filtering",
+    "showingAll": "Showing all evidence",
+    "noEvidenceFound": "No evidence found",
+    "showAllEvidence": "Show all evidence",
+    "selectMember": "Select a member to view evidence",
+    "invalidDate": "Invalid date",
+    "evidenceNumber": "Evidence",
+    "challenge": "Challenge",
+    "unknown": "Unknown",
+    "noDescription": "No description provided"
   }
 }
 
