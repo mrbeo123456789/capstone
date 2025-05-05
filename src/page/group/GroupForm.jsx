@@ -306,9 +306,12 @@ const ChallengeForm = () => {
                                 <span className="text-red-500">*</span>
                                 <input
                                     type="number"
+                                    min="2"
                                     {...register("maxParticipants")}
                                     className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                                    placeholder="Minimum 2 participants"
                                 />
+                                <p className="text-xs text-gray-500">Minimum 2 participants required</p>
                                 <p className="text-red-600">{errors.maxParticipants?.message}</p>
                             </div>
                         </div>
