@@ -18,6 +18,7 @@ const GlobalLeaderboard = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const usersPerPage = 10;
+    const isLoggedIn = !!localStorage.getItem("jwt_token");
 
     // State for API pagination
     const [individualPage, setIndividualPage] = useState(0);
@@ -64,14 +65,15 @@ const GlobalLeaderboard = () => {
         if (globalRankingData) {
             // Process API response to match our component's data structure
             const processedUsers = globalRankingData.content.map((user, index) => ({
-                id: user.id,
-                name: user.name || user.username,
-                username: `@${user.username}`,
-                score: user.score,
+                id: user.memberId,
+                name: user.fullName,
+                username: `#${user.memberId}`,
+                score: user.totalStars,
                 avatar: user.avatar || '/api/placeholder/100/100',
-                rank: user.rank || index + 1 + (individualPage * usersPerPage),
+                rank: user.position || index + 1 + (individualPage * usersPerPage),
                 isCurrentUser: user.isCurrentUser || false
             }));
+
 
             setUsers(processedUsers);
             setTotalIndividualPages(globalRankingData.totalPages || 1);
@@ -121,13 +123,18 @@ const GlobalLeaderboard = () => {
         if (myRankingData && !isLoadingMyRanking) {
             const rank = myRankingData.rank;
             const apiPage = Math.floor((rank - 1) / usersPerPage);
-            setIndividualPage(apiPage);
-            setCurrentPage(apiPage + 1); // currentPage is 1-indexed for UI
+
+            if (!isNaN(apiPage) && apiPage >= 0) {
+                setIndividualPage(apiPage);
+                setCurrentPage(apiPage + 1); // UI page = API page + 1
+            } else {
+                console.warn("Invalid rank:", rank);
+            }
         } else {
-            // API not available yet
             alert(t('leaderboard.rankFeatureNotAvailable'));
         }
     };
+
 
     // Tab switching logic
     useEffect(() => {
@@ -318,7 +325,7 @@ const GlobalLeaderboard = () => {
                                     />
                                 </div>
                                 {/* Only show "My Rank" button in individual tab */}
-                                {activeTab === 'individual' && (
+                                {activeTab === 'individual' && isLoggedIn && myRankingData && (
                                     <button
                                         onClick={goToMyRank}
                                         className={`bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg flex items-center gap-2 transition-colors ${
@@ -330,6 +337,7 @@ const GlobalLeaderboard = () => {
                                         {t('leaderboard.myRank')}
                                     </button>
                                 )}
+
                             </div>
 
                             {/* Rest of Leaderboard */}
