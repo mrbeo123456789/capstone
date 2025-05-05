@@ -30,10 +30,10 @@ const InviteMembers = ({ onClose, participationType }) => {
         }
     }, [suggestedMembers]);
 
-    const paginatedMembers = membersData.slice(
-        (currentPage - 1) * PAGE_SIZE,
-        currentPage * PAGE_SIZE
-    );
+    // const paginatedMembers = membersData.slice(
+    //     (currentPage - 1) * PAGE_SIZE,
+    //     currentPage * PAGE_SIZE
+    // );
 
     const handleCheckboxChange = (id) => {
         setSelected((prev) =>
@@ -112,7 +112,7 @@ const InviteMembers = ({ onClose, participationType }) => {
                 ) : membersData.length === 0 ? (
                     <p className="text-gray-500">{t("challengeInvite.noResults")}</p>
                 ) : (
-                    paginatedMembers.map((member) => (
+                    membersData.map((member) => (
                         <div
                             key={member.id}
                             className="flex items-center justify-between bg-orange-50 p-3 mb-3 rounded-lg shadow-sm"
@@ -142,29 +142,29 @@ const InviteMembers = ({ onClose, participationType }) => {
             </div>
 
             {/* Pagination */}
-            <div className="flex justify-center gap-4 my-4">
-                <button
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                    className="px-4 py-1 bg-gray-300 rounded hover:bg-gray-400"
-                    disabled={currentPage === 1}
-                >
-                    {t("challengeInvite.previous")}
-                </button>
-                <span className="text-gray-700">
-                    {t("challengeInvite.page")} {currentPage}
-                </span>
-                <button
-                    onClick={() =>
-                        setCurrentPage((prev) =>
-                            prev * PAGE_SIZE < membersData.length ? prev + 1 : prev
-                        )
-                    }
-                    className="px-4 py-1 bg-gray-300 rounded hover:bg-gray-400"
-                    disabled={currentPage * PAGE_SIZE >= membersData.length}
-                >
-                    {t("challengeInvite.next")}
-                </button>
-            </div>
+            {/*<div className="flex justify-center gap-4 my-4">*/}
+            {/*    <button*/}
+            {/*        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}*/}
+            {/*        className="px-4 py-1 bg-gray-300 rounded hover:bg-gray-400"*/}
+            {/*        disabled={currentPage === 1}*/}
+            {/*    >*/}
+            {/*        {t("challengeInvite.previous")}*/}
+            {/*    </button>*/}
+            {/*    <span className="text-gray-700">*/}
+            {/*        {t("challengeInvite.page")} {currentPage}*/}
+            {/*    </span>*/}
+            {/*    <button*/}
+            {/*        onClick={() =>*/}
+            {/*            setCurrentPage((prev) =>*/}
+            {/*                prev * PAGE_SIZE < membersData.length ? prev + 1 : prev*/}
+            {/*            )*/}
+            {/*        }*/}
+            {/*        className="px-4 py-1 bg-gray-300 rounded hover:bg-gray-400"*/}
+            {/*        disabled={currentPage * PAGE_SIZE >= membersData.length}*/}
+            {/*    >*/}
+            {/*        {t("challengeInvite.next")}*/}
+            {/*    </button>*/}
+            {/*</div>*/}
 
             {/* Footer */}
             <div className="flex justify-between mt-6">

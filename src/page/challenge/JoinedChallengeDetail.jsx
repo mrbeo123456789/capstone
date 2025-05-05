@@ -332,6 +332,8 @@ const JoinedChallengeDetail = () => {
                         <HostEvidenceManagement challengeId={challenge.id}/>
                     </div>
                 )}
+
+
                 {showMemberInvite && <ChallengeInvitePopup onClose={closeInvite} />}
                 {showGroupInvite && <GroupChallengeInvite onClose={closeInvite} />}
                 {showPopup && (

@@ -1,25 +1,20 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useGetChallengeStatisticsQuery } from '../../service/challengeService.js';
 import {
-    UsersIcon,
-    GroupIcon,
-    FileTextIcon,
-    ThumbsUpIcon,
-    HourglassIcon,
-    BanIcon,
-    TrendingUpIcon,
-    CalendarDaysIcon,
-    CircleDotIcon
+    UsersIcon, GroupIcon, FileTextIcon, ThumbsUpIcon,
+    HourglassIcon, BanIcon, CalendarDaysIcon, CircleDotIcon
 } from 'lucide-react';
 
 const ChallengeStatistic = ({ challengeId }) => {
+    const { t } = useTranslation();
     const { data, isLoading, error } = useGetChallengeStatisticsQuery(challengeId);
 
     if (isLoading) {
         return (
             <div className="flex justify-center items-center h-64">
                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-                <p className="ml-4 text-blue-500 font-medium">Loading statistics...</p>
+                <p className="ml-4 text-blue-500 font-medium">{t("challengeStats.loading")}</p>
             </div>
         );
     }
@@ -27,12 +22,11 @@ const ChallengeStatistic = ({ challengeId }) => {
     if (error || !data) {
         return (
             <div className="text-center text-red-600 py-6">
-                Failed to load challenge statistics.
+                {t("challengeStats.loadError")}
             </div>
         );
     }
 
-    // Helper for bar visual
     const ProgressBar = ({ value, label, color = 'blue' }) => (
         <div className="mb-4">
             <div className="flex justify-between mb-1">
@@ -50,33 +44,32 @@ const ChallengeStatistic = ({ challengeId }) => {
 
     return (
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">📊 Challenge Progress Dashboard</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+                📊 {t("challengeStats.dashboardTitle")}
+            </h2>
 
-            {/* Overview Section */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <InfoCard label="Challenge Name" value={data.challengeName} icon={<FileTextIcon />} />
-                <InfoCard label="Total Participants" value={data.totalParticipants} icon={<UsersIcon />} />
-                <InfoCard label="Total Groups" value={data.totalGroups} icon={<GroupIcon />} />
+                <InfoCard label={t("challengeStats.challengeName")} value={data.challengeName} icon={<FileTextIcon />} />
+                <InfoCard label={t("challengeStats.totalParticipants")} value={data.totalParticipants} icon={<UsersIcon />} />
+                <InfoCard label={t("challengeStats.totalGroups")} value={data.totalGroups} icon={<GroupIcon />} />
             </div>
 
-            {/* Evidence Status */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <InfoCard label="Evidence Submitted" value={data.totalEvidenceSubmitted} icon={<FileTextIcon />} />
-                <InfoCard label="Approved Evidence" value={data.approvedEvidence} icon={<ThumbsUpIcon />} />
-                <InfoCard label="Pending Evidence" value={data.pendingEvidence} icon={<HourglassIcon />} />
-                <InfoCard label="Rejected Evidence" value={data.rejectedEvidence} icon={<BanIcon />} />
+                <InfoCard label={t("challengeStats.evidenceSubmitted")} value={data.totalEvidenceSubmitted} icon={<FileTextIcon />} />
+                <InfoCard label={t("challengeStats.approvedEvidence")} value={data.approvedEvidence} icon={<ThumbsUpIcon />} />
+                <InfoCard label={t("challengeStats.pendingEvidence")} value={data.pendingEvidence} icon={<HourglassIcon />} />
+                <InfoCard label={t("challengeStats.rejectedEvidence")} value={data.rejectedEvidence} icon={<BanIcon />} />
             </div>
 
-            {/* Visual Progress */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div className="bg-gray-50 p-4 rounded shadow">
-                    <ProgressBar value={data.participationRate} label="Participation Rate" color="green" />
-                    <ProgressBar value={data.completionRate} label="Completion Rate" color="indigo" />
+                    <ProgressBar value={data.participationRate} label={t("challengeStats.participationRate")} color="green" />
+                    <ProgressBar value={data.completionRate} label={t("challengeStats.completionRate")} color="indigo" />
                 </div>
                 <div className="bg-gray-50 p-4 rounded shadow grid grid-cols-2 gap-4">
-                    <InfoCard label="Today" value={data.today} icon={<CalendarDaysIcon />} />
-                    <InfoCard label="Submitted Today" value={data.evidenceSubmittedToday} icon={<FileTextIcon />} />
-                    <InfoCard label="Pending Review Today" value={data.pendingReviewToday} icon={<CircleDotIcon />} />
+                    <InfoCard label={t("challengeStats.today")} value={data.today} icon={<CalendarDaysIcon />} />
+                    <InfoCard label={t("challengeStats.submittedToday")} value={data.evidenceSubmittedToday} icon={<FileTextIcon />} />
+                    <InfoCard label={t("challengeStats.pendingToday")} value={data.pendingReviewToday} icon={<CircleDotIcon />} />
                 </div>
             </div>
         </div>

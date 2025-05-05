@@ -138,6 +138,7 @@ const YourGroup = () => {
                         className={`px-4 py-2 rounded-lg ${activeTab === value ? "bg-blue-600 text-white" : "border"}`}
                     >
                         {t(`yourGroup.tabs.${labelKey}`)}
+
                     </button>
                 ))}
             </div>
@@ -180,7 +181,8 @@ const YourGroup = () => {
                                     {group.currentParticipants || group.members?.length || 0} {t("yourGroup.members")}
                                 </div>
                                 <div className="border text-sm px-2 py-1 rounded capitalize">
-                                    {t("yourGroup.`group.currentMemberRole?.toLowerCase()`")}
+                                    {t(`yourGroup.${group.currentMemberRole?.toLowerCase()}`)}
+
                                 </div>
                             </div>
                         ))}
