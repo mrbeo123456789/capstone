@@ -157,9 +157,15 @@ const JoinedGroupDetail = () => {
                                 {menuOpen && (
                                     <div className="absolute z-10 mt-2 w-44 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
                                         <div className="py-1">
-                                            <button onClick={openInvitePopup} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">
-                                                {t("groupDetail.inviteMembers")}
-                                            </button>
+                                            {isOwner && (
+                                                <button
+                                                    onClick={openInvitePopup}
+                                                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                                                >
+                                                    {t("groupDetail.inviteMembers")}
+                                                </button>
+                                            )}
+
                                             {isOwner && (
                                                 <button onClick={handleEditGroup} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">
                                                     {t("groupDetail.editGroup")}

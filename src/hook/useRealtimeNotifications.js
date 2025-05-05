@@ -9,21 +9,20 @@ export const useRealtimeNotifications = (userId) => {
     useEffect(() => {
         if (!userId) return;
 
-        console.log("📡 Listening for userId =", userId);
+
 
         const q = query(
             collection(db, "notifications"),
             where("userId", "==", String(userId)),
             orderBy("createdAt", "desc")
         );
-        console.log("📌 Subscribing to userId:", userId);
+
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
             const data = snapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data()
             }));
-            console.log("📦 Firestore data snapshot:", data);  // 🐞 check realtime kết quả
             setNotifications(data);
         });
 

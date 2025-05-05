@@ -323,7 +323,7 @@ const ChallengeList = () => {
                                                     Finished
                                                 </button>
                                                 <button onClick={() => handleStatusFilter("ONGOING")} className="block w-full text-left px-4 py-2 hover:bg-blue-50">
-                                                    On going
+                                                    Ongoing
                                                 </button>
                                                 <button onClick={() => handleStatusFilter("UPCOMING")} className="block w-full text-left px-4 py-2 hover:bg-blue-50">
                                                     Upcoming
@@ -380,7 +380,7 @@ const ChallengeList = () => {
                                                 </td>
                                                 <td className="p-4">
                                                     <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                                                        challenge.status.toUpperCase() === "APPROVED"
+                                                        challenge.status.toUpperCase() === "UPCOMING"
                                                             ? "bg-green-100 text-green-700"
                                                             : challenge.status.toUpperCase() === "REJECTED"
                                                                 ? "bg-red-100 text-red-700"
