@@ -136,19 +136,28 @@ export const loginValidation = yup.object({
 export const groupValidation = yup.object().shape({
     name: yup
         .string()
-        .required(() => i18n.t("group.nameRequired", { ns: "validation" })),
+        .required(i18n.t("group.nameRequired", { ns: "validation" })),
 
     description: yup
         .string()
-        .required(() => i18n.t("group.descriptionRequired", { ns: "validation" })),
+        .required(i18n.t("group.descriptionRequired", { ns: "validation" })),
 
     picture: yup
         .mixed()
         .test("required-image", function (value) {
             const { isEditing } = this?.options?.context || {};
-            const isValid = isEditing || value instanceof File;
-            return isValid || this.createError({
-                message: i18n.t("group.pictureRequired", { ns: "validation" }),
-            });
+            const hasFile = value instanceof File;
+
+            // Nếu đang edit, bỏ qua validate ảnh
+            if (isEditing) return true;
+
+            // Nếu tạo mới, bắt buộc phải có ảnh (là File)
+            if (!hasFile) {
+                return this.createError({
+                    message: i18n.t("group.pictureRequired", { ns: "validation" }),
+                });
+            }
+
+            return true;
         }),
 });

@@ -41,11 +41,16 @@ const GroupForm = () => {
             reset({
                 name: groupDetail.name || "",
                 description: groupDetail.description || "",
-                picture: null,
             });
+
+            if (groupDetail.picture) {
+                setValue("picture", groupDetail.picture); // 👈 Để validation biết là có ảnh
+            }
+
             setPreview(groupDetail.picture || "");
         }
-    }, [isEditing, groupDetail, reset]);
+    }, [isEditing, groupDetail, reset, setValue]);
+
 
     const onSubmit = async (data) => {
         try {
@@ -55,10 +60,13 @@ const GroupForm = () => {
                 formData.append("name", data.name);
                 formData.append("description", data.description);
 
-                await updateGroup(formData); // ✅ Gửi multipart/form-data
+                if (data.picture) {
+                                    formData.append("picture", data.picture);
+                                 }
 
+                await updateGroup(formData);
                 toast.success(t("updateSuccess"), { autoClose: 2000 });
-                navigate(`/groups/joins/${groupId}`); // ✅ Quay lại trang chi tiết nhóm
+                navigate(`/groups/joins/${groupId}`);
             } else {
                 const formData = new FormData();
                 formData.append("name", data.name);
