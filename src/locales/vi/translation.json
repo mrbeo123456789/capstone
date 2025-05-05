@@ -850,7 +850,29 @@
     "searchUser": "Tìm kiếm người dùng...",
     "totalStars": "Tổng số sao",
     "kickMember": "Loại thành viên"
+  },
+  "SelectGroupModal": {
+    "title": "Chọn nhóm để tham gia",
+    "searchPlaceholder": "Tìm theo tên nhóm...",
+    "filterExactMembers": "Chỉ hiện nhóm có đúng {{number}} thành viên",
+    "noGroups": "Không có nhóm phù hợp.",
+    "notLeaderTooltip": "Bạn không phải trưởng nhóm.",
+    "notExactMembersTooltip": "Nhóm cần đúng {{number}} thành viên.",
+    "yourRole": "Vai trò của bạn",
+    "owner": "Trưởng nhóm",
+    "member": "Thành viên",
+    "members": "thành viên",
+    "prev": "Trước",
+    "next": "Sau",
+    "cancel": "Hủy",
+    "join": "Tham gia",
+    "joining": "Đang tham gia...",
+    "joinSuccess": "Tham gia nhóm vào thử thách thành công!",
+    "joinFail": "Không thể tham gia nhóm vào thử thách.",
+    "selectGroupFirst": "Vui lòng chọn một nhóm trước khi tham gia."
   }
+
+
 }
 
 

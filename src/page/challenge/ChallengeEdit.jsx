@@ -13,6 +13,7 @@ import { editChallengeValidation } from "../../utils/validation.js";
 import RichTextEditor from "../ui/RichTextEditor.jsx";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import { FaWindowClose } from "react-icons/fa";
+import {useGetAvailableGroupsQuery} from "../../service/groupService.js";
 
 const ChallengeEdit = () => {
     const { t } = useTranslation();
@@ -32,11 +33,13 @@ const ChallengeEdit = () => {
         setValue,
         reset,
         trigger,
+        watch, // ✅ thêm dòng này
         formState: { errors },
     } = useForm({
         mode: "onBlur",
         resolver: yupResolver(editChallengeValidation),
     });
+
     const [description, setDescription] = useState("");
 
     useEffect(() => {
@@ -66,6 +69,9 @@ const ChallengeEdit = () => {
                 participationType,
                 challengeTypeId,
                 maxParticipants,
+                maxMembersPerGroup: detail.maxMembersPerGroup || "",
+                groupId: detail.groupId || "",
+                isParticipate: detail.joined ?? true,
             });
         }
     }, [detail, challengeTypes, reset, setValue, trigger]);
@@ -99,6 +105,25 @@ const ChallengeEdit = () => {
             setValue("banner", null);
         }
     };
+    const watchParticipationType = watch("participationType");
+    const watchIsParticipating = watch("isParticipate", true);
+    const [participationType, setParticipationType] = useState("INDIVIDUAL");
+
+    useEffect(() => {
+        if (watchParticipationType) {
+            setParticipationType(watchParticipationType);
+        }
+    }, [watchParticipationType]);
+
+    const maxMemberCount = watch("maxMembersPerGroup");
+
+    const { data: availableGroups = [], refetch } = useGetAvailableGroupsQuery(
+        { minMember: maxMemberCount },  // <-- bạn cần điều chỉnh API để nhận param
+        {
+            skip: participationType !== "GROUP" || !maxMemberCount
+        }
+    );
+
 
     const onSubmit = async (data) => {
         const formData = new FormData();
@@ -115,6 +140,8 @@ const ChallengeEdit = () => {
         formData.append("verificationType", data.verificationType);
         formData.append("participationType", data.participationType);
         formData.append("challengeTypeId", data.challengeTypeId);
+        formData.append("maxParticipants", data.maxParticipants);
+        formData.append("maxParticipants", data.maxParticipants);
         formData.append("maxParticipants", data.maxParticipants);
 
         // Handle picture / banner (new file or reuse)
@@ -144,11 +171,15 @@ const ChallengeEdit = () => {
         toast.error(firstError || t("createChallenge.editValidationError"));
     };
 
+    const [canChooseGroup, setCanChooseGroup] = useState(false);
+    useEffect(() => {
+        setCanChooseGroup(Number(watch("maxMembersPerGroup")) > 1);
+    }, [watch("maxMembersPerGroup")]);
+
     return (
         <div className="bg-white p-1 sm:p-6 w-full rounded-xl border-4 border-transparent">
             <form onSubmit={handleSubmit(onSubmit, onError)}>
                 <h2 className="text-xl font-bold mb-4">{t("createChallenge.editTitle")}</h2>
-
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-4">
                         <label>{t("createChallenge.name")}*</label>
@@ -221,88 +252,207 @@ const ChallengeEdit = () => {
                     </div>
                 </div>
                 {/* Challenge Detail Section */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
-                    <div>
-                        <label>{t("createChallenge.startDate")}</label>
-                        <input type="date" {...register("startDate")} className="w-full p-2 border rounded"/>
-                        <p className="text-red-600">{errors.startDate?.message}</p>
-                    </div>
-                    <div>
-                        <label>{t("createChallenge.endDate")}</label>
-                        <input type="date" {...register("endDate")} className="w-full p-2 border rounded"/>
-                        <p className="text-red-600">{errors.endDate?.message}</p>
-                    </div>
-                    <div>
-                        <label>{t("createChallenge.privacy")}</label>
-                        <select {...register("privacy")} className="w-full p-2 border rounded">
-                            <option value="PUBLIC">{t("public")}</option>
-                            <option value="PRIVATE">{t("private")}</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label>{t("createChallenge.maxParticipants")}</label>
-                        <input type="number" {...register("maxParticipants")} className="w-full p-2 border rounded"/>
-                    </div>
-                    <div>
-                        <label>{t("createChallenge.verificationType.label")}</label>
-                        <select {...register("verificationType")} className="w-full p-2 border rounded">
-                            <option value="MEMBER_REVIEW">{t("createChallenge.verificationType.memberReview")}</option>
-                            <option value="HOST_REVIEW">{t("createChallenge.verificationType.hostReview")}</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label>{t("createChallenge.participationType.label")}</label>
-                        <select {...register("participationType")} className="w-full p-2 border rounded">
-                            <option value="INDIVIDUAL">{t("createChallenge.participationType.individual")}</option>
-                            <option value="GROUP">{t("createChallenge.participationType.group")}</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label>{t("createChallenge.challengeType")}</label>
-                        <select {...register("challengeTypeId")} className="w-full p-2 border rounded">
-                            <option value="">{t("createChallenge.selectChallengeType")}</option>
-                            {challengeTypes.map((type) => (
-                                <option key={type.id} value={type.id}>{type.name}</option>
-                            ))}
-                        </select>
-                        <p className="text-red-600">{errors.challengeTypeId?.message}</p>
-                    </div>
-                </div>
+                    <div className="rounded-lg w-full p-6">
+                        <h3 className="mb-4 text-xl font-bold">{t("createChallenge.details")}</h3>
+                        <form onSubmit={handleSubmit(onSubmit, onError)}>
+                            <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {/* Start Date */}
+                                <div>
+                                    <label className="text-sm font-medium">{t("createChallenge.startDate")}</label>
+                                    <span className="text-red-500">*</span>
+                                    <input type="date" {...register("startDate")}
+                                           className="w-full p-2 border rounded-md"/>
+                                    <p className="text-red-600">{errors.startDate?.message}</p>
+                                </div>
 
-                <div className="mt-6">
-                    <label>{t("createChallenge.description")}</label>
-                    <RichTextEditor
-                        value={description}
-                        onChange={(val) => {
-                            setDescription(val); // update local state
-                            setValue("description", val, {shouldValidate: true}); // sync to react-hook-form
-                            trigger("description");
-                        }}
-                    />
-                    <input type="hidden" {...register("description")} value={description}/>
+                                {/* End Date */}
+                                <div>
+                                    <label className="text-sm font-medium">{t("createChallenge.endDate")}</label>
+                                    <span className="text-red-500">*</span>
+                                    <input type="date" {...register("endDate")}
+                                           className="w-full p-2 border rounded-md"/>
+                                    <p className="text-red-600">{errors.endDate?.message}</p>
+                                </div>
 
-                    <p className="text-red-600">{errors.description?.message}</p>
-                </div>
+                                {/* Privacy */}
+                                <div>
+                                    <label
+                                        className="text-sm font-medium block mb-1">{t("createChallenge.privacy")}</label>
+                                    <div className="flex gap-4">
+                                        <label className="flex items-center gap-2">
+                                            <input type="radio" value="PUBLIC" {...register("privacy")} defaultChecked/>
+                                            {t("public")}
+                                        </label>
+                                        <label className="flex items-center gap-2">
+                                            <input type="radio" value="PRIVATE" {...register("privacy")} />
+                                            {t("private")}
+                                        </label>
+                                    </div>
+                                </div>
 
-                <div className="flex justify-center mt-8 gap-4">
-                    <button
-                        type="submit"
-                        className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
-                        disabled={isUpdating}
-                    >
-                        {isUpdating ? t("createChallenge.updating") : t("createChallenge.update")}
-                    </button>
-                    <button
-                        type="button"
-                        className="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600"
-                        onClick={() => navigate("/challenges/joins")}
-                    >
-                        {t("createChallenge.cancel")}
-                    </button>
-                </div>
+                                {/* isParticipate */}
+                                <div>
+                                    <label
+                                        className="text-sm font-medium block mb-1">{t("createChallenge.isParticipate")}</label>
+                                    <label className="flex items-center gap-2">
+                                        <input type="checkbox" defaultChecked {...register("isParticipate")} />
+                                        {t("createChallenge.joinCheckbox")}
+                                    </label>
+                                </div>
+
+                                {/* Verification Type */}
+                                <div>
+                                    <label
+                                        className="text-sm font-medium">{t("createChallenge.verificationType.label")}</label>
+                                    <select {...register("verificationType")} className="w-full p-2 border rounded-md">
+                                        <option
+                                            value="MEMBER_REVIEW">{t("createChallenge.verificationType.memberReview")}</option>
+                                        <option
+                                            value="HOST_REVIEW">{t("createChallenge.verificationType.hostReview")}</option>
+                                    </select>
+                                </div>
+
+                                {/* Participation Type */}
+                                <div>
+                                    <label
+                                        className="text-sm font-medium">{t("createChallenge.participationType.label")}</label>
+                                    <select
+                                        {...register("participationType")}
+                                        onChange={(e) => {
+                                            setParticipationType(e.target.value);
+                                            setValue("participationType", e.target.value, {shouldValidate: true});
+                                        }}
+                                        className="w-full p-2 border rounded-md"
+                                    >
+                                        <option
+                                            value="INDIVIDUAL">{t("createChallenge.participationType.individual")}</option>
+                                        <option value="GROUP">{t("createChallenge.participationType.group")}</option>
+                                    </select>
+                                </div>
+
+                                {/* Challenge Type */}
+                                <div>
+                                    <label className="text-sm font-medium">{t("createChallenge.challengeType")}</label>
+                                    <select {...register("challengeTypeId", {required: true})}
+                                            className="w-full p-2 border rounded-md">
+                                        <option value="">{t("createChallenge.selectChallengeType")}</option>
+                                        {challengeTypes?.map((type) => (
+                                            <option key={type.id} value={type.id}>{type.name}</option>
+                                        ))}
+                                    </select>
+                                    <p className="text-red-600">{errors.challengeTypeId?.message}</p>
+                                </div>
+
+                                {/* Max Participants or Group Config */}
+                                {participationType === "INDIVIDUAL" && (
+                                    <div>
+                                        <label
+                                            className="text-sm font-medium">{t("createChallenge.maxParticipants")}</label>
+                                        <span className="text-red-500">*</span>
+                                        <input type="number" {...register("maxParticipants")}
+                                               className="w-full p-2 border rounded-md"/>
+                                        <p className="text-red-600">{errors.maxParticipants?.message}</p>
+                                    </div>
+                                )}
+
+                                {participationType === "GROUP" && (
+                                    <>
+                                        <div>
+                                            <label
+                                                className="text-sm font-medium">{t("createChallenge.maxGroups")}</label>
+                                            <input type="number" {...register("maxParticipants")}
+                                                   className="w-full p-2 border rounded-md"/>
+                                            <p className="text-red-600">{errors.maxParticipants?.message}</p>
+                                        </div>
+                                        <div>
+                                            <label
+                                                className="text-sm font-medium">{t("createChallenge.maxMembersPerGroup")}</label>
+                                            <input
+                                                type="number"
+                                                min={2}
+                                                placeholder={t("createChallenge.groupMinMemberNote")}
+                                                {...register("maxMembersPerGroup")}
+                                                className="w-full p-2 border rounded-md"
+                                            />
+                                            <p className="text-red-600">{errors.maxMembersPerGroup?.message}</p>
+                                        </div>
+                                    </>
+                                )}
+
+                                {/* Select Group (Fixed version) */}
+                                {participationType === "GROUP" && watchIsParticipating && (
+                                    <div>
+                                        <label className="text-sm font-medium">{t("createChallenge.selectGroup")}</label>
+                                        <select
+                                            {...register("groupId", { required: true })}
+                                            onChange={(e) => {
+                                                const selectedGroup = availableGroups.find(
+                                                    (g) => g.groupId === Number(e.target.value)
+                                                );
+                                                if (selectedGroup) {
+                                                    // ✅ Set maxMembersPerGroup and maxGroups only if valid
+                                                    setValue("maxGroups", 1);
+                                                    setValue("maxMembersPerGroup", selectedGroup.memberCount, {
+                                                        shouldValidate: true,
+                                                    });
+                                                }
+                                            }}
+                                            className="w-full p-2 border rounded-md"
+                                        >
+                                            <option value="">{t("createChallenge.selectGroupPlaceholder")}</option>
+                                            {availableGroups
+                                                .filter(group => {
+                                                    const expected = Number(watch("maxMembersPerGroup"));
+                                                    return group.memberCount > 1 && (!expected || group.memberCount === expected);
+                                                })
+                                                .map(group => (
+                                                    <option key={group.groupId} value={group.groupId}>
+                                                        {group.groupName} ({group.memberCount} {t("createChallenge.members")})
+                                                    </option>
+                                                ))}
+
+                                        </select>
+                                        <p className="text-red-600">{errors.groupId?.message}</p>
+                                    </div>
+                                )}
+
+                            </div>
+
+                            {/* Description */}
+                            <div>
+                                <label className="text-sm font-medium">{t("createChallenge.description")}</label>
+                                <span className="text-red-500">*</span>
+                                <RichTextEditor
+                                    value={description}
+                                    onChange={(val) => {
+                                        setDescription(val); // update local state
+                                        setValue("description", val, {shouldValidate: true}); // sync to react-hook-form
+                                        trigger("description");
+                                    }}
+                                />
+                                <input type="hidden" {...register("description")} value={description} />
+                                <p className="text-red-600">{errors.description?.message}</p>
+                            </div>
+
+                            {/* Submit Buttons */}
+                            <div className="flex justify-center gap-6 mt-6">
+                                <button type="submit"
+                                        className="bg-red-600 px-6 py-2 rounded text-white hover:bg-red-700"
+                                        disabled={isUpdating}>
+                                    {isUpdating ? t("createChallenge.updating") : t("createChallenge.update")}
+                                </button>
+                                <button type="button"
+                                        className="bg-gray-500 px-6 py-2 rounded text-white hover:bg-gray-600"
+                                        onClick={() => navigate("/challenges/joins")}>
+                                    {t("createChallenge.cancel")}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
             </form>
         </div>
-    );
+);
 };
 
 export default ChallengeEdit;

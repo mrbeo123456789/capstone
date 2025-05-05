@@ -965,9 +965,29 @@
     "searchUser": "ユーザーを検索...",
     "totalStars": "合計スター",
     "kickMember": "メンバーを退会させる"
+  },
+
+
+  "SelectGroupModal": {
+    "title": "参加するグループを選択",
+    "searchPlaceholder": "グループ名で検索...",
+    "filterExactMembers": "{{number}}人のグループのみ表示",
+    "noGroups": "該当するグループが見つかりません。",
+    "notLeaderTooltip": "あなたはグループリーダーではありません。",
+    "notExactMembersTooltip": "{{number}}人のメンバーが必要です。",
+    "yourRole": "あなたの役割",
+    "owner": "リーダー",
+    "member": "メンバー",
+    "members": "人",
+    "prev": "前へ",
+    "next": "次へ",
+    "cancel": "キャンセル",
+    "join": "参加する",
+    "joining": "参加中...",
+    "joinSuccess": "グループでチャレンジに参加しました！",
+    "joinFail": "グループでチャレンジに参加できませんでした。",
+    "selectGroupFirst": "参加する前にグループを選択してください。"
   }
-
-
 
 
 }

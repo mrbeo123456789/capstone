@@ -66,24 +66,25 @@ const CreateChallenge = () => {
         };
         const processed = {
             ...data,
-            maxParticipants: parseInt(data.maxParticipants),
             challengeTypeId: parseInt(data.challengeTypeId),
             isParticipate: String(data.isParticipate).toUpperCase() === "TRUE",
             startDate: formatDate(data.startDate),
             endDate: formatDate(data.endDate)
         };
+
         if (participationType === "GROUP") {
-            processed.maxGroups = parseInt(data.maxParticipants); // ✅ map correctly for GROUP
+            processed.maxGroups = parseInt(data.maxGroups); // ✅ dùng đúng maxGroups
             processed.maxMembersPerGroup = parseInt(data.maxMembersPerGroup);
         } else {
-            // For INDIVIDUAL keep maxParticipants as is
-            processed.maxParticipants = parseInt(data.maxParticipants);
+            processed.maxParticipants = parseInt(data.maxParticipants); // ✅ chỉ dùng khi là INDIVIDUAL
         }
+
         Object.keys(processed).forEach((key) => {
-            if ((key === "picture" || key === "banner") && processed[key]) {
-                formData.append(key, processed[key]);
+            const value = processed[key];
+            if ((key === "picture" || key === "banner") && value) {
+                formData.append(key, value);
             } else {
-                formData.append(key, processed[key] ?? "");
+                formData.append(key, value !== undefined ? value : "");
             }
         });
         processed.groupId = data.groupId;
@@ -91,7 +92,6 @@ const CreateChallenge = () => {
         if (isValid) {
             try {
                 await createChallenge(formData);
-                console.log("createChallenge created");
                 toast.success(t("createChallenge.success"));
                 reset();
                 setPreview(null);
@@ -291,10 +291,10 @@ const CreateChallenge = () => {
                                     <label className="text-sm font-medium">{t("createChallenge.maxGroups")}</label>
                                     <input
                                         type="number"
-                                        {...register("maxParticipants")}
+                                        {...register("maxGroups")}
                                         className="w-full p-2 border rounded-md"
                                     />
-                                    <p className="text-red-600">{errors.maxParticipants?.message}</p>
+                                    <p className="text-red-600">{errors.maxGroups?.message}</p>
                                 </div>
                                 <div>
                                     <label className="text-sm font-medium">{t("createChallenge.maxMembersPerGroup")}</label>
