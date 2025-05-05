@@ -16,7 +16,7 @@ const YourChallenge = () => {
     const [isJoinedGroupOpen, setIsJoinedGroupOpen] = useState(false); // ✅ popup chọn nhóm
     const [selectedInvitation, setSelectedInvitation] = useState(null); // ✅ lời mời đang chọn
 
-    const [getMyChallenges, { data: joinedChallenges = [], isLoading }] = useGetMyChallengesMutation();
+        const [getMyChallenges, { data: joinedChallenges = [], isLoading }] = useGetMyChallengesMutation();
     const { data: invitations = [], isLoading: isInvitationsLoading, refetch: refetchInvitations } = useGetMyInvitationsQuery();
     const [respondInvitation] = useRespondInvitationMutation();
 
@@ -163,10 +163,13 @@ const YourChallenge = () => {
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl overflow-hidden">
                         <JoinedGroup
+                            onClose={() => setIsJoinedGroupOpen(false)}
                             invitation={selectedInvitation}
-                            onClose={() => {
-                                setIsJoinedGroupOpen(false);
-                                setSelectedInvitation(null);
+                            onSuccessJoin={() => {
+                                refetchInvitations();
+                                getMyChallenges(activeTab.toUpperCase());
+                                toast.success(t("challengeInvite.success"));
+                                setTimeout(() => setIsJoinedGroupOpen(false), 300);
                             }}
                         />
                     </div>

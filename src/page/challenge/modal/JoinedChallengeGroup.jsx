@@ -8,7 +8,7 @@ import {useRespondInvitationMutation} from "../../../service/invitationService.j
 import { useJoinGroupToChallengeMutation } from "../../../service/challengeService.js";
 import {useNavigate} from "react-router-dom";
 
-const JoinedGroup = ({ onClose, invitation }) => {
+const JoinedGroup = ({ onClose, invitation, onSuccessJoin }) => {
     const { t } = useTranslation();
     const PAGE_SIZE = 5;
     const navigate = useNavigate(); // tạo biến nếu chưa có
@@ -49,21 +49,20 @@ const JoinedGroup = ({ onClose, invitation }) => {
 
         try {
             if (invitation.invitationId === -1) {
-                // 👉 Người dùng tự tham gia thử thách nhóm
-                await joinGroupToChallenge({ groupId: selectedGroupId, challengeId: invitation.challengeId }).unwrap();
+                await joinGroupToChallenge({ groupId: selectedGroupId, challengeId });
                 toast.success(t("challengeInvite.successJoinGroupChallenge"));
-                navigate("/challenges/joins"); // ✅ Chuyển hướng đến trang danh sách đã tham gia
+                navigate("/challenges/joins");
             } else {
-                // 👉 Người dùng accept lời mời nhóm
                 await respondInvitation({
                     invitationId: invitation.invitationId,
                     invitationType: invitation.invitationType,
                     accept: true,
                     groupId: selectedGroupId,
-                });
-                toast.success(t("challengeInvite.success"));
-                window.location.reload(); // ✅ Reload lại trang để cập nhật UI
+                }); // ✅ Không gọi thêm join nữa
+                onSuccessJoin?.();
             }
+
+
 
             onClose();
         } catch (error) {
@@ -77,6 +76,7 @@ const JoinedGroup = ({ onClose, invitation }) => {
             }
         }
     };
+
 
     if (isLoading) return <div className="p-6">{t("challengeInvite.loading")}</div>;
     if (isError) return <div className="p-6 text-red-500">{t("challengeInvite.loadError")}</div>;
@@ -202,7 +202,8 @@ const JoinedGroup = ({ onClose, invitation }) => {
                             onClick={handleAccept}
                             className="flex items-center gap-2 px-6 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600"
                         >
-                            <IoPersonAdd /> {t("challengeInvite.confirm")} ({selectedGroupId ? 1 : 0})
+                            <IoPersonAdd /> {t("challengeInvite.confirm")}
+
                         </button>
                     </div>
                 </div>
