@@ -110,7 +110,7 @@ const YourChallenge = () => {
                         {filteredInvitations.map((invite) => (
                             <div
                                 key={invite.id}
-                                className="cursor-pointer min-w-[200px] p-4 border rounded-lg space-y-2 flex-shrink-0 hover:shadow-lg transition"
+                                className="cursor-pointer w-[210px] p-4 border rounded-lg space-y-2 flex-shrink-0 hover:shadow-lg transition"
                                 onClick={() => navigate(`/challenges/detail/${invite.challengeId}`)}
                             >
                                 {/* Icon + Text */}
@@ -130,7 +130,7 @@ const YourChallenge = () => {
                                         className="w-full h-full object-cover rounded"
                                     />
                                 </div>
-                                <p className="font-medium">{invite.challengeName}</p>
+                                <p className="font-medium text-center mb-2 line-clamp-3">{invite.challengeName}</p>
 
                                 <div className="flex gap-2">
                                     <button
