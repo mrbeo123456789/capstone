@@ -895,25 +895,6 @@
     "activeLifestyle": "アクティブなライフスタイル",
     "activeLifestyleDesc": "60日間連続で身体活動を記録",
 
-  "SelectGroupModal": {
-    "title": "グループを選択",
-    "searchPlaceholder": "あなたのグループを検索...",
-    "filterExactMembers": "{{number}}人ぴったりのグループのみ表示",
-    "noGroups": "一致するグループが見つかりません。",
-    "prev": "前へ",
-    "next": "次へ",
-    "cancel": "キャンセル",
-    "join": "チャレンジに参加",
-    "joining": "参加中...",
-    "joinSuccess": "チャレンジに参加しました！",
-    "joinFail": "チャレンジへの参加に失敗しました。再試行してください。",
-    "selectGroupFirst": "まずグループを選択してください！",
-    "yourRole": "あなたの役割",
-    "owner": "リーダー",
-    "member": "メンバー",
-    "notLeaderTooltip": "このグループのリーダーではありません。リーダーのグループを選択してください。",
-    "notExactMembersTooltip": "このグループは{{number}}人ぴったりではありません。"
-  },
   "MemberManagement": {
     "title": "メンバー管理",
     "searchPlaceholder": "名前またはメールで検索...",
