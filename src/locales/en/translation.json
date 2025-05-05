@@ -402,6 +402,8 @@
     }
   },
   "JoinsChallengeDetail": {
+    "confirmLeaveTitle": "Leave Challenge",
+    "confirmLeaveMessage": "Are you sure you want to leave this challenge? You won't be able to participate once you leave.",
     "confirmCancelTitle": "Confirm Cancellation",
     "confirmCancelMessage": "Are you sure you want to cancel this challenge?",
     "confirmCancelNo": "No, Keep",

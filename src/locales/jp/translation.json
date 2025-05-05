@@ -231,6 +231,8 @@
   "public": "公開",
   "private": "非公開",
   "JoinsChallengeDetail": {
+    "confirmLeaveTitle": "チャレンジを退出する",
+    "confirmLeaveMessage": "このチャレンジから退出してもよろしいですか？退出後は参加できなくなります。",
     "confirmCancelTitle": "チャレンジのキャンセル確認",
     "confirmCancelMessage": "このチャレンジをキャンセルしてもよろしいですか？",
     "confirmCancelNo": "いいえ、維持します",

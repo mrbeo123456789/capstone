@@ -61,7 +61,7 @@ const ChallengeDetail = () => {
             try {
                 await joinChallenge(parseInt(id));
                 toast.success(t("ChallengeDetail.joinSuccess"));
-                window.location.reload();
+                // window.location.reload();
             } catch (err) {
                 console.error(err);
                 toast.error(t("ChallengeDetail.joinFail"));
@@ -98,10 +98,19 @@ const ChallengeDetail = () => {
                                 {t("ChallengeDetail.joinedStatus")}
                             </span>
                         ) : (() => {
-                            const now = new Date();
-                            const start = new Date(challenge.startDate);
-                            const end = new Date(challenge.endDate);
+                            const normalizeDate = (date) => {
+                                const d = new Date(date);
+                                d.setHours(0, 0, 0, 0);
+                                return d;
+                            };
+                            const now = normalizeDate(new Date());
+                            const start = normalizeDate(new Date(challenge.startDate));
+                            const end = normalizeDate(new Date(challenge.endDate));
 
+                            console.log("now:", now);
+                            console.log("start:", start);
+                            console.log("end:", end);
+                            console.log(now >= start);
                             if (now > end) {
                                 return <span className="text-sm font-medium text-gray-500">{t("ChallengeDetail.ended")}</span>;
                             }
