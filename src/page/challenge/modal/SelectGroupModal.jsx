@@ -50,7 +50,7 @@ const SelectGroupModal = ({ challengeId, onClose, requiredMembers }) => {
             window.location.reload();
         } catch (err) {
             console.error(err);
-            toast.error(t("SelectGroupModal.joinFail"));
+            toast.error(t("SelectGroupModal.joinFail") + `\n` + err?.data?.message);
         }
     };
 

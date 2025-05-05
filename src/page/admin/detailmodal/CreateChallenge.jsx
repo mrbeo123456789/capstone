@@ -84,7 +84,7 @@ const ChallengeForm = () => {
                 toast.success("Challenge created successfully!");
                 reset();
                 setPreview(null);
-                navigate("/challenges/joins");
+                navigate("/admin/challengemanagement");
             } catch (err) {
                 toast.error("Failed to create challenge: " + (err?.data?.message || "Unknown error"));
             }

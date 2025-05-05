@@ -215,17 +215,7 @@ const GlobalLeaderboard = () => {
                         <Users size={18} />
                         {t('leaderboard.group')}
                     </button>
-                    <button
-                        onClick={() => setActiveTab('achievement')}
-                        className={`flex-1 py-3 rounded-t-lg font-semibold flex items-center justify-center gap-2 ${
-                            activeTab === 'achievement'
-                                ? 'bg-blue-700 text-white border-b-2 border-blue-400'
-                                : 'bg-blue-900 text-blue-300 hover:bg-blue-800'
-                        }`}
-                    >
-                        <Trophy size={18} />
-                        {t('leaderboard.achievements')}
-                    </button>
+
                 </div>
 
                 {/* Individual and Group Tabs Content */}
@@ -485,9 +475,7 @@ const GlobalLeaderboard = () => {
                 )}
 
                 {/* Achievements Tab Content */}
-                {activeTab === 'achievement' && (
-                    <Achievement />
-                )}
+
             </div>
         </div>
     );

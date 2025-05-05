@@ -47,7 +47,7 @@ const Header = ({ toggleSidebar }) => {
     }, [authChanged]); // 👈 re-trigger on auth change
 
     return (
-        <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-white/10 shadow-lg border-b border-white/20 h-20 flex items-center px-4">
+        <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-black/60 shadow-lg border-b border-white/20 h-20 flex items-center px-4">
             <div className="flex justify-between items-center w-full">
                 {/* Left: Sidebar + Logo */}
                 <div className="flex items-center space-x-4">
@@ -94,7 +94,7 @@ const Header = ({ toggleSidebar }) => {
                             onClick={() => setLanguageDropdownOpen(!languageDropdownOpen)}
                             className="flex items-center space-x-2 px-4 py-2 rounded-md bg-white/20 backdrop-blur-sm hover:bg-orange-400 hover:text-white transition"
                         >
-                            <IoGlobeOutline className="text-xl" />
+                            <IoGlobeOutline className="text-xl text-yellow-400" />
                         </button>
 
                         {languageDropdownOpen && (
@@ -119,8 +119,6 @@ const Header = ({ toggleSidebar }) => {
 
                     {/* Notification Dropdown */}
                     <NotificationDropdown />
-
-
 
                     {/* Login/Logout Button */}
                     {token ? (

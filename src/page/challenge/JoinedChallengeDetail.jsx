@@ -33,6 +33,8 @@ const JoinedChallengeDetail = () => {
     const [showMemberInvite, setShowMemberInvite] = useState(false);
     const [showGroupInvite, setShowGroupInvite] = useState(false);
     const [showConfirmCancelModal, setShowConfirmCancelModal] = useState(false);
+    const [showConfirmLeaveModal, setShowConfirmLeaveModal] = useState(false);
+
     const navigate = useNavigate();
     const { id } = useParams();
 
@@ -94,30 +96,23 @@ const JoinedChallengeDetail = () => {
         }
     };
 
-    const ConfirmCancelModal = ({ onConfirm, onCancel }) => {
-        return (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 animate-fadeIn">
-                <div className="bg-white rounded-lg shadow-lg max-w-sm w-full p-6 animate-scaleIn">
-                    <h2 className="text-xl font-bold text-center mb-4">{t("JoinsChallengeDetail.confirmCancelTitle")}</h2>
-                    <p className="text-gray-700 text-center mb-6">{t("JoinsChallengeDetail.confirmCancelMessage")}</p>
-                    <div className="flex justify-center gap-6">
-                        <button
-                            onClick={onCancel}
-                            className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
-                        >
-                            {t("JoinsChallengeDetail.confirmCancelNo")}
-                        </button>
-                        <button
-                            onClick={onConfirm}
-                            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                        >
-                            {t("JoinsChallengeDetail.confirmCancelYes")}
-                        </button>
-                    </div>
+    const ConfirmCancelModal = ({ onConfirm, onCancel, title, message }) => (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 animate-fadeIn">
+            <div className="bg-white rounded-lg shadow-lg max-w-sm w-full p-6 animate-scaleIn">
+                <h2 className="text-xl font-bold text-center mb-4">{title}</h2>
+                <p className="text-gray-700 text-center mb-6">{message}</p>
+                <div className="flex justify-center gap-6">
+                    <button onClick={onCancel} className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500">
+                        {t("JoinsChallengeDetail.confirmCancelNo")}
+                    </button>
+                    <button onClick={onConfirm} className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                        {t("JoinsChallengeDetail.confirmCancelYes")}
+                    </button>
                 </div>
             </div>
-        );
-    };
+        </div>
+    );
+
 
     const handleCancelChallenge = async () => {
         setShowConfirmCancelModal(true); // 🆕 mở modal trước
@@ -220,7 +215,7 @@ const JoinedChallengeDetail = () => {
                                                 onClick={
                                                     challenge.role === "HOST" || isOngoing
                                                         ? undefined
-                                                        : handleLeave
+                                                        : () => setShowConfirmLeaveModal(true)
                                                 }
                                                 disabled={challenge.role === "HOST" || isOngoing}
                                                 className={`text-xl transition ${
@@ -359,8 +354,22 @@ const JoinedChallengeDetail = () => {
                     <ConfirmCancelModal
                         onConfirm={confirmCancelChallenge}
                         onCancel={cancelModal}
+                        title={t("JoinsChallengeDetail.confirmCancelTitle")}
+                        message={t("JoinsChallengeDetail.confirmCancelMessage")}
                     />
                 )}
+                {showConfirmLeaveModal && (
+                    <ConfirmCancelModal
+                        onConfirm={async () => {
+                            await handleLeave();
+                            setShowConfirmLeaveModal(false);
+                        }}
+                        onCancel={() => setShowConfirmLeaveModal(false)}
+                        title={t("JoinsChallengeDetail.confirmLeaveTitle")}
+                        message={t("JoinsChallengeDetail.confirmLeaveMessage")}
+                    />
+                )}
+
             </div>
         </div>
     );

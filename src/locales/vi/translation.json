@@ -284,6 +284,8 @@
   "notification.challengeStatusUpdated.content": "Thử thách '{{challengeName}}' đã được cập nhật trạng thái: {{status}}.",
   "notification.adminNote": "Ghi chú: {{adminNote}}",
   "JoinsChallengeDetail": {
+    "confirmLeaveTitle": "Rời khỏi thử thách",
+    "confirmLeaveMessage": "Bạn có chắc chắn muốn rời khỏi thử thách này không? Sau khi rời đi, bạn sẽ không thể tiếp tục tham gia.",
     "confirmCancelTitle": "Xác nhận hủy thử thách",
     "confirmCancelMessage": "Bạn có chắc chắn muốn hủy thử thách này không?",
     "confirmCancelNo": "Không, giữ lại",
