@@ -349,13 +349,6 @@ const UserList = () => {
                                                 <tr key={user.id} className="border-b border-blue-50 hover:bg-blue-50 transition-colors">
                                                     <td className="p-4">
                                                         <div className="flex items-center space-x-3">
-                                                            <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-blue-200">
-                                                                <img
-                                                                    src={user.avatar}
-                                                                    alt={user.name}
-                                                                    className="w-full h-full object-cover"
-                                                                />
-                                                            </div>
                                                             <span
                                                                 className="font-medium text-blue-600 hover:text-blue-800 cursor-pointer hover:underline"
                                                                 onClick={() => openUserDetail(user)}
