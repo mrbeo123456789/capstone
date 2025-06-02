@@ -1,0 +1,989 @@
+{
+  "menu": {
+    "homepage": "Home",
+    "about": "About",
+    "guide": "Guide",
+    "challenges": "Challenges",
+    "leaderboard": "Leaderboard",
+    "news": "News",
+    "login": "Login",
+    "logout": "Logout",
+    "profile": "Profile",
+    "dashboard": "Dashboard",
+    "notifications": "Notifications",
+    "myChallenges": "My Challenges",
+    "createChallenge": "Create Challenge"
+  },
+  "profileUpdated": "Profile updated successfully!",
+  "updateFailed": "Failed to update profile.",
+  "removed": "Removed",
+  "move": "Move",
+  "undo": "Undo",
+  "changePicture": "Change Picture",
+  "uploadHint": "Click to upload or drag and drop",
+  "uploadSubHint": "SVG, PNG, JPG, or GIF (MAX. 800x400px)",
+  "email": "Email",
+  "username": "Username",
+  "generalInformation": "General Information",
+  "fullName": "Full Name",
+  "firstName": "First Name",
+  "lastName": "Last Name",
+  "dateOfBirth": "Date of Birth",
+  "gender": "Gender",
+  "chooseGender": "Choose Gender",
+  "male": "Male",
+  "female": "Female",
+  "other": "Other",
+  "phone": "Phone",
+  "province": "Province/City",
+  "selectProvince": "Select Province",
+  "district": "District",
+  "selectDistrict": "Select District",
+  "ward": "Ward",
+  "selectWard": "Select Ward",
+  "yourInterest": "Your Interest",
+  "addInterest": "Add Interest",
+  "updating": "Updating...",
+  "updateProfile": "Update Profile",
+  "selectChallengeType": "Select Challenge Type",
+  "challengeInvite": {
+    "loading": "Loading group list...",
+    "loadError": "Unable to load group list",
+    "searchPlaceholderGroup": "Search groups by name",
+    "members": "members",
+    "memberAlreadyJoined": "{{name}} has already joined this challenge.",
+    "memberList": "Member List",
+    "searchPlaceholder": "Search by name or email...",
+    "search": "Search",
+    "close": "Close",
+    "invite": "Invite",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page",
+    "selectGroup": "Select a group to join",
+    "confirm": "Confirm",
+    "selectWarning": "Please select a group before proceeding.",
+    "successJoinGroupChallenge": "You have successfully joined the challenge with your selected group.",
+    "success": "Invitation accepted successfully.",
+    "inviteFailed": "An error occurred while processing the invitation. Please try again.",
+    "selectAtLeastOne": "Please select at least one member.",
+    "inviteSuccess": "Invitation sent successfully!",
+    "searchFailed": "Failed to search members.",
+    "title": "Invite to Challenge",
+    "inviteMembers": "Invite Members",
+    "inviteGroups": "Invite Groups",
+    "suggestedTitle": "Suggested members to invite",
+    "noResults": "No results found.",
+    "searchLeaderPlaceholder": "Enter group leader's name...",
+    "notLeaderFound": "Not found any leaders"
+  },
+  "sidebar": {
+    "dashboard": "My Dashboard",
+    "myChallenge": "My Challenge",
+    "myGroup": "My Group",
+    "profile": "Profile",
+    "password": "Password",
+    "achievement": "Achievement",
+    "statistics": "Statistics"
+  },
+  "invitePermission": {
+    "select": "Select Invite Permission",
+    "everyone": "Everyone can invite",
+    "noOne": "No one can invite",
+    "sameGroup": "Only same group members can invite"
+  },
+  "groupForm": {
+    "title": "Group Information",
+    "groupName": "Group Name",
+    "groupNamePlaceholder": "Enter group name",
+    "privacy": "Privacy",
+    "public": "Public",
+    "private": "Private",
+    "description": "Description",
+    "descriptionPlaceholder": "Describe the group",
+    "uploadHint": "Click to upload or drag and drop",
+    "uploadSubHint": "SVG, PNG, JPG, or GIF (MAX. 800x400px)",
+    "changePicture": "Change Picture",
+    "editTitle": "Update Group",
+    "updateButton": "Update Group",
+    "updating": "Updating...",
+    "creating": "Creating...",
+    "createButton": "Create Group",
+    "cancelButton": "Cancel",
+    "createSuccess": "Group created successfully!",
+    "createFailed": "Failed to create group!",
+    "updateSuccess": "Group updated successfully!",
+    "updateFailed": "Failed to update group!"
+  },
+  "groupDetail": {
+    "inviteMembers": "Invite Members",
+    "editGroup": "Edit Group",
+    "leaveGroup": "Leave Group",
+    "disbandGroup": "Disband Group",
+    "description": "Description",
+    "createdAt": "Created At",
+    "tabs": {
+      "members": "Members",
+      "challenges": "Challenges"
+    },
+    "comingSoon": "🔥 Challenge feature coming soon!",
+    "loading": "Loading group data...",
+    "error": "Failed to load group.",
+    "permissionDenied": "You do not have permission to access this group.",
+    "leaveSuccess": "Left group successfully",
+    "leaveFailed": "Failed to leave group. Please try again.",
+    "disbandSuccess": "Group has been disbanded.",
+    "disbandFailed": "Failed to disband group. Please try again.",
+    "kickSuccess": "Member removed from group",
+    "kickFailed": "Failed to remove member. Please try again.",
+    "confirmDelete": "Confirm Group Deletion",
+    "deleteWarning": "Are you sure you want to delete this group? This action cannot be undone and all group data, including challenges and member relationships, will be permanently removed."
+  },
+  "yourGroup": {
+    "createGroup": "Create a group",
+    "searchPlaceholder": "Search Groups",
+    "filter": "Filter",
+    "invitations": "Group Invitations",
+    "loadingInvitations": "Loading invitations...",
+    "noInvitations": "You have no group invites",
+    "inviteLine": "{{name}} invites you to join",
+    "accept": "Accept",
+    "decline": "Decline",
+    "invitationResponseSuccess": "Invitation updated successfully.",
+    "invitationResponseFailed": "Failed to respond to the invitation.",
+    "tabs": {
+      "All": "All",
+      "leader": "Leader",
+      "member": "Member"
+    },
+    "yourGroups": "Your Groups",
+    "noGroups": "You haven't joined any group",
+    "loadingGroups": "Loading groups...",
+    "errorGroups": "Failed to load groups.",
+    "members": "members",
+    "owner": "Owner",
+    "member": "Member"
+  },
+  "groupInvite": {
+    "title": "Invite to Group",
+    "searchPlaceholder": "Search by name or email...",
+    "search": "Search",
+    "close": "Close",
+    "invite": "Invite",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page",
+    "selectAtLeastOne": "Please select at least one member.",
+    "inviteSuccess": "Invitation sent successfully!",
+    "inviteFailed": "Failed to send invitation.",
+    "searchFailed": "Failed to search members.",
+    "enterKeyword": "Please enter a keyword."
+  },
+  "createChallenge": {
+    "editTitle": "Edit Challenge",
+    "update": "Update",
+    "updating": "Updating...",
+    "successUpdate": "Challenge updated successfully!",
+    "editFail": "Failed to update challenge: ",
+    "editValidationError": "Please fill all required fields.",
+    "generalInfo": "General Information",
+    "name": "Challenge Name",
+    "namePlaceholder": "Enter challenge name",
+    "summary": "Summary",
+    "summaryPlaceholder": "Short summary",
+    "banner": "Banner (Optional)",
+    "clickUpload": "Click or Drag to upload",
+    "picture": "Challenge Picture",
+    "pictureNote": "Recommended size: 800x400px",
+    "details": "Challenge Details",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "privacy": "Privacy",
+    "isParticipate": "Participation Option",
+    "joinCheckbox": "I want to participate after creating",
+    "verificationType": {
+      "label": "Verification Method",
+      "memberReview": "Member Review",
+      "hostReview": "Host Review"
+    },
+    "participationType": {
+      "label": "Participation Type",
+      "individual": "Individual",
+      "group": "Group"
+    },
+    "challengeType": "Challenge Type",
+    "selectChallengeType": "Select Challenge Type",
+    "maxParticipants": "Max Participants",
+    "maxGroups": "Max Groups",
+    "maxMembersPerGroup": "Members per Group",
+    "selectGroup": "Select Group",
+    "selectGroupPlaceholder": "Select a group to join",
+    "members": "members",
+    "description": "Description",
+    "create": "Create",
+    "cancel": "Cancel",
+    "creating": "Creating...",
+    "success": "Challenge created successfully!",
+    "fail": "Failed to create challenge: ",
+    "validationError": "Please fill all required fields.",
+    "groupMinMemberNote": "Each group must have at least 2 members"
+
+  },
+
+  "public": "Public",
+  "private": "Private",
+  "ProofUploads": {
+    "loading": "Loading data",
+    "viewEvidence": "View all evidences",
+    "has no proof": "You don't have any proof yet!",
+    "uploaded": "Uploaded",
+    "not have evidence": "Don't have evidence for this day",
+    "previous": "Previous",
+    "page": "Page",
+    "next": "Next",
+    "fullEvidence": "Full Evidence",
+    "close": "Close"
+  },
+  "notification.challengeResult.title": "Challenge Result: Completed",
+  "notification.challengeResult.content": "You have successfully completed the challenge '{{challengeName}}'! Check out your achievement now!",
+  "notification.groupChallengeResult.title": "Group Challenge Result: Completed",
+  "notification.groupChallengeResult.content": "Your group '{{groupName}}' has completed the challenge '{{challengeName}}'! View your group achievement now!",
+  "notification.challengeRoleUpdated.title": "Challenge Role Updated",
+  "notification.challengeRoleUpdated.content": "Your role in the challenge '{{challengeName}}' has been updated to: {{role}}",
+  "notification.challengeStatusUpdated.title": "Challenge Status Updated",
+  "notification.challengeStatusUpdated.content": "The challenge '{{challengeName}}' has been updated to status: {{status}}.",
+  "notification.adminNote": "Note: {{adminNote}}",
+  "notification.challengeStarted.title": "The challenge '{{challengeName}}' has started!",
+  "notification.challengeStarted.content": "Get ready to conquer the challenge '{{challengeName}}' with GoBeyond!",
+  "notification.evidence.approved.title": "Proof on {{day}} approved",
+  "notification.evidence.approved.content": "Your proof submitted on {{day}} in the challenge '{{challengeName}}' has been approved. Feedback: {{feedback}}",
+  "notification.evidence.rejected.title": "Proof on {{day}} rejected",
+  "notification.evidence.rejected.content": "Your proof submitted on {{day}} in the challenge '{{challengeName}}' was rejected. Feedback: {{feedback}}. Please check and resubmit if needed.",
+  "notification.invite.challenge.title": "Challenge Invitation",
+  "notification.invite.challenge.content": "{{inviterName}} has invited you to join the challenge '{{challengeName}}'.",
+  "notification.invite.group.title": "Group Invitation",
+  "notification.invite.group.content": "{{inviterName}} has invited you to join the group '{{groupName}}'.",
+  "notification.invite.kickGroup.title": "You were removed from the group",
+  "notification.invite.kickGroup.content": "You were removed from the group '{{groupName}}' by the admin.",
+  "notification.invite.groupInvitation.title": "Group Invitation",
+  "notification.invite.groupInvitation.content": "You have been invited to join the group '{{groupName}}'.",
+  "notification.groupDisbanded.title": "Group Disbanded",
+  "notification.groupDisbanded.content": "The group '{{groupName}}' has been disbanded.",
+  "notification.challengeInvitation.title": "You have a new invitation",
+  "notification.challengeInvitation.content": "You have been invited to join the challenge '{{challengeName}}'.",
+  "notification.leaderChallengeInvitation.title": "You have a new invitation",
+  "notification.leaderChallengeInvitation.content": "You have been invited to lead a group in the challenge '{{challengeName}}'.",
+  "notification.groupJoinChallenge.title": "Your group has joined a challenge!",
+  "notification.groupJoinChallenge.content": "The group '{{groupName}}' has joined the challenge '{{challengeName}}'.",
+  "notification.challengeCancelled.title": "Challenge Cancelled",
+  "notification.challengeCancelled.content": "The challenge '{{challengeName}}' was cancelled by the admin or host.",
+  "notification.kickedFromChallenge.title": "You were removed from the challenge",
+  "notification.kickedFromChallenge.content": "You were removed from the challenge '{{challengeName}}' by the admin.",
+  "notification.empty": "No new notifications.",
+  "notification.achievementUnlock.title": "New Achievement!",
+  "notification.achievementUnlock.content": "You have unlocked the achievement: '{{achievementName}}'.",
+  "ChallengeDetail": {
+    "joinedStatus": "Joined",
+    "joining": "Joining...",
+    "joinButton": "Join Challenge",
+    "joinSuccess": "Successfully joined the challenge!",
+    "joinFail": "Failed to join the challenge.",
+    "category": "Category",
+    "participation": "Participation",
+    "verification": "Verification",
+    "totalParticipants": "TOTAL PARTICIPANTS",
+    "peopleJoined": "people have joined",
+    "tab": {
+      "info": "Information",
+      "rules": "Rules",
+      "team": "Team Ranking",
+      "individual": "Individual Ranking"
+    },
+    "teamRanking": "Team ranking will be displayed here.",
+    "individualRanking": "Individual ranking will be displayed here.",
+    "notAvailable": "N/A",
+    "ended": "Challenge ended",
+    "alreadyStarted": "Challenge already started",
+    "participationType": {
+      "individual": "Individual",
+      "group": "Group"
+    },
+    "verificationType": {
+      "hostReview": "Host Review",
+      "memberReview": "Member Review"
+    },
+    "loginRequired": "You need to log in first.",
+    "maxGroups": "Max Groups",
+    "maxMembersPerGroup": "Max Members per Group"
+  },
+  "ProgressTracking": {
+    "viewExplanation": "View explanation",
+    "daysOfWeek": {
+      "sun": "Su",
+      "mon": "Mo",
+      "tue": "Tu",
+      "wed": "We",
+      "thu": "Th",
+      "fri": "Fr",
+      "sat": "Sa"
+    },
+    "errors": {
+      "pastDeadline": "Submission deadline for that day has passed",
+      "futureDate": "Not yet time to submit evidence",
+      "cannotSubmit": "Cannot submit evidence for this day"
+    },
+    "modal": {
+      "title": "Status Explanation",
+      "approved": {
+        "title": "Submitted and approved",
+        "description": "Evidence has been verified"
+      },
+      "pending": {
+        "title": "Submitted, awaiting review",
+        "description": "Evidence is being reviewed"
+      },
+      "rejected": {
+        "title": "Submitted but rejected",
+        "description": "Evidence is invalid, needs resubmission"
+      },
+      "missed": {
+        "title": "Not submitted (past deadline)",
+        "description": "Submission time for this day has ended"
+      },
+      "today": {
+        "title": "Today (not submitted)",
+        "description": "Click to submit evidence"
+      },
+      "future": {
+        "title": "Future date",
+        "description": "Not yet time to submit"
+      },
+      "close": "Close"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Login",
+      "username": "Username",
+      "password": "Password",
+      "loginButton": "Login →",
+      "loggingIn": "Logging in...",
+      "or": "OR",
+      "googleLogin": "Login with Google",
+      "forgotPassword": "Forgot password?",
+      "newUser": "New to GoBeyond?",
+      "registerNow": "Register now",
+      "success": "Login successful!",
+      "errors": {
+        "emptyUsername": "Please enter your username",
+        "passwordTooShort": "Password must be at least 6 characters",
+        "ACCOUNT_NOT_FOUND": "Account not found",
+        "ACCOUNT_NOT_VERIFIED": "Account is not verified. Please check your email",
+        "ACCOUNT_BANNED": "This account has been banned",
+        "USER_NOT_FOUND": "User not found",
+        "INVALID_PASSWORD": "Incorrect password",
+        "invalidToken": "Invalid token",
+        "loginFailed": "Login failed. Please try again"
+      }
+    },
+    "register": {
+      "title": "Register",
+      "email": "Email",
+      "username": "Username",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "registerButton": "Register",
+      "registering": "Registering...",
+      "haveAccount": "Already have an account?",
+      "loginNow": "Login now",
+      "errors": {
+        "emptyEmail": "Email cannot be empty.",
+        "invalidEmail": "Email must include '@'.",
+        "emptyUsername": "Username cannot be empty.",
+        "emptyPassword": "Password cannot be empty.",
+        "shortPassword": "Password must be at least 6 characters.",
+        "passwordMismatch": "Confirmation password doesn't match.",
+        "registerFailed": "Registration failed. Please try again."
+      }
+    }
+  },
+  "JoinsChallengeDetail": {
+    "confirmLeaveTitle": "Leave Challenge",
+    "confirmLeaveMessage": "Are you sure you want to leave this challenge? You won't be able to participate once you leave.",
+    "confirmCancelTitle": "Confirm Cancellation",
+    "confirmCancelMessage": "Are you sure you want to cancel this challenge?",
+    "confirmCancelNo": "No, Keep",
+    "confirmCancelYes": "Yes, Cancel",
+    "reportTab": "Feedback & Reports",
+    "groups": "Groups",
+    "disabledDuringChallenge": "This action is disabled during or after the challenge.",
+    "hostCannotLeave": "Host cannot leave the challenge.",
+    "hostCannotReport": "Host cannot report their own challenge.",
+    "notJoined": "You have not joined this challenge.",
+    "loading": "Loading...",
+    "error": "Failed to load challenge details.",
+    "leaveSuccess": "You have left the challenge.",
+    "leaveFail": "Failed to leave the challenge.",
+    "reportSuccess": "Report submitted successfully.",
+    "reportFail": "Failed to submit report.",
+    "loadingProof": "Loading proof data...",
+    "proof": "Proof",
+    "member": "Members",
+    "review": "Review",
+    "description": "Description",
+    "invite": "Invite",
+    "leave": "Leave",
+    "share": "Share",
+    "report": "Report",
+    "title": "Challenge",
+    "reportTitle": "Report Challenge",
+    "reportType": "Type of report",
+    "shareSuccess": "Link copied to clipboard!",
+    "shareFailed": "Failed to copy link.",
+    "type": {
+      "inappropriate": "Inappropriate content",
+      "spam": "Spam",
+      "harassment": "Offensive behavior",
+      "rule": "Rule violation",
+      "other": "Other"
+    },
+    "reason": "Reason",
+    "submit": "Submit Report",
+    "cancel": "Cancel"
+  },
+  "members": "members",
+  "inviteGroups": "Invite Groups",
+  "searchPlaceholder": "Search group name...",
+  "noResults": "No groups found.",
+  "previous": "Previous",
+  "next": "Next",
+  "page": "Page",
+  "invite": "Invite",
+  "loading": "Loading groups...",
+  "loadError": "Failed to load groups.",
+  "selectWarning": "Please select at least one group.",
+  "success": "Groups invited successfully!",
+  "searchPlaceholderGroup": "Enter group name...",
+  "yourChallenge": {
+    "inviteGeneric": "You have an invitation to join a challenge",
+    "create": "Create a challenge",
+    "search": "Search",
+    "filter": "Filter",
+    "filterAll": "All",
+    "filterPersonal": "Personal",
+    "filterGroup": "Group",
+    "invitations": "Invitations",
+    "loadingInvitations": "Loading invitations...",
+    "noInvitations": "You have no challenge invites",
+    "accept": "Accept",
+    "decline": "Decline",
+    "accepted": "Invitation accepted!",
+    "declined": "Invitation declined!",
+    "failedResponse": "Failed to respond. Try again.",
+    "inviteText": "invites you to:",
+    "tabs": {
+      "all": "All",
+      "host": "Host",
+      "co_host": "Cohost",
+      "member": "Member"
+    },
+    "joinedChallenges": "Joined Challenges",
+    "loadingChallenges": "Loading challenges...",
+    "noJoined": "You haven't joined any challenge",
+    "status": {
+      "approved": "Approved",
+      "pending": "Pending",
+      "rejected": "Rejected",
+      "canceled": "Canceled",
+      "ongoing": "On Going",
+      "banned": "Banned",
+      "upcoming": "Up Coming"
+    },
+    "members": "members",
+    "inviteGroups": "Invite Groups",
+    "searchPlaceholder": "Search group name...",
+    "noResults": "No groups found.",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page",
+    "invite": "Invite",
+    "loading": "Loading groups...",
+    "loadError": "Failed to load groups.",
+    "selectWarning": "Please select at least one group.",
+    "success": "Groups invited successfully!",
+    "searchPlaceholderGroup": "Enter group name..."
+  },
+  "forgotPassword": {
+    "title": "Forgot Password?",
+    "subtitle": "Enter your email to receive an OTP.",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email address",
+    "required": "*",
+    "sending": "Sending...",
+    "submit": "Get New Password",
+    "back": "Back to Login",
+    "errorEmpty": "Please enter your email.",
+    "success": "OTP sent to your email.",
+    "fail": "Something went wrong."
+  },
+  "changePassword": {
+    "title": "Change Password",
+    "old": "Current Password",
+    "oldPlaceholder": "Enter current password",
+    "new": "New Password",
+    "newPlaceholder": "Enter new password",
+    "confirm": "Confirm New Password",
+    "confirmPlaceholder": "Re-enter new password",
+    "submit": "Save Changes",
+    "forgot": "Forgot Password?",
+    "fail": "Failed to change password.",
+    "mismatch": "Passwords do not match!"
+  },
+  "AboutUs": {
+    "hero": {
+      "title": "About GoBeyond",
+      "subtitle": "Changing the world through meaningful challenges",
+      "learnMore": "Learn More"
+    },
+    "mission": {
+      "title": "Our Mission",
+      "description": "GoBeyond was created with the goal of connecting communities through challenges that bring positive value. We believe that small actions, when performed by many people, can create significant change for society and the environment.",
+      "pillars": {
+        "connect": {
+          "title": "Connect",
+          "description": "Build communities of people who share the same passion and desire to create positive impact"
+        },
+        "challenge": {
+          "title": "Challenge",
+          "description": "Create meaningful challenges to drive change and personal development"
+        },
+        "impact": {
+          "title": "Create Impact",
+          "description": "Transform challenges into concrete actions that improve communities and the environment"
+        }
+      }
+    },
+    "team": {
+      "title": "Our Team",
+      "description": "Passionate and dedicated people behind GoBeyond, constantly striving to bring the best experiences to the community.",
+      "roles": {
+        "analyst": "Business Analyst",
+        "backend": "Backend Developer",
+        "leader": "Leader",
+        "frontend": "Frontend Developer",
+        "tester": "Tester"
+      }
+    },
+    "values": {
+      "title": "Core Values",
+      "description": "The principles that guide all our decisions and actions",
+      "items": {
+        "responsibility": {
+          "title": "Social Responsibility",
+          "description": "We believe in creating positive impact for communities and the environment through all our activities."
+        },
+        "innovation": {
+          "title": "Innovation",
+          "description": "We continually seek new ways to solve problems and create value for users."
+        },
+        "transparency": {
+          "title": "Transparency",
+          "description": "We build trust through openness, honesty, and clarity in all our operations."
+        },
+        "collaboration": {
+          "title": "Collaboration",
+          "description": "We believe that strength comes from working together and learning from diverse perspectives."
+        }
+      }
+    },
+    "journey": {
+      "title": "Our Journey",
+      "description": "From the initial idea to a thriving growing community",
+      "milestones": {
+        "beginning": {
+          "title": "Beginning",
+          "description": "GoBeyond was formed from the idea of a group of young people passionate about creating positive change."
+        },
+        "development": {
+          "title": "Development",
+          "description": "The platform officially launched with basic features. The first user community was formed."
+        },
+        "expansion": {
+          "title": "Expansion",
+          "description": "GoBeyond grows strongly with many new features and an increasingly growing user community."
+        }
+      }
+    },
+    "contact": {
+      "title": "Connect With Us",
+      "description": "We are always ready to listen to your feedback and accompany you on your journey to create positive change",
+      "email": {
+        "title": "Email"
+      },
+      "phone": {
+        "title": "Phone"
+      },
+      "address": {
+        "title": "Address",
+        "value": "Hoa Lac Hi-tech Park, km 29, Thang Long Avenue, Hanoi"
+      },
+      "button": "Contact Now"
+    }
+  },
+  "VideoModal": {
+    "ratePerformance": "Rate Performance",
+    "rejectButton": "Disapprove",
+    "approveButton": "Approve",
+    "cancel": "Cancel",
+    "sendFeedback": "Submit Feedback",
+    "enterRejectionReason": "Why are you disapproving this?",
+    "reviewSubmitted": "Review submitted successfully!",
+    "approveMessage": "Good performance!",
+    "rejectMessage": "Needs improvement.",
+    "approveSuccess": "Evidence approved!",
+    "rejectSuccess": "Feedback submitted!",
+    "approveFail": "Failed to approve evidence.",
+    "rejectFail": "Failed to submit rejection."
+  },
+  "VoteOther": {
+    "title": "Vote for Others",
+    "loading": "Loading evidences...",
+    "noEvidences": "No evidences available for review.",
+    "unknownUser": "Unknown User",
+    "historyTitle": "Your Voting History",
+    "noPendingProofs": "No pending proofs found for this challenge.",
+    "tooltip": "If no one votes on your evidence, but you have reviewed at least one other member’s proof, your submission can still be marked as completed. Otherwise, it will be automatically rejected.",
+    "table": {
+      "submittedAt": "Submitted At",
+      "reviewedAt": "Reviewed At",
+      "score": "Score",
+      "video": "Video",
+      "view": "View"
+    }
+  },
+  "hostEvidence": {
+    "showStats": "Show Challenge Statistics",
+    "hideStats": "Hide Challenge Statistics",
+    "showPanel": "Show Member & Evidence",
+    "hidePanel": "Hide Member & Evidence",
+    "members": "Members",
+    "searchMembers": "Search members...",
+    "memberName": "Member Name",
+    "joinedAt": "Joined At",
+    "evidenceCount": "Evidence Count",
+    "status": "Status",
+    "notAvailable": "N/A",
+    "pending": "Pending",
+    "done": "Done",
+    "showing": "Showing",
+    "to": "to",
+    "of": "of",
+    "evidence": "Evidence",
+    "forMember": "for {{name}}",
+    "filtering": "Filtering",
+    "showingAll": "Showing all evidence",
+    "memberStats": "Member Evidence Statistics",
+    "totalEvidence": "Total Evidence",
+    "date": "Date",
+    "noEvidence": "No evidence found",
+    "showAll": "Show all evidence",
+    "selectMember": "Select a member to view evidence",
+    "unknownUser": "Unknown User",
+    "noDescription": "No description provided.",
+    "challenge": "Challenge",
+    "memberChallenge": "{{name}}'s Challenge",
+    "evidenceDetails": "Evidence Details",
+    "modal": {
+      "approve": "I approve this evidence",
+      "reject": "I don't approve this evidence",
+      "close": "Close"
+    },
+    "logs": {
+      "acceptEvidence": "Accepting evidence with ID: {{id}}",
+      "rejectEvidence": "Rejecting evidence with ID: {{id}}"
+    },
+    "status": {
+      "approved": "Approved",
+      "waiting": "Pending",
+      "rejected": "Rejected"
+    }
+  },
+  "suggest.reason.both": "Shares your interest and is nearby",
+  "suggest.reason.same_interest": "Shares your interest",
+  "suggest.reason.near_location": "Is nearby your location",
+  "rankingList": {
+    "top3Progress": "Top 3 Progress",
+    "rank": "Rank",
+    "noRankingData": "No ranking data",
+    "members": "Members",
+    "searchPlaceholder": "Search user...",
+    "loadingStarLeaderboard": "Loading star leaderboard...",
+    "noMembersFound": "No members found",
+    "avgStars": "Avg stars"
+  },
+  "challengeStatistic": {
+    "total": "Total Participants",
+    "completed": "Completed",
+    "notCompleted": "Not Completed",
+    "dailyOverview": "Daily progress overview",
+    "completionRate": "Daily completion rate"
+  },
+  "leaderboard": {
+    "individual": "Individual",
+    "group": "Group",
+    "achievements": "Achievements",
+    "searchPlaceholder": "Search users...",
+    "myRank": "My Rank",
+    "myGroupRank": "My Group Rank",
+    "user": "User",
+    "members": "Members",
+    "score": "Score",
+    "noUsersFound": "No users found matching \"{searchTerm}\"",
+    "noGroupsFound": "No groups found matching \"{searchTerm}\"",
+    "previous": "Previous",
+    "next": "Next",
+    "achievementsTitle": "Your Achievements",
+    "usersEarned": "users earned this",
+    "earned": "Earned on",
+    "notEarned": "Not yet earned",
+    "yourProgress": "Your Progress",
+    "achievementsCompleted": "Achievements Completed",
+    "completionRate": "Completion Rate",
+    "overallProgress": "Overall Progress",
+    "copyright": "Copyright © {year}",
+    "page": "Page",
+    "of": "/"
+  },
+  "status": "Status",
+  "progress": "Progress",
+  "challenges": {
+    "groupHistory": "Group Challenge History",
+    "progress": {
+      "inProgress": "In Progress"
+    },
+    "name": "Challenge Name",
+    "period": "Period",
+    "participants": "Participants",
+    "actions": "Actions",
+    "viewDetails": "View Details",
+    "noHistory": "No challenge history found",
+    "searchPlaceholder": "Search challenges...",
+    "filter": {
+      "allStatuses": "All Statuses"
+    },
+    "status": {
+      "completed": "Completed",
+      "inProgress": "Ongoing",
+      "cancelled": "Cancelled",
+      "rejected": "Rejected",
+      "notApplicable": "Not Applicable"
+    },
+    "success": "success"
+  },
+  "pagination": {
+    "showing": "Showing",
+    "to": "to",
+    "of": "of",
+    "results": "results",
+    "previous": "Previous",
+    "next": "Next",
+    "first": "First",
+    "last": "Last"
+  },
+  "achievement": {
+    "label": {
+      "title": "Your Achievements",
+      "progress": "Progress",
+      "earned": "Earned:",
+      "notYetEarned": "Not yet earned",
+      "locked": "LOCKED",
+      "unlocked": "UNLOCKED",
+      "totalProgress": "Total Progress",
+      "of": "of",
+      "achievementsUnlocked": "achievements unlocked",
+      "next": "Next",
+      "prev": "Prev",
+      "loading": "Loading achievements...",
+      "error": "Failed to load achievements."
+    },
+    "description": {
+      "FIRST_TRY": "Joined your first challenge.",
+      "PROFILE_MASTER": "Completed all profile fields.",
+      "ACTIVE_VOTER": "Voted on 10 different proofs.",
+      "CONTRIBUTOR": "Submitted 20 evidences.",
+      "RISING_STAR": "Joined 5 challenges.",
+      "STREAK_MASTER": "Submitted evidence 30 days in a row.",
+      "NIGHT_OWL": "Submitted a proof after 10:00 PM.",
+      "FITNESS_CHAMPION": "Ranked in the top 10 of the global leaderboard.",
+      "GROUP_LEGEND": "Led your group to #1 on the leaderboard.",
+      "TRENDING_CREATOR": "Created a challenge with over 100 participants."
+    }
+
+  },
+  "MemberManagement": {
+    "title": "Member Management",
+    "searchPlaceholder": "Search by name or email...",
+    "member": "Member",
+    "role": "Role",
+    "participate": "Participate",
+    "coHost": "Co-host",
+    "actions": "Actions",
+    "me": "Me",
+    "prev": "Previous",
+    "next": "Next",
+    "kickSuccess": "Member kicked successfully!",
+    "kickFail": "Failed to kick member.",
+    "toggleSuccess": "Updated role successfully!",
+    "toggleFail": "Failed to update role.",
+    "confirmKickTitle": "Confirm Kick",
+    "confirmKickMessage": "Are you sure you want to kick {{name}} from the challenge?",
+    "cancel": "Cancel",
+    "confirm": "Confirm"
+  },
+  "Moderation": {
+    "unableToAnalyze": "Unable to analyze the content.",
+    "rejectedBySummary": "Rejected by rule.",
+    "fileTooLarge": "File is too large. Please select a file smaller than 100MB.",
+    "videoRejected": "Video Rejected!",
+    "uploadSuccess": "Evidence submitted successfully!",
+    "errorDuringSubmit": "Error occurred during submission.",
+    "submitEvidence": "Submit Evidence for",
+    "clickToUpload": "Click to upload",
+    "orDragDrop": "or drag and drop",
+    "acceptedFormats": "JPG, PNG, MP4, GIF (max 800x400px)",
+    "changeFile": "Change File",
+    "cancel": "Cancel",
+    "submit": "Submit",
+    "processing": "Processing..."
+  },
+  "title": "Sports News Today",
+  "search": {
+    "placeholder": "Search news...",
+    "noResults": "No matching news found"
+  },
+  "viewMode": {
+    "grid": "Grid",
+    "list": "List"
+  },
+  "errors": {
+    "loading": "Error loading news",
+    "network": "Could not connect to server"
+  },
+  "buttons": {
+    "retry": "Retry"
+  },
+  "images": {
+    "notAvailable": "No image"
+  },
+  "common": {
+    "loading": "Loading"
+  },
+  "member": {
+    "top3": "Top 3",
+    "user": "User",
+    "you": "You",
+    "stars": "Stars",
+    "topRanking": "Top Ranking",
+    "searchUser": "Search user...",
+    "totalStars": "Total Stars",
+    "kickMember": "Kick Member"
+  },
+  "SelectGroupModal": {
+    "title": "Select a Group to Join",
+    "searchPlaceholder": "Search by group name...",
+    "filterExactMembers": "Only show groups with exactly {{number}} members",
+    "noGroups": "No matching groups found.",
+    "notLeaderTooltip": "You are not the group leader.",
+    "notExactMembersTooltip": "Group must have exactly {{number}} members.",
+    "yourRole": "Your role",
+    "owner": "Leader",
+    "member": "Member",
+    "members": "members",
+    "prev": "Previous",
+    "next": "Next",
+    "cancel": "Cancel",
+    "join": "Join",
+    "joining": "Joining...",
+    "joinSuccess": "Successfully joined the challenge with your group!",
+    "joinFail": "Failed to join the challenge with the group.",
+    "selectGroupFirst": "Please select a group before joining."
+  },
+  "statistics": {
+    "title": "Statistics",
+    "memberSince": "Member since",
+    "performanceOverview": "Your performance overview",
+    "challengesJoined": "Challenges joined",
+    "challengesHosted": "Challenges hosted",
+    "achievements": "Achievements",
+    "groupsJoined": "Groups joined",
+    "evidenceSubmitted": "Evidence submitted",
+    "evidenceApproved": "Evidence approved",
+    "votesGiven": "Votes given",
+    "starsEarned": "Stars earned",
+    "evidenceReviewOutcome": "Evidence Review Outcome",
+    "challengeCompletion": "Challenge Completion",
+    "completedChallenges": "Completed Challenges",
+    "loadingChallenges": "Loading completed challenges...",
+    "noCompletedChallenges": "You have not completed any challenges yet.",
+    "loading": "Loading your statistics...",
+    "completed": "Completed",
+    "incomplete": "Incomplete",
+    "approved": "Approved",
+    "rejected": "Rejected"
+  },
+  "evidence": {
+    "title": "Evidence",
+    "members": "Members",
+    "for": "for",
+    "searchMembers": "Search members...",
+    "memberName": "Member Name",
+    "evidenceCount": "Evidence Count",
+    "status": {
+      "title": "Status",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "pending": "Pending",
+      "done": "Done"
+    },
+    "date": "Date",
+    "pagination": {
+      "showing": "Showing",
+      "to": "to",
+      "of": "of",
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "statistics": "Statistics",
+    "totalEvidence": "Total Evidence",
+    "filtering": "Filtering",
+    "showingAll": "Showing all evidence",
+    "noEvidenceFound": "No evidence found",
+    "showAllEvidence": "Show all evidence",
+    "selectMember": "Select a member to view evidence",
+    "invalidDate": "Invalid date",
+    "evidenceNumber": "Evidence",
+    "challenge": "Challenge",
+    "unknown": "Unknown",
+    "noDescription": "No description provided"
+  },
+  "challengeStats": {
+    "loading": "Loading statistics...",
+    "loadError": "Failed to load challenge statistics.",
+    "dashboardTitle": "Challenge Progress Dashboard",
+    "challengeName": "Challenge Name",
+    "totalParticipants": "Total Participants",
+    "totalGroups": "Total Groups",
+    "evidenceSubmitted": "Evidence Submitted",
+    "approvedEvidence": "Approved Evidence",
+    "pendingEvidence": "Pending Evidence",
+    "rejectedEvidence": "Rejected Evidence",
+    "participationRate": "Participation Rate",
+    "completionRate": "Completion Rate",
+    "today": "Today",
+    "submittedToday": "Submitted Today",
+    "pendingToday": "Pending Review Today"
+  }
+}
+
+
+

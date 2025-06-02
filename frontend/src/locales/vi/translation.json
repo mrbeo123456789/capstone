@@ -1,0 +1,976 @@
+{
+  "menu": {
+    "homepage": "Trang chủ",
+    "about": "Về chúng tôi",
+    "guide": "Hướng dẫn",
+    "challenges": "Thử thách",
+    "leaderboard": "Bảng xếp hạng",
+    "news": "Tin tức",
+    "login": "Đăng nhập",
+    "logout": "Đăng xuất",
+    "profile": "Hồ sơ",
+    "dashboard": "Bảng điều khiển",
+    "notifications": "Thông báo",
+    "myChallenges": "Thử thách của tôi",
+    "createChallenge": "Tạo thử thách"
+  },
+
+  "profileUpdated": "Cập nhật hồ sơ thành công!",
+  "updateFailed": "Cập nhật hồ sơ thất bại.",
+  "removed": "Đã loại bỏ",
+  "move": "Bỏ",
+  "undo": "Hoàn tác",
+  "changePicture": "Thay đổi ảnh",
+  "uploadHint": "Nhấn để tải lên hoặc kéo thả vào đây",
+  "uploadSubHint": "Chỉ chấp nhận SVG, PNG, JPG hoặc GIF (KÍCH THƯỚC TỐI ĐA 800x400px)",
+  "email": "Email",
+  "username": "Tên người dùng",
+  "generalInformation": "Thông tin chung",
+  "fullName": "Họ và tên",
+  "firstName": "Tên",
+  "lastName": "Họ",
+  "dateOfBirth": "Ngày sinh",
+  "gender": "Giới tính",
+  "chooseGender": "Chọn giới tính",
+  "male": "Nam",
+  "female": "Nữ",
+  "other": "Khác",
+  "phone": "Số điện thoại",
+  "province": "Tỉnh/Thành phố",
+  "selectProvince": "Chọn Tỉnh/Thành phố",
+  "district": "Quận/Huyện",
+  "selectDistrict": "Chọn Quận/Huyện",
+  "ward": "Xã/Phường",
+  "selectWard": "Chọn Xã/Phường",
+  "yourInterest": "Sở thích của bạn",
+  "addInterest": "Thêm sở thích",
+  "updating": "Đang cập nhật...",
+  "updateProfile": "Cập nhật hồ sơ",
+  "selectChallengeType": "Chọn kiểu thử thách",
+  "challengeInvite": {
+    "selectWarning": "Vui lòng chọn ít nhất một nhóm để mời",
+    "success": "Mời nhóm thành công",
+    "loading": "Đang tải danh sách nhóm...",
+    "loadError": "Không thể tải danh sách nhóm",
+    "searchPlaceholderGroup": "Tìm kiếm nhóm theo tên",
+    "members": "thành viên",
+    "memberAlreadyJoined": "{{name}} đã tham gia thử thách này rồi.",
+    "memberList": "Danh sách thành viên",
+    "searchPlaceholder": "Tìm kiếm theo tên hoặc email...",
+    "search": "Tìm kiếm",
+    "close": "Đóng",
+    "invite": "Mời",
+    "previous": "Trước",
+    "next": "Sau",
+    "page": "Trang",
+    "selectGroup": "Chọn nhóm tham gia thử thách",
+    "confirm": "Tham gia",
+    "searchLeaderPlaceholder": "Nhập tên trưởng nhóm...",
+    "suggestedTitle": "Gợi ý mời tham gia",
+    "selectAtLeastOne": "Vui lòng chọn ít nhất một thành viên.",
+    "inviteSuccess": "Gửi lời mời thành công!",
+    "inviteFailed": "Gửi lời mời thất bại.",
+    "title": "Mời tham gia thử thách",
+    "inviteMembers": "Mời thành viên",
+    "inviteGroups": "Mời nhóm",
+    "noResults": "Không tìm thấy kết quả nào.",
+    "searchFailed": "Tìm kiếm thất bại.",
+    "noLeadersFound": "Không tìm thấy người dùng nào"
+  },
+  "sidebar": {
+    "dashboard": "Bảng điều khiển",
+    "myChallenge": "Thử thách của tôi",
+    "myGroup": "Nhóm của tôi",
+    "profile": "Hồ sơ cá nhân",
+    "password": "Mật khẩu",
+    "achievement": "Thành tựu",
+    "statistics": "Thống kê"
+  },
+
+  "invitePermission": {
+    "select": "Chọn quyền mời",
+    "everyone": "Mọi người đều có thể mời",
+    "noOne": "Không ai có thể mời",
+    "sameGroup": "Chỉ thành viên cùng nhóm mới được mời"
+  },
+  "groupForm": {
+    "title": "Thông tin nhóm",
+    "groupName": "Tên nhóm",
+    "groupNamePlaceholder": "Nhập tên nhóm",
+    "privacy": "Quyền riêng tư",
+    "public": "Công khai",
+    "private": "Riêng tư",
+    "description": "Mô tả",
+    "descriptionPlaceholder": "Mô tả về nhóm",
+    "uploadHint": "Nhấn để tải ảnh hoặc kéo thả",
+    "uploadSubHint": "SVG, PNG, JPG hoặc GIF (TỐI ĐA 800x400px)",
+    "changePicture": "Thay đổi hình ảnh",
+    "creating": "Đang tạo...",
+    "updating": "Đang cập nhật...",
+    "createButton": "Tạo nhóm",
+    "updateButton": "Lưu thay đổi",
+    "cancelButton": "Hủy",
+    "createSuccess": "Tạo nhóm thành công!",
+    "createFailed": "Tạo nhóm thất bại!",
+    "updateSuccess": "Cập nhật nhóm thành công!",
+    "updateFailed": "Cập nhật nhóm thất bại!"
+  },
+  "groupDetail": {
+    "inviteMembers": "Mời thành viên",
+    "editGroup": "Chỉnh sửa nhóm",
+    "leaveGroup": "Rời nhóm",
+    "disbandGroup": "Giải tán nhóm",
+    "description": "Mô tả",
+    "createdAt": "Ngày tạo",
+    "tabs": {
+      "members": "Thành viên",
+      "challenges": "Thử thách"
+    },
+    "comingSoon": "🔥 Tính năng thử thách sẽ sớm có mặt!",
+    "loading": "Đang tải dữ liệu nhóm...",
+    "error": "Không thể tải nhóm.",
+    "permissionDenied": "Bạn không có quyền truy cập nhóm này.",
+    "leaveSuccess": "Rời nhóm thành công",
+    "leaveFailed": "Rời nhóm thất bại. Vui lòng thử lại.",
+    "disbandSuccess": "Đã giải tán nhóm.",
+    "disbandFailed": "Giải tán nhóm thất bại. Vui lòng thử lại.",
+    "kickSuccess": "Đã loại thành viên khỏi nhóm",
+    "kickFailed": "Không thể loại thành viên. Vui lòng thử lại.",
+    "confirmDelete": "Xác nhận xóa nhóm",
+    "deleteWarning": "Bạn có chắc chắn muốn xóa nhóm này không? Hành động này không thể hoàn tác và toàn bộ dữ liệu của nhóm, bao gồm các thử thách và mối quan hệ thành viên, sẽ bị xóa vĩnh viễn."
+  },
+  "groupInvite": {
+    "title": "Mời vào nhóm",
+    "searchPlaceholder": "Tìm theo tên hoặc email...",
+    "search": "Tìm kiếm",
+    "close": "Đóng",
+    "invite": "Mời",
+    "previous": "Trước",
+    "next": "Tiếp",
+    "page": "Trang",
+    "selectAtLeastOne": "Vui lòng chọn ít nhất một thành viên.",
+    "inviteSuccess": "Gửi lời mời thành công!",
+    "inviteFailed": "Gửi lời mời thất bại.",
+    "searchFailed": "Tìm kiếm thất bại.",
+    "enterKeyword": "Vui lòng nhập từ khóa."
+  },
+  "createChallenge": {
+    "create": "Tạo thử thách",
+    "isParticipate": "Có tham gia hay không",
+    "maxMembersPerGroup": "Số người trong 1 nhóm",
+    "maxParticipants": "Số người tham gia tối đa",
+    "maxGroups": "Số nhóm tham gia tối đa",
+    "creating": "Đang tạo thử thách...",
+    "success": "Tạo thử thách thành công!",
+    "editTitle": "Chỉnh sửa thử thách",
+    "successUpdate": "Cập nhật thử thách thành công!",
+    "editFail": "Cập nhật thử thách thất bại: ",
+    "editValidationError": "Vui lòng điền đầy đủ thông tin bắt buộc.",
+    "generalInfo": "Thông tin chung",
+    "details": "Chi tiết thử thách",
+    "name": "Tên thử thách",
+    "namePlaceholder": "Nhập tên thử thách",
+    "summary": "Tóm tắt",
+    "summaryPlaceholder": "Mô tả ngắn gọn",
+    "banner": "Banner (Không bắt buộc)",
+    "clickUpload": "Bấm hoặc kéo thả để tải lên",
+    "picture": "Ảnh thử thách",
+    "pictureNote": "Định dạng chấp nhận: JPG, PNG. Dung lượng tối đa: 2MB.",
+    "clickUpload": "Nhấn hoặc kéo tệp vào để tải lên",
+    "startDate": "Ngày bắt đầu",
+    "endDate": "Ngày kết thúc",
+    "privacy": "Quyền riêng tư",
+    "isParticipate": "Tùy chọn tham gia",
+    "joinCheckbox": "Tôi muốn tham gia sau khi tạo",
+    "verificationType": {
+      "label": "Phương thức xác minh",
+      "memberReview": "Thành viên đánh giá",
+      "hostReview": "Chủ thử thách đánh giá"
+    },
+    "participationType": {
+      "label": "Hình thức tham gia",
+      "individual": "Cá nhân",
+      "group": "Nhóm"
+    },
+    "join": "Tham gia",
+    "not join": "Không tham gia",
+    "challengeType": "Loại thử thách",
+    "selectChallengeType": "Chọn loại thử thách",
+    "maxParticipants": "Số người tham gia tối đa",
+    "maxGroups": "Số nhóm tối đa",
+    "maxMembersPerGroup": "Số thành viên mỗi nhóm",
+    "selectGroup": "Chọn nhóm",
+    "selectGroupPlaceholder": "Chọn một nhóm",
+    "members": "thành viên",
+    "description": "Mô tả",
+    "create": "Tạo",
+    "cancel": "Hủy",
+    "creating": "Đang tạo...",
+    "success": " Thành công!",
+    "fail": "Tạo thử thách thất bại: ",
+    "validationError": "Vui lòng điền đầy đủ thông tin bắt buộc.",
+    "groupMinMemberNote": "Mỗi nhóm phải có ít nhất 2 thành viên",
+    "confirm": "Đồng ý",
+    "selectWarning": "Vui lòng chọn một nhóm trước khi tiếp tục.",
+    "successJoinGroupChallenge": "Bạn đã tham gia thử thách thành công với nhóm đã chọn.",
+    "inviteFailed": "Đã xảy ra lỗi khi xử lý lời mời. Vui lòng thử lại."
+  },
+  "public": "Công khai",
+  "private": "Riêng tư",
+
+  "ProofUpLoads": {
+    "loading": "Đang tải dữ liệu",
+    "view evidence": "Danh sách bằng chứng",
+    "has no proof": "Bạn chưa có bằng chứng nào.",
+    "uploaded": "Đã hoàn thành",
+    "not have evidence": "Không có bằng chứng của ngày này",
+    "previous": "Trước",
+    "page": "/",
+    "next": "Sau"
+  },
+  "yourGroup": {
+    "createGroup": "Tạo nhóm",
+    "searchPlaceholder": "Tìm kiếm nhóm",
+    "filter": "Bộ lọc",
+    "invitations": "Lời mời tham gia nhóm",
+    "loadingInvitations": "Đang tải lời mời...",
+    "noInvitations": "Bạn không có lời mời nào",
+    "inviteLine": "{{name}} đã mời bạn tham gia",
+    "accept": "Chấp nhận",
+    "decline": "Từ chối",
+    "invitationResponseSuccess": "Cập nhật lời mời thành công.",
+    "invitationResponseFailed": "Phản hồi lời mời thất bại.",
+    "tabs": {
+      "All": "Tất cả",
+      "leader": "Trưởng nhóm",
+      "member": "Thành viên"
+    },
+    "yourGroups": "Nhóm của bạn",
+    "noGroups": "Bạn chưa tham gia nhóm nào",
+    "loadingGroups": "Đang tải danh sách nhóm...",
+    "errorGroups": "Không thể tải danh sách nhóm.",
+    "members": "thành viên",
+    "owner": "Trưởng nhóm",
+    "member": "Thành viên"
+  },
+  "notification.achievementUnlock.title": "🎉 Thành tựu mới!",
+  "notification.achievementUnlock.content": "Bạn đã mở khóa thành tựu: '{{achievementName}}'.",
+  "notification.challengeResult.title": "Kết quả thử thách: Hoàn thành",
+  "notification.challengeResult.content": "Bạn đã hoàn thành thử thách '{{challengeName}}'! Kiểm tra thành tích của bạn nhé!",
+  "notification.groupChallengeResult.title": "Kết quả thử thách nhóm: Hoàn thành",
+  "notification.groupChallengeResult.content": "Nhóm '{{groupName}}' đã hoàn thành thử thách '{{challengeName}}'! Xem thành tích nhóm ngay!",
+  "notification.challengeRoleUpdated.title": "Cập nhật vai trò trong thử thách",
+  "notification.challengeRoleUpdated.content": "Vai trò của bạn trong thử thách '{{challengeName}}' đã được cập nhật thành: {{role}}",
+  "notification.challengeStarted.title": "Thử thách '{{challengeName}}' đã bắt đầu!",
+  "notification.challengeStarted.content": "Hãy sẵn sàng chinh phục thử thách '{{challengeName}}' cùng GoBeyond!",
+  "notification.evidence.approved.title": "Proof on {{day}} approved",
+  "notification.evidence.approved.content": "Your proof submitted on {{day}} in the challenge '{{challengeName}}' has been approved. Feedback: {{feedback}}",
+  "notification.evidence.rejected.title": "Proof on {{day}} rejected",
+  "notification.evidence.rejected.content": "Your proof submitted on {{day}} in the challenge '{{challengeName}}' was rejected. Feedback: {{feedback}}. Please check and resubmit if needed.",
+  "notification.challenge.title": "Lời mời tham gia thử thách",
+  "notification.challenge.content": "{{inviterName}} đã mời bạn tham gia thử thách '{{challengeName}}'.",
+  "notification.group.title": "Lời mời tham gia nhóm",
+  "notification.group.content": "{{inviterName}} đã mời bạn tham gia nhóm '{{groupName}}'.",
+  "notification.kickGroup.title": "Bạn đã bị rời khỏi nhóm",
+  "notification.kickGroup.content": "Bạn đã bị quản trị viên xóa khỏi nhóm '{{groupName}}'.",
+  "notification.groupInvitation.title": "Lời mời tham gia nhóm",
+  "notification.groupInvitation.content": "Bạn đã được mời tham gia nhóm '{{groupName}}'.",
+  "notification.groupDisbanded.title": "Nhóm đã bị giải tán",
+  "notification.groupDisbanded.content": "Nhóm '{{groupName}}' đã bị giải tán.",
+  "notification.challengeInvitation.title": "Bạn có lời mời mới",
+  "notification.challengeInvitation.content": "Bạn đã được mời tham gia thử thách '{{challengeName}}'.",
+  "notification.leaderChallengeInvitation.title": "Bạn có lời mời mới",
+  "notification.leaderChallengeInvitation.content": "Bạn đã được mời dẫn dắt nhóm tham gia thử thách '{{challengeName}}'.",
+  "notification.groupJoinChallenge.title": "Nhóm của bạn đã tham gia thử thách!",
+  "notification.groupJoinChallenge.content": "Nhóm '{{groupName}}' đã tham gia thử thách '{{challengeName}}'.",
+  "notification.challengeCancelled.title": "Thử thách đã bị huỷ",
+  "notification.challengeCancelled.content": "Thử thách '{{challengeName}}' đã bị huỷ bởi quản trị viên hoặc Host.",
+  "notification.kickedFromChallenge.title": "Bạn đã bị kick khỏi thử thách",
+  "notification.kickedFromChallenge.content": "Bạn đã bị quản trị viên xóa khỏi thử thách '{{challengeName}}'.",
+  "notification.empty": "Không có thông báo mới.",
+  "notification.challengeStatusUpdated.title": "Cập nhật trạng thái thử thách",
+  "notification.challengeStatusUpdated.content": "Thử thách '{{challengeName}}' đã được cập nhật trạng thái: {{status}}.",
+  "notification.adminNote": "Ghi chú: {{adminNote}}",
+  "JoinsChallengeDetail": {
+    "confirmLeaveTitle": "Rời khỏi thử thách",
+    "confirmLeaveMessage": "Bạn có chắc chắn muốn rời khỏi thử thách này không? Sau khi rời đi, bạn sẽ không thể tiếp tục tham gia.",
+    "confirmCancelTitle": "Xác nhận hủy thử thách",
+    "confirmCancelMessage": "Bạn có chắc chắn muốn hủy thử thách này không?",
+    "confirmCancelNo": "Không, giữ lại",
+    "confirmCancelYes": "Có, hủy thử thách",
+    "reportTab": "Phản hồi & Báo cáo",
+    "groups": "Nhóm",
+    "disabledDuringChallenge": "Hành động này bị tắt khi thử thách đã diễn ra hoặc kết thúc.",
+    "hostCannotLeave": "Quản lí thử thách không thể rời thử thách",
+    "hostCannotReport": "Host không thể báo cáo thử thách của chính mình.",
+    "notJoined": "Bạn chưa tham gia thử thách này.",
+    "loading": "Đang tải...",
+    "error": "Không thể tải chi tiết thử thách.",
+    "leaveSuccess": "Bạn đã rời khỏi thử thách.",
+    "leaveFail": "Không thể rời khỏi thử thách.",
+    "reportSuccess": "Báo cáo đã được gửi thành công.",
+    "reportFail": "Gửi báo cáo thất bại.",
+    "loadingProof": "Đang tải dữ liệu bằng chứng...",
+    "proof": "Bằng chứng",
+    "member": "Thành viên",
+    "review": "Chấm điểm",
+    "description": "Mô tả",
+    "invite": "Mời",
+    "leave": "Rời khỏi",
+    "share": "Chia sẻ",
+    "report": "Báo cáo",
+    "title": "Thử thách",
+    "reportTitle": "Báo cáo thử thách",
+    "reportType": "Loại báo cáo",
+    "type": {
+      "inappropriate": "Nội dung không phù hợp",
+      "spam": "Spam",
+      "harassment": "Hành vi xúc phạm",
+      "rule": "Vi phạm quy định",
+      "other": "Khác"
+    },
+    "reason": "Lý do",
+    "submit": "Gửi báo cáo",
+    "cancel": "Hủy"
+  },
+  "suggest.reason.both": "Có cùng sở thích và ở gần bạn",
+  "suggest.reason.same_interest": "Có cùng sở thích với bạn",
+  "suggest.reason.near_location": "Ở gần vị trí của bạn",
+  "yourChallenge": {
+    "create": "Tạo thử thách",
+    "search": "Tìm kiếm",
+    "filter": "Bộ lọc",
+    "invitations": "Lời mời",
+    "loadingInvitations": "Đang tải lời mời...",
+    "noInvitations": "Bạn chưa có lời mời tham gia thử thách nào",
+    "accept": "Chấp nhận",
+    "decline": "Từ chối",
+    "accepted": "Đã chấp nhận lời mời!",
+    "declined": "Đã từ chối lời mời!",
+    "failedResponse": "Phản hồi thất bại. Vui lòng thử lại.",
+    "inviteText": "đã mời bạn tham gia:",
+    "filterAll": "Tất cả lời mời",
+    "filterPersonal": "Lời mời cá nhân",
+    "filterGroup": "Lời mời nhóm",
+    "shareSuccess": "Đã sao chép liên kết!",
+    "shareFailed": "Không thể sao chép liên kết.",
+    "tabs": {
+      "all": "Tất cả",
+      "host": "Chủ trì",
+      "co_host": "Phụ trách",
+      "member": "Thành viên"
+    },
+    "joinedChallenges": "Thử thách đã tham gia",
+    "loadingChallenges": "Đang tải thử thách...",
+    "noJoined": "Bạn chưa tham gia thử thách nào",
+    "status": {
+      "approved": "Đã duyệt",
+      "pending": "Đang chờ",
+      "rejected": "Bị từ chối",
+      "canceled": "Đã hủy",
+      "ongoing": "Đang diễn ra",
+      "banned": "Bị ban",
+      "upcoming": "Sắp diễn ra"
+    }
+  },
+  "members": "thành viên",
+  "inviteGroups": "Mời nhóm",
+  "searchPlaceholder": "Tìm kiếm tên nhóm...",
+  "noResults": "Không tìm thấy nhóm nào.",
+  "previous": "Trước",
+  "next": "Tiếp",
+  "page": "Trang",
+  "invite": "Mời",
+  "loading": "Đang tải danh sách nhóm...",
+  "loadError": "Không thể tải nhóm.",
+  "selectWarning": "Vui lòng chọn ít nhất một nhóm.",
+  "success": "Mời nhóm thành công!",
+  "searchPlaceholderGroup": "Nhập tên nhóm...",
+  "ChallengeDetail": {
+    "joinedStatus": "Đã tham gia",
+    "joining": "Đang tham gia...",
+    "joinButton": "Tham gia thử thách",
+    "joinSuccess": "Tham gia thử thách thành công!",
+    "joinFail": "Tham gia thử thách thất bại.",
+    "category": "Danh mục",
+    "participation": "Hình thức tham gia",
+    "verification": "Hình thức xác nhận",
+    "totalParticipants": "TỔNG SỐ THÀNH VIÊN",
+    "peopleJoined": "người đã tham gia",
+    "tab": {
+      "info": "Thông tin",
+      "rules": "Quy tắc",
+      "team": "Xếp hạng Nhóm",
+      "individual": "Xếp hạng Cá nhân"
+    },
+    "teamRanking": "Xếp hạng nhóm sẽ được hiển thị tại đây.",
+    "individualRanking": "Xếp hạng cá nhân sẽ được hiển thị tại đây.",
+    "notAvailable": "Không có",
+    "ended": "Thử thách đã kết thúc",
+    "alreadyStarted": "Thử thách đã bắt đầu",
+    "participationType": {
+      "individual": "Cá nhân",
+      "group": "Theo nhóm"
+    },
+    "verificationType": {
+      "hostReview": "Host duyệt",
+      "memberReview": "Thành viên duyệt"
+    },
+    "loginRequired": "Bạn cần đăng nhập trước.",
+    "maxGroups": "Số nhóm tối đa",
+    "maxMembersPerGroup": "Số thành viên tối đa mỗi nhóm"
+  },
+  "forgotPassword": {
+    "title": "Quên mật khẩu?",
+    "subtitle": "Nhập email của bạn để nhận mã OTP.",
+    "email": "Email",
+    "emailPlaceholder": "Nhập địa chỉ email của bạn",
+    "required": "*",
+    "sending": "Đang gửi...",
+    "submit": "Lấy mật khẩu mới",
+    "back": "Quay lại đăng nhập",
+    "errorEmpty": "Vui lòng nhập email.",
+    "success": "Mã OTP đã được gửi đến email của bạn.",
+    "fail": "Đã xảy ra lỗi."
+  },
+  "changePassword": {
+    "title": "Đổi mật khẩu",
+    "old": "Mật khẩu hiện tại",
+    "oldPlaceholder": "Nhập mật khẩu hiện tại",
+    "new": "Mật khẩu mới",
+    "newPlaceholder": "Nhập mật khẩu mới",
+    "confirm": "Xác nhận mật khẩu",
+    "confirmPlaceholder": "Nhập lại mật khẩu mới",
+    "submit": "Lưu thay đổi",
+    "forgot": "Quên mật khẩu?",
+    "fail": "Đổi mật khẩu thất bại.",
+    "mismatch": "Mật khẩu xác nhận không khớp!"
+  },
+  "ProgressTracking": {
+    "viewExplanation": "Xem giải thích",
+    "daysOfWeek": {
+      "sun": "CN",
+      "mon": "T2",
+      "tue": "T3",
+      "wed": "T4",
+      "thu": "T5",
+      "fri": "T6",
+      "sat": "T7"
+    },
+    "errors": {
+      "pastDeadline": "Đã hết hạn nộp cho ngày đó",
+      "futureDate": "Chưa đến ngày nộp bằng chứng",
+      "cannotSubmit": "Không thể nộp bằng chứng cho ngày này"
+    },
+    "modal": {
+      "title": "Giải thích các trạng thái",
+      "approved": {
+        "title": "Đã nộp và được chấp nhận",
+        "description": "Bằng chứng đã được xác nhận"
+      },
+      "pending": {
+        "title": "Đã nộp, đang chờ duyệt",
+        "description": "Bằng chứng đang được xem xét"
+      },
+      "rejected": {
+        "title": "Đã nộp nhưng bị từ chối",
+        "description": "Bằng chứng không hợp lệ, cần nộp lại"
+      },
+      "missed": {
+        "title": "Chưa nộp (quá hạn)",
+        "description": "Đã hết thời gian nộp cho ngày này"
+      },
+      "today": {
+        "title": "Ngày hôm nay (chưa nộp)",
+        "description": "Nhấp vào để nộp bằng chứng"
+      },
+      "future": {
+        "title": "Ngày trong tương lai",
+        "description": "Chưa đến thời gian nộp"
+      },
+      "close": "Đóng"
+    }
+  },
+  "ProofUploads": {
+    "loading": "Đang tải dữ liệu...",
+    "viewEvidence": "Xem các bằng chứng của bạn",
+    "proofOn": "Bằng chứng ngày",
+    "uploaded": "Đã hoàn thành",
+    "noEvidence": "Không có bằng chứng của ngày này",
+    "previous": "Trước",
+    "page": "Trang",
+    "next": "Sau",
+    "fullEvidence": "Bằng chứng đầy đủ",
+    "close": "Đóng"
+  },
+  "AboutUs": {
+    "hero": {
+      "title": "Về GoBeyond",
+      "subtitle": "Thay đổi thế giới thông qua những thử thách đầy ý nghĩa",
+      "learnMore": "Tìm hiểu thêm"
+    },
+    "mission": {
+      "title": "Sứ mệnh của chúng tôi",
+      "description": "GoBeyond ra đời với mục tiêu kết nối cộng đồng thông qua những thử thách mang lại giá trị tích cực. Chúng tôi tin rằng những hành động nhỏ, khi được thực hiện bởi nhiều người, có thể tạo nên sự thay đổi lớn cho xã hội và môi trường.",
+      "pillars": {
+        "connect": {
+          "title": "Kết nối",
+          "description": "Xây dựng cộng đồng những người có cùng đam mê và mong muốn tạo nên tác động tích cực"
+        },
+        "challenge": {
+          "title": "Thách thức",
+          "description": "Tạo ra những thử thách có ý nghĩa để thúc đẩy sự thay đổi và phát triển cá nhân"
+        },
+        "impact": {
+          "title": "Tạo tác động",
+          "description": "Chuyển đổi những thử thách thành những hành động cụ thể giúp cải thiện cộng đồng và môi trường"
+        }
+      }
+    },
+    "team": {
+      "title": "Đội ngũ của chúng tôi",
+      "description": "Những con người đam mê và tận tâm đứng sau GoBeyond, luôn nỗ lực không ngừng để mang đến những trải nghiệm tốt nhất cho cộng đồng.",
+      "roles": {
+        "analyst": "Business Analyst",
+        "backend": "Backend Developer",
+        "leader": "Leader",
+        "frontend": "Frontend Developer",
+        "tester": "Tester"
+      }
+    },
+    "values": {
+      "title": "Giá trị cốt lõi",
+      "description": "Những nguyên tắc định hướng mọi quyết định và hành động của chúng tôi",
+      "items": {
+        "responsibility": {
+          "title": "Trách nhiệm xã hội",
+          "description": "Chúng tôi tin vào việc tạo ra tác động tích cực cho cộng đồng và môi trường thông qua mọi hoạt động của mình."
+        },
+        "innovation": {
+          "title": "Đổi mới",
+          "description": "Chúng tôi không ngừng tìm kiếm những cách mới để giải quyết vấn đề và tạo ra giá trị cho người dùng."
+        },
+        "transparency": {
+          "title": "Tính minh bạch",
+          "description": "Chúng tôi xây dựng niềm tin thông qua sự cởi mở, trung thực và rõ ràng trong mọi hoạt động."
+        },
+        "collaboration": {
+          "title": "Cộng tác",
+          "description": "Chúng tôi tin rằng sức mạnh đến từ việc làm việc cùng nhau và học hỏi từ những quan điểm đa dạng."
+        }
+      }
+    },
+    "journey": {
+      "title": "Hành trình của chúng tôi",
+      "description": "Từ ý tưởng ban đầu đến một cộng đồng đang phát triển mạnh mẽ",
+      "milestones": {
+        "beginning": {
+          "title": "Khởi nguồn",
+          "description": "GoBeyond được hình thành từ ý tưởng của một nhóm những người trẻ đam mê về việc tạo ra thay đổi tích cực."
+        },
+        "development": {
+          "title": "Phát triển",
+          "description": "Nền tảng chính thức ra mắt với các tính năng cơ bản. Cộng đồng người dùng đầu tiên được hình thành."
+        },
+        "expansion": {
+          "title": "Mở rộng",
+          "description": "GoBeyond phát triển mạnh mẽ với nhiều tính năng mới và cộng đồng người dùng ngày càng tăng trưởng."
+        }
+      }
+    },
+    "contact": {
+      "title": "Kết nối với chúng tôi",
+      "description": "Chúng tôi luôn sẵn sàng lắng nghe ý kiến và đồng hành cùng bạn trong hành trình tạo nên những thay đổi tích cực",
+      "email": {
+        "title": "Email"
+      },
+      "phone": {
+        "title": "Điện thoại"
+      },
+      "address": {
+        "title": "Địa chỉ",
+        "value": "Hoa Lac Hi-tech Park, km 29, Đại lộ Thăng Long, Hà Nội"
+      },
+      "button": "Liên hệ ngay"
+    }
+  },
+  "VideoModal": {
+    "approveMessage": "Tôi chấp nhận video này",
+    "approveSuccess": "Đã chấp nhận thành công!",
+    "approveFail": "Chấp nhận thất bại!",
+    "rejectMessage": "Tôi không chấp nhận video này",
+    "rejectSuccess": "Đã từ chối thành công!",
+    "rejectFail": "Từ chối thất bại!",
+    "browserNotSupported": "Trình duyệt của bạn không hỗ trợ thẻ video.",
+    "rejectButton": "Tôi không chấp nhận video này",
+    "approveButton": "Tôi chấp nhận video này",
+    "reviewSubmitted": "Đã gửi đánh giá thành công!",
+    "previous": "Trước",
+    "next": "Sau"
+  },
+  "VoteOther": {
+    "title": "Chấm điểm bằng chứng",
+    "loading": "Đang tải bằng chứng...",
+    "noEvidences": "Không có bằng chứng nào để chấm.",
+    "unknownUser": "Người dùng ẩn danh",
+    "historyTitle": "Lịch sử chấm điểm",
+    "noPendingProofs": "Không tìm thấy bằng chứng nào đang chờ chấm trong thử thách này.",
+    "tooltip": "Nếu không ai chấm điểm bằng chứng của bạn, nhưng bạn đã chấm ít nhất một bằng chứng khác, hệ thống vẫn tính là hoàn thành. Ngược lại, bằng chứng sẽ tự động bị từ chối.",
+    "table": {
+      "submittedAt": "Thời gian nộp",
+      "reviewedAt": "Thời gian chấm",
+      "score": "Điểm",
+      "video": "Video",
+      "view": "Xem"
+    }
+  },
+
+  "hostEvidence": {
+    "showStats": "Hiện thống kê thử thách",
+    "hideStats": "Ẩn thống kê thử thách",
+    "showPanel": "Hiện thành viên & bằng chứng",
+    "hidePanel": "Ẩn thành viên & bằng chứng",
+    "members": "Thành viên",
+    "searchMembers": "Tìm kiếm thành viên...",
+    "memberName": "Tên thành viên",
+    "joinedAt": "Ngày tham gia",
+    "evidenceCount": "Số bằng chứng",
+    "status": "Trạng thái",
+    "notAvailable": "N/A",
+    "pending": "Đang chờ",
+    "done": "Hoàn thành",
+    "showing": "Hiển thị",
+    "to": "đến",
+    "of": "của",
+    "evidence": "Bằng chứng",
+    "forMember": "của {{name}}",
+    "filtering": "Bộ lọc",
+    "showingAll": "Hiển thị tất cả bằng chứng",
+    "memberStats": "Thống kê bằng chứng của thành viên",
+    "totalEvidence": "Tổng số bằng chứng",
+    "date": "Ngày",
+    "noEvidence": "Không tìm thấy bằng chứng",
+    "showAll": "Hiển thị tất cả bằng chứng",
+    "selectMember": "Chọn thành viên để xem bằng chứng",
+    "unknownUser": "Người dùng không xác định",
+    "noDescription": "Không có mô tả nào được cung cấp.",
+    "challenge": "Thử thách",
+    "memberChallenge": "Thử thách của {{name}}",
+    "evidenceDetails": "Chi tiết bằng chứng",
+    "modal": {
+      "approve": "Tôi chấp nhận bằng chứng này",
+      "reject": "Tôi không chấp nhận bằng chứng này",
+      "close": "Đóng"
+    },
+    "logs": {
+      "acceptEvidence": "Đang chấp nhận bằng chứng có ID: {{id}}",
+      "rejectEvidence": "Đang từ chối bằng chứng có ID: {{id}}"
+    },
+    "status": {
+      "approved": "Đã duyệt",
+      "waiting": "Đang chờ",
+      "rejected": "Đã từ chối"
+    }
+  },
+  "rankingList": {
+    "top3Progress": "Top 3 Tiến Độ",
+    "rank": "Xếp hạng",
+    "noRankingData": "Không có dữ liệu xếp hạng",
+    "members": "Thành viên",
+    "searchPlaceholder": "Tìm kiếm người dùng...",
+    "loadingStarLeaderboard": "Đang tải bảng xếp hạng sao...",
+    "noMembersFound": "Không tìm thấy thành viên nào",
+    "avgStars": "Sao trung bình"
+  },
+  "leaderboard": {
+    "individual": "Cá nhân",
+    "achievements": "Thành tựu",
+    "searchPlaceholder": "Tìm kiếm người dùng...",
+    "myRank": "Xếp hạng của tôi",
+    "myGroupRank": "Xếp hạng nhóm của tôi",
+    "user": "Người dùng",
+    "group": "Nhóm",
+    "members": "Thành viên",
+    "score": "Điểm số",
+    "noUsersFound": "Không tìm thấy người dùng khớp với \"{searchTerm}\"",
+    "noGroupsFound": "Không tìm thấy nhóm khớp với \"{searchTerm}\"",
+    "previous": "Trước",
+    "next": "Tiếp",
+    "achievementsTitle": "Thành tựu của bạn",
+    "usersEarned": "người dùng đã đạt được",
+    "earned": "Đạt được vào",
+    "notEarned": "Chưa đạt được",
+    "yourProgress": "Tiến độ của bạn",
+    "achievementsCompleted": "Thành tựu đã hoàn thành",
+    "completionRate": "Tỷ lệ hoàn thành",
+    "overallProgress": "Tiến độ tổng thể",
+    "copyright": "Bản quyền © {year}",
+    "page": "Trang",
+    "of": "/"
+  },
+  "auth": {
+    "login": {
+      "title": "Đăng nhập",
+      "username": "Tên đăng nhập",
+      "password": "Mật khẩu",
+      "loginButton": "Đăng nhập →",
+      "loggingIn": "Đang đăng nhập...",
+      "or": "HOẶC",
+      "googleLogin": "Đăng nhập bằng Google",
+      "forgotPassword": "Quên mật khẩu?",
+      "newUser": "Bạn mới sử dụng GoBeyond?",
+      "registerNow": "Đăng ký ngay",
+      "success": "Đăng nhập thành công!",
+      "errors": {
+        "emptyUsername": "Vui lòng nhập tên đăng nhập",
+        "shortPassword": "Mật khẩu phải có ít nhất 6 ký tự",
+        "invalidToken": "Token không hợp lệ",
+        "unexpectedResponse": "Phản hồi không hợp lệ từ máy chủ",
+        "incorrectCredentials": "Tên đăng nhập hoặc mật khẩu không đúng",
+        "loginFailed": "Đăng nhập thất bại. Vui lòng thử lại.",
+        "ACCOUNT_NOT_VERIFIED": "Tài khoản chưa được xác thực. Vui lòng nhập mã OTP",
+        "ACCOUNT_NOT_FOUND": "Tài khoản không tồn tại",
+        "WRONG_PASSWORD": "Mật khẩu không đúng",
+        "INVALID_PASSWORD": "Mật khẩu không đúng",
+        "ACCOUNT_BANNED": "Tài khoản của bạn đã bị khóa",
+        "USER_NOT_FOUND": "Không tìm thấy tài khoản"
+      }
+    }
+  },
+  "register": {
+      "title": "Đăng ký",
+      "email": "Email",
+      "username": "Tên đăng nhập",
+      "password": "Mật khẩu",
+      "confirmPassword": "Xác nhận mật khẩu",
+      "registerButton": "Đăng ký",
+      "registering": "Đang đăng ký...",
+      "haveAccount": "Đã có tài khoản?",
+      "loginNow": "Đăng nhập ngay",
+      "errors": {
+        "emptyEmail": "Email không được để trống.",
+        "invalidEmail": "Email phải có đuôi '@'.",
+        "emptyUsername": "Tên đăng nhập không được để trống.",
+        "emptyPassword": "Mật khẩu không được để trống.",
+        "shortPassword": "Mật khẩu ít nhất 6 ký tự.",
+        "passwordMismatch": "Mật khẩu xác nhận không khớp.",
+        "registerFailed": "Đăng ký thất bại. Vui lòng thử lại."
+      }
+    },
+  "status": "Trạng thái",
+  "progress": "Tiến độ",
+  "challenges": {
+    "groupHistory": "Lịch sử thử thách nhóm",
+    "name": "Tên thử thách",
+    "period": "Thời gian",
+    "participants": "Người tham gia",
+    "actions": "Hành động",
+    "viewDetails": "Xem chi tiết",
+    "noHistory": "Không tìm thấy lịch sử thử thách",
+    "searchPlaceholder": "Tìm kiếm thử thách...",
+    "progress": {
+      "inProgress": "Đang hoàn thiện"
+    },
+    "filter": {
+      "allStatuses": "Tất cả trạng thái"
+    },
+    "status": {
+      "completed": "Hoàn thành",
+      "inProgress": "Đang tiến hành",
+      "cancelled": "Đã huỷ",
+      "rejected": "Đã từ chối",
+      "notApplicable": "Không áp dụng"
+    },
+    "success": "thành công"
+  },
+  "pagination": {
+    "showing": "Hiển thị",
+    "to": "đến",
+    "of": "của",
+    "results": "kết quả",
+    "previous": "Trước",
+    "next": "Tiếp",
+    "first": "Đầu tiên",
+    "last": "Cuối cùng"
+  },
+  "achievement": {
+    "label": {
+      "title": "Thành tựu của bạn",
+      "progress": "Tiến trình",
+      "earned": "Đạt được:",
+      "notYetEarned": "Chưa đạt",
+      "locked": "CHƯA MỞ",
+      "unlocked": "ĐÃ MỞ",
+      "totalProgress": "Tổng tiến trình",
+      "of": "trong",
+      "achievementsUnlocked": "thành tựu đã mở",
+      "next": "Tiếp",
+      "prev": "Trước",
+      "loading": "Đang tải thành tựu...",
+      "error": "Không thể tải thành tựu."
+    },
+    "description": {
+      "FIRST_TRY": "Tham gia thử thách đầu tiên.",
+      "PROFILE_MASTER": "Điền đầy đủ thông tin hồ sơ.",
+      "ACTIVE_VOTER": "Đã vote 10 bằng chứng.",
+      "CONTRIBUTOR": "Đã nộp 20 bằng chứng.",
+      "RISING_STAR": "Đã tham gia 5 thử thách.",
+      "STREAK_MASTER": "Đã nộp bài 30 ngày liên tiếp.",
+      "NIGHT_OWL": "Nộp bài sau 22h.",
+      "FITNESS_CHAMPION": "Xếp hạng top 10 bảng xếp hạng toàn hệ thống.",
+      "GROUP_LEGEND": "Nhóm đứng đầu bảng xếp hạng.",
+      "TRENDING_CREATOR": "Tạo thử thách có hơn 100 người tham gia."
+    }
+
+  },
+    "Moderation": {
+    "unableToAnalyze": "Không phân tích được nội dung.",
+    "rejectedBySummary": "Video vi phạm theo kiểm duyệt.",
+    "fileTooLarge": "File quá lớn. Vui lòng chọn file nhỏ hơn 100MB.",
+    "videoRejected": "Video bị từ chối!",
+    "uploadSuccess": "Nộp bằng chứng thành công!",
+    "errorDuringSubmit": "Đã xảy ra lỗi khi xử lý.",
+    "submitEvidence": "Nộp bằng chứng ngày",
+    "clickToUpload": "Click để tải lên",
+    "orDragDrop": "hoặc kéo thả",
+    "acceptedFormats": "JPG, PNG, MP4, GIF (tối đa 800x400px)",
+    "changeFile": "Thay đổi file",
+    "cancel": "Hủy",
+    "submit": "Gửi",
+    "processing": "Đang xử lý...",
+    "confirm": "Xác nhận"
+  },
+  "title": "Tin Thể Thao Hôm Nay",
+  "search": {
+    "placeholder": "Tìm kiếm tin tức...",
+    "noResults": "Không tìm thấy tin tức phù hợp"
+  },
+  "viewMode": {
+    "grid": "Lưới",
+    "list": "Danh sách"
+  },
+  "errors": {
+    "loading": "Lỗi khi tải tin tức",
+    "network": "Không thể kết nối đến máy chủ"
+  },
+  "buttons": {
+    "retry": "Thử lại"
+  },
+  "images": {
+    "notAvailable": "Không có ảnh"
+  },
+
+  "common": {
+    "loading": "Đang tải"
+  },
+  "member": {
+    "top3": "Top 3",
+    "user": "Người dùng",
+    "you": "Bạn",
+    "stars": "Sao",
+    "topRanking": "Xếp hạng cao nhất",
+    "searchUser": "Tìm kiếm người dùng...",
+    "totalStars": "Tổng số sao",
+    "kickMember": "Loại thành viên"
+  },
+  "SelectGroupModal": {
+    "title": "Chọn nhóm để tham gia",
+    "searchPlaceholder": "Tìm theo tên nhóm...",
+    "filterExactMembers": "Chỉ hiện nhóm có đúng {{number}} thành viên",
+    "noGroups": "Không có nhóm phù hợp.",
+    "notLeaderTooltip": "Bạn không phải trưởng nhóm.",
+    "notExactMembersTooltip": "Nhóm cần đúng {{number}} thành viên.",
+    "yourRole": "Vai trò của bạn",
+    "owner": "Trưởng nhóm",
+    "member": "Thành viên",
+    "members": "thành viên",
+    "prev": "Trước",
+    "next": "Sau",
+    "cancel": "Hủy",
+    "join": "Tham gia",
+    "joining": "Đang tham gia...",
+    "joinSuccess": "Tham gia nhóm vào thử thách thành công!",
+    "joinFail": "Không thể tham gia nhóm vào thử thách.",
+    "selectGroupFirst": "Vui lòng chọn một nhóm trước khi tham gia."
+  },
+  "statistics": {
+    "title": "Thống kê",
+    "memberSince": "Thành viên từ",
+    "performanceOverview": "Tổng quan hiệu suất của bạn",
+    "challengesJoined": "Thử thách đã tham gia",
+    "challengesHosted": "Thử thách đã tổ chức",
+    "achievements": "Thành tựu",
+    "groupsJoined": "Nhóm đã tham gia",
+    "evidenceSubmitted": "Bằng chứng đã nộp",
+    "evidenceApproved": "Bằng chứng được duyệt",
+    "votesGiven": "Lượt đánh giá đã thực hiện",
+    "starsEarned": "Sao đã nhận",
+    "evidenceReviewOutcome": "Kết quả đánh giá bằng chứng",
+    "challengeCompletion": "Hoàn thành thử thách",
+    "completedChallenges": "Thử thách đã hoàn thành",
+    "loadingChallenges": "Đang tải thử thách đã hoàn thành...",
+    "noCompletedChallenges": "Bạn chưa hoàn thành thử thách nào.",
+    "loading": "Đang tải thống kê của bạn...",
+    "completed": "Hoàn thành",
+    "incomplete": "Chưa hoàn thành",
+    "approved": "Được duyệt",
+    "rejected": "Bị từ chối"
+  },
+  "evidence": {
+    "title": "Bằng chứng",
+    "members": "Thành viên",
+    "for": "cho",
+    "searchMembers": "Tìm kiếm thành viên...",
+    "memberName": "Tên thành viên",
+    "evidenceCount": "Số lượng bằng chứng",
+    "status": {
+      "title": "Trạng thái",
+      "approved": "Đã duyệt",
+      "rejected": "Từ chối",
+      "pending": "Đang chờ",
+      "done": "Hoàn thành"
+    },
+    "date": "Ngày",
+    "pagination": {
+      "showing": "Hiển thị",
+      "to": "đến",
+      "of": "của",
+      "previous": "Trước",
+      "next": "Tiếp"
+    },
+    "statistics": "Thống kê",
+    "totalEvidence": "Tổng số bằng chứng",
+    "filtering": "Đang lọc",
+    "showingAll": "Hiển thị tất cả bằng chứng",
+    "noEvidenceFound": "Không tìm thấy bằng chứng nào",
+    "showAllEvidence": "Hiển thị tất cả bằng chứng",
+    "selectMember": "Chọn thành viên để xem bằng chứng",
+    "invalidDate": "Ngày không hợp lệ",
+    "evidenceNumber": "Bằng chứng",
+    "challenge": "Thử thách",
+    "unknown": "Không xác định",
+    "noDescription": "Không có mô tả"
+  },
+  "challengeStats": {
+    "loading": "Đang tải thống kê...",
+    "loadError": "Không thể tải thống kê thử thách.",
+    "dashboardTitle": "Bảng điều khiển tiến độ thử thách",
+    "challengeName": "Tên thử thách",
+    "totalParticipants": "Tổng số người tham gia",
+    "totalGroups": "Tổng số nhóm",
+    "evidenceSubmitted": "Bằng chứng đã nộp",
+    "approvedEvidence": "Bằng chứng được duyệt",
+    "pendingEvidence": "Bằng chứng chờ xét duyệt",
+    "rejectedEvidence": "Bằng chứng bị từ chối",
+    "participationRate": "Tỷ lệ tham gia",
+    "completionRate": "Tỷ lệ hoàn thành",
+    "today": "Hôm nay",
+    "submittedToday": "Đã nộp hôm nay",
+    "pendingToday": "Chờ xét hôm nay"
+  }
+
+
+}
+
+
+

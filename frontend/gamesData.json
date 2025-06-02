@@ -1,0 +1,94 @@
+[
+  {
+    "_id": 1,
+    "title": "Running",
+    "img": "https://images.herzindagi.info/image/2024/May/things-to-know-about-running.jpg",
+    "trailer": "https://www.youtube.com/embed/vzHrj0MfHPY",
+    "active": true,
+    "description": {
+      "en": "Running is a cardio exercise that boosts stamina, burns calories, and improves cardiovascular health.",
+      "vi": "Chạy bộ là bài tập cardio giúp tăng sức bền, đốt cháy calo và cải thiện sức khỏe tim mạch.",
+      "jp": "ランニングは持久力を高め、カロリーを消費し、心臓の健康を改善する有酸素運動です。"
+    }
+  },
+  {
+    "_id": 2,
+    "title": "Push-up",
+    "img": "https://blog.nasm.org/hubfs/Guide%20to%20Push%20ups%20Main%20Image.jpg",
+    "trailer": "https://www.youtube.com/embed/tKLRN2YpxRE",
+    "active": false,
+    "description": {
+      "en": "Push-ups strengthen the upper body, especially chest, shoulders, and triceps.",
+      "vi": "Hít đất giúp tăng cường sức mạnh thân trên, đặc biệt là ngực, vai và tay sau.",
+      "jp": "腕立て伏せは、上半身、特に胸、肩、上腕三頭筋を強化します。"
+    }
+  },
+  {
+    "_id": 3,
+    "title": "Yoga",
+    "img": "https://bizweb.dktcdn.net/100/011/344/files/tac-dung-cua-yoga.webp?v=1680778752047",
+    "trailer": "https://www.youtube.com/embed/tKLRN2YpxRE",
+    "active": false,
+    "description": {
+      "en": "Yoga enhances flexibility, reduces stress, and promotes mental clarity.",
+      "vi": "Yoga giúp tăng độ dẻo dai, giảm căng thẳng và nâng cao sự minh mẫn tinh thần.",
+      "jp": "ヨガは柔軟性を高め、ストレスを軽減し、精神の明晰さを促進します。"
+    }
+  },
+  {
+    "_id": 4,
+    "title": "Aerobic",
+    "img": "https://akm-img-a-in.tosshub.com/indiatoday/images/story/202411/barcelona--female-friends-doing-fitness-in-a-park-054032704-16x9_0.jpg?VersionId=76pQyD2pqrgTO0xwjhBRMu7dn0jzIgm7&size=690:388",
+    "trailer": "https://www.youtube.com/embed/vzHrj0MfHPY",
+    "active": true,
+    "description": {
+      "en": "Aerobic exercises raise heart rate, improve lung capacity, and burn fat effectively.",
+      "vi": "Bài tập aerobic giúp tăng nhịp tim, cải thiện dung tích phổi và đốt cháy mỡ hiệu quả.",
+      "jp": "エアロビクスは心拍数を上げ、肺活量を高め、効果的に脂肪を燃焼します。"
+    }
+  },
+  {
+    "_id": 5,
+    "title": "Full body",
+    "img": "https://www.theladders.com/wp-content/uploads/exercise-191001-800x450.jpg",
+    "trailer": "https://www.youtube.com/embed/tKLRN2YpxRE",
+    "active": false,
+    "description": {
+      "en": "Full body workouts engage all major muscle groups for balanced strength and endurance.",
+      "vi": "Bài tập toàn thân tác động đến tất cả các nhóm cơ chính, giúp phát triển sức mạnh và sức bền cân bằng.",
+      "jp": "全身運動はすべての主要な筋肉群を使って、バランスの取れた力と持久力を養います。"
+    }
+  },
+  {
+    "_id": 6,
+    "title": "Dancing",
+    "img": "https://f.hubspotusercontent20.net/hubfs/8737774/Asset/CulturaeSalute/Insight/shutterstock_1823945150.jpg",
+    "trailer": "https://www.youtube.com/embed/tKLRN2YpxRE",
+    "description": {
+      "en": "Dancing is a fun way to stay active, improve coordination, and burn calories.",
+      "vi": "Nhảy múa là cách vui vẻ để vận động, cải thiện sự phối hợp và đốt cháy calo.",
+      "jp": "ダンスは楽しく活動し、協調性を高め、カロリーを消費する方法です。"
+    }
+  },
+  {
+    "_id": 7,
+    "title": "Martial art",
+    "img": "https://www.taiwanese-secrets.com/wp-content/uploads/martial-arts-in-taiwan.002.jpg",
+    "trailer": "https://www.youtube.com/embed/tKLRN2YpxRE",
+    "description": {
+      "en": "Martial arts develop discipline, reflexes, and full-body strength.",
+      "vi": "Võ thuật rèn luyện kỷ luật, phản xạ và sức mạnh toàn thân.",
+      "jp": "武道は規律、反射神経、全身の力を養います。"
+    }
+  },
+  {
+    "_id": 8,
+    "title": "Cross Fit",
+    "img": "https://images.ctfassets.net/0k812o62ndtw/3PfhgssdpZRRSTBIZHti4b/c216b79ce385ce26534c87cdf3beb03d/Calisthenics_end04ef3799ebdf1b82fbbd57a2d3b6163.jpg?w=1024&q=85",
+    "description": {
+      "en": "CrossFit combines weightlifting, cardio, and functional movements for high-intensity training.",
+      "vi": "CrossFit kết hợp tạ, cardio và các động tác chức năng trong một bài tập cường độ cao.",
+      "jp": "クロスフィットは、ウエイトリフティング、有酸素運動、機能的な動きを組み合わせた高強度トレーニングです。"
+    }
+  }
+]

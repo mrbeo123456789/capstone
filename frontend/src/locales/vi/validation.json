@@ -1,0 +1,37 @@
+{
+  "candidate": {
+    "fullNameRequired": "Họ và tên là bắt buộc!",
+    "dobRequired": "Ngày sinh là bắt buộc!",
+    "dobInvalid": "Bạn phải từ 16 tuổi trở lên!",
+    "genderRequired": "Giới tính là bắt buộc!"
+  },
+  "challenge": {
+    "nameRequired": "Tên thử thách là bắt buộc!",
+    "nameMin": "Tên thử thách phải có ít nhất 3 ký tự",
+    "startDateRequired": "Ngày bắt đầu là bắt buộc",
+    "startDateMin": "Ngày bắt đầu phải sau hôm nay",
+    "endDateRequired": "Ngày kết thúc là bắt buộc",
+    "endDateAfterStart": "Ngày kết thúc phải sau ngày bắt đầu",
+    "maxParticipantsType": "Số người tham gia phải là một số",
+    "maxParticipantsPositive": "Số người tham gia phải lớn hơn 0",
+    "maxParticipantsInteger": "Số người tham gia phải là số nguyên",
+    "descriptionRequired": "Mô tả là bắt buộc",
+    "descriptionMin": "Mô tả phải có ít nhất 10 ký tự",
+    "pictureRequired": "Ảnh là bắt buộc",
+    "pictureSize": "Ảnh phải nhỏ hơn 50MB",
+    "pictureType": "Định dạng ảnh không được hỗ trợ",
+    "challengeTypeRequired": "Loại thử thách là bắt buộc"
+  },
+  "login": {
+    "usernameRequired": "Tên đăng nhập là bắt buộc!",
+    "passwordRequired": "Mật khẩu là bắt buộc!",
+    "passwordMin": "Mật khẩu phải có ít nhất 8 ký tự!"
+  },
+  "group": {
+    "nameRequired": "Tên nhóm là bắt buộc!",
+    "descriptionRequired": "Mô tả là bắt buộc!",
+    "pictureRequired": "Ảnh nhóm là bắt buộc!"
+  }
+
+
+}
