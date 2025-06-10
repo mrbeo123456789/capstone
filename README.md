@@ -32,4 +32,4 @@ GoBeyond is a web platform designed to promote consistent physical activity and 
 
 ## 📄 Project Documentation
 
-👉 [View full system documentation](https://docs.google.com/document/d/1xnaKobsaeOfUJw4tpW1l-ur97Ajm3eIggZe0aqU7T08/edit?tab=t.0)
+👉 [View full system documentation](https://docs.google.com/document/d/1pimLdLoBCOc633zw8Lzx4XXzfuNblwdL4TH8jM2ZYyw/edit?usp=sharing)
